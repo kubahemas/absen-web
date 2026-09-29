@@ -10,6 +10,12 @@
  * "KODE_RAHASIA" (lihat penjelasan di bawah setupSpreadsheet). Ini dipakai
  * sebagai garam (salt) tambahan saat membuat hash PIN & password, supaya
  * hash tidak bisa ditebak hanya dari isi sheet + kode yang ada di GitHub.
+ *
+ * FORMAT TANGGAL & WAKTU (lihat juga CLAUDE.md):
+ * - Kolom tanggal (tanpa jam): yyyy-mm-dd. Contoh: 2026-09-29.
+ * - Kolom waktu (tanggal + jam): yyyy-mm-dd HH:mm. Contoh: 2026-09-29 14:05.
+ * - Kolom jam-saja (tanpa tanggal, dari sheet shift/absensi): HH:mm.
+ * - Kolom bulan (rekap_bulanan.bulan): yyyy-mm. Contoh: 2026-09.
  */
 
 function setupSpreadsheet() {
@@ -49,6 +55,13 @@ function setupSpreadsheet() {
     }
 
     sheet.autoResizeColumns(1, def.kolom.length);
+
+    if (def.kolomSensitif && def.kolomSensitif.length > 0) {
+      const mulaiKolom = def.kolom.indexOf(def.kolomSensitif[0]) + 1;
+      const jumlahKolom = def.kolomSensitif.length;
+      sheet.getRange(1, mulaiKolom, sheet.getMaxRows(), jumlahKolom).shiftColumnGroupDepth(1);
+      sheet.hideColumns(mulaiKolom, jumlahKolom);
+    }
   });
 
   Logger.log(hasil.join('\n'));
@@ -56,66 +69,12 @@ function setupSpreadsheet() {
 }
 
 /**
- * MIGRASI: jalankan fungsi ini kalau sheet `akun` sudah dibuat SEBELUM 6 kolom
- * terakhir (wajib_ganti_password dst.) ditambahkan ke desain. Aman dijalankan
- * berkali-kali: kolom yang sudah ada tidak diulang, dan tidak ada baris atau
- * kolom lama yang dihapus/diubah.
- *
- * Nilai default untuk baris yang SUDAH ADA (akun nyata yang sudah dipakai)
- * sengaja dibuat netral (wajib_ganti_password/wajib_ganti_pin = FALSE, tidak
- * memaksa siapa pun ganti password), berbeda dari data contoh baru di
- * setupSpreadsheet() yang defaultnya TRUE karena itu akun baru dengan
- * password bawaan 123456.
- */
-function tambahKolomAkunBaru() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName('akun');
-  if (!sheet) {
-    SpreadsheetApp.getUi().alert('Sheet "akun" tidak ditemukan. Jalankan setupSpreadsheet() dulu.');
-    return;
-  }
-
-  const kolomBaru = [
-    { nama: 'wajib_ganti_password', default: false },
-    { nama: 'wajib_ganti_pin', default: false },
-    { nama: 'password_awal_berlaku_sampai', default: '' },
-    { nama: 'jumlah_salah_login', default: 0 },
-    { nama: 'terkunci', default: false },
-    { nama: 'tanggal_setuju_wajah', default: '' }
-  ];
-
-  const header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const jumlahBarisData = sheet.getLastRow() - 1;
-  let kolomBerikutnya = sheet.getLastColumn() + 1;
-  const ditambahkan = [];
-
-  kolomBaru.forEach(function (k) {
-    if (header.indexOf(k.nama) !== -1) {
-      return;
-    }
-    sheet.getRange(1, kolomBerikutnya).setValue(k.nama).setFontWeight('bold');
-    if (jumlahBarisData > 0) {
-      const nilaiDefault = new Array(jumlahBarisData).fill(k.default);
-      sheet.getRange(2, kolomBerikutnya, jumlahBarisData, 1).setValues(nilaiDefault.map(function (v) { return [v]; }));
-    }
-    ditambahkan.push(k.nama);
-    kolomBerikutnya++;
-  });
-
-  const pesan = ditambahkan.length > 0
-    ? 'Kolom ditambahkan: ' + ditambahkan.join(', ')
-    : 'Semua kolom sudah ada, tidak ada yang ditambahkan.';
-  Logger.log(pesan);
-  SpreadsheetApp.getUi().alert(pesan);
-}
-
-/**
- * Hash PIN/password dengan garam ganda: id_karyawan (beda tiap orang) +
+ * Hash PIN/password dengan garam ganda: id karyawan (beda tiap orang) +
  * KODE_RAHASIA dari Script Properties (tidak pernah ada di sheet/GitHub).
  * Dipakai juga nanti oleh skrip login/ganti-PIN supaya cara hash-nya sama persis.
  */
-function hashDenganGaram(teks, idKaryawan, kodeRahasia) {
-  const gabungan = teks + '|' + idKaryawan + '|' + kodeRahasia;
+function hashDenganGaram(teks, id, kodeRahasia) {
+  const gabungan = teks + '|' + id + '|' + kodeRahasia;
   const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, gabungan, Utilities.Charset.UTF_8);
   return bytes.map(function (b) {
     const v = (b < 0 ? b + 256 : b).toString(16);
@@ -124,23 +83,24 @@ function hashDenganGaram(teks, idKaryawan, kodeRahasia) {
 }
 
 function buatDefinisiSheet(kodeRahasia) {
-  const tanggalHariIni = Utilities.formatDate(new Date(), Session.getScriptTimeZone() || 'GMT+7', 'yyyy-MM-dd');
+  const zona = Session.getScriptTimeZone() || 'GMT+7';
+  const tanggalHariIni = Utilities.formatDate(new Date(), zona, 'yyyy-MM-dd');
 
-  function akun(id, namaLengkap, namaPanggilan) {
-    const berlakuSampai24Jam = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    return [id, namaLengkap, namaPanggilan, 'Ngawi', 'KARYAWAN', 1,
+  function akun(id, nama, panggilan) {
+    const pwAwalSampai = Utilities.formatDate(new Date(Date.now() + 24 * 60 * 60 * 1000), zona, 'yyyy-MM-dd HH:mm');
+    return [id, nama, panggilan, 'Ngawi', 'KARYAWAN', 1,
       hashDenganGaram('123456', id, kodeRahasia), hashDenganGaram('1234', id, kodeRahasia),
       '', '', tanggalHariIni, 6, true,
-      true, false, berlakuSampai24Jam, 0, false, ''];
+      true, false, pwAwalSampai, 0, false, ''];
   }
 
   return [
     {
       nama: 'akun',
-      kolom: ['id_karyawan', 'nama_lengkap', 'nama_panggilan', 'cabang', 'role', 'shift_bawaan',
-        'password_hash', 'pin_hash', 'data_wajah', 'id_hp', 'tanggal_mulai', 'jatah_cuti', 'aktif',
-        'wajib_ganti_password', 'wajib_ganti_pin', 'password_awal_berlaku_sampai',
-        'jumlah_salah_login', 'terkunci', 'tanggal_setuju_wajah'],
+      kolom: ['id', 'nama', 'panggilan', 'cabang', 'role', 'shift', 'pw_hash', 'pin_hash',
+        'data_wajah', 'id_hp', 'mulai_kerja', 'jatah_cuti', 'aktif', 'ganti_pw', 'ganti_pin',
+        'pw_awal_sampai', 'salah_login', 'terkunci', 'setuju_wajah'],
+      kolomSensitif: ['pw_hash', 'pin_hash', 'data_wajah', 'id_hp'],
       contoh: [
         akun('K001', 'Ahmad Fauzi', 'Fauzi'),
         akun('K002', 'Siti Rohmah', 'Siti'),
@@ -149,19 +109,19 @@ function buatDefinisiSheet(kodeRahasia) {
     },
     {
       nama: 'shift',
-      kolom: ['cabang', 'nomor_shift', 'nama_shift', 'jam_masuk', 'jam_tutup', 'jam_pulang', 'toleransi_pulang'],
+      kolom: ['cabang', 'no', 'nama', 'masuk', 'tutup', 'pulang', 'toleransi'],
       contoh: [
         ['Ngawi', 1, 'Shift 1', '07:45', '16:00', '16:30', 5]
       ]
     },
     {
       nama: 'kalender',
-      kolom: ['tanggal', 'cabang', 'id_karyawan', 'isi'],
+      kolom: ['tanggal', 'cabang', 'karyawan', 'isi'],
       contoh: []
     },
     {
       nama: 'pengaturan',
-      kolom: ['kategori', 'nama', 'nilai', 'kelompok', 'maks_hari'],
+      kolom: ['kategori', 'nama', 'nilai', 'kelompok', 'maks'],
       contoh: [
         ['UMUM', 'jatah_cuti', 6, '', ''],
         ['UMUM', 'jendela_absen_menit', 60, '', ''],
@@ -172,12 +132,12 @@ function buatDefinisiSheet(kodeRahasia) {
         ['UMUM', 'simpan_foto_bulan', 2, '', ''],
         ['UMUM', 'simpan_absensi_bulan', 3, '', ''],
         ['UMUM', 'batas_isi_alasan_detik', 10, '', ''],
-        ['JENIS_IZIN', 'Sakit', '', '', ''],
-        ['JENIS_IZIN', 'Keperluan pribadi', '', '', ''],
-        ['JENIS_IZIN', 'Menikah', '', '', 3],
-        ['JENIS_IZIN', 'Keluarga meninggal', '', '', 2],
-        ['JENIS_IZIN', 'Istri melahirkan', '', '', 2],
-        ['JENIS_IZIN', 'Cuti', '', '', ''],
+        ['JENIS_IZIN', 'Sakit', '', 'biasa', ''],
+        ['JENIS_IZIN', 'Keperluan pribadi', '', 'biasa', ''],
+        ['JENIS_IZIN', 'Menikah', '', 'khusus', 3],
+        ['JENIS_IZIN', 'Keluarga meninggal', '', 'khusus', 2],
+        ['JENIS_IZIN', 'Istri melahirkan', '', 'khusus', 2],
+        ['JENIS_IZIN', 'Cuti', '', 'cuti', ''],
         ['ALASAN_TELAT', 'Macet', '', '', ''],
         ['ALASAN_TELAT', 'Hujan', '', '', ''],
         ['ALASAN_TELAT', 'Kendaraan bermasalah', '', '', ''],
@@ -205,30 +165,30 @@ function buatDefinisiSheet(kodeRahasia) {
     },
     {
       nama: 'absensi',
-      kolom: ['tanggal', 'id_karyawan', 'nama', 'cabang', 'shift', 'jam_masuk', 'status_masuk',
-        'menit_telat', 'keterangan_masuk', 'foto_masuk', 'gps_masuk', 'cara_masuk', 'acc_masuk',
-        'jam_pulang', 'status_pulang', 'tingkat_lembur', 'keterangan_pulang', 'foto_pulang',
-        'gps_pulang', 'cara_pulang', 'acc_pulang', 'status_hari', 'penanda',
-        'id_absen_masuk', 'id_absen_pulang'],
+      kolom: ['tanggal', 'karyawan', 'nama', 'cabang', 'shift', 'masuk', 'st_masuk',
+        'telat_mnt', 'ket_masuk', 'foto_masuk', 'gps_masuk', 'cara_masuk', 'acc_masuk',
+        'pulang', 'st_pulang', 'lembur', 'ket_pulang', 'foto_pulang',
+        'gps_pulang', 'cara_pulang', 'acc_pulang', 'st_hari', 'tanda',
+        'id_masuk', 'id_pulang'],
       contoh: []
     },
     {
       nama: 'izin',
-      kolom: ['id_pengajuan', 'id_grup', 'id_karyawan', 'jenis', 'kelompok', 'tanggal_mulai',
-        'tanggal_selesai', 'jumlah_hari_kerja', 'keterangan', 'url_lampiran', 'waktu_pengajuan',
-        'terlambat_mengajukan', 'status_acc', 'diputus_oleh', 'waktu_putus'],
+      kolom: ['id', 'grup', 'karyawan', 'jenis', 'kelompok', 'mulai',
+        'selesai', 'hari', 'ket', 'lampiran', 'diajukan',
+        'telat_aju', 'status', 'oleh', 'diputus'],
       contoh: []
     },
     {
       nama: 'rekap_bulanan',
-      kolom: ['bulan', 'id_karyawan', 'nama', 'cabang', 'hari_kerja', 'masuk', 'telat_hari',
-        'telat_menit', 'pulang_awal', 'alpha', 'izin_biasa', 'izin_khusus', 'cuti', 'sisa_cuti',
-        'lembur_kurang_1jam', 'lembur_1_2jam', 'lembur_lebih_2jam', 'label'],
+      kolom: ['bulan', 'karyawan', 'nama', 'cabang', 'hari_kerja', 'masuk', 'telat',
+        'telat_mnt', 'plg_awal', 'alpha', 'izin', 'izin_khusus', 'cuti', 'sisa_cuti',
+        'lembur_1', 'lembur_2', 'lembur_3', 'label'],
       contoh: []
     },
     {
       nama: 'log',
-      kolom: ['waktu', 'jenis', 'oleh', 'cabang', 'aksi', 'target', 'id_target', 'sebelum', 'sesudah', 'alasan'],
+      kolom: ['waktu', 'jenis', 'oleh', 'cabang', 'aksi', 'target', 'id', 'sebelum', 'sesudah', 'alasan'],
       contoh: []
     }
   ];

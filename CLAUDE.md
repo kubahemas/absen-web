@@ -15,7 +15,8 @@
 
 ## Aturan keamanan (wajib)
 - Repo GitHub bersifat publik. JANGAN menaruh PIN, password, token, atau ID spreadsheet rahasia di kode frontend.
-- PIN dan password disimpan sebagai hash SHA-256 di sheet `akun` (kolom `password_hash`, `pin_hash`), dihitung di Apps Script dengan garam ganda: `teks + id_karyawan + KODE_RAHASIA`. `KODE_RAHASIA` disimpan di Script Properties milik proyek Apps Script (Project Settings > Script Properties) — TIDAK PERNAH ditaruh di sheet atau di GitHub.
+- PIN dan password disimpan sebagai hash SHA-256 di sheet `akun` (kolom `pw_hash`, `pin_hash`), dihitung di Apps Script dengan garam ganda: `teks + id + KODE_RAHASIA`. `KODE_RAHASIA` disimpan di Script Properties milik proyek Apps Script (Project Settings > Script Properties) — TIDAK PERNAH ditaruh di sheet atau di GitHub.
+- Di sheet `akun`, kolom `pw_hash`, `pin_hash`, `data_wajah`, `id_hp` dikelompokkan (grouped) dan disembunyikan secara default supaya tidak terlihat sekilas saat sheet dibuka — tetap bisa dibuka manual lewat tanda "+" di atas kolom kalau perlu dicek.
 - Hanya akun owner yang punya akses ke Spreadsheet dan folder Drive.
 
 ## Desain
@@ -26,24 +27,32 @@
 
 ## Struktur data (8 sheet)
 
-Sumber kebenaran kolom = file `apps-script/setup_spreadsheet.gs`. Kalau mau ubah kolom, ubah di file itu dulu lalu salin bagian ini.
+Sumber kebenaran kolom = file `apps-script/setup_spreadsheet.gs`. Kalau mau ubah kolom, ubah di file itu dulu lalu salin bagian ini. Nama kolom dibuat singkat; di sheet lain selain `akun`, kolom yang berisi ID karyawan selalu bernama `karyawan`.
 
-1. `akun`: id_karyawan (kunci unik, tidak pernah berubah), nama_lengkap (sekaligus username, tidak boleh kembar), nama_panggilan (tampil di pop-up), cabang, role (KARYAWAN/ADMIN/OWNER/PERANGKAT), shift_bawaan, password_hash, pin_hash, data_wajah, id_hp, tanggal_mulai, jatah_cuti, aktif, wajib_ganti_password, wajib_ganti_pin, password_awal_berlaku_sampai, jumlah_salah_login, terkunci, tanggal_setuju_wajah
-   - Kalau spreadsheet sudah dibuat sebelum 6 kolom terakhir ini ada, jalankan fungsi `tambahKolomAkunBaru()` di `apps-script/setup_spreadsheet.gs` — kolom baru ditambahkan tanpa menghapus/mengubah data yang sudah ada.
-2. `shift`: cabang, nomor_shift, nama_shift, jam_masuk, jam_tutup, jam_pulang, toleransi_pulang
-3. `kalender`: tanggal, cabang, id_karyawan (kosong = semua), isi (LIBUR MINGGU / LIBUR TANGGAL MERAH / LIBUR KHUSUS / nomor shift)
-4. `pengaturan`: kategori, nama, nilai, kelompok, maks_hari — kategori yang dipakai:
+Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang, `aju`=pengajuan.
+
+1. `akun`: id (kunci unik, tidak pernah berubah), nama (sekaligus username, tidak boleh kembar), panggilan (tampil di pop-up), cabang, role (KARYAWAN/ADMIN/OWNER/PERANGKAT), shift, pw_hash, pin_hash, data_wajah, id_hp, mulai_kerja, jatah_cuti, aktif, ganti_pw, ganti_pin, pw_awal_sampai, salah_login, terkunci, setuju_wajah
+   - `pw_hash`, `pin_hash`, `data_wajah`, `id_hp` dikelompokkan & disembunyikan (lihat "Aturan keamanan").
+2. `shift`: cabang, no, nama, masuk, tutup, pulang, toleransi
+3. `kalender`: tanggal, cabang, karyawan (kosong = semua), isi (LIBUR MINGGU / LIBUR TANGGAL MERAH / LIBUR KHUSUS / nomor shift)
+4. `pengaturan`: kategori, nama, nilai, kelompok, maks — kategori yang dipakai:
    - `UMUM`: jatah_cuti=6, jendela_absen_menit=60, toleransi_pulang_menit=5, batas_telat_bad=5, batas_pulang_awal_bad=5, batas_izin_biasa_bad=3, simpan_foto_bulan=2, simpan_absensi_bulan=3, batas_isi_alasan_detik=10
-   - `JENIS_IZIN`: Sakit, Keperluan pribadi, Menikah (maks_hari 3), Keluarga meninggal (maks_hari 2), Istri melahirkan (maks_hari 2), Cuti
+   - `JENIS_IZIN` (kolom `kelompok` menandai jenis izin): Sakit (biasa; jadi khusus kalau ada surat dokter — ditentukan saat pengajuan, bukan nilai tetap di sini), Keperluan pribadi (biasa), Menikah (khusus, maks 3), Keluarga meninggal (khusus, maks 2), Istri melahirkan (khusus, maks 2), Cuti (cuti)
    - `ALASAN_TELAT`: Macet, Hujan, Kendaraan bermasalah, Urusan keluarga, Sakit, Lainnya
    - `ALASAN_PULANG_AWAL`: Sakit, Urusan keluarga, Disuruh atasan, Lainnya
    - `KEPERLUAN_LUAR`: Survey, Pengiriman, Pemasangan, Service, Penagihan, Ketemu klien, Lainnya
    - `PEKERJAAN_LEMBUR`: Stok opname, Bongkar muat, Penataan barang, Melayani pelanggan, Menyelesaikan tugas luar, Lainnya
    - Urutan baris = urutan tampil di aplikasi. "Lainnya" selalu paling bawah.
-5. `absensi`: 1 baris per karyawan per hari — tanggal, id_karyawan, nama, cabang, shift, jam_masuk, status_masuk, menit_telat, keterangan_masuk, foto_masuk, gps_masuk, cara_masuk, acc_masuk, jam_pulang, status_pulang, tingkat_lembur, keterangan_pulang, foto_pulang, gps_pulang, cara_pulang, acc_pulang, status_hari, penanda, id_absen_masuk, id_absen_pulang
-6. `izin`: id_pengajuan, id_grup, id_karyawan, jenis, kelompok, tanggal_mulai, tanggal_selesai, jumlah_hari_kerja, keterangan, url_lampiran, waktu_pengajuan, terlambat_mengajukan, status_acc, diputus_oleh, waktu_putus
-7. `rekap_bulanan`: bulan, id_karyawan, nama, cabang, hari_kerja, masuk, telat_hari, telat_menit, pulang_awal, alpha, izin_biasa, izin_khusus, cuti, sisa_cuti, lembur_kurang_1jam, lembur_1_2jam, lembur_lebih_2jam, label
-8. `log`: waktu, jenis, oleh, cabang, aksi, target, id_target, sebelum, sesudah, alasan
+5. `absensi`: 1 baris per karyawan per hari — tanggal, karyawan, nama, cabang, shift, masuk, st_masuk, telat_mnt, ket_masuk, foto_masuk, gps_masuk, cara_masuk, acc_masuk, pulang, st_pulang, lembur, ket_pulang, foto_pulang, gps_pulang, cara_pulang, acc_pulang, st_hari, tanda, id_masuk, id_pulang
+6. `izin`: id, grup, karyawan, jenis, kelompok, mulai, selesai, hari, ket, lampiran, diajukan, telat_aju, status, oleh, diputus
+7. `rekap_bulanan`: bulan, karyawan, nama, cabang, hari_kerja, masuk, telat, telat_mnt, plg_awal, alpha, izin, izin_khusus, cuti, sisa_cuti, lembur_1 (<1 jam), lembur_2 (1–2 jam), lembur_3 (>2 jam), label
+8. `log`: waktu, jenis, oleh, cabang, aksi, target, id, sebelum, sesudah, alasan
+
+## Format tanggal & waktu
+- Kolom tanggal (tanpa jam), format `yyyy-mm-dd`: `kalender.tanggal`, `absensi.tanggal`, `izin.mulai`, `izin.selesai`, `akun.mulai_kerja`.
+- Kolom waktu (tanggal+jam), format `yyyy-mm-dd HH:mm`: `akun.pw_awal_sampai`, `izin.diajukan`, `izin.diputus`, `log.waktu`.
+- Kolom jam-saja (tanpa tanggal), format `HH:mm`: `shift.masuk/tutup/pulang`, `absensi.masuk/pulang`.
+- Kolom bulan, format `yyyy-mm` (contoh `2026-09`): `rekap_bulanan.bulan`.
 
 ## Aturan inti (shift 1 sebagai contoh)
 - Absen masuk dibuka 60 menit sebelum jam masuk. Masuk 07:45:59 masih HADIR, 07:46:00 TELAT.
@@ -58,13 +67,13 @@ Sumber kebenaran kolom = file `apps-script/setup_spreadsheet.gs`. Kalau mau ubah
 - Owner: `OWN` + 2 angka, contoh `OWN01`.
 - Kode cabang: 3 huruf, contoh `NGW` = Ngawi. Kolom `cabang` di sheet tetap berisi nama lengkap cabang (bukan kodenya) — kode cabang cuma dipakai untuk menyusun ID lain di bawah ini.
 - HP toko: `HPT-{kode cabang}-{2 angka}`, contoh `HPT-NGW-01`.
-- HP pribadi (`id_hp`): `HPP-` + 8 karakter acak, contoh `HPP-7K2QX9MB`.
-- Absen: `{M/P/L}-{id_karyawan}-{YYMMDD}-{HHMMSS}-{kode perangkat}`, dibuat di HP saat tombol ditekan. `M`=masuk, `P`=pulang, `L`=lembur. Kode perangkat: `T`+nomor HP toko tanpa nol di depan (dari `HPT-NGW-01` dst. -> `T1`, `T2`, ... `T10`), `P`=HP pribadi, `A`=absen manual oleh admin. Contoh: `M-K001-260928-074512-T3`.
-- Pengajuan izin: `IZN-{tahun}-{4 angka}-{huruf}`, contoh `IZN-2026-0001-A`. Kalau satu pengajuan mencakup beberapa hari, semuanya berbagi `id_grup` = `IZN-{tahun}-{4 angka}` (tanpa huruf akhir).
+- HP pribadi (`akun.id_hp`): `HPP-` + 8 karakter acak, contoh `HPP-7K2QX9MB`.
+- Absen: `{M/P/L}-{id karyawan}-{YYMMDD}-{HHMMSS}-{kode perangkat}`, dibuat di HP saat tombol ditekan. `M`=masuk, `P`=pulang, `L`=lembur. Kode perangkat: `T`+nomor HP toko tanpa nol di depan (dari `HPT-NGW-01` dst. -> `T1`, `T2`, ... `T10`), `P`=HP pribadi, `A`=absen manual oleh admin. Contoh: `M-K001-260928-074512-T3`.
+- Pengajuan izin: `IZN-{tahun}-{4 angka}-{huruf}`, contoh `IZN-2026-0001-A`. Kalau satu pengajuan mencakup beberapa hari, semuanya berbagi `izin.grup` = `IZN-{tahun}-{4 angka}` (tanpa huruf akhir).
 
 ## Akun & hak akses
-- Username = `nama_lengkap` (tidak boleh kembar, tidak dibedakan huruf besar/kecil). `nama_panggilan` cuma untuk tampilan pop-up. `id_karyawan` kunci unik yang tidak pernah berubah; `nama_lengkap` boleh diubah kapan saja.
-- Salah login 5 kali berturut-turut -> `terkunci` = TRUE (kolom `jumlah_salah_login` mencapai 5), cuma admin yang bisa membuka kuncinya lagi.
+- Username = `akun.nama` (tidak boleh kembar, tidak dibedakan huruf besar/kecil). `akun.panggilan` cuma untuk tampilan pop-up. `akun.id` kunci unik yang tidak pernah berubah; `akun.nama` boleh diubah kapan saja.
+- Salah login 5 kali berturut-turut -> `akun.terkunci` = TRUE (kolom `akun.salah_login` mencapai 5), cuma admin yang bisa membuka kuncinya lagi.
 - Menu admin mengikuti role akun yang sedang login, di perangkat apa pun (HP toko atau HP pribadi):
   - Di HP pribadi: ada tombol "Menu admin" di bawah halaman beranda.
   - Di HP toko: password TIDAK disimpan di perangkat; sesi admin keluar otomatis setelah 2 menit tidak disentuh, atau begitu kembali ke layar absen.
