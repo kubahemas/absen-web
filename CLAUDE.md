@@ -53,6 +53,7 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - Kolom waktu (tanggal+jam), format `yyyy-mm-dd HH:mm`: `akun.pw_awal_sampai`, `izin.diajukan`, `izin.diputus`, `log.waktu`.
 - Kolom jam-saja (tanpa tanggal), format `HH:mm`: `shift.masuk/tutup/pulang`, `absensi.masuk/pulang`.
 - Kolom bulan, format `yyyy-mm` (contoh `2026-09`): `rekap_bulanan.bulan`.
+- **Penting (bug yang pernah kejadian):** Google Sheets otomatis mengubah teks yang terlihat seperti tanggal (mis. `"2026-09-29"`) menjadi nilai tanggal asli begitu ditulis lewat `setValues`/`appendRow`. Jadi saat kolom tanggal/waktu dibaca lagi lewat Apps Script, isinya bisa berupa objek Date, bukan teks yang sama persis — perbandingan `=== "2026-09-29"` bisa diam-diam selalu salah. Kode yang membandingkan kolom tanggal/waktu WAJIB menormalkan nilainya dulu (lihat fungsi `sebagaiTanggalTeks()` di `apps-script/api.gs` sebagai contoh) sebelum dibandingkan sebagai teks.
 
 ## Aturan inti (shift 1 sebagai contoh)
 - Absen masuk dibuka 60 menit sebelum jam masuk. Masuk 07:45:59 masih HADIR, 07:46:00 TELAT.

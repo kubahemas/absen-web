@@ -107,7 +107,7 @@ function prosesAbsenMasuk(id, pin) {
 
   const absensi = bacaSheet('absensi');
   const sudahAbsenMasuk = absensi.data.some(function (r) {
-    return String(r.karyawan) === String(id) && r.tanggal === tanggalHariIni && r.masuk;
+    return String(r.karyawan) === String(id) && sebagaiTanggalTeks(r.tanggal, zona) === tanggalHariIni && r.masuk;
   });
   if (sudahAbsenMasuk) {
     return respon({ status: 'gagal', pesan: 'Sudah absen masuk hari ini' });
@@ -178,6 +178,20 @@ function tambahLog(field) {
   baris.waktu = Utilities.formatDate(new Date(), zona, 'yyyy-MM-dd HH:mm');
   Object.keys(field).forEach(function (k) { baris[k] = field[k]; });
   log.sheet.appendRow(log.header.map(function (nama) { return baris[nama]; }));
+}
+
+/**
+ * Google Sheets suka otomatis mengubah teks yang terlihat seperti tanggal
+ * (contoh: "2026-09-29") menjadi nilai tanggal asli begitu ditulis lewat
+ * setValues/appendRow. Jadi saat dibaca lagi, isinya bisa berupa objek
+ * Date, bukan teks yang sama persis. Fungsi ini menyamakan keduanya jadi
+ * teks yyyy-MM-dd supaya perbandingan tanggal selalu benar.
+ */
+function sebagaiTanggalTeks(nilai, zona) {
+  if (nilai instanceof Date) {
+    return Utilities.formatDate(nilai, zona, 'yyyy-MM-dd');
+  }
+  return nilai;
 }
 
 function respon(objek) {
