@@ -28,7 +28,8 @@
 
 Sumber kebenaran kolom = file `apps-script/setup_spreadsheet.gs`. Kalau mau ubah kolom, ubah di file itu dulu lalu salin bagian ini.
 
-1. `akun`: id_karyawan (kunci unik, tidak pernah berubah), nama_lengkap (sekaligus username, tidak boleh kembar), nama_panggilan (tampil di pop-up), cabang, role (KARYAWAN/ADMIN/OWNER/PERANGKAT), shift_bawaan, password_hash, pin_hash, data_wajah, id_hp, tanggal_mulai, jatah_cuti, aktif
+1. `akun`: id_karyawan (kunci unik, tidak pernah berubah), nama_lengkap (sekaligus username, tidak boleh kembar), nama_panggilan (tampil di pop-up), cabang, role (KARYAWAN/ADMIN/OWNER/PERANGKAT), shift_bawaan, password_hash, pin_hash, data_wajah, id_hp, tanggal_mulai, jatah_cuti, aktif, wajib_ganti_password, wajib_ganti_pin, password_awal_berlaku_sampai, jumlah_salah_login, terkunci, tanggal_setuju_wajah
+   - Kalau spreadsheet sudah dibuat sebelum 6 kolom terakhir ini ada, jalankan fungsi `tambahKolomAkunBaru()` di `apps-script/setup_spreadsheet.gs` — kolom baru ditambahkan tanpa menghapus/mengubah data yang sudah ada.
 2. `shift`: cabang, nomor_shift, nama_shift, jam_masuk, jam_tutup, jam_pulang, toleransi_pulang
 3. `kalender`: tanggal, cabang, id_karyawan (kosong = semua), isi (LIBUR MINGGU / LIBUR TANGGAL MERAH / LIBUR KHUSUS / nomor shift)
 4. `pengaturan`: kategori, nama, nilai, kelompok, maks_hari — kategori yang dipakai:
@@ -49,8 +50,44 @@ Sumber kebenaran kolom = file `apps-script/setup_spreadsheet.gs`. Kalau mau ubah
 - Jam absen dicatat saat tombol ditekan, dari jam server saat online.
 - Pulang sampai 16:00:59 = PULANG AWAL (wajib alasan + ACC). 16:01–16:29 = PULANG AWAL tanpa ACC. 16:30–16:35 = PULANG NORMAL. Tombol LEMBUR aktif mulai 16:36.
 - Lembur: <1 jam, 1–2 jam, >2 jam; wajib ACC admin. Aplikasi tidak menghitung rupiah.
-- Pop-up telat wajib isi alasan dalam 10 detik (jika tidak: TIDAK DIISI).
+- Telat dan pulang awal wajib isi alasan dalam 10 detik (jika tidak: TIDAK DIISI) — detail lengkap di bagian "Alur absen & pop-up".
 - PIN 4 angka, password 6 angka; bukan angka berurutan/kembar. Password awal 123456 (berlaku 24 jam), PIN awal 1234 setelah reset.
+
+## Format ID (tetap)
+- Karyawan: `K` + 3 angka, contoh `K001`. Tidak pernah dipakai ulang meski karyawan keluar/nonaktif.
+- Owner: `OWN` + 2 angka, contoh `OWN01`.
+- Kode cabang: 3 huruf, contoh `NGW` = Ngawi. Kolom `cabang` di sheet tetap berisi nama lengkap cabang (bukan kodenya) — kode cabang cuma dipakai untuk menyusun ID lain di bawah ini.
+- HP toko: `HPT-{kode cabang}-{2 angka}`, contoh `HPT-NGW-01`.
+- HP pribadi (`id_hp`): `HPP-` + 8 karakter acak, contoh `HPP-7K2QX9MB`.
+- Absen: `{M/P/L}-{id_karyawan}-{YYMMDD}-{HHMMSS}-{kode perangkat}`, dibuat di HP saat tombol ditekan. `M`=masuk, `P`=pulang, `L`=lembur. Kode perangkat: `T`+nomor HP toko tanpa nol di depan (dari `HPT-NGW-01` dst. -> `T1`, `T2`, ... `T10`), `P`=HP pribadi, `A`=absen manual oleh admin. Contoh: `M-K001-260928-074512-T3`.
+- Pengajuan izin: `IZN-{tahun}-{4 angka}-{huruf}`, contoh `IZN-2026-0001-A`. Kalau satu pengajuan mencakup beberapa hari, semuanya berbagi `id_grup` = `IZN-{tahun}-{4 angka}` (tanpa huruf akhir).
+
+## Akun & hak akses
+- Username = `nama_lengkap` (tidak boleh kembar, tidak dibedakan huruf besar/kecil). `nama_panggilan` cuma untuk tampilan pop-up. `id_karyawan` kunci unik yang tidak pernah berubah; `nama_lengkap` boleh diubah kapan saja.
+- Salah login 5 kali berturut-turut -> `terkunci` = TRUE (kolom `jumlah_salah_login` mencapai 5), cuma admin yang bisa membuka kuncinya lagi.
+- Menu admin mengikuti role akun yang sedang login, di perangkat apa pun (HP toko atau HP pribadi):
+  - Di HP pribadi: ada tombol "Menu admin" di bawah halaman beranda.
+  - Di HP toko: password TIDAK disimpan di perangkat; sesi admin keluar otomatis setelah 2 menit tidak disentuh, atau begitu kembali ke layar absen.
+- Role ADMIN cuma bisa diberikan oleh owner. Kalau admin sendiri butuh izin/cuti, itu ditangani langsung oleh owner. Admin tidak lembur (tombol lembur tidak berlaku untuk role ADMIN).
+
+## HP toko
+- Saat HP baru pertama kali dibuka: pilih salah satu, HP TOKO atau HP PRIBADI.
+- Mendaftarkan HP sebagai HP toko: verifikasi username + password admin cabang (cuma untuk verifikasi identitas, bukan login penuh). Cabang HP ikut cabang admin yang mendaftarkan. Lokasi GPS saat pendaftaran dicatat dan tersimpan di sheet `log`.
+- Owner bisa melihat semua HP toko yang terdaftar dan bisa menonaktifkannya.
+
+## Alur absen & pop-up
+- Jam absen dicatat saat tombol ditekan (bukan saat data sampai ke server), pakai jam server saat online.
+- Pop-up beda tampilan per kasus: tepat waktu (hijau, animasi meriah), telat (merah), pulang (hitam), pulang awal, lembur.
+- Telat, dan pulang awal sampai jam tutup toko (16:00 untuk shift 1): wajib tekan "ISI ALASAN" dalam 10 detik, kalau tidak ditekan -> tercatat "TIDAK DIISI". Layar isi alasan otomatis kembali sendiri kalau 30 detik tidak disentuh.
+- Keterangan untuk lembur, telat, pulang awal, dan absen luar: pilihan dari daftar di sheet `pengaturan` + boleh ketik manual. Kolom ketik WAJIB diisi kalau pilih "Lainnya"; untuk absen luar, kolom ketik diisi tujuan/nama klien.
+- Karyawan sudah absen lembur tapi masih kerja: tombol "Revisi lembur" memperbarui jam lembur ke waktu sekarang (perlu ACC ulang admin). Kalau sebelumnya karyawan pulang biasa (bukan lembur): tombol yang muncul "Ganti jadi lembur".
+- Kalau beberapa peringatan berlaku sekaligus: pop-up utama muncul dulu, baru layar peringatan lanjutan (satu per satu, bukan bersamaan).
+- Absen yang menimbulkan konflik dan tidak jelas milik siapa: dihapus dari sheet `absensi`, tapi salinannya tetap disimpan di sheet `log` (tidak pernah benar-benar hilang).
+- Lembur yang terjadi di luar jam kerja terjadwal (misal dijadwalkan manager di luar sistem) tidak dicatat sistem — dibayar tunai langsung oleh manager, di luar aplikasi.
+
+## Tampilan data (laporan & log)
+- Report (rekap karyawan/owner): semua angka dalam satuan hari; khusus telat, ditambahkan juga total menitnya (bukan cuma jumlah hari telat). Detail ditampilkan sebagai tabel, diurutkan dari tanggal terbaru di atas.
+- Log owner ditampilkan per kategori; detail tiap kategori berupa tabel dengan filter di judul kolom (bisa difilter berdasarkan waktu, admin, cabang, karyawan).
 
 ## Rencana tahap 1 (kerjakan berurutan)
 1. Spreadsheet 8 sheet + data contoh 3 karyawan

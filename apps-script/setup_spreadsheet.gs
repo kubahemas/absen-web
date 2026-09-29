@@ -56,6 +56,60 @@ function setupSpreadsheet() {
 }
 
 /**
+ * MIGRASI: jalankan fungsi ini kalau sheet `akun` sudah dibuat SEBELUM 6 kolom
+ * terakhir (wajib_ganti_password dst.) ditambahkan ke desain. Aman dijalankan
+ * berkali-kali: kolom yang sudah ada tidak diulang, dan tidak ada baris atau
+ * kolom lama yang dihapus/diubah.
+ *
+ * Nilai default untuk baris yang SUDAH ADA (akun nyata yang sudah dipakai)
+ * sengaja dibuat netral (wajib_ganti_password/wajib_ganti_pin = FALSE, tidak
+ * memaksa siapa pun ganti password), berbeda dari data contoh baru di
+ * setupSpreadsheet() yang defaultnya TRUE karena itu akun baru dengan
+ * password bawaan 123456.
+ */
+function tambahKolomAkunBaru() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('akun');
+  if (!sheet) {
+    SpreadsheetApp.getUi().alert('Sheet "akun" tidak ditemukan. Jalankan setupSpreadsheet() dulu.');
+    return;
+  }
+
+  const kolomBaru = [
+    { nama: 'wajib_ganti_password', default: false },
+    { nama: 'wajib_ganti_pin', default: false },
+    { nama: 'password_awal_berlaku_sampai', default: '' },
+    { nama: 'jumlah_salah_login', default: 0 },
+    { nama: 'terkunci', default: false },
+    { nama: 'tanggal_setuju_wajah', default: '' }
+  ];
+
+  const header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const jumlahBarisData = sheet.getLastRow() - 1;
+  let kolomBerikutnya = sheet.getLastColumn() + 1;
+  const ditambahkan = [];
+
+  kolomBaru.forEach(function (k) {
+    if (header.indexOf(k.nama) !== -1) {
+      return;
+    }
+    sheet.getRange(1, kolomBerikutnya).setValue(k.nama).setFontWeight('bold');
+    if (jumlahBarisData > 0) {
+      const nilaiDefault = new Array(jumlahBarisData).fill(k.default);
+      sheet.getRange(2, kolomBerikutnya, jumlahBarisData, 1).setValues(nilaiDefault.map(function (v) { return [v]; }));
+    }
+    ditambahkan.push(k.nama);
+    kolomBerikutnya++;
+  });
+
+  const pesan = ditambahkan.length > 0
+    ? 'Kolom ditambahkan: ' + ditambahkan.join(', ')
+    : 'Semua kolom sudah ada, tidak ada yang ditambahkan.';
+  Logger.log(pesan);
+  SpreadsheetApp.getUi().alert(pesan);
+}
+
+/**
  * Hash PIN/password dengan garam ganda: id_karyawan (beda tiap orang) +
  * KODE_RAHASIA dari Script Properties (tidak pernah ada di sheet/GitHub).
  * Dipakai juga nanti oleh skrip login/ganti-PIN supaya cara hash-nya sama persis.
@@ -73,16 +127,20 @@ function buatDefinisiSheet(kodeRahasia) {
   const tanggalHariIni = Utilities.formatDate(new Date(), Session.getScriptTimeZone() || 'GMT+7', 'yyyy-MM-dd');
 
   function akun(id, namaLengkap, namaPanggilan) {
+    const berlakuSampai24Jam = new Date(Date.now() + 24 * 60 * 60 * 1000);
     return [id, namaLengkap, namaPanggilan, 'Ngawi', 'KARYAWAN', 1,
       hashDenganGaram('123456', id, kodeRahasia), hashDenganGaram('1234', id, kodeRahasia),
-      '', '', tanggalHariIni, 6, true];
+      '', '', tanggalHariIni, 6, true,
+      true, false, berlakuSampai24Jam, 0, false, ''];
   }
 
   return [
     {
       nama: 'akun',
       kolom: ['id_karyawan', 'nama_lengkap', 'nama_panggilan', 'cabang', 'role', 'shift_bawaan',
-        'password_hash', 'pin_hash', 'data_wajah', 'id_hp', 'tanggal_mulai', 'jatah_cuti', 'aktif'],
+        'password_hash', 'pin_hash', 'data_wajah', 'id_hp', 'tanggal_mulai', 'jatah_cuti', 'aktif',
+        'wajib_ganti_password', 'wajib_ganti_pin', 'password_awal_berlaku_sampai',
+        'jumlah_salah_login', 'terkunci', 'tanggal_setuju_wajah'],
       contoh: [
         akun('K001', 'Ahmad Fauzi', 'Fauzi'),
         akun('K002', 'Siti Rohmah', 'Siti'),
