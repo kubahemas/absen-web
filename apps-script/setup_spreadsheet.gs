@@ -136,7 +136,7 @@ function buatDefinisiSheet(kodeRahasia) {
         ['UMUM', 'simpan_foto_bulan', 2, '', ''],
         ['UMUM', 'simpan_absensi_bulan', 3, '', ''],
         ['UMUM', 'batas_isi_alasan_detik', 10, '', ''],
-        ['UMUM', 'libur_minggu_NGW', false, '', ''],
+        ['UMUM', 'libur_minggu_NGW', true, '', ''],
         ['UMUM', 'ukuran_panduan_wajah', 60, '', ''],
         ['UMUM', 'batas_izin_lewat_hari', 2, '', ''],
         ['UMUM', 'sesi_owner_hari', 7, '', ''],

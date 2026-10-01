@@ -36,22 +36,23 @@ Sumber kebenaran kolom = file `apps-script/setup_spreadsheet.gs`. Kalau mau ubah
 
 Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang, `aju`=pengajuan.
 
-1. `akun`: id (kunci unik, tidak pernah berubah), nama (sekaligus username, tidak boleh kembar), panggilan (tampil di pop-up), cabang, role (KARYAWAN/ADMIN/OWNER/PERANGKAT), shift, pw_hash, pin_hash, data_wajah, id_hp, mulai_kerja, jatah_cuti, aktif, ganti_pw, ganti_pin, pw_awal_sampai, salah_login, terkunci, setuju_wajah
+1. `akun`: id (kunci unik, tidak pernah berubah), nama (sekaligus username, tidak boleh kembar), panggilan (tampil di pop-up), cabang, role (KARYAWAN/ADMIN/OWNER/PERANGKAT), shift, pw_hash, pin_hash, data_wajah, id_hp, mulai_kerja, jatah_cuti, aktif, ganti_pw, ganti_pin, pw_awal_sampai, salah_login, terkunci, setuju_wajah, pola_shift (TETAP/BERGILIR), urutan_shift (contoh "1,2"), ganti_setiap (1M/2M/1B/3B), mulai_pola, gps_daftar (untuk akun PERANGKAT)
    - `pw_hash`, `pin_hash`, `data_wajah`, `id_hp` dikelompokkan & disembunyikan (lihat "Aturan keamanan").
 2. `shift`: cabang, no, nama, masuk, tutup, pulang, toleransi
 3. `kalender`: tanggal, cabang, karyawan (kosong = semua), isi (LIBUR MINGGU / LIBUR TANGGAL MERAH / LIBUR KHUSUS / nomor shift)
 4. `pengaturan`: kategori, nama, nilai, kelompok, maks — kategori yang dipakai:
-   - `UMUM`: jatah_cuti=6, jendela_absen_menit=60, toleransi_pulang_menit=5, batas_telat_bad=5, batas_pulang_awal_bad=5, batas_izin_biasa_bad=3, simpan_foto_bulan=2, simpan_absensi_bulan=3, batas_isi_alasan_detik=10
+   - `UMUM`: jatah_cuti=6, jendela_absen_menit=60, toleransi_pulang_menit=5, batas_telat_bad=5, batas_pulang_awal_bad=5, batas_izin_biasa_bad=3, simpan_foto_bulan=2, simpan_absensi_bulan=3, batas_isi_alasan_detik=10, libur_minggu_NGW=TRUE (toko Ngawi tutup hari Minggu; per cabang, nama diikuti kode cabang 3 huruf), ukuran_panduan_wajah=60, batas_izin_lewat_hari=2, sesi_owner_hari=7, sinkron_karyawan_menit=30
    - `JENIS_IZIN` (kolom `kelompok` menandai jenis izin): Sakit (biasa; jadi khusus kalau ada surat dokter — ditentukan saat pengajuan, bukan nilai tetap di sini), Keperluan pribadi (biasa), Menikah (khusus, maks 3), Keluarga meninggal (khusus, maks 2), Istri melahirkan (khusus, maks 2), Cuti (cuti)
    - `ALASAN_TELAT`: Macet, Hujan, Kendaraan bermasalah, Urusan keluarga, Sakit, Lainnya
    - `ALASAN_PULANG_AWAL`: Sakit, Urusan keluarga, Disuruh atasan, Lainnya
    - `KEPERLUAN_LUAR`: Survey, Pengiriman, Pemasangan, Service, Penagihan, Ketemu klien, Lainnya
    - `PEKERJAAN_LEMBUR`: Stok opname, Bongkar muat, Penataan barang, Melayani pelanggan, Menyelesaikan tugas luar, Lainnya
    - Urutan baris = urutan tampil di aplikasi. "Lainnya" selalu paling bawah.
-5. `absensi`: 1 baris per karyawan per hari — tanggal, karyawan, nama, cabang, shift, masuk, st_masuk, telat_mnt, ket_masuk, foto_masuk, gps_masuk, cara_masuk, acc_masuk, pulang, st_pulang, lembur, ket_pulang, foto_pulang, gps_pulang, cara_pulang, acc_pulang, st_hari, tanda, id_masuk, id_pulang
-6. `izin`: id, grup, karyawan, jenis, kelompok, mulai, selesai, hari, ket, lampiran, diajukan, telat_aju, status, oleh, diputus
+5. `absensi`: 1 baris per karyawan per hari — tanggal, karyawan, nama, cabang, shift, masuk, st_masuk, telat_mnt, ket_masuk, foto_masuk, gps_masuk, cara_masuk, acc_masuk, pulang, st_pulang, lembur, ket_pulang, foto_pulang, gps_pulang, cara_pulang, acc_pulang, st_hari, tanda (termasuk nilai SHIFT_BEDA), id_masuk, id_pulang
+6. `izin`: id, grup, karyawan, jenis (termasuk TUKAR_SHIFT, PINDAH_SHIFT), kelompok, mulai, selesai, hari, ket, lampiran, diajukan, telat_aju, status, oleh, diputus, rekan, status_rekan (MENUNGGU/SETUJU/TOLAK/BATAL), shift_asal, shift_tujuan
 7. `rekap_bulanan`: bulan, karyawan, nama, cabang, hari_kerja, masuk, telat, telat_mnt, plg_awal, alpha, izin, izin_khusus, cuti, sisa_cuti, lembur_1 (<1 jam), lembur_2 (1–2 jam), lembur_3 (>2 jam), label
 8. `log`: waktu, jenis, oleh, cabang, aksi, target, id, sebelum, sesudah, alasan
+9. `sesi`: id_sesi, akun, perangkat, token_hash, dibuat, terakhir_aktif, kedaluwarsa, aktif
 
 ## Format tanggal & waktu
 - Kolom tanggal (tanpa jam), format `yyyy-mm-dd`: `kalender.tanggal`, `absensi.tanggal`, `izin.mulai`, `izin.selesai`, `akun.mulai_kerja`.
