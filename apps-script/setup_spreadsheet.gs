@@ -32,6 +32,8 @@ function setupSpreadsheet() {
   }
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.setSpreadsheetTimeZone('Asia/Jakarta');
+
   const sheetDefs = buatDefinisiSheet(kodeRahasia);
   const hasil = [];
 
@@ -83,7 +85,7 @@ function hashDenganGaram(teks, id, kodeRahasia) {
 }
 
 function buatDefinisiSheet(kodeRahasia) {
-  const zona = Session.getScriptTimeZone() || 'GMT+7';
+  const zona = 'Asia/Jakarta';
   const tanggalHariIni = Utilities.formatDate(new Date(), zona, 'yyyy-MM-dd');
 
   function akun(id, nama, panggilan) {
@@ -91,7 +93,8 @@ function buatDefinisiSheet(kodeRahasia) {
     return [id, nama, panggilan, 'Ngawi', 'KARYAWAN', 1,
       hashDenganGaram('123456', id, kodeRahasia), hashDenganGaram('1234', id, kodeRahasia),
       '', '', tanggalHariIni, 6, true,
-      true, false, pwAwalSampai, 0, false, ''];
+      true, false, pwAwalSampai, 0, false, '',
+      'TETAP', '', '', '', ''];
   }
 
   return [
@@ -99,7 +102,8 @@ function buatDefinisiSheet(kodeRahasia) {
       nama: 'akun',
       kolom: ['id', 'nama', 'panggilan', 'cabang', 'role', 'shift', 'pw_hash', 'pin_hash',
         'data_wajah', 'id_hp', 'mulai_kerja', 'jatah_cuti', 'aktif', 'ganti_pw', 'ganti_pin',
-        'pw_awal_sampai', 'salah_login', 'terkunci', 'setuju_wajah'],
+        'pw_awal_sampai', 'salah_login', 'terkunci', 'setuju_wajah',
+        'pola_shift', 'urutan_shift', 'ganti_setiap', 'mulai_pola', 'gps_daftar'],
       kolomSensitif: ['pw_hash', 'pin_hash', 'data_wajah', 'id_hp'],
       contoh: [
         akun('K001', 'Ahmad Fauzi', 'Fauzi'),
@@ -132,6 +136,11 @@ function buatDefinisiSheet(kodeRahasia) {
         ['UMUM', 'simpan_foto_bulan', 2, '', ''],
         ['UMUM', 'simpan_absensi_bulan', 3, '', ''],
         ['UMUM', 'batas_isi_alasan_detik', 10, '', ''],
+        ['UMUM', 'libur_minggu_NGW', false, '', ''],
+        ['UMUM', 'ukuran_panduan_wajah', 60, '', ''],
+        ['UMUM', 'batas_izin_lewat_hari', 2, '', ''],
+        ['UMUM', 'sesi_owner_hari', 7, '', ''],
+        ['UMUM', 'sinkron_karyawan_menit', 30, '', ''],
         ['JENIS_IZIN', 'Sakit', '', 'biasa', ''],
         ['JENIS_IZIN', 'Keperluan pribadi', '', 'biasa', ''],
         ['JENIS_IZIN', 'Menikah', '', 'khusus', 3],
@@ -176,7 +185,8 @@ function buatDefinisiSheet(kodeRahasia) {
       nama: 'izin',
       kolom: ['id', 'grup', 'karyawan', 'jenis', 'kelompok', 'mulai',
         'selesai', 'hari', 'ket', 'lampiran', 'diajukan',
-        'telat_aju', 'status', 'oleh', 'diputus'],
+        'telat_aju', 'status', 'oleh', 'diputus',
+        'rekan', 'status_rekan', 'shift_asal', 'shift_tujuan'],
       contoh: []
     },
     {
@@ -189,6 +199,11 @@ function buatDefinisiSheet(kodeRahasia) {
     {
       nama: 'log',
       kolom: ['waktu', 'jenis', 'oleh', 'cabang', 'aksi', 'target', 'id', 'sebelum', 'sesudah', 'alasan'],
+      contoh: []
+    },
+    {
+      nama: 'sesi',
+      kolom: ['id_sesi', 'akun', 'perangkat', 'token_hash', 'dibuat', 'terakhir_aktif', 'kedaluwarsa', 'aktif'],
       contoh: []
     }
   ];

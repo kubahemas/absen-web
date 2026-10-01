@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HP Toko – Pilih Nama dan PIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&amp;family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+body{margin:0}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+<style>body{background:#E8E6E0;display:flex;justify-content:center;padding:24px 0}</style>
+</head>
+<body>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFD62E; font-family: Poppins, 'Segoe UI', sans-serif; color: #141111; display: flex; flex-direction: column">
+<div style="padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 9px">
+<div style="display: flex; gap: 14px; align-items: center">
+<div style="width: 76px; height: 76px; border-radius: 50%; background: #F2EFE6; border: 5px solid #333438; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #5A5B5E; text-align: center">[Foto kamera]</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.1">Pilih nama + PIN</div>
+<div style="font-size: 13px; font-weight: 600">Foto ini tersimpan sebagai bukti absen</div>
+<button style="display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 2px solid #141111; border-radius: 999px; background: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 800; color: #141111" type="button"><svg aria-hidden="true" fill="none" height="14" stroke="#141111" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24" width="14"><path d="M1 4v6h6"></path><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"></path></svg>Foto ulang</button></div>
+</div>
+<div style="font-size: 13px; font-weight: 700">Huruf depan nama</div>
+<div style="display: flex; gap: 6px; flex-wrap: wrap"><button style="min-width: 36px; min-height: 36px; border: 2px solid #333438; border-radius: 12px; background: transparent; color: #141111; font-family: inherit; font-size: 15px; font-weight: 700" type="button">A</button><button style="min-width: 36px; min-height: 36px; border: 2px solid #333438; border-radius: 12px; background: transparent; color: #141111; font-family: inherit; font-size: 15px; font-weight: 700" type="button">B</button><button style="min-width: 36px; min-height: 36px; border: none; border-radius: 12px; background: #333438; color: #FFD62E; font-family: inherit; font-size: 15px; font-weight: 800" type="button">D</button><button style="min-width: 36px; min-height: 36px; border: 2px solid #333438; border-radius: 12px; background: transparent; color: #141111; font-family: inherit; font-size: 15px; font-weight: 700" type="button">J</button><button style="min-width: 36px; min-height: 36px; border: 2px solid #333438; border-radius: 12px; background: transparent; color: #141111; font-family: inherit; font-size: 15px; font-weight: 700" type="button">R</button><button style="min-width: 36px; min-height: 36px; border: 2px solid #333438; border-radius: 12px; background: transparent; color: #141111; font-family: inherit; font-size: 15px; font-weight: 700" type="button">S</button></div>
+<label for="nama" style="font-size: 13px; font-weight: 700">Nama (terjadwal hari ini, urut abjad)</label>
+<select id="nama" style="height: 48px; border: 3px solid #333438; border-radius: 14px; background: #FFFFFF; font-family: inherit; font-size: 17px; font-weight: 800; color: #141111; padding: 0 12px">
+<option>Dewi Lestari (Shift 1)</option>
+<option>Dimas Saputra (Shift 2)</option>
+</select>
+<a href="#" style="font-size: 13px; font-weight: 700; color: #141111; text-align: center; padding: 4px">Tidak ada di jadwal atau karyawan cabang lain</a>
+</div>
+<div style="flex-grow: 1; background: #FFFFFF; border-radius: 30px 30px 0 0; padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div style="font-size: 15px; font-weight: 700">Masukkan PIN 4 digit</div>
+<div style="display: flex; gap: 18px">
+<div style="width: 18px; height: 18px; border-radius: 50%; background: #141111"></div>
+<div style="width: 18px; height: 18px; border-radius: 50%; background: #141111"></div>
+<div style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #9A9A9A; box-sizing: border-box"></div>
+<div style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #9A9A9A; box-sizing: border-box"></div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">1</button><button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">2</button><button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">3</button><button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">4</button><button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">5</button><button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">6</button><button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">7</button><button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">8</button><button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">9</button>
+<button style="height: 44px; border: none; border-radius: 12px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 700; color: #333438" type="button">Batal</button>
+<button style="height: 44px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 600; color: #141111" type="button">0</button>
+<button aria-label="Hapus angka" style="height: 44px; border: none; border-radius: 12px; background: transparent; display: flex; align-items: center; justify-content: center" type="button"><svg aria-hidden="true" fill="none" height="26" stroke="#141111" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="26"><path d="M21 5H8l-6 7 6 7h13z"></path><path d="M17 9l-6 6"></path><path d="M11 9l6 6"></path></svg></button>
+</div>
+<div style="font-size: 12px; color: #5A5B5E; text-align: center">Digit keempat langsung menyimpan absen</div>
+</div>
+</div>
+</body>
+</html>

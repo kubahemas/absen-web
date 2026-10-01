@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HP Toko – Layar Utama</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&amp;family=Poppins:wght@400;500;600;700;800&amp;display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&amp;family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
 body{margin:0}
 </style>
@@ -13,11 +13,11 @@ body{margin:0}
 <body>
 <div style="width: 390px; height: 844px; box-sizing: border-box; padding: 24px 22px 26px; background: #FFD62E; font-family: Poppins, 'Segoe UI', sans-serif; color: #141111; display: flex; flex-direction: column; gap: 20px">
 <div style="display: flex; justify-content: space-between; align-items: center">
-<img src="../assets/logo.png" alt="Kubah Emas Indonesia" style="height: 58px; width: auto">
-<div style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #333438; color: #FFD62E; font-size: 12px; font-weight: 700">
+<img alt="Kubah Emas Indonesia" src="../assets/logo.png" style="height: 58px; width: auto"/>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px"><div style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #333438; color: #FFD62E; font-size: 12px; font-weight: 700">
 <div style="width: 8px; height: 8px; border-radius: 50%; background: #5FD38A"></div>
 <div>Online</div>
-</div>
+</div><button aria-label="Lihat jadwal shift hari ini" style="display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; border: 2px solid #333438; background: #FFFFFF; font-family: inherit; font-size: 12px; font-weight: 800; color: #141111; min-height: 30px" type="button">Shift 1 aktif <svg aria-hidden="true" fill="none" height="12" stroke="#141111" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewbox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></div>
 </div>
 <div style="display: flex; gap: 12px; align-items: stretch">
 <div style="width: 6px; background: #141111"></div>
@@ -26,24 +26,28 @@ body{margin:0}
 <div style="font-size: 14px; font-weight: 500">Senin, 28 September 2026</div>
 </div>
 </div>
-<div style="font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 96px; font-weight: 700; line-height: 1; letter-spacing: -1px; text-align: center; color: #141111">07:41</div>
+<div style="font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 72px; font-weight: 700; line-height: 1; letter-spacing: -1px; text-align: center; color: #141111">07:41<span style="font-size: 30px; font-weight: 600; color: #3E3F42; margin-left: 4px">:23</span></div>
 <div style="display: flex; flex-direction: column; gap: 14px; flex-grow: 1">
-<button type="button" style="height: 124px; border: 4px solid #5CC98A; border-radius: 26px; background: #1F8A4C; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 18px; padding: 0 22px">
-<div style="width: 56px; height: 56px; border-radius: 50%; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F8A4C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path></svg></div>
+<button style="height: 112px; border: 4px solid #5CC98A; border-radius: 26px; background: #1F8A4C; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 18px; padding: 0 22px" type="button">
+<div style="width: 56px; height: 56px; border-radius: 50%; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" fill="none" height="30" stroke="#1F8A4C" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="30"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path></svg></div>
 <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px"><div style="font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: 0.5px">ABSEN MASUK</div><div style="font-size: 13px; font-weight: 500">Shift 1 mulai 07:45</div></div>
 </button>
-<button type="button" style="height: 124px; border: 4px solid #FF7A6E; border-radius: 26px; background: #D92A22; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 18px; padding: 0 22px">
-<div style="width: 56px; height: 56px; border-radius: 50%; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#D92A22" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div>
+<button style="height: 112px; border: 4px solid #FF7A6E; border-radius: 26px; background: #D92A22; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 18px; padding: 0 22px" type="button">
+<div style="width: 56px; height: 56px; border-radius: 50%; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" fill="none" height="30" stroke="#D92A22" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="30"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div>
 <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px"><div style="font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: 0.5px">ABSEN PULANG</div><div style="font-size: 13px; font-weight: 500">Pulang normal 16:30</div></div>
 </button>
+<button aria-label="Lihat semua yang tidak masuk hari ini" style="background: transparent; border: 2px dashed #333438; border-radius: 20px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; font-family: inherit; text-align: left" type="button">
+<div style="width: 100%; display: flex; justify-content: space-between; align-items: center"><div style="font-size: 13px; font-weight: 800; color: #141111">Hari ini tidak masuk (8)</div><div style="font-size: 11px; font-weight: 700; color: #3E3F42">Ketuk untuk lihat semua ›</div></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 68px; overflow: hidden"><div style="display: flex; align-items: center; padding: 5px 12px; border-radius: 999px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #141111">Siti</div><div style="display: flex; align-items: center; padding: 5px 12px; border-radius: 999px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #141111">Budi</div><div style="display: flex; align-items: center; padding: 5px 12px; border-radius: 999px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #141111">Rina</div><div style="display: flex; align-items: center; padding: 5px 12px; border-radius: 999px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #141111">Dewi</div><div style="display: flex; align-items: center; padding: 5px 12px; border-radius: 999px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #141111">Andi</div><div style="display: flex; align-items: center; padding: 5px 12px; border-radius: 999px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #141111">Joko</div><div style="display: flex; align-items: center; padding: 5px 11px; border-radius: 999px; background: #333438; color: #FFD62E; font-size: 13px; font-weight: 800">+2 lainnya</div></div>
+</button>
 <div style="flex-grow: 1"></div>
-<button type="button" style="height: 72px; border: none; border-radius: 20px; background: #141111; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 28px">
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFD62E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+<button style="height: 72px; border: none; border-radius: 20px; background: #141111; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 28px" type="button">
+<svg aria-hidden="true" fill="none" height="24" stroke="#FFD62E" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
 <div style="display: flex; flex-direction: column; align-items: flex-start"><div style="font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700">LEMBUR</div><div style="font-size: 11px; font-weight: 600; color: #FFD62E">Aktif mulai 16:36</div></div>
 </button>
 </div>
 <div style="display: flex; justify-content: center">
-<button type="button" style="border: 2px solid #333438; background: transparent; color: #333438; font-family: inherit; font-size: 13px; font-weight: 700; padding: 0 20px; border-radius: 999px; min-height: 44px">Masuk sebagai Admin</button>
+<button style="border: 2px solid #333438; background: transparent; color: #333438; font-family: inherit; font-size: 13px; font-weight: 700; padding: 0 20px; border-radius: 999px; min-height: 44px" type="button">Masuk sebagai Admin</button>
 </div>
 </div>
 </body>

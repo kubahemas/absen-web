@@ -6,8 +6,13 @@
 - Jangan menambah fitur di luar yang diminta. Kalau ada yang kurang jelas, tanya dulu.
 - Beri tahu dengan jujur kalau ada keputusan yang berisiko.
 
+## Acuan desain lengkap
+- Keputusan desain paling detail dan terbaru ada di `docs/keputusan-desain.md` (aturan tampilan/navigasi, HP toko, HP pribadi, admin cabang, owner, aturan data & perhitungan, format export Excel, keamanan & teknis). **Kalau isinya bertentangan dengan ringkasan di CLAUDE.md ini, `docs/keputusan-desain.md` yang berlaku.**
+- Acuan tampilan: `docs/mockup/BUKA INI - Galeri Mockup.html` (versi final). Acuan format file export: `docs/contoh-export/` (contoh .xlsx bulanan & harian).
+- Beberapa poin besar yang ada di sana dan belum masuk ringkasan CLAUDE.md ini: pola shift tetap/bergilir, tukar & pindah shift antar karyawan, sistem sesi login (termasuk sesi owner & token HP toko lewat sheet `sesi`), label performa EXCELLENT/GOOD/BAD, export Excel bulanan & harian (aplikasi tidak pernah menyimpan angka gaji), serta aturan detail navigasi/pop-up/kualitas foto di HP toko. Baca filenya langsung untuk detail sebelum mengerjakan bagian terkait.
+
 ## Susunan teknis
-- Database: Google Sheets (8 sheet).
+- Database: Google Sheets (9 sheet).
 - Backend: Google Apps Script, di-deploy sebagai Web App. Semua baca-tulis data lewat sini.
 - Frontend: HTML + CSS + JavaScript biasa (tanpa framework), PWA, di-hosting di GitHub Pages (HTTPS wajib untuk kamera).
 - Foto: Google Drive milik owner.
@@ -25,7 +30,7 @@
 - Font: Oswald (judul, tombol besar), Poppins (teks).
 - Logo dan foto karyawan ada di folder `assets/`.
 
-## Struktur data (8 sheet)
+## Struktur data (9 sheet)
 
 Sumber kebenaran kolom = file `apps-script/setup_spreadsheet.gs`. Kalau mau ubah kolom, ubah di file itu dulu lalu salin bagian ini. Nama kolom dibuat singkat; di sheet lain selain `akun`, kolom yang berisi ID karyawan selalu bernama `karyawan`.
 
