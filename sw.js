@@ -1,6 +1,6 @@
 // Service worker sederhana: hanya menyimpan file halaman.
 // Setiap kali kode halaman diubah, naikkan nomor VERSI_CACHE supaya HP memuat ulang file baru.
-const VERSI_CACHE = 'absen-v1';
+const VERSI_CACHE = 'absen-v2';
 
 const FILE_HALAMAN = [
   './',
@@ -8,6 +8,8 @@ const FILE_HALAMAN = [
   'config.js',
   'manifest.json',
   'assets/logo.png',
+  'assets/logo-kuning.png',
+  'assets/lambang.png',
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
   'assets/icons/icon-maskable-512.png',

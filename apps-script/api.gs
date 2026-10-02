@@ -68,7 +68,19 @@ function prosesDaftarKaryawan(cabang) {
     .map(function (r) {
       return { id: r.id, nama: r.nama, panggilan: r.panggilan };
     });
-  return respon({ status: 'ok', data: daftar });
+  // Info shift (tidak ada data sensitif). Untuk sekarang: shift pertama cabang itu.
+  const daftarShift = bacaShiftCabang(cabang);
+  let infoShift = null;
+  if (daftarShift.length) {
+    const sh = daftarShift[0];
+    infoShift = {
+      nama: sh.nama,
+      masuk: sh.masuk,
+      pulang: sh.pulang,
+      toleransi_pulang: sh.toleransi !== null ? sh.toleransi : ambilNilaiUmum('toleransi_pulang_menit', 5)
+    };
+  }
+  return respon({ status: 'ok', data: daftar, shift: infoShift });
 }
 
 function doPost(e) {
@@ -81,6 +93,10 @@ function doPost(e) {
 
   if (data.aksi === 'absen_masuk') {
     return prosesAbsenMasuk(data.id, data.pin);
+  }
+
+  if (data.aksi === 'simpan_alasan') {
+    return prosesSimpanAlasan(data.id, data.kode_alasan, data.alasan);
   }
 
   return respon({ status: 'gagal', pesan: 'Aksi tidak dikenali.' });
@@ -129,9 +145,13 @@ function prosesAbsenMasuk(id, pin) {
     perbaruiKolom(akun, akunDitemukan, { salah_login: 0 });
   }
 
-  const zona = Session.getScriptTimeZone() || 'GMT+7';
-  const tanggalHariIni = Utilities.formatDate(new Date(), zona, 'yyyy-MM-dd');
-  const jamSekarang = Utilities.formatDate(new Date(), zona, 'HH:mm');
+  const zona = ZONA_ABSEN;
+  const sekarang = new Date();
+  const tanggalHariIni = Utilities.formatDate(sekarang, zona, 'yyyy-MM-dd');
+  const jamSekarang = Utilities.formatDate(sekarang, zona, 'HH:mm');
+  const detikSekarang = Number(Utilities.formatDate(sekarang, zona, 'H')) * 3600 +
+    Number(Utilities.formatDate(sekarang, zona, 'm')) * 60 +
+    Number(Utilities.formatDate(sekarang, zona, 's'));
 
   const absensi = bacaSheet('absensi');
   const sudahAbsenMasuk = absensi.data.some(function (r) {
@@ -141,6 +161,27 @@ function prosesAbsenMasuk(id, pin) {
     return respon({ status: 'gagal', pesan: 'Sudah absen masuk hari ini' });
   }
 
+  // Jam masuk dari sheet shift (cabang + nomor shift karyawan).
+  const shiftKaryawan = bacaShiftCabang(akunDitemukan.cabang).find(function (sh) {
+    return String(sh.no) === String(akunDitemukan.shift);
+  });
+  if (!shiftKaryawan || !shiftKaryawan.masuk) {
+    return respon({ status: 'gagal', pesan: 'Jadwal shift karyawan tidak ditemukan, hubungi admin' });
+  }
+  const detikMasuk = jamKeDetik(shiftKaryawan.masuk);
+  const jendelaDetik = ambilNilaiUmum('jendela_absen_menit', 60) * 60;
+  if (detikSekarang < detikMasuk - jendelaDetik) {
+    return respon({
+      status: 'gagal',
+      pesan: 'Absen masuk belum dibuka, mulai ' + detikKeJam(detikMasuk - jendelaDetik)
+    });
+  }
+
+  // Kurang dari 60 detik setelah jam masuk = HADIR; mulai 60 detik = TELAT.
+  const selisih = detikSekarang - detikMasuk;
+  const telat = selisih >= 60;
+  const telatMnt = telat ? Math.floor(selisih / 60) : 0;
+
   const barisBaru = {};
   absensi.header.forEach(function (nama) { barisBaru[nama] = ''; });
   barisBaru.tanggal = tanggalHariIni;
@@ -149,18 +190,133 @@ function prosesAbsenMasuk(id, pin) {
   barisBaru.cabang = akunDitemukan.cabang;
   barisBaru.shift = akunDitemukan.shift;
   barisBaru.masuk = jamSekarang;
+  barisBaru.st_masuk = telat ? 'TELAT' : 'HADIR';
+  barisBaru.telat_mnt = telatMnt;
+  barisBaru.ket_masuk = telat ? 'TIDAK DIISI' : '';
   barisBaru.cara_masuk = 'PIN';
 
   absensi.sheet.appendRow(absensi.header.map(function (nama) { return barisBaru[nama]; }));
 
-  return respon({
+  const hasil = {
     status: 'ok',
     pesan: 'Absen masuk berhasil',
+    st_masuk: barisBaru.st_masuk,
+    telat_mnt: telatMnt,
     karyawan: id,
     nama: akunDitemukan.nama,
+    panggilan: akunDitemukan.panggilan,
     tanggal: tanggalHariIni,
-    masuk: jamSekarang
+    jam: jamSekarang,
+    shift: shiftKaryawan.nama
+  };
+  if (telat) {
+    hasil.pilihan_alasan = ambilDaftarPengaturan('ALASAN_TELAT');
+    hasil.batas_isi_detik = ambilNilaiUmum('batas_isi_alasan_detik', 10);
+    hasil.kode_alasan = Utilities.getUuid().replace(/-/g, '').slice(0, 16);
+    CacheService.getScriptCache().put(KUNCI_KODE_ALASAN + id, hasil.kode_alasan, 300);
+  }
+  return respon(hasil);
+}
+
+/**
+ * Simpan alasan telat. Tidak minta PIN lagi: cukup kode sekali pakai yang
+ * dikirim saat absen masuk (berlaku 5 menit), dan ket_masuk hari ini harus
+ * masih "TIDAK DIISI". alasan = { pilihan, teks }.
+ */
+function prosesSimpanAlasan(id, kode, alasan) {
+  if (!id || !kode) {
+    return respon({ status: 'gagal', pesan: 'Data tidak lengkap' });
+  }
+  const cache = CacheService.getScriptCache();
+  const kodeTersimpan = cache.get(KUNCI_KODE_ALASAN + id);
+  if (!kodeTersimpan || kodeTersimpan !== String(kode)) {
+    return respon({ status: 'gagal', pesan: 'Waktu mengisi alasan sudah habis' });
+  }
+
+  const zona = ZONA_ABSEN;
+  const tanggalHariIni = Utilities.formatDate(new Date(), zona, 'yyyy-MM-dd');
+  const absensi = bacaSheet('absensi');
+  const baris = absensi.data.find(function (r) {
+    return String(r.karyawan) === String(id) && sebagaiTanggalTeks(r.tanggal, zona) === tanggalHariIni;
   });
+  if (!baris || baris.ket_masuk !== 'TIDAK DIISI') {
+    return respon({ status: 'gagal', pesan: 'Alasan tidak bisa disimpan' });
+  }
+
+  const pilihan = alasan && alasan.pilihan ? String(alasan.pilihan) : '';
+  const teks = alasan && alasan.teks ? String(alasan.teks).trim() : '';
+  if (ambilDaftarPengaturan('ALASAN_TELAT').indexOf(pilihan) === -1) {
+    return respon({ status: 'gagal', pesan: 'Pilihan alasan tidak dikenal' });
+  }
+  if (teks.length > 100) {
+    return respon({ status: 'gagal', pesan: 'Keterangan maksimal 100 karakter' });
+  }
+  if (pilihan === 'Lainnya' && !teks) {
+    return respon({ status: 'gagal', pesan: 'Keterangan wajib diisi kalau memilih Lainnya' });
+  }
+
+  perbaruiKolom(absensi, baris, { ket_masuk: teks ? pilihan + ': ' + teks : pilihan });
+  cache.remove(KUNCI_KODE_ALASAN + id);
+  return respon({ status: 'ok', pesan: 'Alasan tersimpan' });
+}
+
+var ZONA_ABSEN = 'Asia/Jakarta';
+var KUNCI_KODE_ALASAN = 'kode_alasan_';
+
+/** Nilai angka dari sheet pengaturan kategori UMUM (pakai bawaan kalau tidak ada). */
+function ambilNilaiUmum(nama, bawaan) {
+  const baris = bacaSheet('pengaturan').data.find(function (r) { return r.kategori === 'UMUM' && r.nama === nama; });
+  const angka = baris ? Number(baris.nilai) : NaN;
+  return isNaN(angka) ? bawaan : angka;
+}
+
+/** Daftar nama pilihan (urutan baris) dari satu kategori di sheet pengaturan. */
+function ambilDaftarPengaturan(kategori) {
+  return bacaSheet('pengaturan').data
+    .filter(function (r) { return r.kategori === kategori; })
+    .map(function (r) { return String(r.nama); });
+}
+
+/**
+ * Baca sheet shift satu cabang. Memakai getDisplayValues supaya jam "07:45"
+ * tetap terbaca sebagai teks jam (Sheets bisa menyimpannya sebagai nilai jam).
+ */
+function bacaShiftCabang(cabang) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('shift');
+  const nilai = sheet.getDataRange().getDisplayValues();
+  const header = nilai[0];
+  const hasil = [];
+  for (let i = 1; i < nilai.length; i++) {
+    const r = {};
+    header.forEach(function (nama, idx) { r[nama] = nilai[i][idx]; });
+    if (r.cabang !== cabang) continue;
+    const toleransi = parseInt(r.toleransi, 10);
+    hasil.push({
+      no: r.no,
+      nama: r.nama,
+      masuk: normalisasiJam(r.masuk),
+      tutup: normalisasiJam(r.tutup),
+      pulang: normalisasiJam(r.pulang),
+      toleransi: isNaN(toleransi) ? null : toleransi
+    });
+  }
+  return hasil;
+}
+
+function normalisasiJam(teks) {
+  const m = /(\d{1,2})[:.](\d{2})/.exec(String(teks));
+  return m ? ('0' + m[1]).slice(-2) + ':' + m[2] : '';
+}
+
+function jamKeDetik(jam) {
+  const p = jam.split(':');
+  return Number(p[0]) * 3600 + Number(p[1]) * 60;
+}
+
+function detikKeJam(detik) {
+  const j = Math.floor(detik / 3600);
+  const m = Math.floor((detik % 3600) / 60);
+  return ('0' + j).slice(-2) + ':' + ('0' + m).slice(-2);
 }
 
 /**
