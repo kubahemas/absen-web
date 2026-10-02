@@ -24,6 +24,10 @@
 - Di sheet `akun`, kolom `pw_hash`, `pin_hash`, `data_wajah`, `id_hp` dikelompokkan (grouped) dan disembunyikan secara default supaya tidak terlihat sekilas saat sheet dibuka — tetap bisa dibuka manual lewat tanda "+" di atas kolom kalau perlu dicek.
 - Hanya akun owner yang punya akses ke Spreadsheet dan folder Drive.
 
+## Aturan membuat layar baru (wajib)
+- Setiap layar baru HARUS menyalin CSS dari file mockup yang sesuai di `docs/mockup/layar/`, bukan menggambar ulang dari nol.
+- Halaman ini sudah PWA (`manifest.json`, `sw.js`). Setiap kali file halaman (index.html, config.js, dll.) diubah, naikkan nomor `VERSI_CACHE` di `sw.js` supaya HP memuat versi baru. Kalau menambah file halaman baru, daftarkan juga di `FILE_HALAMAN` di `sw.js`. Panggilan ke Apps Script tidak boleh di-cache.
+
 ## Desain
 - Blueprint lengkap ada di Claude Docs milik pemilik; ringkasan aturan inti ada di file ini. Kalau butuh detail, tanyakan ke pemilik.
 - Warna: kuning #FFD62E (latar), abu seragam #333438, hitam #141111, hijau #1F8A4C (ABSEN MASUK, tepat waktu), merah #D92A22 / #B91C1C (ABSEN PULANG, telat, peringatan, pelanggaran). Merah hanya untuk peringatan/pelanggaran, kecuali tombol ABSEN PULANG.
