@@ -105,6 +105,10 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - Report (rekap karyawan/owner): semua angka dalam satuan hari; khusus telat, ditambahkan juga total menitnya (bukan cuma jumlah hari telat). Detail ditampilkan sebagai tabel, diurutkan dari tanggal terbaru di atas.
 - Log owner ditampilkan per kategori; detail tiap kategori berupa tabel dengan filter di judul kolom (bisa difilter berdasarkan waktu, admin, cabang, karyawan).
 
+## Belum aman dipakai karyawan sungguhan (wajib dikerjakan sebelum go-live)
+- Semua aksi selain `ping` wajib menyertakan token HP toko terdaftar atau sesi login yang sah (lihat `docs/keputusan-desain.md` bagian 11). Saat ini `daftar_karyawan` dan `absen_masuk` di `apps-script/api.gs` BELUM mengecek token apa pun — siapa saja yang tahu URL Web App bisa memanggilnya. Ini cukup untuk tes/pengembangan, tapi harus ditutup dengan sistem token (sheet `sesi`) sebelum dipakai di toko sungguhan.
+- Akun owner `OWN01` belum dibuat. Saat dibuat nanti, WAJIB lewat fungsi khusus di editor Apps Script yang meminta password diketik interaktif saat fungsi dijalankan (`Browser.inputBox` atau sejenisnya) — password owner tidak boleh ditulis sebagai teks di kode `apps-script/` manapun (kode itu disalin ke GitHub yang publik).
+
 ## Rencana tahap 1 (kerjakan berurutan)
 1. Spreadsheet 8 sheet + data contoh 3 karyawan
 2. Apps Script: terima absen dan tulis ke sheet `absensi`

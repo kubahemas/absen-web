@@ -7,6 +7,9 @@
  * = semua file .gs saling bisa panggil fungsi satu sama lain).
  *
  * - GET  ?aksi=ping           -> tes hidup, boleh dari address bar browser.
+ * - GET  ?aksi=daftar_karyawan&cabang=... -> daftar {id, nama, panggilan}
+ *   karyawan/admin aktif di satu cabang. Dipakai halaman HP toko (index.html)
+ *   untuk mengisi daftar nama. Tidak ada data rahasia di balasan ini.
  * - POST { aksi:'absen_masuk', id, pin } -> WAJIB lewat POST (bukan GET)
  *   supaya PIN tidak muncul di alamat URL. Body dikirim sebagai teks JSON
  *   dengan Content-Type text/plain (bukan application/json) supaya browser
@@ -30,6 +33,10 @@ function doGet(e) {
     });
   }
 
+  if (aksi === 'daftar_karyawan') {
+    return prosesDaftarKaryawan(e.parameter.cabang);
+  }
+
   if (aksi === 'absen_masuk') {
     return respon({
       status: 'gagal',
@@ -41,6 +48,27 @@ function doGet(e) {
     status: 'gagal',
     pesan: 'Aksi tidak dikenali. Gunakan ?aksi=ping (GET) untuk tes hidup.'
   });
+}
+
+/**
+ * Daftar nama untuk layar "pilih nama" di HP toko: id, nama, panggilan
+ * karyawan DAN admin yang aktif di satu cabang (admin tetap absen sendiri,
+ * cuma tidak lembur — jadi tetap harus muncul di daftar ini). Owner dan
+ * akun PERANGKAT tidak absen, jadi tidak disertakan.
+ */
+function prosesDaftarKaryawan(cabang) {
+  if (!cabang) {
+    return respon({ status: 'gagal', pesan: 'cabang wajib diisi' });
+  }
+  const akun = bacaSheet('akun');
+  const daftar = akun.data
+    .filter(function (r) {
+      return r.cabang === cabang && r.aktif === true && (r.role === 'KARYAWAN' || r.role === 'ADMIN');
+    })
+    .map(function (r) {
+      return { id: r.id, nama: r.nama, panggilan: r.panggilan };
+    });
+  return respon({ status: 'ok', data: daftar });
 }
 
 function doPost(e) {

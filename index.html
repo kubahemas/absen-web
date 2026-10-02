@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Absensi Kubah Emas</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #E8E6E0;
+    display: flex;
+    justify-content: center;
+    font-family: Poppins, 'Segoe UI', sans-serif;
+    color: #141111;
+  }
+  .hp {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    background: #FFD62E;
+    display: flex;
+    flex-direction: column;
+  }
+  .layar { display: none; flex-direction: column; flex: 1; }
+  .layar.aktif { display: flex; }
+
+  /* ---- Layar utama ---- */
+  #layarUtama { padding: 22px 20px 26px; gap: 18px; }
+  .baris-atas { display: flex; justify-content: space-between; align-items: center; }
+  .baris-atas img { height: 50px; }
+  .status-badge { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #333438; color: #FFD62E; font-size: 12px; font-weight: 700; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #5FD38A; }
+  .status-badge.offline .status-dot { background: #D92A22; }
+  .label-shift { margin-top: 6px; display: inline-block; padding: 5px 10px; border-radius: 999px; border: 2px solid #333438; background: #FFFFFF; font-size: 12px; font-weight: 800; }
+  .info-cabang { display: flex; gap: 12px; }
+  .info-cabang .garis { width: 6px; background: #141111; border-radius: 2px; }
+  .info-cabang .teks { display: flex; flex-direction: column; gap: 2px; }
+  .info-cabang .nama-cabang { font-size: 15px; font-weight: 700; }
+  .info-cabang .tanggal { font-size: 14px; font-weight: 500; }
+  .jam { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 64px; font-weight: 700; text-align: center; color: #141111; }
+  .jam .detik { font-size: 26px; font-weight: 600; color: #3E3F42; margin-left: 4px; }
+  .tombol-absen { height: 100px; border-radius: 24px; color: #fff; font-family: inherit; display: flex; align-items: center; gap: 16px; padding: 0 20px; border: 4px solid; }
+  .tombol-absen .judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; }
+  .tombol-absen .sub { font-size: 12px; font-weight: 500; }
+  #btnMasuk { background: #1F8A4C; border-color: #5CC98A; }
+  #btnPulang { background: #D92A22; border-color: #FF7A6E; opacity: 0.45; }
+  #btnLembur { height: 64px; border: none; border-radius: 18px; background: #141111; color: #fff; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 20px; font-weight: 700; opacity: 0.45; margin: 0 24px; }
+  .pesan-belum-aktif { text-align: center; font-size: 11px; color: #5A5B5E; margin-top: -8px; }
+
+  /* ---- Layar pilih nama + PIN ---- */
+  #layarPilihNama { }
+  .pilih-atas { padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .pilih-judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700; }
+  .huruf-label { font-size: 13px; font-weight: 700; }
+  .huruf-daftar { display: flex; gap: 6px; flex-wrap: wrap; }
+  .huruf-daftar button { min-width: 34px; min-height: 34px; border: 2px solid #333438; border-radius: 10px; background: transparent; color: #141111; font-family: inherit; font-size: 14px; font-weight: 700; }
+  .huruf-daftar button.aktif { border: none; background: #333438; color: #FFD62E; font-weight: 800; }
+  select#selectNama { height: 48px; border: 3px solid #333438; border-radius: 14px; background: #FFFFFF; font-family: inherit; font-size: 16px; font-weight: 700; color: #141111; padding: 0 10px; }
+  #infoMuat { font-size: 13px; text-align: center; padding: 6px; }
+  .kotak-pin { flex-grow: 1; background: #fff; border-radius: 28px 28px 0 0; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .pin-judul { font-size: 15px; font-weight: 700; text-align: center; }
+  .pin-titik { display: flex; justify-content: center; gap: 16px; }
+  .pin-titik div { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #9A9A9A; box-sizing: border-box; }
+  .pin-titik div.isi { background: #141111; border: none; }
+  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .keypad button { height: 52px; border: none; border-radius: 12px; background: #FFF4C2; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 600; color: #141111; }
+  .keypad button.kosong { background: transparent; font-family: inherit; font-size: 14px; font-weight: 700; color: #333438; }
+  .keypad button:disabled { opacity: 0.4; }
+  .pin-ket { font-size: 12px; color: #5A5B5E; text-align: center; }
+  #btnBatalNama { background: transparent; border: none; text-align: center; font-size: 13px; font-weight: 700; color: #141111; padding: 4px; text-decoration: underline; }
+
+  /* ---- Overlay hasil ---- */
+  #overlayHasil { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 24px; color: #fff; font-family: inherit; text-align: center; z-index: 10; }
+  #overlayHasil.tampil { display: flex; }
+  #overlayHasil.ok { background: #1F8A4C; }
+  #overlayHasil.gagal { background: #B91C1C; }
+  #overlayHasil .judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+  #overlayHasil .sub { font-size: 15px; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="hp">
+
+  <div id="layarUtama" class="layar aktif">
+    <div class="baris-atas">
+      <img src="assets/logo.png" alt="Kubah Emas Indonesia">
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px">
+        <div class="status-badge" id="statusBadge"><div class="status-dot"></div><div id="statusTeks">Online</div></div>
+        <div class="label-shift" id="labelShift">Shift 1 aktif</div>
+      </div>
+    </div>
+    <div class="info-cabang">
+      <div class="garis"></div>
+      <div class="teks">
+        <div class="nama-cabang" id="namaCabang">Cabang</div>
+        <div class="tanggal" id="tanggalHariIni">-</div>
+      </div>
+    </div>
+    <div class="jam" id="jamBesar">--:--<span class="detik" id="jamDetik">:--</span></div>
+    <div style="display:flex; flex-direction:column; gap:14px; flex-grow:1">
+      <button class="tombol-absen" id="btnMasuk" type="button">
+        <div class="judul">ABSEN MASUK</div>
+      </button>
+      <button class="tombol-absen" id="btnPulang" type="button" disabled>
+        <div class="judul">ABSEN PULANG</div>
+      </button>
+      <div style="flex-grow:1"></div>
+      <button id="btnLembur" type="button" disabled>LEMBUR</button>
+      <div class="pesan-belum-aktif">Absen pulang dan lembur belum aktif di versi ini</div>
+    </div>
+  </div>
+
+  <div id="layarPilihNama" class="layar">
+    <div class="pilih-atas">
+      <div class="pilih-judul">Pilih nama</div>
+      <div class="huruf-label">Huruf depan nama</div>
+      <div class="huruf-daftar" id="hurufDaftar"></div>
+      <label for="selectNama" style="font-size:13px; font-weight:700">Nama (urut abjad)</label>
+      <select id="selectNama">
+        <option value="">-- pilih nama --</option>
+      </select>
+      <div id="infoMuat"></div>
+    </div>
+    <div class="kotak-pin">
+      <div class="pin-judul">Masukkan PIN 4 digit</div>
+      <div class="pin-titik" id="pinTitik">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="keypad" id="keypad">
+        <button type="button" data-digit="1">1</button>
+        <button type="button" data-digit="2">2</button>
+        <button type="button" data-digit="3">3</button>
+        <button type="button" data-digit="4">4</button>
+        <button type="button" data-digit="5">5</button>
+        <button type="button" data-digit="6">6</button>
+        <button type="button" data-digit="7">7</button>
+        <button type="button" data-digit="8">8</button>
+        <button type="button" data-digit="9">9</button>
+        <button type="button" class="kosong" id="btnBatalPin">Batal</button>
+        <button type="button" data-digit="0">0</button>
+        <button type="button" id="btnHapusDigit" aria-label="Hapus angka">⌫</button>
+      </div>
+      <div class="pin-ket">Digit keempat langsung mengirim absen</div>
+      <button id="btnBatalNama" type="button">‹ Kembali ke layar utama</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="overlayHasil">
+  <div>
+    <div class="judul" id="hasilJudul"></div>
+    <div class="sub" id="hasilSub"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  const CONFIG = window.APP_CONFIG;
+  const layarUtama = document.getElementById('layarUtama');
+  const layarPilihNama = document.getElementById('layarPilihNama');
+  const overlayHasil = document.getElementById('overlayHasil');
+
+  document.getElementById('namaCabang').textContent = 'Cabang ' + CONFIG.cabang;
+  document.getElementById('labelShift').textContent = CONFIG.labelShift;
+  document.getElementById('tanggalHariIni').textContent = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  }).format(new Date());
+
+  // ---- Status online/offline ----
+  function perbaruiStatusOnline() {
+    const badge = document.getElementById('statusBadge');
+    const teks = document.getElementById('statusTeks');
+    if (navigator.onLine) {
+      badge.classList.remove('offline');
+      teks.textContent = 'Online';
+    } else {
+      badge.classList.add('offline');
+      teks.textContent = 'Offline';
+    }
+  }
+  window.addEventListener('online', perbaruiStatusOnline);
+  window.addEventListener('offline', perbaruiStatusOnline);
+  perbaruiStatusOnline();
+
+  // ---- Jam besar mengikuti jam server ----
+  let selisihJamServer = 0; // ms, ditambahkan ke Date.now() lokal
+  function tampilkanJam() {
+    const sekarang = new Date(Date.now() + selisihJamServer);
+    const dua = function (n) { return String(n).padStart(2, '0'); };
+    document.getElementById('jamBesar').innerHTML =
+      dua(sekarang.getHours()) + ':' + dua(sekarang.getMinutes()) +
+      '<span class="detik">:' + dua(sekarang.getSeconds()) + '</span>';
+  }
+  setInterval(tampilkanJam, 1000);
+  tampilkanJam();
+
+  function sinkronJamServer() {
+    fetch(CONFIG.webAppUrl + '?aksi=ping')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.status === 'ok' && data.jam_server) {
+          const jamServer = new Date(data.jam_server.replace(' ', 'T'));
+          selisihJamServer = jamServer.getTime() - Date.now();
+        }
+      })
+      .catch(function () { /* biarkan pakai jam HP kalau server tidak terjangkau */ });
+  }
+  sinkronJamServer();
+
+  // ---- Daftar karyawan (untuk layar pilih nama) ----
+  let daftarKaryawan = [];
+  let mutaDaftarKaryawan = false;
+
+  function muatDaftarKaryawan() {
+    const info = document.getElementById('infoMuat');
+    info.textContent = 'Memuat daftar nama...';
+    mutaDaftarKaryawan = true;
+    const url = CONFIG.webAppUrl + '?aksi=daftar_karyawan&cabang=' + encodeURIComponent(CONFIG.cabang);
+    fetch(url)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        mutaDaftarKaryawan = false;
+        if (data.status === 'ok') {
+          daftarKaryawan = data.data.slice().sort(function (a, b) { return a.nama.localeCompare(b.nama); });
+          info.textContent = '';
+          bangunHurufDaftar();
+          isiSelectNama(daftarKaryawan);
+        } else {
+          info.textContent = 'Gagal memuat daftar nama: ' + (data.pesan || 'tidak dikenal');
+        }
+      })
+      .catch(function () {
+        mutaDaftarKaryawan = false;
+        info.textContent = 'Gagal terhubung ke server. Ketuk "Kembali" lalu coba lagi.';
+      });
+  }
+
+  function bangunHurufDaftar() {
+    const kontainer = document.getElementById('hurufDaftar');
+    kontainer.innerHTML = '';
+    const hurufSet = {};
+    daftarKaryawan.forEach(function (k) { hurufSet[k.nama.charAt(0).toUpperCase()] = true; });
+    const huruf = Object.keys(hurufSet).sort();
+    huruf.forEach(function (h) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = h;
+      btn.addEventListener('click', function () {
+        const sudahAktif = btn.classList.contains('aktif');
+        kontainer.querySelectorAll('button').forEach(function (b) { b.classList.remove('aktif'); });
+        if (sudahAktif) {
+          isiSelectNama(daftarKaryawan);
+        } else {
+          btn.classList.add('aktif');
+          isiSelectNama(daftarKaryawan.filter(function (k) { return k.nama.charAt(0).toUpperCase() === h; }));
+        }
+      });
+      kontainer.appendChild(btn);
+    });
+  }
+
+  function isiSelectNama(daftar) {
+    const select = document.getElementById('selectNama');
+    select.innerHTML = '<option value="">-- pilih nama --</option>';
+    daftar.forEach(function (k) {
+      const opt = document.createElement('option');
+      opt.value = k.id;
+      opt.textContent = k.nama;
+      opt.dataset.panggilan = k.panggilan;
+      select.appendChild(opt);
+    });
+  }
+
+  // ---- PIN keypad ----
+  let idTerpilih = '';
+  let panggilanTerpilih = '';
+  let pinSaatIni = '';
+
+  document.getElementById('selectNama').addEventListener('change', function (e) {
+    const opt = e.target.selectedOptions[0];
+    idTerpilih = e.target.value;
+    panggilanTerpilih = opt ? (opt.dataset.panggilan || '') : '';
+    pinSaatIni = '';
+    tampilkanPinTitik();
+    perbaruiKeypad();
+  });
+
+  function tampilkanPinTitik() {
+    const titik = document.querySelectorAll('#pinTitik div');
+    titik.forEach(function (t, i) { t.classList.toggle('isi', i < pinSaatIni.length); });
+  }
+
+  function perbaruiKeypad() {
+    const aktif = !!idTerpilih;
+    document.querySelectorAll('#keypad button[data-digit]').forEach(function (b) { b.disabled = !aktif; });
+  }
+
+  document.getElementById('keypad').addEventListener('click', function (e) {
+    const digit = e.target.getAttribute('data-digit');
+    if (digit !== null && idTerpilih && pinSaatIni.length < 4) {
+      pinSaatIni += digit;
+      tampilkanPinTitik();
+      if (pinSaatIni.length === 4) {
+        kirimAbsenMasuk();
+      }
+    }
+  });
+
+  document.getElementById('btnHapusDigit').addEventListener('click', function () {
+    pinSaatIni = pinSaatIni.slice(0, -1);
+    tampilkanPinTitik();
+  });
+
+  document.getElementById('btnBatalPin').addEventListener('click', kembaliKeLayarUtama);
+  document.getElementById('btnBatalNama').addEventListener('click', kembaliKeLayarUtama);
+
+  function kirimAbsenMasuk() {
+    perbaruiKeypadKirim(true);
+    fetch(CONFIG.webAppUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ aksi: 'absen_masuk', id: idTerpilih, pin: pinSaatIni })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { tampilkanHasil(data); })
+      .catch(function () { tampilkanHasil({ status: 'gagal', pesan: 'Tidak bisa terhubung ke server. Coba lagi.' }); });
+  }
+
+  function perbaruiKeypadKirim(sedangKirim) {
+    document.querySelectorAll('#keypad button').forEach(function (b) { b.disabled = sedangKirim; });
+  }
+
+  function tampilkanHasil(data) {
+    const judul = document.getElementById('hasilJudul');
+    const sub = document.getElementById('hasilSub');
+    if (data.status === 'ok') {
+      overlayHasil.className = 'tampil ok';
+      judul.textContent = 'Berhasil, ' + (panggilanTerpilih || 'Anda') + '!';
+      sub.textContent = 'Absen masuk jam ' + data.masuk;
+    } else {
+      overlayHasil.className = 'tampil gagal';
+      judul.textContent = 'Tidak tersimpan';
+      sub.textContent = data.pesan || 'Terjadi kesalahan';
+    }
+    setTimeout(tutupOverlayDanReset, 2500);
+    overlayHasil.addEventListener('click', tutupOverlayDanReset, { once: true });
+  }
+
+  function tutupOverlayDanReset() {
+    overlayHasil.className = '';
+    kembaliKeLayarUtama();
+  }
+
+  function kembaliKeLayarUtama() {
+    idTerpilih = '';
+    panggilanTerpilih = '';
+    pinSaatIni = '';
+    tampilkanPinTitik();
+    perbaruiKeypadKirim(false);
+    perbaruiKeypad();
+    document.getElementById('selectNama').value = '';
+    document.querySelectorAll('#hurufDaftar button').forEach(function (b) { b.classList.remove('aktif'); });
+    if (daftarKaryawan.length) { isiSelectNama(daftarKaryawan); }
+    layarPilihNama.classList.remove('aktif');
+    layarUtama.classList.add('aktif');
+  }
+
+  document.getElementById('btnMasuk').addEventListener('click', function () {
+    layarUtama.classList.remove('aktif');
+    layarPilihNama.classList.add('aktif');
+    if (!daftarKaryawan.length && !mutaDaftarKaryawan) { muatDaftarKaryawan(); }
+  });
+
+  perbaruiKeypad();
+})();
+</script>
+</body>
+</html>
