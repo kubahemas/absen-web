@@ -59,11 +59,18 @@
   .jam { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 72px; font-weight: 700; line-height: 1; letter-spacing: -1px; text-align: center; color: #141111; }
   .jam .detik { font-size: 30px; font-weight: 600; color: #3E3F42; margin-left: 4px; }
   .area-tombol { display: flex; flex-direction: column; gap: 14px; flex-grow: 1; }
-  .tombol-absen { height: 112px; border: 4px solid; border-radius: 26px; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 18px; padding: 0 22px; text-align: left; }
+  /* flex-shrink:0 supaya tombol tidak gepeng di layar pendek; judul satu baris dan mengecil di HP sempit */
+  .tombol-absen { height: 112px; flex-shrink: 0; border: 4px solid; border-radius: 26px; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 18px; padding: 0 22px; text-align: left; overflow: hidden; }
   .tombol-absen .lingkar { width: 56px; height: 56px; border-radius: 50%; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .tombol-absen .teks-tombol { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-  .tombol-absen .judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: 0.5px; }
-  .tombol-absen .sub { font-size: 13px; font-weight: 500; }
+  .tombol-absen .teks-tombol { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+  .tombol-absen .judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: clamp(18px, calc((100vw - 170px) / 6.5), 32px); line-height: 1.15; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
+  .tombol-absen .sub { font-size: 13px; line-height: 1.3; font-weight: 500; white-space: nowrap; }
+  @media (max-width: 360px) {
+    .tombol-absen { gap: 12px; padding: 0 14px; }
+    .tombol-absen .lingkar { width: 48px; height: 48px; }
+    .tombol-absen .sub { font-size: 12px; }
+  }
+  #btnLembur { flex-shrink: 0; }
   #btnMasuk { background: #1F8A4C; border-color: #5CC98A; }
   #btnPulang { background: #D92A22; border-color: #FF7A6E; }
   #btnLembur { height: 72px; border: none; border-radius: 20px; background: #141111; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 28px; }
@@ -72,6 +79,49 @@
   .belum-aktif { opacity: 0.45; }
   .baris-admin { display: flex; justify-content: center; }
   #btnAdmin { border: 2px solid #333438; background: transparent; color: #333438; font-family: inherit; font-size: 13px; font-weight: 700; padding: 0 20px; border-radius: 999px; min-height: 44px; }
+
+  /* ---- Layar HP baru (disalin dari mockup 29 - HP baru) ---- */
+  #layarJenis { padding: 24px 22px 28px; gap: 16px; }
+  #layarJenis > img { height: 64px; width: auto; align-self: flex-start; }
+  .judul-blok { display: flex; gap: 12px; align-items: stretch; }
+  .judul-blok .garis { width: 6px; background: #141111; flex-shrink: 0; }
+  .judul-blok .h { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1; }
+  .judul-blok .s { font-size: 13px; font-weight: 600; }
+  .pilih-jenis { min-height: 110px; border: none; border-radius: 24px; font-family: inherit; display: flex; align-items: center; gap: 16px; padding: 0 20px; text-align: left; }
+  .pilih-jenis .bulat { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pilih-jenis .t { display: flex; flex-direction: column; gap: 4px; }
+  .pilih-jenis .j { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700; }
+  .pilih-jenis .k { font-size: 13px; font-weight: 600; }
+  #btnJenisToko { background: #141111; color: #FFD62E; }
+  #btnJenisToko .bulat { background: #FFD62E; }
+  #btnJenisToko .k { color: #FFFFFF; }
+  #btnJenisPribadi { background: #FFFFFF; color: #141111; }
+  #btnJenisPribadi .bulat { background: #141111; }
+  #btnJenisPribadi .k { color: #3E3F42; }
+  .catatan-tengah { font-size: 12px; font-weight: 600; text-align: center; line-height: 1.45; min-height: 18px; }
+
+  /* ---- Layar daftarkan HP toko (disalin dari mockup 30 - Daftarkan HP toko) ---- */
+  #layarDaftarHp { padding: 16px 18px; gap: 10px; }
+  #layarDaftarHp .judul-blok .h { font-size: 22px; }
+  .kartu-putih { background: #FFFFFF; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .kartu-putih .judul-kartu { font-size: 14px; font-weight: 800; }
+  .kartu-putih .bidang { display: flex; flex-direction: column; gap: 6px; }
+  .kartu-putih label { font-size: 13px; font-weight: 700; }
+  .kartu-putih input { height: 42px; border: 2px solid #333438; border-radius: 14px; background: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 700; color: #141111; padding: 0 12px; width: 100%; }
+  .catatan-hijau { font-size: 13px; font-weight: 700; color: #15643A; }
+  .catatan-abu { background: #F2EFE6; border-radius: 12px; padding: 10px 12px; font-size: 12px; font-weight: 700; }
+  #pesanDaftar { min-height: 20px; font-size: 13px; font-weight: 700; color: #B91C1C; text-align: center; }
+  #pesanDaftar.info { color: #141111; }
+  .bar-bawah { display: flex; gap: 10px; flex-shrink: 0; }
+  #btnKembaliJenis { width: 56px; flex-shrink: 0; border: 3px solid #141111; border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: #141111; }
+  #btnDaftarkan { flex-grow: 1; height: 54px; border: 4px solid #5CC98A; border-radius: 26px; background: #1F8A4C; color: #FFFFFF; font-family: inherit; font-size: 18px; font-weight: 800; }
+  #btnDaftarkan:disabled { opacity: 0.5; }
+
+  /* ---- Ringkasan setelah HP terdaftar ---- */
+  #layarRingkasan { padding: 24px 22px; justify-content: center; gap: 14px; }
+  #layarRingkasan .kartu-putih { align-items: center; text-align: center; padding: 28px 18px; }
+  #layarRingkasan .besar { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 30px; font-weight: 700; line-height: 1.15; }
+  #layarRingkasan .rinci { font-size: 15px; font-weight: 700; }
 
   /* ---- Layar pilih nama + PIN ---- */
   #layarPilihNama { }
@@ -146,7 +196,53 @@
 <body>
 <div class="hp">
 
-  <div id="layarUtama" class="layar aktif">
+  <div id="layarJenis" class="layar">
+    <img src="assets/logo.png" alt="Kubah Emas Indonesia">
+    <div class="judul-blok"><div class="garis"></div><div><div class="h">HP ini belum terdaftar</div><div class="s">Pilih dipakai untuk apa. Cukup sekali.</div></div></div>
+    <div style="flex-grow:1"></div>
+    <button type="button" class="pilih-jenis" id="btnJenisToko">
+      <div class="bulat"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#141111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"></path><path d="M4 9v11h16V9"></path><path d="M9 20v-6h6v6"></path></svg></div>
+      <div class="t"><div class="j">HP TOKO</div><div class="k">Untuk absen semua karyawan.</div></div>
+    </button>
+    <button type="button" class="pilih-jenis" id="btnJenisPribadi">
+      <div class="bulat"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFD62E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"></rect><path d="M11 18h2"></path></svg></div>
+      <div class="t"><div class="j">HP PRIBADI</div><div class="k">Untuk absen luar, izin, dan report milik sendiri.</div></div>
+    </button>
+    <div class="catatan-tengah" id="catatanJenis"></div>
+    <div style="flex-grow:1"></div>
+    <div class="catatan-tengah">Pilihan ini tidak bisa diubah sendiri.</div>
+  </div>
+
+  <div id="layarDaftarHp" class="layar">
+    <div class="judul-blok"><div class="garis"></div><div><div class="h">Daftarkan HP toko</div><div class="s">Verifikasi admin cabang</div></div></div>
+    <form class="kartu-putih" id="formDaftarHp" autocomplete="off" onsubmit="return false">
+      <div class="judul-kartu">1. Verifikasi admin cabang</div>
+      <div class="bidang"><label for="inUsername">Username (nama lengkap)</label><input id="inUsername" name="username_admin" autocomplete="off" autocapitalize="words" placeholder="Nama lengkap admin"></div>
+      <div class="bidang"><label for="inPassword">Password</label><input id="inPassword" name="password_admin" type="password" autocomplete="new-password" placeholder="••••••"></div>
+      <div class="catatan-hijau">Hanya verifikasi, tidak login.</div>
+    </form>
+    <div class="kartu-putih">
+      <div class="judul-kartu">2. Data HP ini</div>
+      <div class="bidang"><label for="inNamaHp">Nama HP (bebas, supaya mudah dikenali)</label><input id="inNamaHp" autocomplete="off" maxlength="40" value="HP Toko"></div>
+      <div class="catatan-abu">Cabang mengikuti admin. Lokasi HP ikut dicatat.</div>
+    </div>
+    <div id="pesanDaftar"></div>
+    <div style="flex-grow:1"></div>
+    <div class="bar-bawah">
+      <button type="button" id="btnKembaliJenis" aria-label="Kembali">‹</button>
+      <button type="button" id="btnDaftarkan">Daftarkan</button>
+    </div>
+  </div>
+
+  <div id="layarRingkasan" class="layar">
+    <div class="kartu-putih">
+      <div class="besar">HP terdaftar</div>
+      <div class="rinci" id="ringkasanIsi"></div>
+      <div class="catatan-tengah">Ketuk untuk lanjut</div>
+    </div>
+  </div>
+
+  <div id="layarUtama" class="layar">
     <div class="baris-atas">
       <img src="assets/logo.png" alt="Kubah Emas Indonesia">
       <div class="kolom-kanan-atas">
@@ -247,8 +343,46 @@
   const metaTema = document.querySelector('meta[name="theme-color"]');
   const TEMA = { kuning: '#FFD62E', hijau: '#1F8A4C', merah: '#B91C1C' };
 
-  document.getElementById('namaCabang').textContent = 'Cabang ' + CONFIG.cabang + ' · ' + CONFIG.namaPerangkat;
-  document.getElementById('labelShift').textContent = CONFIG.labelShift;
+  // ---- Data HP toko (token dll.) di localStorage. Password admin TIDAK pernah disimpan. ----
+  const KUNCI_HP = 'absen_hp_toko';
+  let hpAktif = null; // { token, id, nama, cabang, kode }
+
+  function bacaHp() {
+    try {
+      const h = JSON.parse(localStorage.getItem(KUNCI_HP) || 'null');
+      return h && h.token ? h : null;
+    } catch (e) { return null; }
+  }
+  function simpanHp(h) {
+    hpAktif = h;
+    try { localStorage.setItem(KUNCI_HP, JSON.stringify(h)); } catch (e) { /* tetap jalan selama halaman terbuka */ }
+  }
+  function hapusHp() {
+    hpAktif = null;
+    try { localStorage.removeItem(KUNCI_HP); } catch (e) { /* abaikan */ }
+  }
+  function tampilkanLabelCabang() {
+    document.getElementById('namaCabang').textContent = hpAktif ? 'Cabang ' + hpAktif.cabang + ' · ' + hpAktif.nama : 'Cabang';
+  }
+
+  const semuaLayar = document.querySelectorAll('.layar');
+  function tampilLayar(el) {
+    semuaLayar.forEach(function (l) { l.classList.toggle('aktif', l === el); });
+    window.scrollTo(0, 0);
+  }
+  const layarJenis = document.getElementById('layarJenis');
+  const layarDaftarHp = document.getElementById('layarDaftarHp');
+  const layarRingkasan = document.getElementById('layarRingkasan');
+
+  // Token ditolak server: lupakan token ini dan kembali ke pilihan jenis HP.
+  function hpTidakTerdaftar() {
+    tutupPopup();
+    tutupLayarAlasan();
+    alasan = null;
+    hapusHp();
+    daftarKaryawan = [];
+    tampilLayar(layarJenis);
+  }
   document.getElementById('tanggalHariIni').textContent = new Intl.DateTimeFormat('id-ID', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
   }).format(new Date());
@@ -304,6 +438,7 @@
 
   function tampilkanInfoShift(sh) {
     if (!sh) { return; }
+    document.getElementById('labelShift').textContent = sh.nama + ' aktif';
     document.getElementById('subMasuk').textContent = sh.nama + ' mulai ' + sh.masuk;
     document.getElementById('subPulang').textContent = 'Pulang normal ' + sh.pulang;
     // "Aktif mulai" = jam pulang + toleransi pulang + 1 menit
@@ -318,13 +453,22 @@
     const info = document.getElementById('infoMuat');
     info.textContent = 'Memuat daftar nama...';
     mutaDaftarKaryawan = true;
-    const url = CONFIG.webAppUrl + '?aksi=daftar_karyawan&cabang=' + encodeURIComponent(CONFIG.cabang);
-    fetch(url)
+    fetch(CONFIG.webAppUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ aksi: 'daftar_karyawan', token: hpAktif.token })
+    })
       .then(function (r) { return r.json(); })
       .then(function (data) {
         mutaDaftarKaryawan = false;
-        if (data.status === 'ok') {
+        if (data.kode === 'HP_TIDAK_TERDAFTAR') {
+          hpTidakTerdaftar();
+        } else if (data.status === 'ok') {
           daftarKaryawan = data.data.slice().sort(function (a, b) { return a.nama.localeCompare(b.nama); });
+          if (data.hp) {
+            simpanHp({ token: hpAktif.token, id: data.hp.id, nama: data.hp.nama, cabang: data.hp.cabang, kode: hpAktif.kode });
+            tampilkanLabelCabang();
+          }
           tampilkanInfoShift(data.shift);
           info.textContent = '';
           bangunHurufDaftar();
@@ -597,11 +741,12 @@
     fetch(CONFIG.webAppUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ aksi: 'simpan_alasan', id: alasan.id, kode_alasan: alasan.kode, alasan: { pilihan: alasan.pilihan, teks: teks } })
+      body: JSON.stringify({ aksi: 'simpan_alasan', token: hpAktif.token, id: alasan.id, kode_alasan: alasan.kode, alasan: { pilihan: alasan.pilihan, teks: teks } })
     })
       .then(function (r) { return r.json(); })
       .then(function (data) {
         sedangSimpanAlasan = false;
+        if (data.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return; }
         tutupLayarAlasan();
         alasan = null;
         if (data.status === 'ok') {
@@ -627,7 +772,7 @@
     fetch(CONFIG.webAppUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ aksi: 'absen_masuk', id: idTerpilih, pin: pinSaatIni })
+      body: JSON.stringify({ aksi: 'absen_masuk', token: hpAktif.token, id: idTerpilih, pin: pinSaatIni })
     })
       .then(function (r) { return r.json(); })
       .then(function (data) { tampilkanHasil(data); })
@@ -639,6 +784,7 @@
   }
 
   function tampilkanHasil(data) {
+    if (data.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return; }
     if (data.status !== 'ok') {
       tampilGagal(data.pesan);
       return;
@@ -657,27 +803,121 @@
     document.getElementById('selectNama').value = '';
     document.querySelectorAll('#hurufDaftar button').forEach(function (b) { b.classList.remove('aktif'); });
     if (daftarKaryawan.length) { isiSelectNama(daftarKaryawan); }
-    layarPilihNama.classList.remove('aktif');
-    layarUtama.classList.add('aktif');
+    tampilLayar(hpAktif ? layarUtama : layarJenis);
   }
 
   document.getElementById('btnMasuk').addEventListener('click', function () {
-    layarUtama.classList.remove('aktif');
-    layarPilihNama.classList.add('aktif');
+    tampilLayar(layarPilihNama);
     if (!daftarKaryawan.length && !mutaDaftarKaryawan) { muatDaftarKaryawan(); }
   });
 
   perbaruiKeypad();
-  muatDaftarKaryawan(); // sekaligus mengisi info shift di tombol
+
+  // ---- Pilih jenis HP & pendaftaran HP toko ----
+  const inUsername = document.getElementById('inUsername');
+  const inPassword = document.getElementById('inPassword');
+  const inNamaHp = document.getElementById('inNamaHp');
+  const pesanDaftar = document.getElementById('pesanDaftar');
+  const btnDaftarkan = document.getElementById('btnDaftarkan');
+
+  function kosongkanFormDaftar() {
+    inUsername.value = '';
+    inPassword.value = '';
+    inNamaHp.value = 'HP Toko';
+    pesanDaftar.textContent = '';
+    pesanDaftar.className = '';
+    btnDaftarkan.disabled = false;
+  }
+
+  document.getElementById('btnJenisToko').addEventListener('click', function () {
+    kosongkanFormDaftar();
+    tampilLayar(layarDaftarHp);
+  });
+  document.getElementById('btnJenisPribadi').addEventListener('click', function () {
+    document.getElementById('catatanJenis').textContent = 'HP pribadi: belum tersedia.';
+  });
+  document.getElementById('btnKembaliJenis').addEventListener('click', function () {
+    kosongkanFormDaftar();
+    tampilLayar(layarJenis);
+  });
+
+  function pesanLokasi(err) {
+    if (err && err.code === 1) { return 'Izin lokasi ditolak. Izinkan lokasi untuk situs ini di pengaturan browser, lalu coba lagi.'; }
+    if (err && err.code === 3) { return 'Lokasi terlalu lama didapat. Pindah ke tempat terbuka lalu coba lagi.'; }
+    return 'Lokasi HP tidak bisa diambil. Nyalakan GPS lalu coba lagi.';
+  }
+
+  btnDaftarkan.addEventListener('click', function () {
+    const username = inUsername.value.trim();
+    const password = inPassword.value;
+    const namaHp = inNamaHp.value.trim();
+    pesanDaftar.className = '';
+    if (!username || !password) { pesanDaftar.textContent = 'Isi username dan password admin.'; return; }
+    if (!namaHp) { pesanDaftar.textContent = 'Isi nama HP.'; return; }
+    if (!navigator.geolocation) { pesanDaftar.textContent = 'Browser ini tidak mendukung lokasi.'; return; }
+
+    btnDaftarkan.disabled = true;
+    pesanDaftar.className = 'info';
+    pesanDaftar.textContent = 'Mengambil lokasi...';
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      pesanDaftar.textContent = 'Mendaftarkan...';
+      const body = JSON.stringify({
+        aksi: 'daftar_hp_toko', username: username, password: password, nama_hp: namaHp,
+        lat: pos.coords.latitude, lng: pos.coords.longitude, akurasi: pos.coords.accuracy
+      });
+      inPassword.value = ''; // password tidak disimpan di mana pun
+      fetch(CONFIG.webAppUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.status === 'ok') {
+            simpanHp({ token: data.token, id: data.id_hp, nama: data.nama_hp, cabang: data.cabang, kode: data.kode_perangkat });
+            kosongkanFormDaftar();
+            tampilkanLabelCabang();
+            document.getElementById('ringkasanIsi').textContent = data.id_hp + ' · ' + data.kode_perangkat + ' · Cabang ' + data.cabang;
+            tampilLayar(layarRingkasan);
+            setTimeout(lanjutDariRingkasan, 3000);
+            muatDaftarKaryawan();
+          } else {
+            pesanDaftar.className = '';
+            pesanDaftar.textContent = data.pesan || 'Pendaftaran gagal.';
+            btnDaftarkan.disabled = false;
+          }
+        })
+        .catch(function () {
+          pesanDaftar.className = '';
+          pesanDaftar.textContent = 'Tidak bisa terhubung ke server. Coba lagi.';
+          btnDaftarkan.disabled = false;
+        });
+    }, function (err) {
+      pesanDaftar.className = '';
+      pesanDaftar.textContent = pesanLokasi(err);
+      btnDaftarkan.disabled = false;
+    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+  });
+
+  function lanjutDariRingkasan() {
+    if (layarRingkasan.classList.contains('aktif')) { tampilLayar(layarUtama); }
+  }
+  layarRingkasan.addEventListener('click', lanjutDariRingkasan);
+
+  // ---- Mulai: ada token tersimpan = layar utama, kalau tidak = pilih jenis HP ----
+  hpAktif = bacaHp();
+  if (hpAktif) {
+    tampilkanLabelCabang();
+    tampilLayar(layarUtama);
+    muatDaftarKaryawan(); // sekaligus memeriksa token dan mengisi info shift di tombol
+  } else {
+    tampilLayar(layarJenis);
+  }
 
   // Tombol Back HP: layar utama diabaikan, pop-up/layar wajib tidak bisa ditutup,
-  // layar pilih nama kembali ke layar utama.
+  // layar pilih nama kembali ke layar utama, layar daftar kembali ke pilihan jenis.
   history.pushState({ absen: 1 }, '');
   window.addEventListener('popstate', function () {
     history.pushState({ absen: 1 }, '');
-    if (!wajib && layarPilihNama.classList.contains('aktif') && !popup.classList.contains('tampil')) {
-      kembaliKeLayarUtama();
-    }
+    if (wajib || popup.classList.contains('tampil')) { return; }
+    if (layarPilihNama.classList.contains('aktif')) { kembaliKeLayarUtama(); }
+    else if (layarDaftarHp.classList.contains('aktif')) { kosongkanFormDaftar(); tampilLayar(layarJenis); }
   });
 
   if ('serviceWorker' in navigator) {

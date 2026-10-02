@@ -110,7 +110,9 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - Log owner ditampilkan per kategori; detail tiap kategori berupa tabel dengan filter di judul kolom (bisa difilter berdasarkan waktu, admin, cabang, karyawan).
 
 ## Belum aman dipakai karyawan sungguhan (wajib dikerjakan sebelum go-live)
-- Semua aksi selain `ping` wajib menyertakan token HP toko terdaftar atau sesi login yang sah (lihat `docs/keputusan-desain.md` bagian 11). Saat ini `daftar_karyawan` dan `absen_masuk` di `apps-script/api.gs` BELUM mengecek token apa pun — siapa saja yang tahu URL Web App bisa memanggilnya. Ini cukup untuk tes/pengembangan, tapi harus ditutup dengan sistem token (sheet `sesi`) sebelum dipakai di toko sungguhan.
+- Token HP toko SUDAH berlaku (Paket 2A): `daftar_karyawan`, `absen_masuk`, `simpan_alasan` wajib menyertakan token (POST). Tiap HP toko = satu baris `akun` role PERANGKAT (id `HPT-{kode cabang}-{nn}`); yang disimpan di `pw_hash` hanya hash token (garam `TOKEN_HP` + `KODE_RAHASIA`), token asli tidak pernah disimpan. Cabang selalu ditentukan server dari baris HP itu. Kode cabang dibaca dari sheet `pengaturan` (kategori `CABANG`, nama = nama cabang, nilai = kode 3 huruf).
+- **Catatan cache token:** hasil validasi token disimpan di CacheService selama 10 menit. Menghapus baris HP toko atau mengubah `aktif` jadi FALSE baru berlaku maksimal 10 menit kemudian.
+- Masih belum ada: sesi login untuk admin/owner/HP pribadi (sheet `sesi`) — Paket 2B. `tes/tes-api.html` memakai API lama tanpa token dan sudah tidak berfungsi.
 - Akun owner `OWN01` belum dibuat. Saat dibuat nanti, WAJIB lewat fungsi khusus di editor Apps Script yang meminta password diketik interaktif saat fungsi dijalankan (`Browser.inputBox` atau sejenisnya) — password owner tidak boleh ditulis sebagai teks di kode `apps-script/` manapun (kode itu disalin ke GitHub yang publik).
 
 ## Rencana tahap 1 (kerjakan berurutan)

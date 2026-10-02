@@ -7,10 +7,12 @@
  * = semua file .gs saling bisa panggil fungsi satu sama lain).
  *
  * - GET  ?aksi=ping           -> tes hidup, boleh dari address bar browser.
- * - GET  ?aksi=daftar_karyawan&cabang=... -> daftar {id, nama, panggilan}
- *   karyawan/admin aktif di satu cabang. Dipakai halaman HP toko (index.html)
- *   untuk mengisi daftar nama. Tidak ada data rahasia di balasan ini.
- * - POST { aksi:'absen_masuk', id, pin } -> WAJIB lewat POST (bukan GET)
+ * - POST { aksi:'daftar_hp_toko', username, password, nama_hp, lat, lng, akurasi }
+ *   -> verifikasi admin cabang lalu buat token HP toko (lihat "Token HP toko").
+ * - POST { aksi:'daftar_karyawan', token } -> daftar {id, nama, panggilan}
+ *   karyawan/admin aktif di cabang HP toko itu (cabang dari server, bukan dari HP).
+ * - Semua aksi selain ping dan daftar_hp_toko WAJIB menyertakan token HP toko.
+ * - POST { aksi:'absen_masuk', token, id, pin } -> WAJIB lewat POST (bukan GET)
  *   supaya PIN tidak muncul di alamat URL. Body dikirim sebagai teks JSON
  *   dengan Content-Type text/plain (bukan application/json) supaya browser
  *   tidak melakukan CORS preflight yang tidak didukung Apps Script.
@@ -33,14 +35,10 @@ function doGet(e) {
     });
   }
 
-  if (aksi === 'daftar_karyawan') {
-    return prosesDaftarKaryawan(e.parameter.cabang);
-  }
-
-  if (aksi === 'absen_masuk') {
+  if (aksi === 'absen_masuk' || aksi === 'daftar_karyawan') {
     return respon({
       status: 'gagal',
-      pesan: 'Absen masuk sekarang harus lewat POST, bukan GET. Pakai tes/tes-api.html untuk tes.'
+      pesan: 'Aksi ini harus lewat POST dengan token HP toko, bukan GET.'
     });
   }
 
@@ -56,10 +54,9 @@ function doGet(e) {
  * cuma tidak lembur — jadi tetap harus muncul di daftar ini). Owner dan
  * akun PERANGKAT tidak absen, jadi tidak disertakan.
  */
-function prosesDaftarKaryawan(cabang) {
-  if (!cabang) {
-    return respon({ status: 'gagal', pesan: 'cabang wajib diisi' });
-  }
+function prosesDaftarKaryawan(hp) {
+  // Cabang SELALU dari baris HP toko di server, bukan kiriman HP.
+  const cabang = hp.cabang;
   const akun = bacaSheet('akun');
   const daftar = akun.data
     .filter(function (r) {
@@ -80,7 +77,7 @@ function prosesDaftarKaryawan(cabang) {
       toleransi_pulang: sh.toleransi !== null ? sh.toleransi : ambilNilaiUmum('toleransi_pulang_menit', 5)
     };
   }
-  return respon({ status: 'ok', data: daftar, shift: infoShift });
+  return respon({ status: 'ok', data: daftar, shift: infoShift, hp: { id: hp.id, nama: hp.nama, cabang: hp.cabang } });
 }
 
 function doPost(e) {
@@ -91,18 +88,26 @@ function doPost(e) {
     return respon({ status: 'gagal', pesan: 'Data yang dikirim bukan JSON yang valid.' });
   }
 
-  if (data.aksi === 'absen_masuk') {
-    return prosesAbsenMasuk(data.id, data.pin);
+  // Pendaftaran HP toko: diverifikasi lewat username+password admin, tanpa token.
+  if (data.aksi === 'daftar_hp_toko') {
+    return prosesDaftarHpToko(data);
   }
 
-  if (data.aksi === 'simpan_alasan') {
-    return prosesSimpanAlasan(data.id, data.kode_alasan, data.alasan);
+  // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
+  if (data.aksi === 'daftar_karyawan' || data.aksi === 'absen_masuk' || data.aksi === 'simpan_alasan') {
+    const hp = validasiTokenHp(data.token);
+    if (!hp) {
+      return respon({ status: 'gagal', kode: 'HP_TIDAK_TERDAFTAR', pesan: 'HP ini belum terdaftar atau sudah dinonaktifkan' });
+    }
+    if (data.aksi === 'daftar_karyawan') { return prosesDaftarKaryawan(hp); }
+    if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp); }
+    return prosesSimpanAlasan(data.id, data.kode_alasan, data.alasan, hp);
   }
 
   return respon({ status: 'gagal', pesan: 'Aksi tidak dikenali.' });
 }
 
-function prosesAbsenMasuk(id, pin) {
+function prosesAbsenMasuk(id, pin, hp) {
   if (!id || !pin) {
     return respon({ status: 'gagal', pesan: 'id dan pin wajib diisi' });
   }
@@ -115,7 +120,10 @@ function prosesAbsenMasuk(id, pin) {
   const akun = bacaSheet('akun');
   const akunDitemukan = akun.data.find(function (r) { return String(r.id) === String(id); });
 
-  if (!akunDitemukan) {
+  // Karyawan harus dari cabang HP toko ini (dicek sebelum PIN, jadi tidak menaikkan salah_login).
+  // Hanya KARYAWAN/ADMIN yang boleh absen lewat sini.
+  if (!akunDitemukan || akunDitemukan.cabang !== hp.cabang ||
+      (akunDitemukan.role !== 'KARYAWAN' && akunDitemukan.role !== 'ADMIN')) {
     // Sengaja pesan disamakan dengan "PIN salah" supaya id karyawan tidak bisa ditebak-tebak.
     return respon({ status: 'gagal', pesan: 'Karyawan atau PIN salah' });
   }
@@ -223,7 +231,7 @@ function prosesAbsenMasuk(id, pin) {
  * dikirim saat absen masuk (berlaku 5 menit), dan ket_masuk hari ini harus
  * masih "TIDAK DIISI". alasan = { pilihan, teks }.
  */
-function prosesSimpanAlasan(id, kode, alasan) {
+function prosesSimpanAlasan(id, kode, alasan, hp) {
   if (!id || !kode) {
     return respon({ status: 'gagal', pesan: 'Data tidak lengkap' });
   }
@@ -239,7 +247,7 @@ function prosesSimpanAlasan(id, kode, alasan) {
   const baris = absensi.data.find(function (r) {
     return String(r.karyawan) === String(id) && sebagaiTanggalTeks(r.tanggal, zona) === tanggalHariIni;
   });
-  if (!baris || baris.ket_masuk !== 'TIDAK DIISI') {
+  if (!baris || baris.cabang !== hp.cabang || baris.ket_masuk !== 'TIDAK DIISI') {
     return respon({ status: 'gagal', pesan: 'Alasan tidak bisa disimpan' });
   }
 
@@ -258,6 +266,162 @@ function prosesSimpanAlasan(id, kode, alasan) {
   perbaruiKolom(absensi, baris, { ket_masuk: teks ? pilihan + ': ' + teks : pilihan });
   cache.remove(KUNCI_KODE_ALASAN + id);
   return respon({ status: 'ok', pesan: 'Alasan tersimpan' });
+}
+
+/**
+ * ---- Token HP toko ----
+ * Token asli (acak, 3 UUID v4 digabung = lebih dari 128 bit) dibuat di server,
+ * dikirim ke HP sekali saat pendaftaran, TIDAK pernah disimpan di sheet/log.
+ * Yang disimpan hanya hash-nya di akun.pw_hash baris role PERANGKAT.
+ * Hasil validasi di-cache 10 menit (kunci = hash token), jadi menghapus baris
+ * atau mengubah aktif jadi FALSE baru berlaku maksimal 10 menit kemudian.
+ */
+var GARAM_TOKEN_HP = 'TOKEN_HP';
+
+function hashTokenHp(token) {
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  return hashDenganGaram(String(token), GARAM_TOKEN_HP, kodeRahasia);
+}
+
+/** Kembalikan { id, nama, cabang } kalau token sah, kalau tidak null. */
+function validasiTokenHp(token) {
+  if (!token || typeof token !== 'string' || token.length < 32 || token.length > 200) { return null; }
+  if (!PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA')) { return null; }
+  const hash = hashTokenHp(token);
+  const cache = CacheService.getScriptCache();
+  const kunci = 'hp_' + hash;
+  const tersimpan = cache.get(kunci);
+  if (tersimpan) { return JSON.parse(tersimpan); }
+
+  const baris = bacaSheet('akun').data.find(function (r) {
+    return r.role === 'PERANGKAT' && r.aktif === true && r.pw_hash === hash;
+  });
+  if (!baris) { return null; }
+  const hp = { id: baris.id, nama: baris.nama, cabang: baris.cabang };
+  cache.put(kunci, JSON.stringify(hp), 600);
+  return hp;
+}
+
+/**
+ * Daftarkan HP toko baru. HANYA verifikasi admin cabang (username + password);
+ * tidak membuat sesi login apa pun. Cabang ikut cabang admin.
+ */
+function prosesDaftarHpToko(d) {
+  const pesanUmum = 'Username atau password salah, atau akun bukan admin';
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  if (!kodeRahasia) {
+    return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' });
+  }
+
+  const username = String(d.username || '').trim().toLowerCase();
+  const password = String(d.password || '');
+  if (!username || !password || password.length > 100) {
+    return respon({ status: 'gagal', pesan: pesanUmum });
+  }
+
+  // Lokasi wajib.
+  const lat = Number(d.lat), lng = Number(d.lng), akurasi = Number(d.akurasi);
+  if (d.lat === '' || d.lat == null || d.lng === '' || d.lng == null ||
+      !isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+    return respon({ status: 'gagal', pesan: 'Lokasi HP wajib dan harus valid. Izinkan akses lokasi lalu coba lagi.' });
+  }
+  const akurasiBulat = isFinite(akurasi) && akurasi >= 0 ? Math.round(akurasi) : 0;
+
+  const akun = bacaSheet('akun');
+  const admin = akun.data.find(function (r) {
+    return String(r.nama).trim().toLowerCase() === username && r.role === 'ADMIN';
+  });
+  if (!admin || admin.aktif !== true || admin.terkunci === true || admin.ganti_pw === true) {
+    return respon({ status: 'gagal', pesan: pesanUmum });
+  }
+
+  if (hashDenganGaram(password, String(admin.id), kodeRahasia) !== admin.pw_hash) {
+    const salahBaru = (Number(admin.salah_login) || 0) + 1;
+    if (salahBaru >= 5) {
+      perbaruiKolom(akun, admin, { salah_login: salahBaru, terkunci: true });
+      tambahLog({
+        jenis: 'KEAMANAN', oleh: admin.id, cabang: admin.cabang, aksi: 'KUNCI_AKUN',
+        target: 'akun', id: admin.id, sebelum: 'terkunci=FALSE', sesudah: 'terkunci=TRUE',
+        alasan: 'Password salah 5 kali saat daftar HP toko'
+      });
+    } else {
+      perbaruiKolom(akun, admin, { salah_login: salahBaru });
+    }
+    return respon({ status: 'gagal', pesan: pesanUmum });
+  }
+  if (Number(admin.salah_login) !== 0) {
+    perbaruiKolom(akun, admin, { salah_login: 0 });
+  }
+
+  const kodeCabang = ambilKodeCabang(admin.cabang);
+  if (!kodeCabang) {
+    return respon({ status: 'gagal', pesan: 'Kode cabang ' + admin.cabang + ' belum diisi di sheet pengaturan (kategori CABANG)' });
+  }
+
+  const kunciLock = LockService.getScriptLock();
+  kunciLock.waitLock(15000);
+  try {
+    // Nomor HP = nomor terbesar yang pernah ada di cabang ini + 1 (termasuk yang tidak aktif).
+    const polaId = new RegExp('^HPT-' + kodeCabang + '-(\\d+)$');
+    let maks = 0;
+    bacaSheet('akun').data.forEach(function (r) {
+      const m = polaId.exec(String(r.id));
+      if (r.role === 'PERANGKAT' && m) { maks = Math.max(maks, Number(m[1])); }
+    });
+    const nomor = maks + 1;
+    const idHp = 'HPT-' + kodeCabang + '-' + ('0' + nomor).slice(-2);
+
+    let namaHp = String(d.nama_hp || '').trim().slice(0, 40);
+    if (!namaHp || namaHp === 'HP Toko') { namaHp = 'HP Toko ' + nomor; }
+
+    const token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+    const gps = lat + ',' + lng + ',' + akurasiBulat;
+
+    const baru = {};
+    akun.header.forEach(function (nama) { baru[nama] = ''; });
+    baru.id = idHp;
+    baru.nama = namaHp;
+    baru.panggilan = namaHp;
+    baru.cabang = admin.cabang;
+    baru.role = 'PERANGKAT';
+    baru.pw_hash = hashTokenHp(token);
+    baru.aktif = true;
+    baru.ganti_pw = false;
+    baru.ganti_pin = false;
+    baru.salah_login = 0;
+    baru.terkunci = false;
+    akun.sheet.appendRow(akun.header.map(function (nama) { return baru[nama]; }));
+    const barisBaru = akun.sheet.getLastRow();
+    const kolGps = akun.header.indexOf('gps_daftar') + 1;
+    if (kolGps > 0) {
+      const sel = akun.sheet.getRange(barisBaru, kolGps);
+      sel.setNumberFormat('@');
+      sel.setValue(gps);
+    }
+
+    tambahLog({
+      jenis: 'PERANGKAT', oleh: admin.id, cabang: admin.cabang, aksi: 'DAFTAR_HP_TOKO',
+      target: namaHp, id: idHp, sesudah: gps
+    });
+
+    return respon({
+      status: 'ok',
+      token: token,
+      id_hp: idHp,
+      nama_hp: namaHp,
+      cabang: admin.cabang,
+      kode_perangkat: 'T' + nomor
+    });
+  } finally {
+    kunciLock.releaseLock();
+  }
+}
+
+/** Kode cabang 3 huruf dari sheet pengaturan (kategori CABANG, nama = nama cabang, nilai = kode). */
+function ambilKodeCabang(cabang) {
+  const baris = bacaSheet('pengaturan').data.find(function (r) { return r.kategori === 'CABANG' && r.nama === cabang; });
+  const kode = baris ? String(baris.nilai).trim().toUpperCase() : '';
+  return /^[A-Z]{3}$/.test(kode) ? kode : '';
 }
 
 var ZONA_ABSEN = 'Asia/Jakarta';
@@ -362,6 +526,13 @@ function tambahLog(field) {
   baris.waktu = Utilities.formatDate(new Date(), zona, 'yyyy-MM-dd HH:mm');
   Object.keys(field).forEach(function (k) { baris[k] = field[k]; });
   log.sheet.appendRow(log.header.map(function (nama) { return baris[nama]; }));
+  // Teks seperti "-7.6,111.4,20" jangan sampai diubah Sheets jadi angka: paksa format teks.
+  const kolSesudah = log.header.indexOf('sesudah') + 1;
+  if (kolSesudah > 0 && /^[-\d.,\s]+$/.test(String(baris.sesudah)) && String(baris.sesudah) !== '') {
+    const sel = log.sheet.getRange(log.sheet.getLastRow(), kolSesudah);
+    sel.setNumberFormat('@');
+    sel.setValue(String(baris.sesudah));
+  }
 }
 
 /**

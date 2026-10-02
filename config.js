@@ -1,11 +1,7 @@
 /**
- * Konfigurasi halaman HP toko. Edit nilai di bawah sesuai cabang & deployment
- * Apps Script kamu. Tidak ada rahasia di sini — hanya alamat Web App (publik,
- * tetap dilindungi verifikasi PIN) dan nama cabang.
+ * Konfigurasi halaman HP toko. Tidak ada rahasia di sini — hanya alamat Web App.
+ * Nama cabang dan nama HP ditentukan server dari token HP toko yang terdaftar.
  */
 window.APP_CONFIG = {
-  webAppUrl: 'https://script.google.com/macros/s/AKfycbzD90WskDBVYbE76Yt2HRn6QtNIx6eJIJX4lyLBB4gvozQOmv8WBt8W_D6MUMu-khw/exec',
-  cabang: 'Ngawi',
-  namaPerangkat: 'HP Toko 1',
-  labelShift: 'Shift 1 aktif'
+  webAppUrl: 'https://script.google.com/macros/s/AKfycbzD90WskDBVYbE76Yt2HRn6QtNIx6eJIJX4lyLBB4gvozQOmv8WBt8W_D6MUMu-khw/exec'
 };
