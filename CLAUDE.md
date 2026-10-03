@@ -45,7 +45,9 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 2. `shift`: cabang, no, nama, masuk, tutup, pulang, toleransi
 3. `kalender`: tanggal, cabang, karyawan (kosong = semua), isi (LIBUR MINGGU / LIBUR TANGGAL MERAH / LIBUR KHUSUS / nomor shift)
 4. `pengaturan`: kategori, nama, nilai, kelompok, maks — kategori yang dipakai:
-   - `UMUM`: jatah_cuti=6, jendela_absen_menit=60, toleransi_pulang_menit=5, batas_telat_bad=5, batas_pulang_awal_bad=5, batas_izin_biasa_bad=3, simpan_foto_bulan=2, simpan_absensi_bulan=3, batas_isi_alasan_detik=10, libur_minggu_NGW=TRUE (toko Ngawi tutup hari Minggu; per cabang, nama diikuti kode cabang 3 huruf), ukuran_panduan_wajah=60, batas_izin_lewat_hari=2, sesi_owner_hari=7, sinkron_karyawan_menit=30
+   - `UMUM`: jatah_cuti=6, jendela_absen_menit=60, toleransi_pulang_menit=5, batas_telat_bad=5, batas_pulang_awal_bad=5, batas_izin_biasa_bad=3, simpan_foto_bulan=2, simpan_absensi_bulan=3, batas_isi_alasan_detik=10, libur_minggu_NGW=TRUE (toko Ngawi tutup hari Minggu; per cabang, nama diikuti kode cabang 3 huruf), ukuran_panduan_wajah=60, batas_izin_lewat_hari=2, sesi_owner_hari=7, sinkron_karyawan_menit=30, akurasi_maks_m=100 dan radius_daftar_m=100 (batas akurasi GPS dan jarak maksimal HP ke toko saat mendaftarkan HP toko; kalau barisnya tidak ada, server memakai bawaan 100)
+   - `CABANG`: nama = nama cabang, nilai = kode 3 huruf (contoh Ngawi -> NGW).
+   - `LOKASI`: nama = nama cabang (persis sama dengan `akun.cabang`), nilai = koordinat toko "lat,lng" (contoh `-7.4044,111.4462`). Kalau barisnya tidak ada atau tidak valid, pendaftaran HP toko DITOLAK. Sel nilai harus berformat Plain text.
    - `JENIS_IZIN` (kolom `kelompok` menandai jenis izin): Sakit (biasa; jadi khusus kalau ada surat dokter — ditentukan saat pengajuan, bukan nilai tetap di sini), Keperluan pribadi (biasa), Menikah (khusus, maks 3), Keluarga meninggal (khusus, maks 2), Istri melahirkan (khusus, maks 2), Cuti (cuti)
    - `ALASAN_TELAT`: Macet, Hujan, Kendaraan bermasalah, Urusan keluarga, Sakit, Lainnya
    - `ALASAN_PULANG_AWAL`: Sakit, Urusan keluarga, Disuruh atasan, Lainnya
@@ -112,7 +114,7 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 ## Belum aman dipakai karyawan sungguhan (wajib dikerjakan sebelum go-live)
 - Token HP toko SUDAH berlaku (Paket 2A): `daftar_karyawan`, `absen_masuk`, `simpan_alasan` wajib menyertakan token (POST). Tiap HP toko = satu baris `akun` role PERANGKAT (id `HPT-{kode cabang}-{nn}`); yang disimpan di `pw_hash` hanya hash token (garam `TOKEN_HP` + `KODE_RAHASIA`), token asli tidak pernah disimpan. Cabang selalu ditentukan server dari baris HP itu. Kode cabang dibaca dari sheet `pengaturan` (kategori `CABANG`, nama = nama cabang, nilai = kode 3 huruf).
 - **Catatan cache token:** hasil validasi token disimpan di CacheService selama 10 menit. Menghapus baris HP toko atau mengubah `aktif` jadi FALSE baru berlaku maksimal 10 menit kemudian.
-- Masih belum ada: sesi login untuk admin/owner/HP pribadi (sheet `sesi`) — Paket 2B. `tes/tes-api.html` memakai API lama tanpa token dan sudah tidak berfungsi.
+- Masih belum ada: sesi login untuk admin/owner/HP pribadi (sheet `sesi`) — Paket 2B. Halaman tes lama `tes/tes-api.html` sudah dihapus.
 - Akun owner `OWN01` belum dibuat. Saat dibuat nanti, WAJIB lewat fungsi khusus di editor Apps Script yang meminta password diketik interaktif saat fungsi dijalankan (`Browser.inputBox` atau sejenisnya) — password owner tidak boleh ditulis sebagai teks di kode `apps-script/` manapun (kode itu disalin ke GitHub yang publik).
 
 ## Rencana tahap 1 (kerjakan berurutan)

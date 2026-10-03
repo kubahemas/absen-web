@@ -16,7 +16,6 @@
  *   supaya PIN tidak muncul di alamat URL. Body dikirim sebagai teks JSON
  *   dengan Content-Type text/plain (bukan application/json) supaya browser
  *   tidak melakukan CORS preflight yang tidak didukung Apps Script.
- *   Cara tes: buka tes/tes-api.html di komputer (lihat penjelasan terpisah).
  *
  * Pengaman PIN: setiap PIN salah, salah_login bertambah 1. Sampai 5 kali,
  * akun otomatis terkunci (terkunci=TRUE) dan absen selalu ditolak walau
@@ -319,13 +318,14 @@ function prosesDaftarHpToko(d) {
     return respon({ status: 'gagal', pesan: pesanUmum });
   }
 
-  // Lokasi wajib.
-  const lat = Number(d.lat), lng = Number(d.lng), akurasi = Number(d.akurasi);
-  if (d.lat === '' || d.lat == null || d.lng === '' || d.lng == null ||
-      !isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
-    return respon({ status: 'gagal', pesan: 'Lokasi HP wajib dan harus valid. Izinkan akses lokasi lalu coba lagi.' });
+  // Lokasi wajib; tipe dan rentang divalidasi di server (jangan percaya client).
+  const lat = d.lat, lng = d.lng, akurasi = d.akurasi;
+  if (typeof lat !== 'number' || typeof lng !== 'number' || typeof akurasi !== 'number' ||
+      !isFinite(lat) || !isFinite(lng) || !isFinite(akurasi) ||
+      Math.abs(lat) > 90 || Math.abs(lng) > 180 || akurasi < 0 || akurasi > 100000) {
+    return respon({ status: 'gagal', kode: 'LOKASI_DITOLAK', pesan: 'Lokasi HP wajib dan harus valid. Izinkan akses lokasi lalu coba lagi.' });
   }
-  const akurasiBulat = isFinite(akurasi) && akurasi >= 0 ? Math.round(akurasi) : 0;
+  const akurasiBulat = Math.round(akurasi);
 
   const akun = bacaSheet('akun');
   const admin = akun.data.find(function (r) {
@@ -356,6 +356,30 @@ function prosesDaftarHpToko(d) {
   const kodeCabang = ambilKodeCabang(admin.cabang);
   if (!kodeCabang) {
     return respon({ status: 'gagal', pesan: 'Kode cabang ' + admin.cabang + ' belum diisi di sheet pengaturan (kategori CABANG)' });
+  }
+
+  // Cek lokasi terhadap koordinat cabang (sheet pengaturan: kategori LOKASI, nama = nama cabang).
+  const toko = ambilLokasiCabang(admin.cabang);
+  if (!toko) {
+    return respon({
+      status: 'gagal', kode: 'LOKASI_DITOLAK',
+      pesan: 'Koordinat Cabang ' + admin.cabang + ' belum diisi atau tidak valid di sheet pengaturan (kategori LOKASI). Hubungi owner.'
+    });
+  }
+  const akurasiMaks = ambilNilaiUmum('akurasi_maks_m', 100);
+  const radiusDaftar = ambilNilaiUmum('radius_daftar_m', 100);
+  if (akurasi > akurasiMaks) {
+    return respon({
+      status: 'gagal', kode: 'LOKASI_DITOLAK',
+      pesan: 'Lokasi kurang akurat (' + akurasiBulat + ' m), coba lagi dekat jendela atau di luar'
+    });
+  }
+  const jarak = Math.round(jarakMeter(lat, lng, toko.lat, toko.lng));
+  if (jarak > radiusDaftar) {
+    return respon({
+      status: 'gagal', kode: 'LOKASI_DITOLAK',
+      pesan: 'Anda berjarak ' + jarak + ' m dari Cabang ' + admin.cabang + ' (maksimal ' + radiusDaftar + ' m)'
+    });
   }
 
   const kunciLock = LockService.getScriptLock();
@@ -401,7 +425,9 @@ function prosesDaftarHpToko(d) {
 
     tambahLog({
       jenis: 'PERANGKAT', oleh: admin.id, cabang: admin.cabang, aksi: 'DAFTAR_HP_TOKO',
-      target: namaHp, id: idHp, sesudah: gps
+      target: namaHp, id: idHp,
+      sesudah: lat + ',' + lng,   // sendiri di satu sel, bisa ditempel ke Google Maps
+      alasan: 'akurasi ' + akurasiBulat + ' m, jarak ke toko ' + jarak + ' m'
     });
 
     return respon({
@@ -415,6 +441,31 @@ function prosesDaftarHpToko(d) {
   } finally {
     kunciLock.releaseLock();
   }
+}
+
+/** Koordinat cabang { lat, lng } dari pengaturan (kategori LOKASI, nilai "lat,lng"), atau null kalau tidak ada/tidak valid. */
+function ambilLokasiCabang(cabang) {
+  const baris = bacaSheet('pengaturan').data.find(function (r) { return r.kategori === 'LOKASI' && r.nama === cabang; });
+  if (!baris) { return null; }
+  const bagian = String(baris.nilai).split(',');
+  if (bagian.length !== 2) { return null; }
+  const lat = Number(bagian[0].trim()), lng = Number(bagian[1].trim());
+  if (bagian[0].trim() === '' || bagian[1].trim() === '' || !isFinite(lat) || !isFinite(lng) ||
+      Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+    return null;
+  }
+  return { lat: lat, lng: lng };
+}
+
+/** Jarak dua titik di bumi dalam meter (rumus haversine). */
+function jarakMeter(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const rad = function (x) { return x * Math.PI / 180; };
+  const dLat = rad(lat2 - lat1);
+  const dLng = rad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 /** Kode cabang 3 huruf dari sheet pengaturan (kategori CABANG, nama = nama cabang, nilai = kode). */

@@ -121,6 +121,7 @@
   #layarRingkasan { padding: 24px 22px; justify-content: center; gap: 14px; }
   #layarRingkasan .kartu-putih { align-items: center; text-align: center; padding: 28px 18px; }
   #layarRingkasan .besar { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 30px; font-weight: 700; line-height: 1.15; }
+  #btnLanjut { height: 54px; flex-shrink: 0; border: 4px solid #5CC98A; border-radius: 26px; background: #1F8A4C; color: #FFFFFF; font-family: inherit; font-size: 18px; font-weight: 800; }
   #layarRingkasan .rinci { font-size: 15px; font-weight: 700; }
 
   /* ---- Layar pilih nama + PIN ---- */
@@ -238,8 +239,8 @@
     <div class="kartu-putih">
       <div class="besar">HP terdaftar</div>
       <div class="rinci" id="ringkasanIsi"></div>
-      <div class="catatan-tengah">Ketuk untuk lanjut</div>
     </div>
+    <button type="button" id="btnLanjut">Lanjut</button>
   </div>
 
   <div id="layarUtama" class="layar">
@@ -824,6 +825,7 @@
     inUsername.value = '';
     inPassword.value = '';
     inNamaHp.value = 'HP Toko';
+    btnDaftarkan.textContent = 'Daftarkan';
     pesanDaftar.textContent = '';
     pesanDaftar.className = '';
     btnDaftarkan.disabled = false;
@@ -859,25 +861,81 @@
     btnDaftarkan.disabled = true;
     pesanDaftar.className = 'info';
     pesanDaftar.textContent = 'Mengambil lokasi...';
-    navigator.geolocation.getCurrentPosition(function (pos) {
+
+    // Beberapa detik mencari fix terbaik: berhenti begitu akurasi <= 25 m, atau setelah 12 detik
+    // memakai fix terbaik yang ada (maksimal menunggu 25 detik kalau belum ada sama sekali).
+    let terbaik = null;
+    let selesai = false;
+    let idPantau = null;
+    const mulai = Date.now();
+
+    function akhiri() {
+      if (selesai) { return; }
+      selesai = true;
+      navigator.geolocation.clearWatch(idPantau);
+      clearInterval(timerCek);
+      kirimPendaftaran(terbaik);
+    }
+    const timerCek = setInterval(function () {
+      const lama = Date.now() - mulai;
+      if (selesai) { clearInterval(timerCek); return; }
+      if ((terbaik && lama >= 12000) || lama >= 25000) {
+        clearInterval(timerCek);
+        if (terbaik) { akhiri(); } else {
+          selesai = true;
+          navigator.geolocation.clearWatch(idPantau);
+          pesanDaftar.className = '';
+          pesanDaftar.textContent = pesanLokasi({ code: 3 });
+          btnDaftarkan.disabled = false;
+        }
+      }
+    }, 500);
+
+    idPantau = navigator.geolocation.watchPosition(function (pos) {
+      if (selesai) { return; }
+      if (!terbaik || pos.coords.accuracy < terbaik.coords.accuracy) { terbaik = pos; }
+      pesanDaftar.textContent = 'Mengambil lokasi... (akurasi ' + Math.round(terbaik.coords.accuracy) + ' m)';
+      if (terbaik.coords.accuracy <= 25) { clearInterval(timerCek); akhiri(); }
+    }, function (err) {
+      if (selesai) { return; }
+      if (err.code === 1 || !terbaik) {
+        // Izin ditolak, atau belum ada fix sama sekali: berhenti dengan pesan jelas.
+        if (err.code === 1 || err.code === 2) {
+          selesai = true;
+          clearInterval(timerCek);
+          navigator.geolocation.clearWatch(idPantau);
+          pesanDaftar.className = '';
+          pesanDaftar.textContent = pesanLokasi(err);
+          btnDaftarkan.disabled = false;
+        }
+        // timeout biasa: biarkan timerCek yang memutuskan
+      }
+    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+
+    function kirimPendaftaran(pos) {
       pesanDaftar.textContent = 'Mendaftarkan...';
       const body = JSON.stringify({
         aksi: 'daftar_hp_toko', username: username, password: password, nama_hp: namaHp,
         lat: pos.coords.latitude, lng: pos.coords.longitude, akurasi: pos.coords.accuracy
       });
-      inPassword.value = ''; // password tidak disimpan di mana pun
       fetch(CONFIG.webAppUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body })
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (data.status === 'ok') {
             simpanHp({ token: data.token, id: data.id_hp, nama: data.nama_hp, cabang: data.cabang, kode: data.kode_perangkat });
-            kosongkanFormDaftar();
+            kosongkanFormDaftar(); // password dikosongkan; tidak pernah disimpan di mana pun
             tampilkanLabelCabang();
-            document.getElementById('ringkasanIsi').textContent = data.id_hp + ' · ' + data.kode_perangkat + ' · Cabang ' + data.cabang;
+            document.getElementById('ringkasanIsi').textContent = data.id_hp + ' · Cabang ' + data.cabang;
             tampilLayar(layarRingkasan);
-            setTimeout(lanjutDariRingkasan, 3000);
             muatDaftarKaryawan();
+          } else if (data.kode === 'LOKASI_DITOLAK') {
+            // Password sudah terbukti benar: biarkan di kolom supaya "Coba lagi" tidak perlu mengetik ulang.
+            pesanDaftar.className = '';
+            pesanDaftar.textContent = data.pesan || 'Lokasi ditolak.';
+            btnDaftarkan.textContent = 'Coba lagi';
+            btnDaftarkan.disabled = false;
           } else {
+            inPassword.value = '';
             pesanDaftar.className = '';
             pesanDaftar.textContent = data.pesan || 'Pendaftaran gagal.';
             btnDaftarkan.disabled = false;
@@ -888,17 +946,12 @@
           pesanDaftar.textContent = 'Tidak bisa terhubung ke server. Coba lagi.';
           btnDaftarkan.disabled = false;
         });
-    }, function (err) {
-      pesanDaftar.className = '';
-      pesanDaftar.textContent = pesanLokasi(err);
-      btnDaftarkan.disabled = false;
-    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+    }
   });
 
-  function lanjutDariRingkasan() {
-    if (layarRingkasan.classList.contains('aktif')) { tampilLayar(layarUtama); }
-  }
-  layarRingkasan.addEventListener('click', lanjutDariRingkasan);
+  document.getElementById('btnLanjut').addEventListener('click', function () {
+    tampilLayar(layarUtama);
+  });
 
   // ---- Mulai: ada token tersimpan = layar utama, kalau tidak = pilih jenis HP ----
   hpAktif = bacaHp();
