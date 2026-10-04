@@ -189,9 +189,41 @@
   .alasan-ket label { font-size: 13px; font-weight: 700; }
   .alasan-ket textarea { height: 64px; border: 2px solid #333438; border-radius: 14px; background: #FFFFFF; font-family: inherit; font-size: 14px; color: #141111; padding: 10px; box-sizing: border-box; resize: none; }
   #pesanAlasan { min-height: 18px; font-size: 13px; font-weight: 700; text-align: center; }
-  #btnSimpanAlasan { height: 70px; border: none; border-radius: 26px; background: #141111; color: #FFFFFF; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; flex-shrink: 0; }
+  #btnSimpanAlasan { flex-grow: 1; height: 70px; border: none; border-radius: 26px; background: #141111; color: #FFFFFF; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; }
   #btnSimpanAlasan:disabled { opacity: 0.5; }
-  .alasan-foot { font-size: 12px; font-weight: 600; text-align: center; }
+  .alasan-foot { font-size: 12px; font-weight: 600; text-align: center; order: 5; }
+  .alasan-bar { display: flex; gap: 10px; flex-shrink: 0; order: 4; }
+  #btnBatalAlasan { display: none; width: 96px; flex-shrink: 0; height: 60px; border: 3px solid #141111; border-radius: 18px; background: transparent; font-family: inherit; font-size: 15px; font-weight: 800; color: #141111; }
+
+  /* ---- Variasi layar keterangan LEMBUR (disalin dari mockup 20 - Lembur) ---- */
+  .alasan-head-lembur, .alasan-kartu { display: none; }
+  #layarAlasan.lembur { background: #FFD62E; color: #141111; gap: 10px; }
+  #layarAlasan.lembur .alasan-head-lembur { display: flex; justify-content: space-between; align-items: center; }
+  .alasan-head-lembur img { height: 30px; width: auto; }
+  .alasan-head-lembur .t { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; }
+  #layarAlasan.lembur .alasan-kartu { display: flex; flex-direction: column; gap: 10px; background: #333438; color: #FFFFFF; border-radius: 22px; padding: 18px; }
+  .alasan-kartu .n { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: #FFD62E; }
+  .alasan-kartu .c { display: flex; gap: 8px; flex-wrap: wrap; }
+  .alasan-kartu .w, .alasan-kartu .k { padding: 6px 12px; border-radius: 999px; color: #141111; font-size: 13px; font-weight: 700; }
+  .alasan-kartu .w { background: #FFFFFF; }
+  .alasan-kartu .k { background: #FFD62E; }
+  #layarAlasan.lembur .alasan-chip, #layarAlasan.lembur .alasan-judul .s { display: none; }
+  #layarAlasan.lembur .alasan-judul .garis { background: #141111; }
+  #layarAlasan.lembur .alasan-judul .h { font-family: inherit; font-size: 20px; font-weight: 800; line-height: 1.2; }
+  #layarAlasan.lembur .alasan-grid button { min-height: 40px; border-radius: 18px; font-size: 16px; }
+  #layarAlasan.lembur .alasan-grid button.dipilih { background: #141111; color: #FFD62E; }
+  #layarAlasan.lembur .alasan-ket textarea { height: 120px; }
+  #layarAlasan.lembur #btnSimpanAlasan { height: 60px; font-size: 22px; }
+  #layarAlasan.lembur #btnBatalAlasan { display: block; }
+  #layarAlasan.lembur .alasan-foot { order: 3; }
+
+  /* ---- Pop-up PULANG (disalin dari mockup 6c / 6d / 6e): latar hitam ---- */
+  .popup.hitam { background: #141111; }
+  .popup.hitam .bulat { background: #141111; }
+  .popup.hitam .judul-popup { color: #141111; }
+  .popup.hitam .pil { border: 2px solid #141111; background: #F2F2F0; color: #141111; }
+  .popup.hitam .pil.merah-pil { border-color: #B91C1C; background: #FDE8E8; color: #B91C1C; }
+  .popup .pil-menunggu { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #141111; color: #FFD62E; font-size: 14px; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -264,7 +296,7 @@
         <div class="lingkar"><svg aria-hidden="true" fill="none" height="30" stroke="#1F8A4C" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="30"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path></svg></div>
         <div class="teks-tombol"><div class="judul">ABSEN MASUK</div><div class="sub" id="subMasuk">&nbsp;</div></div>
       </button>
-      <button class="tombol-absen belum-aktif" id="btnPulang" type="button" disabled>
+      <button class="tombol-absen" id="btnPulang" type="button">
         <div class="lingkar"><svg aria-hidden="true" fill="none" height="30" stroke="#D92A22" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="30"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div>
         <div class="teks-tombol"><div class="judul">ABSEN PULANG</div><div class="sub" id="subPulang">&nbsp;</div></div>
       </button>
@@ -320,6 +352,8 @@
 <div id="popup" class="popup" role="alertdialog" aria-live="assertive"></div>
 
 <div id="layarAlasan" role="dialog" aria-live="polite">
+  <div class="alasan-head-lembur"><img src="assets/logo.png" alt=""><div class="t">LEMBUR</div></div>
+  <div class="alasan-kartu"><div class="n" id="alasanNama"></div><div class="c"><div class="w" id="alasanChipPulang"></div><div class="k" id="alasanChipTingkat"></div></div></div>
   <div class="alasan-chip" id="alasanChip"></div>
   <div class="alasan-judul"><div class="garis"></div><div><div class="h" id="alasanJudul"></div><div class="s" id="alasanSub"></div></div></div>
   <div class="alasan-grid" id="alasanGrid"></div>
@@ -329,8 +363,11 @@
   </div>
   <div id="pesanAlasan"></div>
   <div style="flex-grow:1"></div>
-  <button id="btnSimpanAlasan" type="button">SIMPAN ALASAN</button>
-  <div class="alasan-foot">Tanpa sentuhan 30 detik: TIDAK DIISI.</div>
+  <div class="alasan-bar">
+    <button id="btnBatalAlasan" type="button">Batal</button>
+    <button id="btnSimpanAlasan" type="button">SIMPAN ALASAN</button>
+  </div>
+  <div class="alasan-foot" id="alasanFoot">Tanpa sentuhan 30 detik: TIDAK DIISI.</div>
 </div>
 
 <script src="config.js"></script>
@@ -342,7 +379,8 @@
   const popup = document.getElementById('popup');
   const layarAlasan = document.getElementById('layarAlasan');
   const metaTema = document.querySelector('meta[name="theme-color"]');
-  const TEMA = { kuning: '#FFD62E', hijau: '#1F8A4C', merah: '#B91C1C' };
+  const TEMA = { kuning: '#FFD62E', hijau: '#1F8A4C', merah: '#B91C1C', hitam: '#141111' };
+  let modeAbsen = 'MASUK'; // MASUK | PULANG | PULANG_LEMBUR (jenis yang sedang dikerjakan di layar pilih nama)
 
   // ---- Data HP toko (token dll.) di localStorage. Password admin TIDAK pernah disimpan. ----
   const KUNCI_HP = 'absen_hp_toko';
@@ -406,12 +444,24 @@
 
   // ---- Jam besar mengikuti jam server ----
   let selisihJamServer = 0; // ms, ditambahkan ke Date.now() lokal
+  let shiftUtama = null;    // info shift dari server (untuk mengaktifkan tombol LEMBUR)
   function tampilkanJam() {
     const sekarang = new Date(Date.now() + selisihJamServer);
     const dua = function (n) { return String(n).padStart(2, '0'); };
     document.getElementById('jamBesar').innerHTML =
       dua(sekarang.getHours()) + ':' + dua(sekarang.getMinutes()) +
       '<span class="detik">:' + dua(sekarang.getSeconds()) + '</span>';
+    // LEMBUR aktif mulai jam pulang + toleransi + 1 menit (server tetap yang memutuskan)
+    const btnLembur = document.getElementById('btnLembur');
+    let aktif = false;
+    if (shiftUtama) {
+      const p = shiftUtama.pulang.split(':');
+      const mulai = Number(p[0]) * 3600 + Number(p[1]) * 60 + (Number(shiftUtama.toleransi_pulang) + 1) * 60;
+      const detikIni = sekarang.getHours() * 3600 + sekarang.getMinutes() * 60 + sekarang.getSeconds();
+      aktif = detikIni >= mulai;
+    }
+    btnLembur.disabled = !aktif;
+    btnLembur.classList.toggle('belum-aktif', !aktif);
   }
   setInterval(tampilkanJam, 1000);
   tampilkanJam();
@@ -439,6 +489,8 @@
 
   function tampilkanInfoShift(sh) {
     if (!sh) { return; }
+    shiftUtama = sh;
+    tampilkanJam();
     document.getElementById('labelShift').textContent = sh.nama + ' aktif';
     document.getElementById('subMasuk').textContent = sh.nama + ' mulai ' + sh.masuk;
     document.getElementById('subPulang').textContent = 'Pulang normal ' + sh.pulang;
@@ -550,7 +602,7 @@
       pinSaatIni += digit;
       tampilkanPinTitik();
       if (pinSaatIni.length === 4) {
-        kirimAbsenMasuk();
+        kirimAbsen();
       }
     }
   });
@@ -606,6 +658,7 @@
 
   const SVG_JEMPOL = '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v11"></path><path d="M15 5.9L14 10h5.8a2 2 0 0 1 2 2.3l-1.4 7a2 2 0 0 1-2 1.7H7V10l4.3-7.6A1.9 1.9 0 0 1 15 5.9z"></path><path d="M3 10h4v11H3z"></path></svg>';
   const SVG_PERINGATAN = '<svg width="58" height="58" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>';
+  const SVG_KELUAR = '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFD62E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>';
   const SVG_CENTANG = '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>';
 
   function htmlConfetti() {
@@ -647,7 +700,7 @@
   function tampilTelat(data, panggilan) {
     const batas = Number(data.batas_isi_detik) || 10;
     alasan = {
-      id: idTerpilih, kode: data.kode_alasan, pilihan: '', daftar: data.pilihan_alasan || [],
+      mode: 'TELAT', id: idTerpilih, kode: data.kode_alasan, pilihan: '', daftar: data.pilihan_alasan || [],
       panggilan: panggilan, telatMnt: data.telat_mnt, jam: data.jam, shift: data.shift
     };
     tutupPopup();
@@ -684,10 +737,12 @@
   function mulaiDiamAlasan() {
     clearTimeout(timerDiamAlasan);
     timerDiamAlasan = setTimeout(function () {
-      // 30 detik tanpa sentuhan: kembali ke layar utama, alasan tetap TIDAK DIISI.
+      // 30 detik tanpa sentuhan: kembali ke layar utama.
+      // Telat: alasan tetap TIDAK DIISI. Pulang cepat/lembur: belum tersimpan sama sekali.
+      const batalPulang = alasan && alasan.mode !== 'TELAT';
       tutupLayarAlasan();
       alasan = null;
-      kembaliKeLayarUtama();
+      if (batalPulang) { tampilGagal('Absen pulang dibatalkan dan belum tersimpan. Silakan ulangi.'); } else { kembaliKeLayarUtama(); }
     }, 30000);
   }
 
@@ -699,10 +754,32 @@
 
   function bukaLayarAlasan() {
     wajib = true;
-    setTema(TEMA.merah);
-    document.getElementById('alasanChip').textContent = 'Telat ' + alasan.telatMnt + ' menit';
-    document.getElementById('alasanJudul').textContent = 'Kenapa telat, ' + alasan.panggilan + '? (wajib)';
-    document.getElementById('alasanSub').textContent = 'Masuk ' + alasan.jam + ' (' + alasan.shift + ')';
+    const lembur = alasan.mode === 'LEMBUR';
+    layarAlasan.classList.toggle('lembur', lembur);
+    setTema(lembur ? TEMA.kuning : TEMA.merah);
+    const foot = document.getElementById('alasanFoot');
+    const labelKet = document.querySelector('.alasan-ket label');
+    document.getElementById('btnSimpanAlasan').textContent = lembur ? 'SIMPAN LEMBUR' : 'SIMPAN ALASAN';
+    if (alasan.mode === 'TELAT') {
+      document.getElementById('alasanChip').textContent = 'Telat ' + alasan.telatMnt + ' menit';
+      document.getElementById('alasanJudul').textContent = 'Kenapa telat, ' + alasan.panggilan + '? (wajib)';
+      document.getElementById('alasanSub').textContent = 'Masuk ' + alasan.jam + ' (' + alasan.shift + ')';
+      foot.textContent = 'Tanpa sentuhan 30 detik: TIDAK DIISI.';
+      labelKet.textContent = 'Keterangan (wajib jika pilih Lainnya)';
+    } else if (alasan.mode === 'PULANG_CEPAT') {
+      document.getElementById('alasanChip').textContent = 'Pulang awal ' + alasan.jam;
+      document.getElementById('alasanJudul').textContent = 'Kenapa pulang awal, ' + alasan.panggilan + '? (wajib)';
+      document.getElementById('alasanSub').textContent = 'Pulang ' + alasan.jam + ' (' + alasan.shift + ')';
+      foot.textContent = (alasan.acc ? 'Menunggu ACC admin. ' : '') + 'Tanpa sentuhan 30 detik: absen pulang dibatalkan.';
+      labelKet.textContent = 'Keterangan (wajib jika pilih Lainnya)';
+    } else {
+      document.getElementById('alasanNama').textContent = alasan.nama;
+      document.getElementById('alasanChipPulang').textContent = 'Pulang ' + alasan.jam;
+      document.getElementById('alasanChipTingkat').textContent = labelTingkat(alasan.tingkat);
+      document.getElementById('alasanJudul').textContent = 'Pekerjaan apa?';
+      foot.textContent = 'Lembur menunggu persetujuan admin.';
+      labelKet.textContent = 'Keterangan (opsional, wajib jika pilih Lainnya)';
+    }
     document.getElementById('alasanKet').value = '';
     document.getElementById('pesanAlasan').textContent = '';
     document.getElementById('btnSimpanAlasan').disabled = false;
@@ -739,10 +816,15 @@
     sedangSimpanAlasan = true;
     clearTimeout(timerDiamAlasan);
     document.getElementById('btnSimpanAlasan').disabled = true;
+    const masuk = alasan.mode === 'TELAT';
+    const panggilanSimpan = alasan.panggilan;
+    const body = masuk
+      ? { aksi: 'simpan_alasan', token: hpAktif.token, id: alasan.id, kode_alasan: alasan.kode, alasan: { pilihan: alasan.pilihan, teks: teks } }
+      : { aksi: 'simpan_pulang', token: hpAktif.token, id: alasan.id, kode_pending: alasan.kode, keterangan: { pilihan: alasan.pilihan, teks: teks } };
     fetch(CONFIG.webAppUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ aksi: 'simpan_alasan', token: hpAktif.token, id: alasan.id, kode_alasan: alasan.kode, alasan: { pilihan: alasan.pilihan, teks: teks } })
+      body: JSON.stringify(body)
     })
       .then(function (r) { return r.json(); })
       .then(function (data) {
@@ -750,7 +832,9 @@
         if (data.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return; }
         tutupLayarAlasan();
         alasan = null;
-        if (data.status === 'ok') {
+        if (data.status === 'ok' && !masuk) {
+          tampilPulang(data, data.panggilan || panggilanSimpan);
+        } else if (data.status === 'ok') {
           bukaPopupOtomatis('hadir', TEMA.hijau,
             '<div class="kartu">' +
               '<div class="ikon-besar"><div class="bulat">' + SVG_CENTANG + '</div></div>' +
@@ -768,12 +852,52 @@
       });
   });
 
-  function kirimAbsenMasuk() {
+  document.getElementById('btnBatalAlasan').addEventListener('click', function () {
+    tutupLayarAlasan();
+    alasan = null;
+    kembaliKeLayarUtama();
+  });
+
+  function labelTingkat(t) {
+    return t === 1 ? 'Lembur < 1 jam' : (t === 2 ? 'Lembur 1–2 jam' : 'Lembur > 2 jam');
+  }
+
+  function teksDurasi(menit) {
+    const j = Math.floor(menit / 60), m = menit % 60;
+    if (j > 0 && m > 0) { return j + ' jam ' + m + ' menit'; }
+    return j > 0 ? j + ' jam' : m + ' menit';
+  }
+
+  // Pop-up PULANG / PULANG AWAL / LEMBUR (latar hitam, menutup sendiri)
+  function tampilPulang(data, panggilan) {
+    const ket = '(' + escHtml(data.shift) + ')';
+    let pil;
+    if (data.st_pulang === 'PULANG CEPAT') {
+      pil = '<div class="pil merah-pil">Pulang awal ' + escHtml(data.jam) + ' ' + ket + '</div>';
+    } else if (data.st_pulang === 'LEMBUR DI TOKO') {
+      pil = '<div class="pil">Lembur ' + escHtml(data.jam) + ' (' + teksDurasi(data.durasi_menit) + ')</div>';
+    } else {
+      pil = '<div class="pil">Pulang ' + escHtml(data.jam) + ' ' + ket + '</div>';
+    }
+    bukaPopupOtomatis('hitam', TEMA.hitam,
+      '<div class="kartu">' +
+        '<div class="ikon-besar"><div class="bulat">' + SVG_KELUAR + '</div></div>' +
+        '<div class="judul-popup">Terima kasih, ' + escHtml(panggilan) + '!</div>' +
+        pil +
+        (data.acc === 'MENUNGGU' ? '<div class="pil-menunggu">Menunggu persetujuan admin</div>' : '') +
+        '<div class="petunjuk">Menutup otomatis dalam 4 detik</div>' +
+      '</div>', 4);
+  }
+
+  function kirimAbsen() {
     perbaruiKeypadKirim(true);
+    const body = modeAbsen === 'MASUK'
+      ? { aksi: 'absen_masuk', token: hpAktif.token, id: idTerpilih, pin: pinSaatIni }
+      : { aksi: 'absen_pulang', token: hpAktif.token, id: idTerpilih, pin: pinSaatIni, jenis: modeAbsen };
     fetch(CONFIG.webAppUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ aksi: 'absen_masuk', token: hpAktif.token, id: idTerpilih, pin: pinSaatIni })
+      body: JSON.stringify(body)
     })
       .then(function (r) { return r.json(); })
       .then(function (data) { tampilkanHasil(data); })
@@ -791,6 +915,21 @@
       return;
     }
     const panggilan = data.panggilan || panggilanTerpilih || 'Anda';
+    if (modeAbsen !== 'MASUK') {
+      if (data.perlu_keterangan) {
+        // Pulang cepat / lembur: belum tersimpan, wajib isi alasan/keterangan dulu.
+        alasan = {
+          mode: data.jenis_keterangan === 'PEKERJAAN_LEMBUR' ? 'LEMBUR' : 'PULANG_CEPAT',
+          id: idTerpilih, kode: data.kode_pending, pilihan: '', daftar: data.pilihan || [],
+          panggilan: panggilan, nama: data.nama, jam: data.jam, shift: data.shift,
+          tingkat: data.tingkat, durasi: data.durasi_menit, acc: data.acc === 'MENUNGGU'
+        };
+        bukaLayarAlasan();
+      } else {
+        tampilPulang(data, panggilan);
+      }
+      return;
+    }
     if (data.st_masuk === 'TELAT') { tampilTelat(data, panggilan); } else { tampilHadir(data, panggilan); }
   }
 
@@ -804,12 +943,21 @@
     document.getElementById('selectNama').value = '';
     document.querySelectorAll('#hurufDaftar button').forEach(function (b) { b.classList.remove('aktif'); });
     if (daftarKaryawan.length) { isiSelectNama(daftarKaryawan); }
+    modeAbsen = 'MASUK';
     tampilLayar(hpAktif ? layarUtama : layarJenis);
   }
 
-  document.getElementById('btnMasuk').addEventListener('click', function () {
+  function bukaPilihNama(mode) {
+    modeAbsen = mode;
+    document.querySelector('.pilih-judul').textContent =
+      mode === 'MASUK' ? 'Absen masuk: pilih nama' : (mode === 'PULANG' ? 'Absen pulang: pilih nama' : 'Lembur: pilih nama');
     tampilLayar(layarPilihNama);
     if (!daftarKaryawan.length && !mutaDaftarKaryawan) { muatDaftarKaryawan(); }
+  }
+  document.getElementById('btnMasuk').addEventListener('click', function () { bukaPilihNama('MASUK'); });
+  document.getElementById('btnPulang').addEventListener('click', function () { bukaPilihNama('PULANG'); });
+  document.getElementById('btnLembur').addEventListener('click', function () {
+    if (!document.getElementById('btnLembur').disabled) { bukaPilihNama('PULANG_LEMBUR'); }
   });
 
   perbaruiKeypad();

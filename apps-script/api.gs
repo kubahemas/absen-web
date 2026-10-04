@@ -93,13 +93,16 @@ function doPost(e) {
   }
 
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
-  if (data.aksi === 'daftar_karyawan' || data.aksi === 'absen_masuk' || data.aksi === 'simpan_alasan') {
+  const aksiBertoken = ['daftar_karyawan', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang'];
+  if (aksiBertoken.indexOf(data.aksi) !== -1) {
     const hp = validasiTokenHp(data.token);
     if (!hp) {
       return respon({ status: 'gagal', kode: 'HP_TIDAK_TERDAFTAR', pesan: 'HP ini belum terdaftar atau sudah dinonaktifkan' });
     }
     if (data.aksi === 'daftar_karyawan') { return prosesDaftarKaryawan(hp); }
     if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp); }
+    if (data.aksi === 'absen_pulang') { return prosesAbsenPulang(data.id, data.pin, data.jenis, hp); }
+    if (data.aksi === 'simpan_pulang') { return prosesSimpanPulang(data.id, data.kode_pending, data.keterangan, hp); }
     return prosesSimpanAlasan(data.id, data.kode_alasan, data.alasan, hp);
   }
 
@@ -107,50 +110,9 @@ function doPost(e) {
 }
 
 function prosesAbsenMasuk(id, pin, hp) {
-  if (!id || !pin) {
-    return respon({ status: 'gagal', pesan: 'id dan pin wajib diisi' });
-  }
-
-  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
-  if (!kodeRahasia) {
-    return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' });
-  }
-
-  const akun = bacaSheet('akun');
-  const akunDitemukan = akun.data.find(function (r) { return String(r.id) === String(id); });
-
-  // Karyawan harus dari cabang HP toko ini (dicek sebelum PIN, jadi tidak menaikkan salah_login).
-  // Hanya KARYAWAN/ADMIN yang boleh absen lewat sini.
-  if (!akunDitemukan || akunDitemukan.cabang !== hp.cabang ||
-      (akunDitemukan.role !== 'KARYAWAN' && akunDitemukan.role !== 'ADMIN')) {
-    // Sengaja pesan disamakan dengan "PIN salah" supaya id karyawan tidak bisa ditebak-tebak.
-    return respon({ status: 'gagal', pesan: 'Karyawan atau PIN salah' });
-  }
-
-  if (akunDitemukan.terkunci === true) {
-    return respon({ status: 'gagal', pesan: 'Akun terkunci, hubungi admin' });
-  }
-
-  const hashDicoba = hashDenganGaram(String(pin), String(id), kodeRahasia);
-
-  if (hashDicoba !== akunDitemukan.pin_hash) {
-    const salahBaru = (Number(akunDitemukan.salah_login) || 0) + 1;
-    if (salahBaru >= 5) {
-      perbaruiKolom(akun, akunDitemukan, { salah_login: salahBaru, terkunci: true });
-      tambahLog({
-        jenis: 'KEAMANAN', oleh: id, cabang: akunDitemukan.cabang, aksi: 'KUNCI_AKUN',
-        target: 'akun', id: id, sebelum: 'terkunci=FALSE', sesudah: 'terkunci=TRUE',
-        alasan: 'PIN salah 5 kali berturut-turut'
-      });
-      return respon({ status: 'gagal', pesan: 'Akun terkunci, hubungi admin' });
-    }
-    perbaruiKolom(akun, akunDitemukan, { salah_login: salahBaru });
-    return respon({ status: 'gagal', pesan: 'Karyawan atau PIN salah' });
-  }
-
-  if (Number(akunDitemukan.salah_login) !== 0) {
-    perbaruiKolom(akun, akunDitemukan, { salah_login: 0 });
-  }
+  const cek = cekKaryawanDanPin(id, pin, hp);
+  if (cek.gagal) { return cek.gagal; }
+  const akunDitemukan = cek.akun;
 
   const zona = ZONA_ABSEN;
   const sekarang = new Date();
@@ -473,6 +435,309 @@ function ambilKodeCabang(cabang) {
   const baris = bacaSheet('pengaturan').data.find(function (r) { return r.kategori === 'CABANG' && r.nama === cabang; });
   const kode = baris ? String(baris.nilai).trim().toUpperCase() : '';
   return /^[A-Z]{3}$/.test(kode) ? kode : '';
+}
+
+/**
+ * Cari karyawan di cabang HP toko ini dan cek PIN-nya (dipakai absen masuk dan pulang).
+ * Kembalian: { akun } kalau lolos, atau { gagal: <respon JSON> } kalau ditolak.
+ * Salah PIN menaikkan salah_login; 5x berturut-turut = akun terkunci + dicatat ke log.
+ */
+function cekKaryawanDanPin(id, pin, hp) {
+  if (!id || !pin) {
+    return { gagal: respon({ status: 'gagal', pesan: 'id dan pin wajib diisi' }) };
+  }
+
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  if (!kodeRahasia) {
+    return { gagal: respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }) };
+  }
+
+  const akun = bacaSheet('akun');
+  const akunDitemukan = akun.data.find(function (r) { return String(r.id) === String(id); });
+
+  // Karyawan harus dari cabang HP toko ini (dicek sebelum PIN, jadi tidak menaikkan salah_login).
+  // Hanya KARYAWAN/ADMIN yang boleh absen lewat sini.
+  if (!akunDitemukan || akunDitemukan.cabang !== hp.cabang ||
+      (akunDitemukan.role !== 'KARYAWAN' && akunDitemukan.role !== 'ADMIN')) {
+    // Sengaja pesan disamakan dengan "PIN salah" supaya id karyawan tidak bisa ditebak-tebak.
+    return { gagal: respon({ status: 'gagal', pesan: 'Karyawan atau PIN salah' }) };
+  }
+
+  if (akunDitemukan.terkunci === true) {
+    return { gagal: respon({ status: 'gagal', pesan: 'Akun terkunci, hubungi admin' }) };
+  }
+
+  const hashDicoba = hashDenganGaram(String(pin), String(id), kodeRahasia);
+
+  if (hashDicoba !== akunDitemukan.pin_hash) {
+    const salahBaru = (Number(akunDitemukan.salah_login) || 0) + 1;
+    if (salahBaru >= 5) {
+      perbaruiKolom(akun, akunDitemukan, { salah_login: salahBaru, terkunci: true });
+      tambahLog({
+        jenis: 'KEAMANAN', oleh: id, cabang: akunDitemukan.cabang, aksi: 'KUNCI_AKUN',
+        target: 'akun', id: id, sebelum: 'terkunci=FALSE', sesudah: 'terkunci=TRUE',
+        alasan: 'PIN salah 5 kali berturut-turut'
+      });
+      return { gagal: respon({ status: 'gagal', pesan: 'Akun terkunci, hubungi admin' }) };
+    }
+    perbaruiKolom(akun, akunDitemukan, { salah_login: salahBaru });
+    return { gagal: respon({ status: 'gagal', pesan: 'Karyawan atau PIN salah' }) };
+  }
+
+  if (Number(akunDitemukan.salah_login) !== 0) {
+    perbaruiKolom(akun, akunDitemukan, { salah_login: 0 });
+  }
+  return { akun: akunDitemukan };
+}
+
+/**
+ * ---- Absen pulang ----
+ * Semua dihitung di server dari jam server. Jam pulang dan toleransi dibaca dari
+ * sheet shift (shift yang tercatat di baris absensi hari itu), tidak ditulis di kode.
+ *
+ * Alur: absen_pulang (id, pin, jenis PULANG | PULANG_LEMBUR).
+ *  - PULANG NORMAL: langsung tersimpan.
+ *  - PULANG CEPAT atau LEMBUR: alasan/keterangan WAJIB. Jam saat PIN benar dicatat di
+ *    cache (5 menit) dan balasannya meminta keterangan; BARU tersimpan ke sheet lewat
+ *    aksi simpan_pulang (kode_pending + keterangan). Tidak ada keterangan = tidak tersimpan.
+ * Aplikasi tidak menyimpan angka rupiah lembur; kolom `lembur` berisi "tingkat|menit".
+ */
+
+/**
+ * Fungsi murni (tanpa sheet/cache/jam sistem): tentukan status pulang.
+ *  detik     = jam sekarang dalam detik sejak 00:00
+ *  shift     = { masuk, tutup, pulang: 'HH:mm', toleransi: menit }
+ *  jenis     = 'PULANG' | 'PULANG_LEMBUR'
+ *  sudahMasuk, sudahPulang = boolean (kondisi baris absensi hari ini)
+ * Kembalian: { ok:false, pesan } atau
+ *  { ok:true, st_pulang, keterangan:'ALASAN_PULANG_AWAL'|'PEKERJAAN_LEMBUR'|null,
+ *    acc:'MENUNGGU'|'', tingkat, durasi_menit }
+ */
+function tentukanStatusPulang(detik, shift, jenis, sudahMasuk, sudahPulang) {
+  if (!sudahMasuk) { return { ok: false, pesan: 'Belum absen masuk hari ini' }; }
+  if (sudahPulang) { return { ok: false, pesan: 'Sudah absen pulang hari ini' }; }
+  if (jenis !== 'PULANG' && jenis !== 'PULANG_LEMBUR') { return { ok: false, pesan: 'Jenis absen pulang tidak dikenal' }; }
+
+  const detikPulang = jamKeDetik(shift.pulang);
+  const detikTutup = jamKeDetik(shift.tutup);
+  const batasLembur = detikPulang + (Number(shift.toleransi) + 1) * 60; // 1 menit setelah toleransi
+
+  if (jenis === 'PULANG_LEMBUR') {
+    if (detik < batasLembur) {
+      return { ok: false, pesan: 'Lembur baru bisa dicatat mulai ' + detikKeJam(batasLembur) };
+    }
+    const durasiDetik = detik - detikPulang;
+    // Tepat di batas masuk tingkat bawah: 60:00 = tingkat 1, 120:00 = tingkat 2.
+    const tingkat = durasiDetik <= 3600 ? 1 : (durasiDetik <= 7200 ? 2 : 3);
+    return {
+      ok: true, st_pulang: 'LEMBUR DI TOKO', keterangan: 'PEKERJAAN_LEMBUR', acc: 'MENUNGGU',
+      tingkat: tingkat, durasi_menit: Math.floor(durasiDetik / 60)
+    };
+  }
+
+  if (detik < detikPulang) {
+    // Sampai 1 menit setelah jam tutup (mis. 16:00:59) wajib ACC admin; sesudahnya tanpa ACC.
+    return {
+      ok: true, st_pulang: 'PULANG CEPAT', keterangan: 'ALASAN_PULANG_AWAL',
+      acc: detik < detikTutup + 60 ? 'MENUNGGU' : '', tingkat: 0, durasi_menit: 0
+    };
+  }
+  return { ok: true, st_pulang: 'PULANG NORMAL', keterangan: null, acc: '', tingkat: 0, durasi_menit: 0 };
+}
+
+var KUNCI_PULANG_PENDING = 'pulang_pending_';
+
+/** Baris absensi karyawan hari ini + info shift-nya; atau { gagal }. */
+function bacaKondisiPulang(akunDitemukan, tanggalHariIni) {
+  const absensi = bacaSheet('absensi');
+  const baris = absensi.data.find(function (r) {
+    return String(r.karyawan) === String(akunDitemukan.id) && sebagaiTanggalTeks(r.tanggal, ZONA_ABSEN) === tanggalHariIni;
+  }) || null;
+  const sudahMasuk = !!baris && String(baris.masuk) !== '';
+  const sudahPulang = !!baris && String(baris.pulang) !== '';
+  let shift = null;
+  if (baris) {
+    shift = bacaShiftCabang(akunDitemukan.cabang).find(function (sh) { return String(sh.no) === String(baris.shift); }) || null;
+    if (shift && shift.toleransi === null) { shift.toleransi = ambilNilaiUmum('toleransi_pulang_menit', 5); }
+  }
+  return { absensi: absensi, baris: baris, sudahMasuk: sudahMasuk, sudahPulang: sudahPulang, shift: shift };
+}
+
+function prosesAbsenPulang(id, pin, jenis, hp) {
+  const cek = cekKaryawanDanPin(id, pin, hp);
+  if (cek.gagal) { return cek.gagal; }
+  const akunDitemukan = cek.akun;
+
+  const sekarang = new Date();
+  const tanggalHariIni = Utilities.formatDate(sekarang, ZONA_ABSEN, 'yyyy-MM-dd');
+  const jamSekarang = Utilities.formatDate(sekarang, ZONA_ABSEN, 'HH:mm');
+  const detik = Number(Utilities.formatDate(sekarang, ZONA_ABSEN, 'H')) * 3600 +
+    Number(Utilities.formatDate(sekarang, ZONA_ABSEN, 'm')) * 60 +
+    Number(Utilities.formatDate(sekarang, ZONA_ABSEN, 's'));
+
+  if (jenis === 'PULANG_LEMBUR' && akunDitemukan.role === 'ADMIN') {
+    return respon({ status: 'gagal', pesan: 'Admin tidak mencatat lembur' });
+  }
+
+  const kondisi = bacaKondisiPulang(akunDitemukan, tanggalHariIni);
+  if (kondisi.baris && kondisi.sudahMasuk && !kondisi.sudahPulang && !kondisi.shift) {
+    return respon({ status: 'gagal', pesan: 'Jadwal shift karyawan tidak ditemukan, hubungi admin' });
+  }
+  const hasil = tentukanStatusPulang(detik, kondisi.shift, jenis, kondisi.sudahMasuk, kondisi.sudahPulang);
+  if (!hasil.ok) {
+    return respon({ status: 'gagal', pesan: hasil.pesan });
+  }
+
+  const info = {
+    id: akunDitemukan.id, nama: akunDitemukan.nama, panggilan: akunDitemukan.panggilan,
+    tanggal: tanggalHariIni, jam: jamSekarang, shift: kondisi.shift.nama,
+    st_pulang: hasil.st_pulang, acc: hasil.acc, tingkat: hasil.tingkat, durasi_menit: hasil.durasi_menit
+  };
+
+  if (hasil.keterangan) {
+    // Wajib ada keterangan: simpan dulu di cache (jam = saat PIN benar), tulis ke sheet setelah diisi.
+    info.kategori = hasil.keterangan;
+    info.kode = Utilities.getUuid().replace(/-/g, '').slice(0, 16);
+    CacheService.getScriptCache().put(KUNCI_PULANG_PENDING + akunDitemukan.id, JSON.stringify(info), 300);
+    return respon({
+      status: 'ok', perlu_keterangan: true, kode_pending: info.kode,
+      jenis_keterangan: hasil.keterangan, pilihan: ambilDaftarPengaturan(hasil.keterangan),
+      nama: info.nama, panggilan: info.panggilan, jam: info.jam, shift: info.shift,
+      st_pulang: info.st_pulang, acc: info.acc, tingkat: info.tingkat, durasi_menit: info.durasi_menit
+    });
+  }
+
+  tulisPulang(kondisi, info, '');
+  return respon(balasanPulang(info));
+}
+
+/** Aksi simpan_pulang: lengkapi PULANG CEPAT / LEMBUR dengan keterangan, lalu tulis ke sheet. */
+function prosesSimpanPulang(id, kode, ket, hp) {
+  if (!id || !kode) { return respon({ status: 'gagal', pesan: 'Data tidak lengkap' }); }
+  const cache = CacheService.getScriptCache();
+  const mentah = cache.get(KUNCI_PULANG_PENDING + id);
+  const info = mentah ? JSON.parse(mentah) : null;
+  if (!info || info.kode !== String(kode)) {
+    return respon({ status: 'gagal', pesan: 'Waktu mengisi keterangan sudah habis, ulangi absen pulang' });
+  }
+
+  const akun = bacaSheet('akun').data.find(function (r) { return String(r.id) === String(id); });
+  if (!akun || akun.cabang !== hp.cabang) {
+    return respon({ status: 'gagal', pesan: 'Karyawan atau PIN salah' });
+  }
+
+  const v = validasiKeterangan(info.kategori, ket);
+  if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
+
+  const kondisi = bacaKondisiPulang(akun, info.tanggal);
+  if (!kondisi.sudahMasuk) { return respon({ status: 'gagal', pesan: 'Belum absen masuk hari ini' }); }
+  if (kondisi.sudahPulang) { return respon({ status: 'gagal', pesan: 'Sudah absen pulang hari ini' }); }
+
+  tulisPulang(kondisi, info, v.teks);
+  cache.remove(KUNCI_PULANG_PENDING + id);
+  return respon(balasanPulang(info));
+}
+
+/** Pilihan harus ada di daftar pengaturan; "Lainnya" wajib teks; teks maksimal 100 karakter. */
+function validasiKeterangan(kategori, ket) {
+  const pilihan = ket && ket.pilihan ? String(ket.pilihan) : '';
+  const teks = ket && ket.teks ? String(ket.teks).trim() : '';
+  if (ambilDaftarPengaturan(kategori).indexOf(pilihan) === -1) { return { ok: false, pesan: 'Pilihan tidak dikenal' }; }
+  if (teks.length > 100) { return { ok: false, pesan: 'Keterangan maksimal 100 karakter' }; }
+  if (pilihan === 'Lainnya' && !teks) { return { ok: false, pesan: 'Keterangan wajib diisi kalau memilih Lainnya' }; }
+  return { ok: true, teks: teks ? pilihan + ': ' + teks : pilihan };
+}
+
+function tulisPulang(kondisi, info, keterangan) {
+  const perubahan = {
+    pulang: info.jam,
+    st_pulang: info.st_pulang,
+    ket_pulang: keterangan,
+    cara_pulang: 'PIN',
+    acc_pulang: info.acc
+  };
+  if (info.st_pulang === 'LEMBUR DI TOKO') { perubahan.lembur = info.tingkat + '|' + info.durasi_menit; }
+  perbaruiKolom(kondisi.absensi, kondisi.baris, perubahan);
+}
+
+function balasanPulang(info) {
+  return {
+    status: 'ok', pesan: 'Absen pulang berhasil', st_pulang: info.st_pulang, jam: info.jam, shift: info.shift,
+    nama: info.nama, panggilan: info.panggilan, acc: info.acc, tingkat: info.tingkat, durasi_menit: info.durasi_menit
+  };
+}
+
+/**
+ * Tes otomatis logika pulang. Jalankan dari editor Apps Script (pilih tesServer > Jalankan).
+ * TIDAK menulis ke sheet absensi atau log; hanya memanggil fungsi murni dengan waktu simulasi.
+ * Hasil tampil di Log eksekusi (dan jendela pesan kalau bisa).
+ */
+function tesServer() {
+  const s1 = { masuk: '07:45', tutup: '16:00', pulang: '16:30', toleransi: 5 };
+  const siang = { masuk: '13:45', tutup: '21:30', pulang: '22:00', toleransi: 5 };
+  const detik = function (jam) {
+    const p = jam.split(':');
+    return Number(p[0]) * 3600 + Number(p[1]) * 60 + (p[2] ? Number(p[2]) : 0);
+  };
+  const baris = [];
+  let gagal = 0;
+
+  // sudahMasuk/sudahPulang default true/false
+  function uji(nama, jam, shift, jenis, harap, sudahMasuk, sudahPulang) {
+    const h = tentukanStatusPulang(detik(jam), shift, jenis,
+      sudahMasuk === undefined ? true : sudahMasuk, sudahPulang === undefined ? false : sudahPulang);
+    let lulus = h.ok === harap.ok;
+    if (lulus && harap.ok) {
+      ['st_pulang', 'keterangan', 'acc', 'tingkat', 'durasi_menit'].forEach(function (k) {
+        if (harap[k] !== undefined && h[k] !== harap[k]) { lulus = false; }
+      });
+    }
+    if (lulus && !harap.ok && harap.pesan && h.pesan.indexOf(harap.pesan) === -1) { lulus = false; }
+    if (!lulus) { gagal++; }
+    baris.push((lulus ? 'LULUS  ' : 'GAGAL  ') + nama + (lulus ? '' : '  -> hasil: ' + JSON.stringify(h)));
+  }
+
+  const CEPAT = { ok: true, st_pulang: 'PULANG CEPAT', keterangan: 'ALASAN_PULANG_AWAL' };
+  const NORMAL = { ok: true, st_pulang: 'PULANG NORMAL', keterangan: null };
+  const TOLAK = { ok: false };
+
+  uji('16:29:00 PULANG = pulang cepat', '16:29:00', s1, 'PULANG', CEPAT);
+  uji('16:29:59 PULANG = pulang cepat', '16:29:59', s1, 'PULANG', CEPAT);
+  uji('16:30:00 PULANG = normal', '16:30:00', s1, 'PULANG', NORMAL);
+  uji('16:35:00 PULANG = normal', '16:35:00', s1, 'PULANG', NORMAL);
+  uji('16:36:00 PULANG = normal (jenis PULANG tetap normal)', '16:36:00', s1, 'PULANG', NORMAL);
+  uji('15:59:59 PULANG = cepat + ACC menunggu', '15:59:59', s1, 'PULANG', { ok: true, st_pulang: 'PULANG CEPAT', acc: 'MENUNGGU' });
+  uji('16:00:59 PULANG = cepat + ACC menunggu', '16:00:59', s1, 'PULANG', { ok: true, st_pulang: 'PULANG CEPAT', acc: 'MENUNGGU' });
+  uji('16:01:00 PULANG = cepat tanpa ACC', '16:01:00', s1, 'PULANG', { ok: true, st_pulang: 'PULANG CEPAT', acc: '' });
+
+  uji('16:29:00 PULANG_LEMBUR ditolak', '16:29:00', s1, 'PULANG_LEMBUR', TOLAK, true, false);
+  uji('16:30:00 PULANG_LEMBUR ditolak', '16:30:00', s1, 'PULANG_LEMBUR', TOLAK);
+  uji('16:35:00 PULANG_LEMBUR ditolak', '16:35:00', s1, 'PULANG_LEMBUR', TOLAK);
+  uji('16:35:59 PULANG_LEMBUR ditolak', '16:35:59', s1, 'PULANG_LEMBUR', TOLAK);
+  uji('16:36:00 PULANG_LEMBUR diterima, tingkat 1', '16:36:00', s1, 'PULANG_LEMBUR',
+    { ok: true, st_pulang: 'LEMBUR DI TOKO', keterangan: 'PEKERJAAN_LEMBUR', acc: 'MENUNGGU', tingkat: 1, durasi_menit: 6 });
+  uji('17:30:00 lembur tepat 60 menit = tingkat 1', '17:30:00', s1, 'PULANG_LEMBUR', { ok: true, tingkat: 1, durasi_menit: 60 });
+  uji('17:30:01 lembur = tingkat 2', '17:30:01', s1, 'PULANG_LEMBUR', { ok: true, tingkat: 2 });
+  uji('18:30:00 lembur tepat 120 menit = tingkat 2', '18:30:00', s1, 'PULANG_LEMBUR', { ok: true, tingkat: 2, durasi_menit: 120 });
+  uji('18:30:01 lembur = tingkat 3', '18:30:01', s1, 'PULANG_LEMBUR', { ok: true, tingkat: 3 });
+
+  uji('pulang dobel ditolak', '16:40:00', s1, 'PULANG', { ok: false, pesan: 'Sudah absen pulang' }, true, true);
+  uji('lembur dobel ditolak', '17:40:00', s1, 'PULANG_LEMBUR', { ok: false, pesan: 'Sudah absen pulang' }, true, true);
+  uji('pulang tanpa absen masuk ditolak', '16:40:00', s1, 'PULANG', { ok: false, pesan: 'Belum absen masuk' }, false, false);
+  uji('jenis tidak dikenal ditolak', '16:40:00', s1, 'LAIN', TOLAK);
+
+  uji('shift siang 21:59:00 = pulang cepat', '21:59:00', siang, 'PULANG', CEPAT);
+  uji('shift siang 22:00:00 = normal', '22:00:00', siang, 'PULANG', NORMAL);
+  uji('shift siang 22:05:59 lembur ditolak', '22:05:59', siang, 'PULANG_LEMBUR', TOLAK);
+  uji('shift siang 22:06:00 lembur tingkat 1', '22:06:00', siang, 'PULANG_LEMBUR', { ok: true, tingkat: 1, durasi_menit: 6 });
+  uji('shift siang 23:00:00 lembur tingkat 1', '23:00:00', siang, 'PULANG_LEMBUR', { ok: true, tingkat: 1 });
+  uji('shift siang 23:00:01 lembur tingkat 2', '23:00:01', siang, 'PULANG_LEMBUR', { ok: true, tingkat: 2 });
+
+  const ringkas = (gagal === 0 ? 'SEMUA LULUS' : gagal + ' SKENARIO GAGAL') + ' (' + baris.length + ' skenario)';
+  const teks = baris.join('\n') + '\n\n' + ringkas;
+  Logger.log(teks);
+  try { SpreadsheetApp.getUi().alert(ringkas + '\n\nRincian ada di Log eksekusi.'); } catch (e) { /* tanpa jendela pesan */ }
+  return teks;
 }
 
 var ZONA_ABSEN = 'Asia/Jakarta';
