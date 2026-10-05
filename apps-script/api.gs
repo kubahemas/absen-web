@@ -121,6 +121,12 @@ function doPost(e) {
   if (data.aksi === 'pribadi_hari_ini') { return prosesPribadiHariIni(data); }
   if (data.aksi === 'pribadi_riwayat') { return prosesPribadiRiwayat(data); }
 
+  // Konfirmasi (ACC / TOLAK): owner (sesi owner), admin HP toko (token + sesi), atau admin HP pribadi (sesi).
+  if (data.aksi === 'konfirmasi_jumlah') { return prosesKonfirmasiJumlah(data); }
+  if (data.aksi === 'konfirmasi_daftar') { return prosesKonfirmasiDaftar(data); }
+  if (data.aksi === 'konfirmasi_putuskan') { return prosesKonfirmasiPutuskan(data); }
+  if (data.aksi === 'ambil_foto') { return prosesAmbilFoto(data); }
+
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
   const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
@@ -1387,6 +1393,46 @@ function tesServer() {
   const banyakAbsen = []; for (let n = 0; n < 80; n++) { banyakAbsen.push({ tanggal: '2026-10-' + ('0' + (1 + (n % 5))).slice(-2), karyawan: 'K001', masuk: '07:45', pulang: '', st_masuk: 'HADIR', st_pulang: '', cara_masuk: 'PIN', cara_pulang: '', acc_masuk: '', acc_pulang: '' }); }
   ujiBebas('riwayat dibatasi 50 baris', rakitRiwayat(banyakAbsen, 'K001', '2026-09-01', 50).length === 50);
 
+  // ---- Gelombang 2 bagian 3: Konfirmasi (ACC / TOLAK) ----
+  const dasarAbs = { tanggal: '2026-10-05', cabang: 'Ngawi', shift: 1, jam_masuk: '', jam_pulang: '', cara_masuk: 'PIN', cara_pulang: 'PIN', acc_masuk: '', acc_pulang: '', st_masuk: 'HADIR', st_pulang: '', lembur: '', ket_masuk: '', ket_pulang: '', foto_masuk: '', foto_pulang: '', gps_masuk: '', gps_pulang: '' };
+  const buatAbs = function (o) { return Object.assign({}, dasarAbs, o); };
+  const barisKonf = [
+    buatAbs({ karyawan: 'K001', nama: 'Budi', jam_masuk: '07:44', cara_masuk: 'LUAR', acc_masuk: 'MENUNGGU', ket_masuk: 'LUAR: Madiun / Antar', gps_masuk: '-7.4,111.4,18', foto_masuk: 'https://drive.google.com/file/d/ABCDEFGHIJ1234/view', jam_pulang: '16:31', cara_pulang: 'LUAR', acc_pulang: 'MENUNGGU', st_pulang: 'PULANG NORMAL', gps_pulang: '-7.4,111.4,350', foto_pulang: 'TANPA FOTO' }),
+    buatAbs({ karyawan: 'K002', nama: 'Siti', jam_pulang: '18:35', acc_pulang: 'MENUNGGU', st_pulang: 'LEMBUR DI TOKO', lembur: '2|125', ket_pulang: 'Stok opname' }),
+    buatAbs({ karyawan: 'K003', nama: 'Rina', cabang: 'Pusat', jam_pulang: '15:10', acc_pulang: 'MENUNGGU', st_pulang: 'PULANG CEPAT', ket_pulang: 'Sakit' }),
+    buatAbs({ karyawan: 'K010', nama: 'Dewi (admin)', jam_masuk: '08:00', cara_masuk: 'LUAR', acc_masuk: 'MENUNGGU', ket_masuk: 'LUAR: a / b', gps_masuk: '-7.4,111.4,20' }),
+    buatAbs({ karyawan: 'K004', nama: 'Joko', jam_masuk: '07:40', acc_masuk: '', jam_pulang: '16:30', st_pulang: 'PULANG NORMAL' }),
+    buatAbs({ karyawan: 'K005', nama: 'Andi', jam_masuk: '07:50', cara_masuk: 'LUAR', acc_masuk: 'DITERIMA', jam_pulang: '16:30', st_pulang: 'PULANG NORMAL', acc_pulang: 'DITOLAK' })
+  ];
+  const itemKonf = rakitItemKonfirmasi(barisKonf);
+  ujiBebas('konfirmasi: hanya yang MENUNGGU jadi item (K004 normal dan K005 yang sudah diputuskan tidak)', itemKonf.length === 5 && itemKonf.every(function (x) { return ['K001', 'K002', 'K003', 'K010'].indexOf(x.karyawan) !== -1; }), String(itemKonf.length));
+  ujiBebas('konfirmasi: satu baris = dua item terpisah (masuk dan pulang K001), id "ID|tanggal|JENIS"', itemKonf.filter(function (x) { return x.karyawan === 'K001'; }).map(function (x) { return x.id; }).sort().join(',') === 'K001|2026-10-05|MASUK,K001|2026-10-05|PULANG');
+  const kel = function (id) { return itemKonf.filter(function (x) { return x.id === id; })[0].kelompok; };
+  ujiBebas('pengelompokan: luar (masuk dan pulang luar), lembur, pulang cepat', kel('K001|2026-10-05|MASUK') === 'LUAR' && kel('K001|2026-10-05|PULANG') === 'LUAR' && kel('K002|2026-10-05|PULANG') === 'LEMBUR' && kel('K003|2026-10-05|PULANG') === 'PULANG_CEPAT');
+  const itLembur = itemKonf.filter(function (x) { return x.karyawan === 'K002'; })[0];
+  ujiBebas('kartu lembur membawa tingkat dan durasi, keterangan, jam', itLembur.tingkat === 2 && itLembur.durasi_menit === 125 && itLembur.ket === 'Stok opname' && itLembur.jam === '18:35');
+  const itLuarMasuk = itemKonf.filter(function (x) { return x.id === 'K001|2026-10-05|MASUK'; })[0];
+  const itLuarPulang = itemKonf.filter(function (x) { return x.id === 'K001|2026-10-05|PULANG'; })[0];
+  ujiBebas('kartu luar: tautan Google Maps dari lat,lng dan status foto', itLuarMasuk.maps === 'https://www.google.com/maps?q=-7.4,111.4' && itLuarMasuk.foto === 'ADA' && itLuarPulang.foto === 'TANPA' && itLuarMasuk.ket === 'LUAR: Madiun / Antar');
+  ujiBebas('kartu luar: akurasi lebih dari 100 m diberi tanda (350 m ya, 18 m tidak)', itLuarPulang.akurasi_buruk === true && itLuarMasuk.akurasi_buruk === false && itLuarMasuk.akurasi === 18);
+  ujiBebas('tautan Maps: format lat,lng; tidak valid = null', urlMaps('-7.404412,111.446212,18') === 'https://www.google.com/maps?q=-7.404412,111.446212' && urlMaps('rusak') === null && urlMaps('91,10,5') === null && urlMaps('1,181,5') === null && urlMaps('') === null && urlMaps(',,') === null);
+  const adminK = { role: 'ADMIN', id: 'K010', cabang: 'Ngawi' };
+  const lihatAdmin = saringItemKonfirmasi(itemKonf, adminK, '');
+  ujiBebas('hak lihat admin: hanya cabangnya, BUKAN absen sendiri (K010 tidak), cabang lain (K003 Pusat) tidak', lihatAdmin.every(function (x) { return x.cabang === 'Ngawi' && x.karyawan !== 'K010'; }) && lihatAdmin.length === 3, String(lihatAdmin.length));
+  const lihatOwner = saringItemKonfirmasi(itemKonf, { role: 'OWNER', id: 'OWN01', cabang: '' }, '');
+  ujiBebas('hak lihat owner: semua cabang termasuk item milik admin (5 item); filter cabang Pusat = 1', lihatOwner.length === 5 && lihatOwner.some(function (x) { return x.karyawan === 'K010'; }) && saringItemKonfirmasi(itemKonf, { role: 'OWNER', id: 'OWN01', cabang: '' }, 'Pusat').length === 1);
+  ujiBebas('hak lihat: KARYAWAN atau tanpa aktor tidak melihat apa pun', saringItemKonfirmasi(itemKonf, { role: 'KARYAWAN', id: 'K001', cabang: 'Ngawi' }, '').length === 0 && saringItemKonfirmasi(itemKonf, null, '').length === 0);
+  ujiBebas('hak putuskan: admin cabang lain ditolak, admin pada item sendiri ditolak, owner boleh semua', !bolehMemutuskanKonfirmasi(adminK, { karyawan: 'K003', cabang: 'Pusat' }).boleh && !bolehMemutuskanKonfirmasi(adminK, { karyawan: 'K010', cabang: 'Ngawi' }).boleh && bolehMemutuskanKonfirmasi({ role: 'OWNER', id: 'OWN01', cabang: '' }, { karyawan: 'K010', cabang: 'Ngawi' }).boleh);
+  ujiBebas('satu keputusan per item: hanya MENUNGGU bisa diputuskan (DITERIMA/DITOLAK/kosong tidak)', bisaDiputuskan('MENUNGGU') === true && ['DITERIMA', 'DITOLAK', '', undefined].every(function (x) { return bisaDiputuskan(x) === false; }));
+  ujiBebas('id item: bentuk sah diurai, bentuk lain ditolak (injeksi, jenis salah, tanggal rusak)', JSON.stringify(parseIdItem('K001|2026-10-05|MASUK')) === JSON.stringify({ karyawan: 'K001', tanggal: '2026-10-05', jenis: 'MASUK' }) && parseIdItem('K001|2026-10-05|LAIN') === null && parseIdItem('K001|besok|MASUK') === null && parseIdItem("K001|2026-10-05|MASUK'--") === null && parseIdItem('') === null && parseIdItem(null) === null);
+  const banyakItem = []; for (let n = 0; n < 45; n++) { banyakItem.push({ id: 'K' + n, kelompok: n % 3 === 0 ? 'PULANG_CEPAT' : (n % 3 === 1 ? 'LUAR' : 'LEMBUR'), tanggal: '2026-10-' + ('0' + (1 + (n % 9))).slice(-2), jam: '07:' + ('0' + (n % 60)).slice(-2) }); }
+  const h1 = halamanKonfirmasi(banyakItem, 0, 20), h3 = halamanKonfirmasi(banyakItem, 40, 20);
+  ujiBebas('pembatasan 20 kartu per layar: halaman 1 = 20 dan masih ada lagi; halaman 3 = 5 dan habis; total 45', h1.daftar.length === 20 && h1.ada_lagi === true && h3.daftar.length === 5 && h3.ada_lagi === false && h1.total === 45);
+  ujiBebas('urutan: Absen luar dulu, lalu Lembur, lalu Pulang cepat; di dalam kelompok terbaru dulu', h1.daftar[0].kelompok === 'LUAR' && halamanKonfirmasi(banyakItem, 0, 45).daftar.map(function (x) { return x.kelompok; }).join(',').replace(/(\w+)(,\1)+/g, '$1') === 'LUAR,LEMBUR,PULANG_CEPAT' && (function () { const l = halamanKonfirmasi(banyakItem, 0, 45).daftar.filter(function (x) { return x.kelompok === 'LUAR'; }); return l[0].tanggal >= l[l.length - 1].tanggal; })());
+  ujiBebas('jumlah: 99 tampil 99, 100 tampil "99+"', jumlahTeks(0) === '0' && jumlahTeks(99) === '99' && jumlahTeks(100) === '99+' && jumlahTeks(250) === '99+');
+  ujiBebas('foto: ID berkas Drive dari tautan; kosong, TANPA FOTO, tautan asing = null', idBerkasDrive('https://drive.google.com/file/d/ABCDEFGHIJ1234/view?usp=drivesdk') === 'ABCDEFGHIJ1234' && idBerkasDrive('https://drive.google.com/open?id=XYZabc_123-456') === 'XYZabc_123-456' && idBerkasDrive('TANPA FOTO') === null && idBerkasDrive('') === null && idBerkasDrive('https://contoh.com/gambar.jpg') === null);
+  ujiBebas('kartu Hari ini konsisten dengan Konfirmasi: menunggu ACC menghitung item masuk DAN pulang yang MENUNGGU', hitungHariIni([{ tanggal: '2026-10-05', cabang: 'Ngawi', shift: 1, masuk: '07:44', st_masuk: 'HADIR', pulang: '16:31', acc_masuk: 'MENUNGGU', acc_pulang: 'MENUNGGU' }, { tanggal: '2026-10-05', cabang: 'Ngawi', shift: 1, masuk: '07:50', st_masuk: 'TELAT', pulang: '', acc_masuk: 'DITERIMA', acc_pulang: '' }], '2026-10-05', '', '').menunggu_acc === 2);
+
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -1461,6 +1507,10 @@ function tesServer() {
   baris.push('  - Telat lewat absen luar: pop-up TELAT + alasan; ket_masuk menjadi "Macet | LUAR: ..." (bagian luar tetap)');
   baris.push('  - Pulang luar setelah masuk di HP toko: form tujuan/keperluan muncul; setelah masuk luar: tanpa form; PULANG + LEMBUR mengikuti aturan jam lembur; acc_pulang MENUNGGU, cara_pulang LUAR');
   baris.push('  - Riwayat absen di HP pribadi: hanya milik sendiri, 31 hari terakhir, paling banyak 50 baris, jam masuk/pulang benar (bukan terbalik AM/PM)');
+  baris.push('  - Konfirmasi: menu admin (HP toko dan HP pribadi) dan menu owner menampilkan jumlah menunggu (99+ bila lebih); isi dikelompokkan Absen luar, Lembur, Pulang cepat; ACC mengubah acc_masuk/acc_pulang jadi DITERIMA, TOLAK (dengan konfirmasi) jadi DITOLAK, tombolnya hilang; sheet log ada ACC_ABSEN / TOLAK_ABSEN');
+  baris.push('  - Konfirmasi hak: admin Ngawi tidak melihat item Pusat dan tidak melihat absen luar miliknya sendiri; owner melihat semua cabang (filter cabang kalau lebih dari satu) termasuk milik admin dan bisa meng-ACC-nya');
+  baris.push('  - Lihat foto: foto hanya dimuat saat tombol ditekan; TANPA FOTO tampil sebagai tulisan; tautan Buka di Google Maps membuka lokasi yang benar; akurasi di atas 100 m diberi tanda');
+  baris.push('  - Muat lagi: layar menampilkan 20 kartu per muatan; setelah beberapa item diputuskan, Muat lagi tidak melewatkan item');
   baris.push('  - Aktifkan kembali karyawan nonaktif: saklar Tampilkan nonaktif -> tombol Aktifkan kembali; aktif jadi TRUE dengan ID sama, pin_hash/salah_login/terkunci tidak berubah, log AKTIFKAN_KARYAWAN; nama kembar dengan karyawan aktif ditolak');
   baris.push('  - Form Tambah karyawan: cabang bershift tunggal menampilkan catatan shift otomatis (tanpa dropdown), dan form tetap bisa disimpan walau shift tidak dipilih');
   baris.push('  - Login admin/owner dengan huruf besar/kecil berbeda (ADMIN123 vs admin123) berhasil; akun lama yang berhasil login dengan ketikan persis lama: pw_hash otomatis berubah ke versi huruf kecil (kolom pw_hash berubah, salah_login tidak naik)');
@@ -2073,6 +2123,8 @@ function hitungHariIni(rows, tanggal, cabang, shift) {
     if (String(r.masuk) !== '') { a.masuk++; }
     if (r.st_masuk === 'TELAT') { a.telat++; }
     if (String(r.pulang) !== '') { a.pulang++; }
+    // sama dengan Konfirmasi: item masuk dan item pulang yang MENUNGGU dihitung terpisah
+    if (r.acc_masuk === 'MENUNGGU') { a.menunggu_acc++; }
     if (r.acc_pulang === 'MENUNGGU') { a.menunggu_acc++; }
   });
   return a;
@@ -3214,6 +3266,250 @@ function prosesPribadiRiwayat(d) {
   if (!p) { return responSesiPribadiHabis(); }
   const mulai = Utilities.formatDate(new Date(Date.now() - 31 * 86400000), ZONA_ABSEN, 'yyyy-MM-dd');
   return respon({ status: 'ok', daftar: rakitRiwayat(bacaAbsensiAkun(p.id, mulai), p.id, mulai, 50) });
+}
+
+/**
+ * ---- Konfirmasi (ACC / TOLAK) ----
+ * Item = absen yang menunggu keputusan: acc_masuk = MENUNGGU (absen luar masuk) atau acc_pulang = MENUNGGU
+ * (absen luar pulang, lembur, pulang cepat). Satu baris absensi bisa menghasilkan dua item (masuk dan pulang).
+ * Kelompok: LUAR (absen luar masuk/pulang), LEMBUR (LEMBUR DI TOKO), PULANG_CEPAT (PULANG CEPAT).
+ * Id item = "ID karyawan|yyyy-MM-dd|MASUK atau PULANG" (satu baris per karyawan per hari).
+ * Hak (ditegakkan di server): ADMIN hanya cabangnya dan BUKAN absennya sendiri; OWNER semua cabang termasuk milik admin.
+ * Hanya SATU keputusan per item (hanya yang masih MENUNGGU bisa diputuskan). Dicatat di log.
+ * Yang dibaca hanya baris-baris terakhir sheet absensi (maksimal MAKS_BARIS_KONFIRMASI baris).
+ */
+var MAKS_BARIS_KONFIRMASI = 2000;
+var UKURAN_HALAMAN_KONFIRMASI = 20;
+var URUTAN_KELOMPOK = { LUAR: 0, LEMBUR: 1, PULANG_CEPAT: 2 };
+
+/** Fungsi murni: id item dipecah {karyawan, tanggal, jenis}; null kalau bentuknya tidak sah. */
+function parseIdItem(id) {
+  const m = /^([A-Za-z0-9]{1,20})\|(\d{4}-\d{2}-\d{2})\|(MASUK|PULANG)$/.exec(String(id || ''));
+  return m ? { karyawan: m[1], tanggal: m[2], jenis: m[3] } : null;
+}
+
+/** Fungsi murni: hanya item yang MASIH menunggu yang bisa diputuskan (satu keputusan per item). */
+function bisaDiputuskan(accSekarang) { return String(accSekarang) === 'MENUNGGU'; }
+
+/** Fungsi murni: tampilan jumlah: maksimal 99, lebih dari itu "99+". */
+function jumlahTeks(n) { return n > 99 ? '99+' : String(n); }
+
+/** Fungsi murni: tautan Google Maps dari "lat,lng,akurasi"; null kalau tidak valid. */
+function urlMaps(gpsTeks) {
+  const p = String(gpsTeks || '').split(',');
+  if (p.length < 2) { return null; }
+  const lat = Number(p[0]), lng = Number(p[1]);
+  if (p[0].trim() === '' || p[1].trim() === '' || !isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) { return null; }
+  return 'https://www.google.com/maps?q=' + lat + ',' + lng;
+}
+
+/** Fungsi murni: ID berkas Drive dari tautan di kolom foto; null untuk kosong / TANPA FOTO / tidak dikenal. */
+function idBerkasDrive(tautan) {
+  const t = String(tautan || '');
+  const m = /\/d\/([A-Za-z0-9_-]{10,})/.exec(t) || /[?&]id=([A-Za-z0-9_-]{10,})/.exec(t);
+  return m ? m[1] : null;
+}
+
+/** Fungsi murni: kelompok sebuah item pulang. */
+function kelompokItem(jenis, baris) {
+  if (jenis === 'MASUK') { return 'LUAR'; }
+  if (String(baris.cara_pulang) === 'LUAR') { return 'LUAR'; }
+  if (baris.st_pulang === 'LEMBUR DI TOKO') { return 'LEMBUR'; }
+  if (baris.st_pulang === 'PULANG CEPAT') { return 'PULANG_CEPAT'; }
+  return '';
+}
+
+/**
+ * Fungsi murni: dari baris absensi jadi item konfirmasi (maksimal dua per baris, masuk dan pulang terpisah).
+ * baris: tanggal 'yyyy-MM-dd', karyawan, nama, cabang, shift, jam_masuk, jam_pulang, cara_masuk, cara_pulang, acc_masuk, acc_pulang,
+ * st_masuk, telat_mnt, st_pulang, lembur ("tingkat|menit"), ket_masuk, ket_pulang, foto_masuk, foto_pulang, gps_masuk, gps_pulang.
+ */
+function rakitItemKonfirmasi(rows) {
+  const items = [];
+  rows.forEach(function (b) {
+    const buat = function (jenis) {
+      const masuk = jenis === 'MASUK';
+      const gps = String((masuk ? b.gps_masuk : b.gps_pulang) || '');
+      const foto = String((masuk ? b.foto_masuk : b.foto_pulang) || '');
+      const kelompok = kelompokItem(jenis, b);
+      if (!kelompok) { return; }
+      const lem = /^(\d+)\|(\d+)$/.exec(String(b.lembur));
+      items.push({
+        id: b.karyawan + '|' + b.tanggal + '|' + jenis, jenis: jenis, kelompok: kelompok,
+        karyawan: b.karyawan, nama: b.nama, cabang: b.cabang, tanggal: b.tanggal, shift: b.shift,
+        jam: masuk ? b.jam_masuk : b.jam_pulang,
+        status: masuk ? b.st_masuk : b.st_pulang,
+        ket: String((masuk ? b.ket_masuk : b.ket_pulang) || ''),
+        tingkat: !masuk && lem ? Number(lem[1]) : 0, durasi_menit: !masuk && lem ? Number(lem[2]) : 0,
+        gps: gps, akurasi: akurasiDariGps(gps), akurasi_buruk: akurasiBuruk(gps), maps: urlMaps(gps),
+        foto: foto === '' ? 'BELUM' : (foto === TEKS_TANPA_FOTO ? 'TANPA' : 'ADA')
+      });
+    };
+    if (String(b.acc_masuk) === 'MENUNGGU') { buat('MASUK'); }
+    if (String(b.acc_pulang) === 'MENUNGGU') { buat('PULANG'); }
+  });
+  return items;
+}
+
+/** Fungsi murni: item yang boleh dilihat aktor. OWNER: semua (boleh difilter cabang); ADMIN: cabangnya dan bukan miliknya sendiri. */
+function saringItemKonfirmasi(items, aktor, filterCabang) {
+  return items.filter(function (it) {
+    if (!bolehMemutuskanKonfirmasi(aktor, { karyawan: it.karyawan, cabang: it.cabang }).boleh) { return false; }
+    return !(aktor.role === 'OWNER' && filterCabang && it.cabang !== filterCabang);
+  });
+}
+
+/** Fungsi murni: satu halaman (maksimal 20 kartu): kelompok dulu (Luar, Lembur, Pulang cepat), lalu terbaru dulu. */
+function halamanKonfirmasi(items, offset, ukuran) {
+  const urut = items.slice().sort(function (a, b) {
+    if (URUTAN_KELOMPOK[a.kelompok] !== URUTAN_KELOMPOK[b.kelompok]) { return URUTAN_KELOMPOK[a.kelompok] - URUTAN_KELOMPOK[b.kelompok]; }
+    const ka = a.tanggal + ' ' + (a.jam || ''), kb = b.tanggal + ' ' + (b.jam || '');
+    return ka < kb ? 1 : (ka > kb ? -1 : 0);
+  });
+  const mulai = Math.max(0, Number(offset) || 0);
+  return { daftar: urut.slice(mulai, mulai + ukuran), total: urut.length, ada_lagi: mulai + ukuran < urut.length };
+}
+
+/** Baca baris absensi dari bawah ke atas (maksimal MAKS_BARIS_KONFIRMASI) yang masih menunggu (masuk atau pulang). */
+function bacaAbsensiMenunggu() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('absensi');
+  const terakhir = sheet.getLastRow();
+  if (terakhir < 2) { return []; }
+  const lebar = sheet.getLastColumn();
+  const header = sheet.getRange(1, 1, 1, lebar).getValues()[0];
+  const iMasuk = header.indexOf('masuk'), iPulang = header.indexOf('pulang');
+  const hasil = [];
+  let akhir = terakhir, dibaca = 0;
+  while (akhir >= 2 && dibaca < MAKS_BARIS_KONFIRMASI) {
+    const awal = Math.max(2, akhir - 199);
+    const rentang = sheet.getRange(awal, 1, akhir - awal + 1, lebar);
+    const v = rentang.getValues(), tampil = rentang.getDisplayValues();
+    for (let i = v.length - 1; i >= 0; i--) {
+      const r = {};
+      header.forEach(function (nama, idx) { r[nama] = v[i][idx]; });
+      if (String(r.acc_masuk) !== 'MENUNGGU' && String(r.acc_pulang) !== 'MENUNGGU') { continue; }
+      r.tanggal = String(sebagaiTanggalTeks(r.tanggal, ZONA_ABSEN));
+      r.jam_masuk = String(r.masuk) === '' ? '' : jamDariTampilan(tampil[i][iMasuk]);
+      r.jam_pulang = String(r.pulang) === '' ? '' : jamDariTampilan(tampil[i][iPulang]);
+      r._baris = awal + i;
+      hasil.push(r);
+    }
+    dibaca += v.length;
+    akhir = awal - 1;
+  }
+  return hasil;
+}
+
+/** Cari satu baris absensi (karyawan + tanggal) dari bawah ke atas; kembalikan { bacaan, baris } atau null. */
+function cariBarisAbsensi(karyawan, tanggal) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('absensi');
+  const terakhir = sheet.getLastRow();
+  if (terakhir < 2) { return null; }
+  const lebar = sheet.getLastColumn();
+  const header = sheet.getRange(1, 1, 1, lebar).getValues()[0];
+  let akhir = terakhir, dibaca = 0;
+  while (akhir >= 2 && dibaca < MAKS_BARIS_KONFIRMASI * 2) {
+    const awal = Math.max(2, akhir - 199);
+    const v = sheet.getRange(awal, 1, akhir - awal + 1, lebar).getValues();
+    for (let i = v.length - 1; i >= 0; i--) {
+      const r = {};
+      header.forEach(function (nama, idx) { r[nama] = v[i][idx]; });
+      if (String(r.karyawan) === String(karyawan) && String(sebagaiTanggalTeks(r.tanggal, ZONA_ABSEN)) === tanggal) {
+        r._baris = awal + i;
+        return { bacaan: { sheet: sheet, header: header }, baris: r };
+      }
+    }
+    dibaca += v.length;
+    akhir = awal - 1;
+  }
+  return null;
+}
+
+/** Siapa yang bertindak: OWNER (sesi owner), ADMIN HP toko (token + sesi), atau ADMIN HP pribadi (sesi). { aktor } atau { gagal }. */
+function aktorKonfirmasi(d) {
+  if (!d.token) {
+    const o = validasiSesi(d.sesi, 'OWNER');
+    if (o) { return { aktor: { role: 'OWNER', id: o.akun.id, cabang: '' } }; }
+  }
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a; }
+  return { aktor: { role: 'ADMIN', id: a.s.akun.id, cabang: a.s.akun.cabang } };
+}
+
+function itemUntukAktor(aktor, filterCabang) {
+  return saringItemKonfirmasi(rakitItemKonfirmasi(bacaAbsensiMenunggu()), aktor, filterCabang);
+}
+
+/** Aksi konfirmasi_jumlah: jumlah item yang menunggu (untuk badge menu; maksimal 99+). */
+function prosesKonfirmasiJumlah(d) {
+  const k = aktorKonfirmasi(d);
+  if (k.gagal) { return k.gagal; }
+  const n = itemUntukAktor(k.aktor, '').length;
+  return respon({ status: 'ok', jumlah: n, jumlah_teks: jumlahTeks(n) });
+}
+
+/** Aksi konfirmasi_daftar { offset?, cabang? }: satu halaman (maksimal 20 kartu), hanya yang MENUNGGU. */
+function prosesKonfirmasiDaftar(d) {
+  const k = aktorKonfirmasi(d);
+  if (k.gagal) { return k.gagal; }
+  const filter = k.aktor.role === 'OWNER' && d.cabang ? String(d.cabang).slice(0, 60) : '';
+  const semua = itemUntukAktor(k.aktor, filter);
+  const h = halamanKonfirmasi(semua, d.offset, UKURAN_HALAMAN_KONFIRMASI);
+  return respon({ status: 'ok', daftar: h.daftar, total: h.total, jumlah_teks: jumlahTeks(h.total), ada_lagi: h.ada_lagi });
+}
+
+/** Aksi konfirmasi_putuskan { id, keputusan: ACC | TOLAK }: satu keputusan per item, dicatat di log. */
+function prosesKonfirmasiPutuskan(d) {
+  const k = aktorKonfirmasi(d);
+  if (k.gagal) { return k.gagal; }
+  const it = parseIdItem(d.id);
+  if (!it) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
+  if (d.keputusan !== 'ACC' && d.keputusan !== 'TOLAK') { return respon({ status: 'gagal', pesan: 'Keputusan tidak dikenal' }); }
+  const kunciLock = LockService.getScriptLock();
+  kunciLock.waitLock(10000);
+  try {
+    const cari = cariBarisAbsensi(it.karyawan, it.tanggal);
+    if (!cari) { return respon({ status: 'gagal', pesan: 'Absen tidak ditemukan' }); }
+    const kolomAcc = it.jenis === 'MASUK' ? 'acc_masuk' : 'acc_pulang';
+    const izin = bolehMemutuskanKonfirmasi(k.aktor, { karyawan: cari.baris.karyawan, cabang: cari.baris.cabang });
+    if (!izin.boleh) { return respon({ status: 'gagal', pesan: izin.pesan }); }
+    if (!bisaDiputuskan(cari.baris[kolomAcc])) { return respon({ status: 'gagal', pesan: 'Item ini sudah diputuskan' }); }
+    const baru = d.keputusan === 'ACC' ? 'DITERIMA' : 'DITOLAK';
+    const ubah = {}; ubah[kolomAcc] = baru;
+    perbaruiKolom(cari.bacaan, cari.baris, ubah);
+    tambahLog({
+      jenis: 'KONFIRMASI', oleh: k.aktor.id, cabang: cari.baris.cabang, aksi: d.keputusan === 'ACC' ? 'ACC_ABSEN' : 'TOLAK_ABSEN',
+      target: cari.baris.nama + ' ' + it.jenis + ' ' + it.tanggal, id: cari.baris.karyawan, sebelum: kolomAcc + '=MENUNGGU', sesudah: kolomAcc + '=' + baru
+    });
+    return respon({ status: 'ok', keputusan: baru });
+  } finally {
+    kunciLock.releaseLock();
+  }
+}
+
+/** Aksi ambil_foto { id }: baca satu foto dari Drive (tidak publik) dan kirim sebagai base64, hanya untuk yang berhak. */
+function prosesAmbilFoto(d) {
+  const k = aktorKonfirmasi(d);
+  if (k.gagal) { return k.gagal; }
+  const it = parseIdItem(d.id);
+  if (!it) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
+  const cari = cariBarisAbsensi(it.karyawan, it.tanggal);
+  if (!cari) { return respon({ status: 'gagal', pesan: 'Absen tidak ditemukan' }); }
+  const izin = bolehMemutuskanKonfirmasi(k.aktor, { karyawan: cari.baris.karyawan, cabang: cari.baris.cabang }); // hak lihat = hak putuskan
+  if (!izin.boleh) { return respon({ status: 'gagal', pesan: izin.pesan }); }
+  const tautan = String(it.jenis === 'MASUK' ? cari.baris.foto_masuk : cari.baris.foto_pulang);
+  if (tautan === '') { return respon({ status: 'ok', foto: null, teks: 'Foto belum ada' }); }
+  if (tautan === TEKS_TANPA_FOTO) { return respon({ status: 'ok', foto: null, teks: TEKS_TANPA_FOTO }); }
+  const idBerkas = idBerkasDrive(tautan);
+  if (!idBerkas) { return respon({ status: 'ok', foto: null, teks: 'Foto tidak bisa dibuka' }); }
+  try {
+    const blob = DriveApp.getFileById(idBerkas).getBlob();
+    const bytes = blob.getBytes();
+    if (bytes.length > 400 * 1024) { return respon({ status: 'ok', foto: null, teks: 'Foto terlalu besar untuk ditampilkan' }); }
+    return respon({ status: 'ok', foto: 'data:image/jpeg;base64,' + Utilities.base64Encode(bytes) });
+  } catch (e) {
+    return respon({ status: 'ok', foto: null, teks: 'Foto tidak bisa dibuka' });
+  }
 }
 
 var ZONA_ABSEN = 'Asia/Jakarta';
