@@ -106,6 +106,10 @@ function doPost(e) {
   if (data.aksi === 'owner_keluarkan_semua') { return prosesOwnerKeluarkanSemua(data.sesi); }
   if (data.aksi === 'owner_ganti_password') { return prosesOwnerGantiPassword(data.sesi, data.lama, data.baru); }
   if (data.aksi === 'logout') { return prosesLogout(data.sesi); }
+  if (data.aksi === 'login_pribadi') { return prosesLoginPribadi(data); }
+  if (data.aksi === 'atur_kredensial_admin') { return prosesAturKredensialAdmin(data); }
+  if (data.aksi === 'pribadi_profil') { return prosesPribadiProfil(data); }
+  if (data.aksi === 'pribadi_keluarkan_semua') { return prosesPribadiKeluarkanSemua(data); }
 
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
   const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto'];
@@ -573,6 +577,8 @@ function cekKaryawanDanPin(id, pin, hp) {
   if (!id || !pin) {
     return { gagal: respon({ status: 'gagal', pesan: 'id dan pin wajib diisi' }) };
   }
+  // PIN harus tepat 5 angka (PIN lama 4 angka tidak valid); bentuk salah tidak menaikkan hitungan salah.
+  if (!validasiPin(pin).ok) { return { gagal: respon({ status: 'gagal', pesan: 'Karyawan atau PIN salah' }) }; }
 
   const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
   if (!kodeRahasia) {
@@ -600,6 +606,7 @@ function cekKaryawanDanPin(id, pin, hp) {
     const salahBaru = (Number(akunDitemukan.salah_login) || 0) + 1;
     if (salahBaru >= 5) {
       perbaruiKolom(akun, akunDitemukan, { salah_login: salahBaru, terkunci: true });
+      hapusCacheSesiAkun(id);
       tambahLog({
         jenis: 'KEAMANAN', oleh: id, cabang: akunDitemukan.cabang, aksi: 'KUNCI_AKUN',
         target: 'akun', id: id, sebelum: 'terkunci=FALSE', sesudah: 'terkunci=TRUE',
@@ -1160,8 +1167,8 @@ function tesServer() {
     hapusProp.sort().join(',') === 'palsu_salah_abc,tahan_OWN09,tahan_siapa', hapusProp.join(','));
 
   // ---- Karyawan: PIN bebas, ID otomatis, nama, hak admin, reset PIN, daftar nama ----
-  ['1234', '1111', '0000', '9876'].forEach(function (p) { ujiBebas('PIN ' + p + ' diterima (PIN bebas, tanpa aturan berurutan/kembar)', validasiPin(p).ok); });
-  ujiBebas('PIN bukan 4 digit angka ditolak', ['', '123', '12345', 'abcd', '12a4', ' 123', '12 34', '１２３４', null, undefined, 1234, [1, 2, 3, 4]].every(function (p) { return !validasiPin(p).ok; }));
+  ['12345', '11111', '00000', '98765'].forEach(function (p) { ujiBebas('PIN ' + p + ' diterima (5 angka apa pun, tanpa aturan berurutan/kembar)', validasiPin(p).ok); });
+  ujiBebas('PIN bukan 5 angka ditolak (termasuk PIN lama 4 angka dan 6 angka)', ['', '1234', '123456', 'abcde', '12a45', ' 1234', '12 345', '１２３４５', null, undefined, 12345, [1, 2, 3, 4, 5]].every(function (p) { return !validasiPin(p).ok; }));
 
   const semuaIdUji = ['K001', 'K002', 'OWN01', 'HPT-NGW-01', 'K007'];
   ujiBebas('ID karyawan otomatis = K + nomor terbesar + 1 (OWN/HPT tidak dihitung)', buatIdKaryawan(semuaIdUji) === 'K008', buatIdKaryawan(semuaIdUji));
@@ -1192,8 +1199,8 @@ function tesServer() {
     { id: 'K004', nama: 'Rina', role: 'KARYAWAN', cabang: 'Pusat', aktif: true, panggilan: 'Rina', shift: 1, mulai_kerja: '2026-01-01' },
     { id: 'HPT-NGW-01', nama: 'HP Toko 1', role: 'PERANGKAT', cabang: 'Ngawi', aktif: true, panggilan: '', shift: '', mulai_kerja: '' }
   ];
-  ujiBebas('layar Karyawan: hanya KARYAWAN aktif cabang itu (ADMIN/OWNER/HP/cabang lain tidak tampil)', saringDaftarKaryawan(akunDaftar, 'Ngawi', false).map(function (x) { return x.id; }).join(',') === 'K001');
-  ujiBebas('layar Karyawan: saklar nonaktif menampilkan K002 juga, tetap tanpa ADMIN/OWNER', saringDaftarKaryawan(akunDaftar, 'Ngawi', true).map(function (x) { return x.id; }).join(',') === 'K001,K002');
+  ujiBebas('layar Karyawan: hanya KARYAWAN aktif cabang itu (ADMIN/OWNER/HP/cabang lain tidak tampil)', saringDaftarKaryawan(akunDaftar, 'Ngawi', 'AKTIF').map(function (x) { return x.id; }).join(',') === 'K001');
+  ujiBebas('layar Karyawan: kelompok Nonaktif hanya berisi K002 (satu kelompok sekaligus, tanpa ADMIN/OWNER)', saringDaftarKaryawan(akunDaftar, 'Ngawi', 'NONAKTIF').map(function (x) { return x.id; }).join(',') === 'K002' && saringDaftarKaryawan(akunDaftar, 'Ngawi', undefined).map(function (x) { return x.id; }).join(',') === 'K001');
   ujiBebas('daftar nama di layar pilih nama: nonaktif (K002) tidak muncul, ADMIN aktif muncul, HP/owner/cabang lain tidak', daftarUntukPilihNama(akunDaftar, 'Ngawi').map(function (x) { return x.id; }).join(',') === 'K001,K003');
 
   // ---- Foto absen: id absen, validasi gambar dan unggahan (tanpa menulis ke Drive/sheet) ----
@@ -1282,6 +1289,29 @@ function tesServer() {
   ujiBebas('password baru yang beda hanya huruf besar/kecil dari yang lama ditolak (sama setelah normalisasi)', !periksaKekuatanPassword(normalisasiPassword('KUBAHEMAS2026'), 'owner', normalisasiPassword('kubahemas2026')).ok);
   ujiBebas('normalisasi aman untuk undefined/null/angka', normalisasiPassword(undefined) === '' && normalisasiPassword(null) === '' && normalisasiPassword(123456) === '123456');
 
+  // ---- Gelombang 2 bagian 1: PIN 5 angka, kata sandi admin, kredensial pertama, sesi HP pribadi ----
+  ujiBebas('kata sandi admin: 8 karakter bebas diterima (huruf, angka urut, campuran, simbol)', ['abcdefgh', '12345678', 'Ab1!@#$%', 'Kata sandi panjang'].every(function (p) { return validasiKataSandiAdmin(p).ok; }));
+  ujiBebas('kata sandi admin: 7 karakter, 101 karakter, bukan teks ditolak; 100 karakter diterima', !validasiKataSandiAdmin('1234567').ok && !validasiKataSandiAdmin('x'.repeat(101)).ok && validasiKataSandiAdmin('x'.repeat(100)).ok && !validasiKataSandiAdmin(12345678).ok && !validasiKataSandiAdmin(null).ok && !validasiKataSandiAdmin('').ok);
+  const adminBaru = { role: 'ADMIN', aktif: true, ganti_pw: true, pw_hash: '', terkunci: false };
+  ujiBebas('kredensial pertama: ADMIN aktif, ganti_pw TRUE, pw_hash kosong diizinkan', jalurKredensialAwalAdmin(adminBaru).boleh === true);
+  ujiBebas('kredensial pertama: HANYA ADMIN (KARYAWAN, OWNER, PERANGKAT, tidak ada ditolak)', ['KARYAWAN', 'OWNER', 'PERANGKAT'].every(function (r) { return !jalurKredensialAwalAdmin(Object.assign({}, adminBaru, { role: r })).boleh; }) && !jalurKredensialAwalAdmin(null).boleh);
+  ujiBebas('kredensial pertama: ditolak kalau pw_hash sudah terisi, ganti_pw FALSE, nonaktif, atau terkunci', !jalurKredensialAwalAdmin(Object.assign({}, adminBaru, { pw_hash: 'abc' })).boleh && !jalurKredensialAwalAdmin(Object.assign({}, adminBaru, { ganti_pw: false })).boleh && !jalurKredensialAwalAdmin(Object.assign({}, adminBaru, { aktif: false })).boleh && !jalurKredensialAwalAdmin(Object.assign({}, adminBaru, { terkunci: true })).boleh);
+  ujiBebas('pesan gagal login HP pribadi: satu pesan untuk nama tidak ada dan kredensial salah, pesan terkunci terpisah', PESAN_PRIBADI_GAGAL === 'Nama atau PIN/kata sandi salah' && PESAN_PRIBADI_GAGAL !== PESAN_PRIBADI_TERKUNCI);
+  const cachePribadi = { d: {}, get: function (k) { return this.d[k] || null; }, put: function (k, v) { this.d[k] = v; }, remove: function (k) { delete this.d[k]; } };
+  let hPribadi; for (let n = 1; n <= 4; n++) { hPribadi = catatGagalPalsu(cachePribadi, 'pribadi-xyz', t0 + n * 1000); }
+  ujiBebas('nama tidak ada: 4 percobaan belum ditahan, ke-5 ditahan lewat cache (bukan Script Properties)', hPribadi.ditahan === false && catatGagalPalsu(cachePribadi, 'pribadi-xyz', t0 + 5000).ditahan === true && Object.keys(cachePribadi.d).every(function (k) { return k.indexOf('palsu_') === 0; }));
+  ujiBebas('jenis sesi dari kolom perangkat: HPTOKO..=TOKO, HPP..=PRIBADI, selain itu OWNER', jenisSesi({ perangkat: 'HPTOKOHPTNGW01|HP toko HPT-NGW-01' }) === 'TOKO' && jenisSesi({ perangkat: 'HPPabc123def4567|Android · Chrome' }) === 'PRIBADI' && jenisSesi({ perangkat: 'abc123def4567890|Windows · Edge' }) === 'OWNER');
+  const sesiCabut = [
+    { id_sesi: 'A', akun: 'K001', aktif: true, token_hash: 'ha', perangkat: 'HPPaaaa1111|HP 1' }, { id_sesi: 'B', akun: 'K001', aktif: true, token_hash: 'hb', perangkat: 'HPPbbbb2222|HP 2' },
+    { id_sesi: 'C', akun: 'K001', aktif: false, token_hash: 'hc', perangkat: 'HPPcccc3333|HP 3' }, { id_sesi: 'D', akun: 'K002', aktif: true, token_hash: 'hd', perangkat: 'HPPdddd4444|HP 4' }
+  ];
+  ujiBebas('pencabutan sesi (reset PIN / nonaktif / keluarkan semua): semua sesi aktif akun itu dicabut, akun lain tidak', cabutSesiPada(sesiCabut, 'K001', '').filter(function (x) { return x.akun === 'K001'; }).every(function (x) { return !x.aktif; }) && cabutSesiPada(sesiCabut, 'K001', '').filter(function (x) { return x.akun === 'K002'; })[0].aktif === true);
+  ujiBebas('pencabutan sesi menghapus cache validasi: kunci sp_ + hash hanya untuk sesi AKTIF milik akun itu', JSON.stringify(kunciCacheSesi(sesiCabut, 'K001')) === JSON.stringify(['sp_ha', 'sp_hb']) && kunciCacheSesi(sesiCabut, 'K999').length === 0);
+  const adminNgawi = { role: 'ADMIN', id: 'K010', cabang: 'Ngawi' };
+  ujiBebas('akses admin lintas cabang ditolak (karyawan Pusat oleh admin Ngawi)', !bolehKelolaKaryawan('ADMIN', 'Ngawi', { role: 'KARYAWAN', cabang: 'Pusat' }).boleh && bolehKelolaKaryawan('ADMIN', 'Ngawi', { role: 'KARYAWAN', cabang: 'Ngawi' }).boleh);
+  ujiBebas('ACC: admin pada absennya sendiri ditolak (hanya owner), admin cabang lain ditolak, admin cabang sendiri milik orang lain boleh', !bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K010', cabang: 'Ngawi' }).boleh && !bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K001', cabang: 'Pusat' }).boleh && bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K001', cabang: 'Ngawi' }).boleh);
+  ujiBebas('ACC: owner boleh semua cabang termasuk item milik admin; KARYAWAN/tanpa aktor ditolak', bolehMemutuskanKonfirmasi({ role: 'OWNER', id: 'OWN01', cabang: '' }, { karyawan: 'K010', cabang: 'Pusat' }).boleh && !bolehMemutuskanKonfirmasi({ role: 'KARYAWAN', id: 'K001', cabang: 'Ngawi' }, { karyawan: 'K002', cabang: 'Ngawi' }).boleh && !bolehMemutuskanKonfirmasi(null, { karyawan: 'K002', cabang: 'Ngawi' }).boleh);
+
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -1347,6 +1377,10 @@ function tesServer() {
   baris.push('  - Foto pulang/lembur: setelah keterangan diisi, foto_pulang berisi tautan; id_pulang berawalan P- (pulang) atau L- (lembur); revisi/ganti jadi lembur mengosongkan foto_pulang lalu mengisinya dengan foto baru');
   baris.push('  - Tambah karyawan di HP toko (admin): ID baru K + nomor terbesar + 1, cabang ikut admin, pin_hash terisi, pw_hash KOSONG, aktif TRUE; batalkan di layar PIN = tidak ada baris baru');
   baris.push('  - Tambah karyawan dengan nama yang sama dengan karyawan aktif (huruf besar/kecil beda): ditolak dengan pesan jelas');
+  baris.push('  - Login HP pribadi: karyawan (nama + PIN 5 angka) dan admin (nama + kata sandi) masuk; salah 5x mengunci akun; nama ngawur 5x ditahan tanpa membuka petunjuk apakah nama ada');
+  baris.push('  - Admin baru (pw_hash kosong, ganti_pw TRUE diisi pemilik di sheet): login pertama dengan nama saja membuka layar Buat kata sandi dan PIN; sesudahnya pw_hash dan pin_hash terisi, ganti_pw FALSE, dan sheet sesi bertambah satu baris (kolom perangkat berawalan HPP, kolom kedaluwarsa kosong)');
+  baris.push('  - Reset PIN / Nonaktifkan karyawan dari HP toko atau HP pribadi admin: karyawan yang sedang masuk di HP pribadi langsung ditolak pada permintaan berikutnya (sesi di sheet jadi aktif FALSE)');
+  baris.push('  - Karyawan lama dengan PIN 4 angka tidak bisa absen lagi sampai admin menjalankan Reset PIN (PIN baru 5 angka)');
   baris.push('  - Aktifkan kembali karyawan nonaktif: saklar Tampilkan nonaktif -> tombol Aktifkan kembali; aktif jadi TRUE dengan ID sama, pin_hash/salah_login/terkunci tidak berubah, log AKTIFKAN_KARYAWAN; nama kembar dengan karyawan aktif ditolak');
   baris.push('  - Form Tambah karyawan: cabang bershift tunggal menampilkan catatan shift otomatis (tanpa dropdown), dan form tetap bisa disimpan walau shift tidak dipilih');
   baris.push('  - Login admin/owner dengan huruf besar/kecil berbeda (ADMIN123 vs admin123) berhasil; akun lama yang berhasil login dengan ketikan persis lama: pw_hash otomatis berubah ke versi huruf kecil (kolom pw_hash berubah, salah_login tidak naik)');
@@ -1463,18 +1497,18 @@ function buatSesi(akunId, idPerangkat, labelPerangkat, menit) {
   const token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
   const sesi = bacaSesi();
   const sekarang = Date.now();
-  const kedaluwarsa = sekarang + menit * 60000;
+  const kedaluwarsa = menit === null ? null : sekarang + menit * 60000; // null = tanpa kedaluwarsa (HP pribadi)
   const baris = {
     id_sesi: 'S-' + Utilities.getUuid().replace(/-/g, '').slice(0, 12), akun: akunId,
     perangkat: idPerangkat + '|' + labelPerangkat, token_hash: hashSesi(token),
-    dibuat: teksWaktu(sekarang), terakhir_aktif: teksWaktu(sekarang), kedaluwarsa: teksWaktu(kedaluwarsa), aktif: true
+    dibuat: teksWaktu(sekarang), terakhir_aktif: teksWaktu(sekarang), kedaluwarsa: kedaluwarsa === null ? '' : teksWaktu(kedaluwarsa), aktif: true
   };
   sesi.sheet.appendRow(sesi.header.map(function (n) { return baris[n]; }));
   return { token: token, id_sesi: baris.id_sesi, kedaluwarsa: kedaluwarsa };
 }
 
 /** Kembalikan { sesi (bacaan sheet), baris, akun } kalau tiket sesi sah (dan role cocok), kalau tidak null. */
-function validasiSesi(token, role) {
+function validasiSesi(token, role, jenis) {
   if (!token || typeof token !== 'string' || token.length < 32 || token.length > 200) { return null; }
   if (!PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA')) { return null; }
   const hash = hashSesi(token);
@@ -1482,7 +1516,10 @@ function validasiSesi(token, role) {
   const baris = sesi.data.find(function (r) { return r.token_hash === hash && r.aktif === true; });
   if (!baris) { return null; }
   const sekarang = Date.now();
-  if (!sesiMasihBerlaku(msDariSel(baris.kedaluwarsa), sekarang)) {
+  const jn = jenisSesi(baris);
+  if (jenis && jn !== jenis) { return null; }
+  // Sesi HP pribadi tidak punya kedaluwarsa waktu (sampai Log out/dicabut); jenis lain wajib belum kedaluwarsa.
+  if (jn !== 'PRIBADI' && !sesiMasihBerlaku(msDariSel(baris.kedaluwarsa), sekarang)) {
     perbaruiKolom(sesi, baris, { aktif: false });
     return null;
   }
@@ -1498,12 +1535,16 @@ function validasiSesi(token, role) {
 function cabutSesiAkun(akunId, kecualiIdSesi) {
   const sesi = bacaSesi();
   let n = 0;
+  const kunciCache = [];
   sesi.data.forEach(function (r) {
     if (String(r.akun) === String(akunId) && r.aktif === true && r.id_sesi !== kecualiIdSesi) {
       perbaruiKolom(sesi, r, { aktif: false });
+      kunciCache.push('sp_' + r.token_hash);
       n++;
     }
   });
+  // pencabutan berlaku SEKETIKA: buang cache validasi sesi HP pribadi
+  if (kunciCache.length) { CacheService.getScriptCache().removeAll(kunciCache); }
   return n;
 }
 
@@ -2045,6 +2086,7 @@ function prosesUbahNamaHp(d) {
   if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
   const s = validasiSesi(d.sesi, null);
   if (!s) { return responSesiHabis(); }
+  if (s.akun.role === 'ADMIN' && jenisSesi(s.baris) !== 'TOKO') { return responSesiHabis(); }
 
   let idHp, idHpToken = null;
   if (s.akun.role === 'ADMIN') {
@@ -2169,7 +2211,10 @@ function prosesLogout(sesiToken) {
     const hash = hashSesi(sesiToken);
     const sesi = bacaSesi();
     const baris = sesi.data.find(function (r) { return r.token_hash === hash && r.aktif === true; });
-    if (baris) { perbaruiKolom(sesi, baris, { aktif: false }); }
+    if (baris) {
+      perbaruiKolom(sesi, baris, { aktif: false });
+      CacheService.getScriptCache().remove('sp_' + hash);
+    }
   }
   return respon({ status: 'ok' });
 }
@@ -2178,12 +2223,12 @@ function prosesLogout(sesiToken) {
  * ---- Karyawan (dikelola admin di HP toko) ----
  * Semua aksi di bagian ini WAJIB token HP toko terdaftar + sesi admin yang valid, dan hanya
  * menyentuh karyawan (role KARYAWAN) di cabang admin itu. Baris ADMIN/OWNER tidak tampil dan tidak
- * bisa diubah lewat sini. PIN: 4 digit angka apa pun (1234 dan 1111 boleh). PIN tidak pernah dicatat.
+ * bisa diubah lewat sini. PIN: tepat 5 angka (angka apa pun boleh). PIN tidak pernah dicatat.
  */
 
-/** Fungsi murni: PIN harus teks 4 digit angka. */
+/** Fungsi murni: PIN harus teks TEPAT 5 angka (angka apa pun boleh). PIN lama 4 angka tidak valid lagi. */
 function validasiPin(pin) {
-  if (typeof pin !== 'string' || !/^\d{4}$/.test(pin)) { return { ok: false, pesan: 'PIN harus 4 digit angka' }; }
+  if (typeof pin !== 'string' || !/^\d{5}$/.test(pin)) { return { ok: false, pesan: 'PIN harus 5 angka' }; }
   return { ok: true };
 }
 
@@ -2195,10 +2240,11 @@ function bolehKelolaKaryawan(roleAktor, cabangAktor, target) {
   return { boleh: true };
 }
 
-/** Fungsi murni: daftar karyawan untuk layar Karyawan (hanya role KARYAWAN di cabang itu; nonaktif tersembunyi kecuali diminta). */
-function saringDaftarKaryawan(rows, cabang, tampilkanNonaktif) {
+/** Fungsi murni: daftar karyawan untuk layar Karyawan: hanya role KARYAWAN di cabang itu, dan hanya SATU kelompok: 'AKTIF' (bawaan) atau 'NONAKTIF'. */
+function saringDaftarKaryawan(rows, cabang, kelompok) {
+  const nonaktif = kelompok === 'NONAKTIF';
   return rows
-    .filter(function (r) { return r.role === 'KARYAWAN' && r.cabang === cabang && (tampilkanNonaktif === true || r.aktif === true); })
+    .filter(function (r) { return r.role === 'KARYAWAN' && r.cabang === cabang && ((r.aktif === true) === !nonaktif); })
     .map(function (r) {
       return { id: r.id, nama: r.nama, panggilan: r.panggilan, shift: r.shift, aktif: r.aktif === true, mulai_kerja: sebagaiTanggalTeks(r.mulai_kerja, ZONA_ABSEN) };
     })
@@ -2259,9 +2305,16 @@ function perubahanResetPin(hashBaru) {
 
 /** Wajib token HP toko + sesi admin; admin harus dari cabang HP itu. Kembalian { hp, s } atau { gagal }. */
 function autentikasiAdminToko(d) {
+  // Jalur (b): sesi admin HP PRIBADI (tanpa token HP toko). Jalur (a): token HP toko + sesi admin HP toko.
+  if (!d.token) {
+    const p = validasiSesiPribadi(d.sesi);
+    if (!p) { return { gagal: responSesiPribadiHabis() }; }
+    if (p.role !== 'ADMIN') { return { gagal: respon({ status: 'gagal', pesan: 'Hanya admin yang boleh mengelola karyawan' }) }; }
+    return { hp: null, s: { akun: { id: p.id, nama: p.nama, cabang: p.cabang, role: p.role } } };
+  }
   const hp = validasiTokenHp(d.token);
   if (!hp) { return { gagal: respon({ status: 'gagal', kode: 'HP_TIDAK_TERDAFTAR', pesan: 'HP ini belum terdaftar atau sudah dinonaktifkan' }) }; }
-  const s = validasiSesi(d.sesi, 'ADMIN');
+  const s = validasiSesi(d.sesi, 'ADMIN', 'TOKO');
   if (!s) { return { gagal: responSesiHabis() }; }
   if (s.akun.cabang !== hp.cabang) { return { gagal: respon({ status: 'gagal', pesan: 'Admin hanya boleh mengelola karyawan di cabangnya' }) }; }
   return { hp: hp, s: s };
@@ -2272,9 +2325,11 @@ function prosesKaryawanDaftar(d) {
   const a = autentikasiAdminToko(d);
   if (a.gagal) { return a.gagal; }
   const cabang = a.s.akun.cabang;
-  const daftar = saringDaftarKaryawan(bacaSheet('akun').data, cabang, d.tampilkan_nonaktif === true);
+  const semuaAkun = bacaSheet('akun').data;
+  const kelompok = d.kelompok === 'NONAKTIF' ? 'NONAKTIF' : 'AKTIF';
+  const daftar = saringDaftarKaryawan(semuaAkun, cabang, kelompok);
   const shifts = bacaShiftCabang(cabang).map(function (sh) { return { no: sh.no, nama: sh.nama, masuk: sh.masuk, pulang: sh.pulang }; });
-  return respon({ status: 'ok', cabang: cabang, daftar: daftar, daftar_shift: shifts, jumlah_aktif: daftar.filter(function (x) { return x.aktif; }).length });
+  return respon({ status: 'ok', cabang: cabang, daftar: daftar, daftar_shift: shifts, kelompok: kelompok, jumlah_aktif: saringDaftarKaryawan(semuaAkun, cabang, 'AKTIF').length });
 }
 
 /**
@@ -2339,6 +2394,7 @@ function prosesKaryawanResetPin(d) {
   if (!izin.boleh) { return respon({ status: 'gagal', pesan: izin.pesan }); }
   if (target.aktif !== true) { return respon({ status: 'gagal', pesan: 'Karyawan sudah nonaktif' }); }
   perbaruiKolom(akun, target, perubahanResetPin(hashDenganGaram(d.pin, String(target.id), kodeRahasia)));
+  cabutSesiAkun(target.id, ''); // semua sesi HP pribadi karyawan ini dicabut seketika
   tambahLog({ jenis: 'KARYAWAN', oleh: a.s.akun.id, cabang: target.cabang, aksi: 'RESET_PIN', target: target.nama, id: target.id, sebelum: 'salah_login/terkunci diperiksa', sesudah: 'salah_login=0; terkunci=FALSE' });
   return respon({ status: 'ok', id: target.id, nama: target.nama });
 }
@@ -2380,6 +2436,7 @@ function prosesKaryawanNonaktif(d) {
   if (!izin.boleh) { return respon({ status: 'gagal', pesan: izin.pesan }); }
   if (target.aktif === true) {
     perbaruiKolom(akun, target, { aktif: false });
+    cabutSesiAkun(target.id, ''); // akun nonaktif tidak bisa login di HP mana pun
     tambahLog({ jenis: 'KARYAWAN', oleh: a.s.akun.id, cabang: target.cabang, aksi: 'NONAKTIFKAN_KARYAWAN', target: target.nama, id: target.id, sebelum: 'aktif=TRUE', sesudah: 'aktif=FALSE' });
   }
   return respon({ status: 'ok', id: target.id, nama: target.nama });
@@ -2649,6 +2706,202 @@ function cocokkanPassword(password, id, kodeRahasia, hashTersimpan) {
   const hAsli = hashDenganGaram(String(password === undefined || password === null ? '' : password), String(id), kodeRahasia);
   if (hAsli === hashTersimpan) { return { cocok: true, migrasi: true, hashBaru: hKecil }; }
   return { cocok: false };
+}
+
+/**
+ * ---- Akun dan login HP PRIBADI (Gelombang 2) ----
+ * KARYAWAN: PIN tepat 5 angka (angka apa pun boleh), dipakai di HP toko dan di login HP pribadi.
+ * ADMIN: PIN 5 angka (absen di HP toko) DAN kata sandi minimal 8 karakter bebas (tidak peka huruf besar-kecil)
+ *        untuk "Masuk sebagai Admin" di HP toko dan login HP pribadi. OWNER: tidak berubah (login terpisah).
+ * Sesi HP pribadi = tiket acak, di sheet sesi hanya hash-nya (kolom perangkat berawalan "HPP"), TANPA kedaluwarsa
+ * waktu (kolom kedaluwarsa kosong): berlaku sampai Log out atau dicabut (reset PIN, nonaktif, keluarkan semua
+ * perangkat, atau atur ulang kata sandi). Satu akun boleh punya banyak sesi; tidak ada pengikatan akun ke HP.
+ * Validasi sesi memakai cache 60 detik (kunci "sp_" + hash tiket); cache DIHAPUS saat sesi dicabut atau akun terkunci.
+ */
+var PESAN_PRIBADI_GAGAL = 'Nama atau PIN/kata sandi salah';
+var PESAN_PRIBADI_TERKUNCI = 'Terlalu banyak percobaan salah. Akun terkunci, hubungi admin.';
+
+/** Fungsi murni: jenis sesi dari kolom perangkat: TOKO (admin di HP toko), PRIBADI (HP pribadi), selain itu OWNER. */
+function jenisSesi(barisSesi) {
+  const p = String(barisSesi.perangkat);
+  if (p.indexOf('HPTOKO') === 0) { return 'TOKO'; }
+  if (p.indexOf('HPP') === 0) { return 'PRIBADI'; }
+  return 'OWNER';
+}
+
+/** Fungsi murni: kata sandi admin minimal 8 karakter bebas (huruf/angka/campuran, angka berurutan boleh), maksimal 100. */
+function validasiKataSandiAdmin(pw) {
+  if (typeof pw !== 'string') { return { ok: false, pesan: 'Kata sandi wajib diisi' }; }
+  if (pw.length < 8) { return { ok: false, pesan: 'Kata sandi minimal 8 karakter' }; }
+  if (pw.length > 100) { return { ok: false, pesan: 'Kata sandi maksimal 100 karakter' }; }
+  return { ok: true };
+}
+
+/** Fungsi murni: jalur kredensial pertama HANYA untuk ADMIN aktif, belum terkunci, ganti_pw TRUE, dan pw_hash kosong. */
+function jalurKredensialAwalAdmin(akun) {
+  if (!akun || akun.role !== 'ADMIN') { return { boleh: false }; }
+  if (akun.aktif !== true || akun.terkunci === true) { return { boleh: false }; }
+  if (String(akun.pw_hash) !== '' || akun.ganti_pw !== true) { return { boleh: false }; }
+  return { boleh: true };
+}
+
+/** Fungsi murni: kunci cache validasi sesi (sp_ + hash tiket) untuk semua sesi aktif milik satu akun. */
+function kunciCacheSesi(daftarSesi, akunId) {
+  return daftarSesi
+    .filter(function (r) { return String(r.akun) === String(akunId) && r.aktif === true; })
+    .map(function (r) { return 'sp_' + r.token_hash; });
+}
+
+/**
+ * Fungsi murni: boleh memutuskan (ACC/TOLAK) sebuah item konfirmasi?
+ *  aktor = { role, id, cabang }; item = { karyawan (id pemilik absen), cabang }.
+ *  OWNER: semua cabang, termasuk item milik admin. ADMIN: hanya cabangnya dan BUKAN miliknya sendiri. Selain itu ditolak.
+ */
+function bolehMemutuskanKonfirmasi(aktor, item) {
+  if (!aktor || !item) { return { boleh: false, pesan: 'Data tidak lengkap' }; }
+  if (aktor.role === 'OWNER') { return { boleh: true }; }
+  if (aktor.role === 'ADMIN') {
+    if (item.cabang !== aktor.cabang) { return { boleh: false, pesan: 'Hanya boleh memutuskan absen di cabang sendiri' }; }
+    if (String(item.karyawan) === String(aktor.id)) { return { boleh: false, pesan: 'Admin tidak boleh memutuskan absennya sendiri (hanya owner)' }; }
+    return { boleh: true };
+  }
+  return { boleh: false, pesan: 'Tidak punya hak memutuskan' };
+}
+
+/** Hapus cache validasi semua sesi aktif milik akun (tanpa mencabut sesi), mis. saat akun terkunci. */
+function hapusCacheSesiAkun(akunId) {
+  const kunci = kunciCacheSesi(bacaSesi().data, akunId);
+  if (kunci.length) { CacheService.getScriptCache().removeAll(kunci); }
+}
+
+/** Sesi HP pribadi yang sah: { id, nama, panggilan, role, cabang, shift } atau null. Cache 60 detik. */
+function validasiSesiPribadi(token) {
+  if (!token || typeof token !== 'string' || token.length < 32 || token.length > 200) { return null; }
+  if (!PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA')) { return null; }
+  const cache = CacheService.getScriptCache();
+  const kunci = 'sp_' + hashSesi(token);
+  const ada = cache.get(kunci);
+  if (ada) { return JSON.parse(ada); }
+  const s = validasiSesi(token, null, 'PRIBADI');
+  if (!s) { return null; }
+  const a = s.akun;
+  if (a.aktif !== true || a.terkunci === true || (a.role !== 'KARYAWAN' && a.role !== 'ADMIN')) { return null; }
+  const hasil = { id: a.id, nama: a.nama, panggilan: a.panggilan, role: a.role, cabang: a.cabang, shift: a.shift };
+  cache.put(kunci, JSON.stringify(hasil), 60);
+  return hasil;
+}
+
+function responSesiPribadiHabis() {
+  return respon({ status: 'gagal', kode: 'SESI_TIDAK_VALID', pesan: 'Sesi berakhir atau dicabut, silakan masuk lagi' });
+}
+
+function sidikNamaPribadi(nama) {
+  return Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, 'pribadi|' + String(nama || '').trim().toLowerCase())).slice(0, 24);
+}
+
+/** Nama tidak ada / akun tidak aktif / peran salah: pesan SAMA dengan kredensial salah; ditahan 15 menit (cache) setelah 5x. */
+function gagalLoginPribadiPalsu(nama) {
+  const r = catatGagalPalsu(CacheService.getScriptCache(), sidikNamaPribadi(nama), Date.now());
+  return respon({ status: 'gagal', pesan: r.ditahan ? PESAN_PRIBADI_TERKUNCI : PESAN_PRIBADI_GAGAL });
+}
+
+function cariAkunPribadi(akun, namaMentah) {
+  const n = String(namaMentah || '').trim().toLowerCase();
+  if (!n) { return null; }
+  return akun.data.find(function (r) { return String(r.nama).trim().toLowerCase() === n && (r.role === 'KARYAWAN' || r.role === 'ADMIN'); }) || null;
+}
+
+/** Cocokkan PIN (KARYAWAN) atau kata sandi (ADMIN) dengan hash tersimpan. { cocok, migrasi?, hashBaru?, tidakDihitung? } */
+function cocokRahasiaPribadi(row, rahasia, kodeRahasia) {
+  if (row.role === 'KARYAWAN') {
+    if (!validasiPin(rahasia).ok) { return { cocok: false, tidakDihitung: true }; } // bukan 5 angka: tidak menaikkan hitungan salah
+    return { cocok: hashDenganGaram(rahasia, String(row.id), kodeRahasia) === row.pin_hash };
+  }
+  if (String(row.pw_hash) === '' || rahasia === '') { return { cocok: false, tidakDihitung: rahasia === '' }; }
+  return cocokkanPassword(rahasia, row.id, kodeRahasia, row.pw_hash);
+}
+
+function selesaikanLoginPribadi(row, d) {
+  const sesi = buatSesi(row.id, 'HPP' + bersihkanIdPerangkat(d.id_perangkat), bersihkanLabel(d.label), null);
+  return respon({ status: 'ok', sesi: sesi.token, id: row.id, nama: row.nama, panggilan: row.panggilan, role: row.role, cabang: row.cabang });
+}
+
+/**
+ * Aksi login_pribadi { nama, rahasia, id_perangkat, label }. Server menentukan dari peran akun:
+ * KARYAWAN memakai PIN 5 angka, ADMIN memakai kata sandi. Admin yang pw_hash-nya kosong dan ganti_pw TRUE
+ * (diisi pemilik lewat sheet) dibalas perlu_kredensial_baru (belum login).
+ */
+function prosesLoginPribadi(d) {
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  if (!kodeRahasia) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const rahasia = d.rahasia === undefined || d.rahasia === null ? '' : String(d.rahasia);
+  if (rahasia.length > 100) { return respon({ status: 'gagal', pesan: PESAN_PRIBADI_GAGAL }); }
+  const akun = bacaSheet('akun');
+  const row = cariAkunPribadi(akun, d.nama);
+  if (!row || row.aktif !== true) { return gagalLoginPribadiPalsu(d.nama); }
+
+  if (jalurKredensialAwalAdmin(row).boleh) { return respon({ status: 'ok', perlu_kredensial_baru: true }); }
+  if (row.terkunci === true) { return respon({ status: 'gagal', kode: 'TERKUNCI', pesan: PESAN_PRIBADI_TERKUNCI }); }
+
+  const c = cocokRahasiaPribadi(row, rahasia, kodeRahasia);
+  if (!c.cocok) {
+    if (c.tidakDihitung) { return respon({ status: 'gagal', pesan: PESAN_PRIBADI_GAGAL }); }
+    const salahBaru = (Number(row.salah_login) || 0) + 1;
+    if (salahBaru >= 5) {
+      perbaruiKolom(akun, row, { salah_login: salahBaru, terkunci: true });
+      hapusCacheSesiAkun(row.id);
+      tambahLog({ jenis: 'KEAMANAN', oleh: row.id, cabang: row.cabang, aksi: 'KUNCI_AKUN', target: 'akun', id: row.id, sebelum: 'terkunci=FALSE', sesudah: 'terkunci=TRUE', alasan: 'Salah PIN/kata sandi 5 kali saat login HP pribadi' });
+      return respon({ status: 'gagal', kode: 'TERKUNCI', pesan: PESAN_PRIBADI_TERKUNCI });
+    }
+    perbaruiKolom(akun, row, { salah_login: salahBaru });
+    return respon({ status: 'gagal', pesan: PESAN_PRIBADI_GAGAL });
+  }
+  const ubah = {};
+  if (c.migrasi) { ubah.pw_hash = c.hashBaru; } // migrasi hash kata sandi ke huruf kecil
+  if (Number(row.salah_login) !== 0) { ubah.salah_login = 0; }
+  if (Object.keys(ubah).length) { perbaruiKolom(akun, row, ubah); }
+  return selesaikanLoginPribadi(row, d);
+}
+
+/**
+ * Aksi atur_kredensial_admin { nama, kata_sandi, pin, id_perangkat, label }: kredensial pertama ADMIN
+ * (pw_hash kosong, ganti_pw TRUE; diisi pemilik lewat sheet). Kata sandi (min 8) dan PIN 5 angka dikirim
+ * dalam SATU permintaan. Setelah berhasil: hash tersimpan, ganti_pw FALSE, sesi lama dicabut, sesi baru dibuat.
+ */
+function prosesAturKredensialAdmin(d) {
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  if (!kodeRahasia) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const akun = bacaSheet('akun');
+  const row = cariAkunPribadi(akun, d.nama);
+  if (!jalurKredensialAwalAdmin(row).boleh) { return respon({ status: 'gagal', pesan: PESAN_PRIBADI_GAGAL }); }
+  const ks = validasiKataSandiAdmin(d.kata_sandi);
+  if (!ks.ok) { return respon({ status: 'gagal', pesan: ks.pesan }); }
+  const pin = validasiPin(d.pin);
+  if (!pin.ok) { return respon({ status: 'gagal', pesan: pin.pesan }); }
+  perbaruiKolom(akun, row, {
+    pw_hash: hashPasswordBaru(d.kata_sandi, row.id, kodeRahasia),
+    pin_hash: hashDenganGaram(d.pin, String(row.id), kodeRahasia),
+    ganti_pw: false, salah_login: 0
+  });
+  cabutSesiAkun(row.id, '');
+  tambahLog({ jenis: 'KEAMANAN', oleh: row.id, cabang: row.cabang, aksi: 'ATUR_KREDENSIAL_ADMIN', target: 'akun', id: row.id, alasan: 'Kata sandi dan PIN admin dibuat (login pertama atau pemulihan)' });
+  return selesaikanLoginPribadi(row, d);
+}
+
+/** Aksi pribadi_profil { sesi }: memeriksa sesi dan mengembalikan profil singkat. */
+function prosesPribadiProfil(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  return respon({ status: 'ok', id: p.id, nama: p.nama, panggilan: p.panggilan, role: p.role, cabang: p.cabang });
+}
+
+/** Aksi pribadi_keluarkan_semua { sesi }: cabut SEMUA sesi HP pribadi akun ini (termasuk yang ini). */
+function prosesPribadiKeluarkanSemua(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  const n = cabutSesiAkun(p.id, '');
+  tambahLog({ jenis: 'KEAMANAN', oleh: p.id, cabang: p.cabang, aksi: 'KELUARKAN_SEMUA_PERANGKAT', target: 'sesi', id: p.id, alasan: n + ' sesi dicabut' });
+  return respon({ status: 'ok', jumlah: n });
 }
 
 var ZONA_ABSEN = 'Asia/Jakarta';

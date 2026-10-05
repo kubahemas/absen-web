@@ -91,7 +91,7 @@ function buatDefinisiSheet(kodeRahasia) {
   function akun(id, nama, panggilan) {
     const pwAwalSampai = Utilities.formatDate(new Date(Date.now() + 24 * 60 * 60 * 1000), zona, 'yyyy-MM-dd HH:mm');
     return [id, nama, panggilan, 'Ngawi', 'KARYAWAN', 1,
-      hashDenganGaram('123456', id, kodeRahasia), hashDenganGaram('1234', id, kodeRahasia),
+      hashDenganGaram('123456', id, kodeRahasia), hashDenganGaram('12345', id, kodeRahasia),
       '', '', tanggalHariIni, 6, true,
       true, false, pwAwalSampai, 0, false, '',
       'TETAP', '', '', '', ''];
