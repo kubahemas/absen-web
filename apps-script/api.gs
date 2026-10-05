@@ -98,7 +98,7 @@ function doPost(e) {
   if (data.aksi === 'owner_beranda') { return prosesOwnerBeranda(data.sesi); }
   if (data.aksi === 'owner_perhatian') { return prosesOwnerPerhatian(data.sesi); }
   if (data.aksi === 'owner_perhatian_daftar') { return prosesOwnerPerhatianDaftar(data.sesi); }
-  if (data.aksi === 'owner_tandai_dibaca') { return prosesOwnerTandaiDibaca(data.sesi); }
+  if (data.aksi === 'owner_tandai_dibaca') { return prosesOwnerTandaiDibaca(data.sesi, data.id, data.mode); }
   if (data.aksi === 'owner_hari_ini') { return prosesOwnerHariIni(data.sesi, data.cabang, data.shift); }
   if (data.aksi === 'owner_daftar_hp') { return prosesOwnerDaftarHp(data.sesi, data.cabang, data.tampilkan_nonaktif); }
   if (data.aksi === 'ubah_nama_hp') { return prosesUbahNamaHp(data); }
@@ -488,7 +488,7 @@ function prosesDaftarHpToko(d) {
     akun.header.forEach(function (nama) { baru[nama] = ''; });
     baru.id = idHp;
     baru.nama = namaHp;
-    baru.panggilan = namaHp;
+    baru.panggilan = ''; // HP toko tidak memakai panggilan (namanya ada di kolom nama)
     baru.cabang = admin.cabang;
     baru.role = 'PERANGKAT';
     baru.pw_hash = hashTokenHp(token);
@@ -1038,9 +1038,9 @@ function tesServer() {
     { waktu: '2026-10-02 11:00', jenis: 'KEAMANAN', aksi: 'KUNCI_AKUN', oleh: 'K001', cabang: 'Ngawi', target: 'akun', id: 'K001' },
     { waktu: '2026-08-01 11:00', jenis: 'PERANGKAT', aksi: 'DAFTAR_HP_TOKO', oleh: 'K010', cabang: 'Ngawi', target: 'HP lama', id: 'HPT-NGW-01', alasan: '' }
   ];
-  const batasUji = epoch('00:00:00') - 30 * 86400000;
+  const batasUji = epoch('00:00:00') - 7 * 86400000;
   const itemUji = rakitPerhatian(logUji, namaUji, batasUji);
-  ujiBebas('perhatian: hanya HP baru + login perangkat baru dalam 30 hari (4 item), log lain/lama diabaikan', itemUji.length === 4, itemUji.length + ' item');
+  ujiBebas('perhatian: hanya HP baru + login perangkat baru dalam 7 hari (4 item), log lain/lama diabaikan', itemUji.length === 4, itemUji.length + ' item');
   ujiBebas('perhatian: terbaru di atas', itemUji[0].tipe === 'LOGIN_BARU' && itemUji[0].sub.indexOf('2026-10-05 08:15') !== -1 && itemUji[3].judul.indexOf('HPT-NGW-02') !== -1);
   ujiBebas('perhatian: semua owner melihat item yang sama (login owner lain ikut tampil)', JSON.stringify(rakitPerhatian(logUji, namaUji, batasUji)) === JSON.stringify(itemUji) && itemUji[0].judul.indexOf('Bu Sari') !== -1 && itemUji[2].judul.indexOf('owner') !== -1);
   ujiBebas('perhatian: jarak ke toko terbaca dari log', itemUji.filter(function (x) { return x.judul.indexOf('HPT-NGW-03') !== -1; })[0].info === '42 m dari toko');
@@ -1065,15 +1065,88 @@ function tesServer() {
 
   // ---- Ubah nama HP ----
 
-  // ---- Perlu perhatian: ringkasan (jumlah belum dibaca, batas 3, urutan terbaru, kosong) ----
-  const r0 = ringkasPerhatian([], 0);
-  ujiBebas('perhatian kosong: 0 belum dibaca dan tidak ada item', r0.jumlah_belum === 0 && r0.terbaru.length === 0);
-  const lima = [5, 4, 3, 2, 1].map(function (n) { return { ms: epoch('00:00:00') + n * 3600000, tipe: 'HP_BARU', judul: 'item' + n, sub: '', info: '' }; });
-  const r5 = ringkasPerhatian(lima, epoch('00:00:00') + 3.5 * 3600000);
-  ujiBebas('perhatian: terbaru dibatasi 3 item, urutan terbaru dulu', r5.terbaru.length === 3 && r5.terbaru[0].judul === 'item5' && r5.terbaru[2].judul === 'item3');
-  ujiBebas('perhatian: jumlah belum dibaca dihitung dari semua item, bukan hanya 3', r5.jumlah_belum === 2 && ringkasPerhatian(lima, 0).jumlah_belum === 5);
-  ujiBebas('perhatian: penanda menandai item baru/lama', r5.terbaru[0].baru === true && r5.terbaru[1].baru === true && r5.terbaru[2].baru === false);
-  ujiBebas('perhatian: daftar lengkap belum dibaca hanya yang di atas penanda', itemBelumDibaca(lima, epoch('00:00:00') + 3.5 * 3600000).length === 2 && itemBelumDibaca(lima, epoch('00:00:00') + 99 * 3600000).length === 0);
+
+  // ---- Perlu perhatian: ringkasan, penanda per item / semua, batas 15, "99+", jendela 7 hari ----
+  const r0 = ringkasPerhatian([], { semua_sampai: 0, item: {} });
+  ujiBebas('perhatian kosong: 0 belum dibaca, tidak ada item, bukan 99+', r0.jumlah_belum === 0 && r0.jumlah_teks === '0' && r0.terbaru.length === 0 && r0.lebih === false);
+  const jam0 = epoch('00:00:00');
+  const buatItem = function (n) { const ms = jam0 - n * 3600000; return { ms: ms, kunci: kunciItem(ms, 'HP_BARU', 'K010', 'HPT-' + n), tipe: 'HP_BARU', judul: 'item' + n, sub: 'sub', info: '' }; };
+  const lima = [1, 2, 3, 4, 5].map(buatItem); // item1 paling baru
+  const kosongP = { semua_sampai: 0, item: {} };
+  const rl = ringkasPerhatian(lima, kosongP);
+  ujiBebas('perhatian: 3 item terbaru belum dibaca, urutan terbaru dulu, jumlah dari semua', rl.terbaru.length === 3 && rl.terbaru[0].judul === 'item1' && rl.terbaru[2].judul === 'item3' && rl.jumlah_belum === 5);
+  const pSatu = tandaiSatuPenanda(kosongP, lima[0].kunci, jam0);
+  const rSatu = ringkasPerhatian(lima, pSatu);
+  ujiBebas('tandai satu item: item itu hilang, item berikutnya naik mengisi, jumlah turun 1', rSatu.jumlah_belum === 4 && rSatu.terbaru[0].judul === 'item2' && rSatu.terbaru[2].judul === 'item4');
+  ujiBebas('tandai satu item: hanya item itu (yang lain tetap belum dibaca)', itemBelumDibaca(lima, pSatu).length === 4 && itemBelumDibaca(lima, pSatu).every(function (x) { return x.judul !== 'item1'; }));
+  ujiBebas('tandai satu dengan kunci tidak sah ditolak', tandaiSatuPenanda(kosongP, 'asal', jam0) === null && tandaiSatuPenanda(kosongP, 123, jam0) === null && tandaiSatuPenanda(kosongP, 'x|y', jam0) === null);
+  const pSemua = tandaiSemuaPenanda(jam0);
+  ujiBebas('tandai semua: semua_sampai maju ke sekarang, tidak ada yang belum dibaca, daftar entri kosong', itemBelumDibaca(lima, pSemua).length === 0 && ringkasPerhatian(lima, pSemua).jumlah_belum === 0 && Object.keys(pSemua.item).length === 0);
+  const itemBaruLagi = { ms: jam0 + 60000, kunci: kunciItem(jam0 + 60000, 'LOGIN_BARU', 'OWN02', 'abc'), tipe: 'LOGIN_BARU', judul: 'baru', sub: '', info: '' };
+  ujiBebas('setelah tandai semua, item yang datang kemudian tetap muncul', itemBelumDibaca(lima.concat([itemBaruLagi]), pSemua).length === 1);
+
+  const empatBelas = []; for (let n = 1; n <= 20; n++) { empatBelas.push(buatItem(n)); }
+  const dl = daftarPerhatian(empatBelas, kosongP);
+  ujiBebas('daftar lengkap dibatasi 15 item terbaru (dari 20)', dl.daftar.length === 15 && dl.daftar[0].judul === 'item1' && dl.daftar[14].judul === 'item15' && dl.jumlah_belum === 20);
+  const seratus = []; for (let n = 1; n <= 120; n++) { seratus.push(buatItem(n)); }
+  const r99 = ringkasPerhatian(seratus, kosongP);
+  ujiBebas('lebih dari 99 belum dibaca: jumlah tampil 99 dan penanda "99+"', r99.jumlah_belum === 99 && r99.jumlah_teks === '99+' && r99.lebih === true);
+  const r99pas = ringkasPerhatian(seratus.slice(0, 99), kosongP);
+  ujiBebas('tepat 99 belum dibaca: tampil "99" tanpa plus', r99pas.jumlah_teks === '99' && r99pas.lebih === false);
+
+  const tujuhHari = 7 * 86400000;
+  const logTujuh = [
+    { waktu: '2026-10-05 07:00', jenis: 'PERANGKAT', aksi: 'DAFTAR_HP_TOKO', oleh: 'K010', cabang: 'Ngawi', target: 'A', id: 'HPT-A', alasan: '' },
+    { waktu: '2026-09-28 13:00', jenis: 'PERANGKAT', aksi: 'DAFTAR_HP_TOKO', oleh: 'K010', cabang: 'Ngawi', target: 'B', id: 'HPT-B', alasan: '' },
+    { waktu: '2026-09-27 06:00', jenis: 'PERANGKAT', aksi: 'DAFTAR_HP_TOKO', oleh: 'K010', cabang: 'Ngawi', target: 'C', id: 'HPT-C', alasan: '' }
+  ];
+  const sekarang5 = epoch('12:00:00');
+  const dalamTujuh = rakitPerhatian(logTujuh, namaUji, sekarang5 - tujuhHari);
+  ujiBebas('jendela 7 hari: hanya item dalam 7 hari terakhir yang dihitung (2 dari 3)', dalamTujuh.length === 2 && dalamTujuh[1].judul.indexOf('HPT-B') !== -1);
+
+  // pembuangan entri lama pada penanda
+  const kunciTua = kunciItem(sekarang5 - 8 * 86400000, 'HP_BARU', 'K010', 'tua');
+  const kunciLama = kunciItem(sekarang5 - 3 * 86400000, 'HP_BARU', 'K010', 'lama');
+  const kunciSegar = kunciItem(sekarang5 - 1 * 86400000, 'HP_BARU', 'K010', 'segar');
+  const pKotor = { semua_sampai: sekarang5 - 2 * 86400000, item: {} };
+  pKotor.item[kunciTua] = sekarang5 - 8 * 86400000;     // lebih tua dari 7 hari -> dibuang
+  pKotor.item[kunciLama] = sekarang5 - 3 * 86400000;    // lebih lama dari semua_sampai -> dibuang
+  pKotor.item[kunciSegar] = sekarang5 - 1 * 86400000;   // masih relevan -> tetap
+  const pBersih = bersihkanPenanda(pKotor, sekarang5);
+  ujiBebas('penanda: entri lebih tua dari 7 hari dan yang tercakup semua_sampai dibuang, yang relevan tetap',
+    Object.keys(pBersih.item).length === 1 && pBersih.item[kunciSegar] !== undefined && pBersih.semua_sampai === pKotor.semua_sampai);
+  const banyak = { semua_sampai: 0, item: {} };
+  for (let n = 0; n < 400; n++) { banyak.item[kunciItem(sekarang5 - n * 60000, 'HP_BARU', 'K010', 'x' + n)] = sekarang5 - n * 60000; }
+  const pBanyak = bersihkanPenanda(banyak, sekarang5);
+  ujiBebas('penanda: dibatasi ' + MAKS_ENTRI_DIBACA + ' entri dan nilai JSON jauh di bawah batas Script Properties (9 KB)', Object.keys(pBanyak.item).length === MAKS_ENTRI_DIBACA && JSON.stringify(pBanyak).length < 9000, String(JSON.stringify(pBanyak).length));
+
+  const kunciPanjang = {};
+  for (let n = 0; n < 300; n++) { kunciPanjang[kunciItem(sekarang5 - n * 60000, 'LOGIN_BARU', 'OWNER-ABCDEFGHIJ12345', 'ID-PANJANG-' + 'z'.repeat(30) + n)] = sekarang5 - n * 60000; }
+  ujiBebas('penanda: kunci terpanjang pun tetap di bawah 9 KB (entri terlama dibuang)', JSON.stringify(bersihkanPenanda({ semua_sampai: 0, item: kunciPanjang }, sekarang5)).length <= MAKS_UKURAN_PENANDA);
+
+  // ---- Reset harian salah_login ----
+  const akunReset = [
+    { id: 'K001', salah_login: 3, terkunci: false }, { id: 'K002', salah_login: 5, terkunci: true },
+    { id: 'K003', salah_login: 0, terkunci: false }, { id: 'K004', salah_login: '', terkunci: false }, { id: 'K005', salah_login: 2, terkunci: false }
+  ];
+  const pilihReset = pilihBarisResetSalahLogin(akunReset);
+  ujiBebas('reset harian: akun belum terkunci dengan salah_login > 0 direset (K001, K005)', pilihReset.join(',') === '0,4');
+  ujiBebas('reset harian: akun terkunci (K002) TETAP terkunci dan tidak dipilih', pilihReset.indexOf(1) === -1);
+
+  // ---- Penahanan username palsu lewat cache (bukan Script Properties) ----
+  const cachePalsu = { d: {}, get: function (k) { return this.d[k] || null; }, put: function (k, v) { this.d[k] = v; }, remove: function (k) { delete this.d[k]; } };
+  let hasilPalsu;
+  for (let n = 1; n <= 4; n++) { hasilPalsu = catatGagalPalsu(cachePalsu, 'sidikA', t0 + n * 1000); }
+  ujiBebas('username palsu: 4 percobaan belum ditahan', hasilPalsu.ditahan === false);
+  hasilPalsu = catatGagalPalsu(cachePalsu, 'sidikA', t0 + 5000);
+  ujiBebas('username palsu: percobaan ke-5 ditahan 15 menit (di cache)', hasilPalsu.ditahan === true && hasilPalsu.barusan === true && hasilPalsu.tahanSampai === t0 + 5000 + 15 * 60000);
+  ujiBebas('username palsu: percobaan berikutnya masih ditahan, pesan tahan sama dengan akun asli', catatGagalPalsu(cachePalsu, 'sidikA', t0 + 60000).ditahan === true);
+  ujiBebas('username palsu: bebas lagi setelah 15 menit dan hitungan mulai dari awal', catatGagalPalsu(cachePalsu, 'sidikA', t0 + 5000 + 15 * 60000 + 1000).ditahan === false);
+  ujiBebas('username palsu lain tidak ikut ditahan (per username)', catatGagalPalsu(cachePalsu, 'sidikB', t0).ditahan === false);
+  ujiBebas('penahanan palsu hanya memakai kunci cache palsu_* (tidak ada tahan_*)', Object.keys(cachePalsu.d).every(function (k) { return k.indexOf('palsu_') === 0; }));
+  const hapusProp = pilihPropertiPalsuUntukDihapus(['KODE_RAHASIA', 'tahan_OWN01', 'tahan_siapa', 'palsu_salah_abc', 'dibaca_OWN01', 'tahan_OWN09'], ['OWN01']);
+  ujiBebas('pembersihan properti palsu: hanya tahan_<bukan owner> dan palsu_*; KODE_RAHASIA, tahan_OWN01, dibaca_* aman',
+    hapusProp.sort().join(',') === 'palsu_salah_abc,tahan_OWN09,tahan_siapa', hapusProp.join(','));
 
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
@@ -1132,6 +1205,10 @@ function tesServer() {
   baris.push('  - Username owner yang tidak ada dan password salah: pesan sama; setelah 5x username palsu juga ditahan (tes: ketik username ngawur 5x)');
   baris.push('  - Perlu perhatian: "tandai dibaca" memajukan penanda hanya untuk owner yang menekan (Script Properties dibaca_OWN01); owner lain masih melihat item sebagai baru');
   baris.push('  - Ubah nama HP: owner boleh HP mana pun; admin hanya HP yang dipegangnya dan hanya kalau cabang admin sama; hanya kolom nama yang berubah (panggilan, id, aktif, pw_hash tidak berubah); nama "=SUM(A1)" tersimpan sebagai teks; log UBAH_NAMA_HP_TOKO tercatat; label di layar utama HP ikut baru segera');
+  baris.push('  - Tandai dibaca per item/semua: Script Properties dibaca_OWN01 berisi JSON kecil; owner lain tidak terpengaruh');
+  baris.push('  - Jalankan pasangPemicuHarian sekali: menu Pemicu di Apps Script menampilkan resetSalahLoginHarian (harian ~00:05); jalankan lagi tidak membuat pemicu ganda');
+  baris.push('  - Jalankan resetSalahLoginHarian sekali: salah_login akun yang belum terkunci jadi 0, akun terkunci tetap terkunci');
+  baris.push('  - Jalankan bersihkanPenahananPalsu sekali: log menyebut properti yang dihapus (biasanya 0); KODE_RAHASIA dan tahan_OWN01 tidak tersentuh');
   baris.push('  - Masuk sebagai Admin di HP toko: keluar sendiri setelah 2 menit tanpa sentuhan dan saat kembali ke layar absen');
 
   const ringkas = (gagal === 0 ? 'SEMUA LULUS' : gagal + ' SKENARIO GAGAL') + ' (' + jumlahSkenario + ' skenario)';
@@ -1366,19 +1443,33 @@ function pesanTahan(tahanMs) {
  * pesan login tidak membocorkan username mana yang ada.
  */
 function gagalLoginOwnerPalsu(usernameMentah) {
-  const cache = CacheService.getScriptCache();
   const sidik = Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, 'owner|' + String(usernameMentah || '').trim().toLowerCase())).slice(0, 24);
-  const sekarang = Date.now();
-  const tahan = Number(cache.get('palsu_tahan_' + sidik) || 0);
-  if (masihDitahan(tahan, sekarang)) { return respon({ status: 'gagal', kode: 'DITAHAN', pesan: pesanTahan(tahan) }); }
-  const k = keputusanSalahPassword(Number(cache.get('palsu_salah_' + sidik) || 0), sekarang);
-  if (k.tahanSampai) {
-    cache.put('palsu_tahan_' + sidik, String(k.tahanSampai), TAHAN_LOGIN_OWNER_MENIT * 60);
-    cache.remove('palsu_salah_' + sidik);
-    return respon({ status: 'gagal', kode: 'DITAHAN', pesan: 'Salah password 5 kali. Login owner ditahan ' + TAHAN_LOGIN_OWNER_MENIT + ' menit' });
+  const r = catatGagalPalsu(CacheService.getScriptCache(), sidik, Date.now());
+  if (r.ditahan) {
+    return respon({
+      status: 'gagal', kode: 'DITAHAN',
+      pesan: r.barusan ? 'Salah password 5 kali. Login owner ditahan ' + TAHAN_LOGIN_OWNER_MENIT + ' menit' : pesanTahan(r.tahanSampai)
+    });
   }
-  cache.put('palsu_salah_' + sidik, String(k.salahBaru), TAHAN_LOGIN_OWNER_MENIT * 60);
   return respon({ status: 'gagal', pesan: pesanLoginOwnerGagal('TIDAK_ADA') });
+}
+
+/**
+ * Catat satu percobaan login username palsu. HANYA di cache (cache = objek dengan get/put/remove,
+ * kedaluwarsa sendiri sekitar 15 menit); tidak menyentuh Script Properties maupun sheet.
+ */
+function catatGagalPalsu(cache, sidik, sekarangMs) {
+  const ttl = TAHAN_LOGIN_OWNER_MENIT * 60;
+  const tahan = Number(cache.get('palsu_tahan_' + sidik) || 0);
+  if (masihDitahan(tahan, sekarangMs)) { return { ditahan: true, tahanSampai: tahan, barusan: false }; }
+  const k = keputusanSalahPassword(Number(cache.get('palsu_salah_' + sidik) || 0), sekarangMs);
+  if (k.tahanSampai) {
+    cache.put('palsu_tahan_' + sidik, String(k.tahanSampai), ttl);
+    cache.remove('palsu_salah_' + sidik);
+    return { ditahan: true, tahanSampai: k.tahanSampai, barusan: true };
+  }
+  cache.put('palsu_salah_' + sidik, String(k.salahBaru), ttl);
+  return { ditahan: false };
 }
 
 /** Aksi login_owner. Jalur pw_hash kosong: balas perlu_password_baru (belum login). */
@@ -1431,42 +1522,39 @@ function prosesAturPasswordOwner(d) {
   return selesaikanLoginOwner(owner, d);
 }
 
-/** Aksi owner_beranda: kartu Perlu perhatian, daftar HP toko, perangkat yang sedang login. */
+/** Aksi owner_beranda: nama owner dan perangkat yang sedang login (untuk dialog "Keluarkan semua perangkat"). */
 function prosesOwnerBeranda(sesiToken) {
   const s = validasiSesi(sesiToken, 'OWNER');
   if (!s) { return responSesiHabis(); }
-  const semuaAkun = bacaSheet('akun').data;
-  const namaDari = function (id) {
-    const a = semuaAkun.find(function (r) { return String(r.id) === String(id); });
-    return a ? a.nama : String(id);
-  };
-  const hpToko = semuaAkun
-    .filter(function (r) { return r.role === 'PERANGKAT'; })
-    .map(function (r) { return { id: r.id, nama: r.nama, cabang: r.cabang, aktif: r.aktif === true }; });
-
-  // Perlu perhatian: informasi saja, terbaru di atas (sumber log, sama untuk semua owner).
-  const perhatian = rakitPerhatian(bacaSheet('log').data, namaDari, Date.now() - BATAS_PERHATIAN_HARI * 24 * 3600000);
-
   const sekarang = Date.now();
   const perangkatAktif = bacaSesi().data
     .filter(function (r) { return String(r.akun) === String(s.akun.id) && r.aktif === true && sesiMasihBerlaku(msDariSel(r.kedaluwarsa), sekarang); })
     .map(function (r) {
       return { label: labelDariPerangkat(r.perangkat), terakhir_aktif: teksWaktu(msDariSel(r.terakhir_aktif)), ini: r.id_sesi === s.baris.id_sesi };
     });
-
-  return respon({
-    status: 'ok', nama: s.akun.nama, id: s.akun.id,
-    perhatian: perhatian.slice(0, 20), hp_toko: hpToko, perangkat_aktif: perangkatAktif
-  });
+  return respon({ status: 'ok', nama: s.akun.nama, id: s.akun.id, perangkat_aktif: perangkatAktif });
 }
 
 /**
  * ---- Perlu perhatian (owner) ----
- * Sumbernya log: pendaftaran HP toko baru dan login owner dari perangkat baru. SEMUA owner melihat
- * item yang sama. Penanda "terakhir dibaca" disimpan per owner di Script Properties (dibaca_<ID>,
- * ms epoch). Log tidak diubah atau dihapus; "tandai dibaca" hanya memajukan penanda.
+ * Sumbernya log: pendaftaran HP toko baru dan login owner dari perangkat baru, HANYA 7 hari terakhir.
+ * Semua owner melihat item yang sama. Penanda "dibaca" disimpan per owner di Script Properties
+ * dibaca_<ID owner> sebagai JSON { semua_sampai: ms, item: { <kunci item>: ms item } }:
+ *  - semua_sampai: semua item yang lebih lama/sama dengan waktu ini dianggap sudah dibaca;
+ *  - item: item yang ditandai dibaca satu per satu (dibuang kalau lebih tua dari 7 hari atau
+ *    sudah tercakup semua_sampai, dan dibatasi MAKS_ENTRI_DIBACA supaya nilainya kecil).
+ * Data log tidak pernah diubah atau dihapus.
  */
-var BATAS_PERHATIAN_HARI = 30;
+var BATAS_PERHATIAN_HARI = 7;
+var MAKS_BARIS_LOG_PERHATIAN = 1000;
+var BATAS_ITEM_DAFTAR = 15;
+var MAKS_ENTRI_DIBACA = 100;
+var MAKS_UKURAN_PENANDA = 8000; // karakter; batas Script Properties 9 KB per nilai
+
+function bersihNamaKunci(teks, maks) { return String(teks === undefined || teks === null ? '' : teks).replace(/\|/g, '_').slice(0, maks); }
+
+/** Kunci stabil satu item perhatian: "ms|TIPE|oleh|id". */
+function kunciItem(ms, tipe, oleh, id) { return ms + '|' + tipe + '|' + bersihNamaKunci(oleh, 20) + '|' + bersihNamaKunci(id, 40); }
 
 /** Fungsi murni: dari baris log jadi daftar item perhatian (terbaru di atas) sejak batasMs. */
 function rakitPerhatian(logRows, namaDari, batasMs) {
@@ -1477,13 +1565,13 @@ function rakitPerhatian(logRows, namaDari, batasMs) {
     if (r.jenis === 'PERANGKAT' && r.aksi === 'DAFTAR_HP_TOKO') {
       const m = /jarak ke toko (\d+) m/.exec(String(r.alasan));
       items.push({
-        ms: ms, tipe: 'HP_BARU', judul: 'HP toko baru: ' + r.id + ' (' + r.target + ')',
+        ms: ms, kunci: kunciItem(ms, 'HP_BARU', r.oleh, r.id), tipe: 'HP_BARU', judul: 'HP toko baru: ' + r.id + ' (' + r.target + ')',
         sub: 'Cabang ' + r.cabang + ' · oleh ' + namaDari(r.oleh) + ' · ' + teksWaktu(ms),
         info: m ? m[1] + ' m dari toko' : ''
       });
     } else if (r.jenis === 'KEAMANAN' && r.aksi === 'LOGIN_PERANGKAT_BARU') {
       items.push({
-        ms: ms, tipe: 'LOGIN_BARU', judul: 'Login ' + namaDari(r.oleh) + ' dari perangkat baru',
+        ms: ms, kunci: kunciItem(ms, 'LOGIN_BARU', r.oleh, r.id), tipe: 'LOGIN_BARU', judul: 'Login ' + namaDari(r.oleh) + ' dari perangkat baru',
         sub: r.target + ' · ' + teksWaktu(ms), info: ''
       });
     }
@@ -1492,61 +1580,211 @@ function rakitPerhatian(logRows, namaDari, batasMs) {
   return items;
 }
 
-/** Fungsi murni: item yang lebih baru dari penanda dibaca (penandaMs 0 = belum pernah membaca). */
-function itemBelumDibaca(items, penandaMs) {
-  return items.filter(function (it) { return it.ms > penandaMs; });
+/** Fungsi murni: penanda yang sudah dirapikan (entri tua/tercakup/kelebihan dibuang). */
+function bersihkanPenanda(p, sekarangMs) {
+  const batas = sekarangMs - BATAS_PERHATIAN_HARI * 24 * 3600000;
+  const hasil = { semua_sampai: Number(p && p.semua_sampai) || 0, item: {} };
+  const asal = (p && p.item) || {};
+  Object.keys(asal)
+    .filter(function (k) { const ms = Number(asal[k]); return ms >= batas && ms > hasil.semua_sampai; })
+    .sort(function (a, b) { return Number(asal[b]) - Number(asal[a]); })
+    .slice(0, MAKS_ENTRI_DIBACA)
+    .forEach(function (k) { hasil.item[k] = Number(asal[k]); });
+  // Jaga ukuran nilai: buang entri terlama sampai muat (kunci panjang pun tidak melewati batas).
+  let kunciUrut = Object.keys(hasil.item).sort(function (a, b) { return hasil.item[a] - hasil.item[b]; });
+  while (JSON.stringify(hasil).length > MAKS_UKURAN_PENANDA && kunciUrut.length) { delete hasil.item[kunciUrut.shift()]; }
+  return hasil;
 }
 
-function bacaPenandaDibaca(idOwner) {
-  return Number(PropertiesService.getScriptProperties().getProperty('dibaca_' + idOwner) || 0);
+/** Fungsi murni: item yang belum dibaca. penanda boleh angka (bentuk lama: semua_sampai saja). */
+function itemBelumDibaca(items, penanda) {
+  const p = typeof penanda === 'number' ? { semua_sampai: penanda, item: {} } : penanda;
+  return items.filter(function (it) { return it.ms > p.semua_sampai && !p.item[it.kunci]; });
+}
+
+/** Fungsi murni: tandai satu item. Kembalikan penanda baru, atau null kalau kunci tidak sah. */
+function tandaiSatuPenanda(p, kunci, sekarangMs) {
+  if (typeof kunci !== 'string' || !/^\d{12,14}\|[A-Z_]+\|[^|]{0,20}\|[^|]{0,40}$/.test(kunci)) { return null; }
+  const ms = Number(kunci.split('|')[0]);
+  const salinan = { semua_sampai: p.semua_sampai, item: {} };
+  Object.keys(p.item).forEach(function (k) { salinan.item[k] = p.item[k]; });
+  salinan.item[kunci] = ms;
+  return bersihkanPenanda(salinan, sekarangMs);
+}
+
+/** Fungsi murni: tandai semua dibaca = majukan semua_sampai ke sekarang, daftar item dikosongkan. */
+function tandaiSemuaPenanda(sekarangMs) { return { semua_sampai: sekarangMs, item: {} }; }
+
+function itemUntukHalaman(it) { return { id: it.kunci, tipe: it.tipe, judul: it.judul, sub: it.sub, info: it.info }; }
+
+/** Fungsi murni: jumlah belum dibaca (tampil maksimal 99, lebih dari itu "99+") dan 3 item terbaru yang belum dibaca. */
+function ringkasPerhatian(items, penanda) {
+  const belum = itemBelumDibaca(items, penanda);
+  return {
+    jumlah_belum: Math.min(belum.length, 99), jumlah_teks: belum.length > 99 ? '99+' : String(belum.length), lebih: belum.length > 99,
+    terbaru: belum.slice(0, 3).map(itemUntukHalaman)
+  };
+}
+
+/** Fungsi murni: daftar lengkap yang belum dibaca, maksimal 15 item terbaru. */
+function daftarPerhatian(items, penanda) {
+  const belum = itemBelumDibaca(items, penanda);
+  return {
+    jumlah_belum: Math.min(belum.length, 99), jumlah_teks: belum.length > 99 ? '99+' : String(belum.length), lebih: belum.length > 99,
+    daftar: belum.slice(0, BATAS_ITEM_DAFTAR).map(itemUntukHalaman)
+  };
+}
+
+function bacaPenanda(idOwner, sekarangMs) {
+  const mentah = PropertiesService.getScriptProperties().getProperty('dibaca_' + idOwner);
+  let p = { semua_sampai: 0, item: {} };
+  if (mentah) {
+    if (/^\d+$/.test(mentah)) { p.semua_sampai = Number(mentah); } // bentuk lama: hanya angka waktu
+    else { try { p = JSON.parse(mentah); } catch (e) { p = { semua_sampai: 0, item: {} }; } }
+  }
+  return bersihkanPenanda(p, sekarangMs);
+}
+
+/**
+ * Baca baris-baris TERAKHIR sheet log saja (bukan seluruh sheet): dari bawah ke atas per blok
+ * 100 baris, berhenti setelah melewati batas waktu atau maksBaris baris.
+ */
+function bacaLogTerakhir(batasMs, maksBaris) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('log');
+  const terakhir = sheet.getLastRow();
+  if (terakhir < 2) { return []; }
+  const lebar = sheet.getLastColumn();
+  const header = sheet.getRange(1, 1, 1, lebar).getValues()[0];
+  const hasil = [];
+  let akhir = terakhir;
+  while (akhir >= 2 && hasil.length < maksBaris) {
+    const awal = Math.max(2, akhir - 99);
+    const nilai = sheet.getRange(awal, 1, akhir - awal + 1, lebar).getValues();
+    let terlama = Infinity;
+    for (let i = nilai.length - 1; i >= 0; i--) {
+      const r = {};
+      header.forEach(function (nama, idx) { r[nama] = nilai[i][idx]; });
+      terlama = Math.min(terlama, msDariSel(r.waktu));
+      hasil.push(r);
+    }
+    if (terlama < batasMs) { break; }
+    akhir = awal - 1;
+  }
+  return hasil;
 }
 
 function ambilItemPerhatian(s) {
+  const sekarang = Date.now();
+  const batas = sekarang - BATAS_PERHATIAN_HARI * 24 * 3600000;
   const semuaAkun = bacaSheet('akun').data;
   const namaDari = function (id) {
     const a = semuaAkun.find(function (r) { return String(r.id) === String(id); });
     return a ? a.nama : String(id);
   };
-  const items = rakitPerhatian(bacaSheet('log').data, namaDari, Date.now() - BATAS_PERHATIAN_HARI * 24 * 3600000);
-  return { items: items, penanda: bacaPenandaDibaca(s.akun.id) };
+  return {
+    items: rakitPerhatian(bacaLogTerakhir(batas, MAKS_BARIS_LOG_PERHATIAN), namaDari, batas),
+    penanda: bacaPenanda(s.akun.id, sekarang)
+  };
 }
 
-function itemUntukHalaman(it, penanda) {
-  return { tipe: it.tipe, judul: it.judul, sub: it.sub, info: it.info, baru: it.ms > penanda };
-}
-
-/** Aksi owner_perhatian: jumlah belum dibaca + 3 item terbaru (yang belum dibaca ditandai baru=true). */
+/** Aksi owner_perhatian: jumlah belum dibaca (maks "99+") + 3 item terbaru yang belum dibaca. */
 function prosesOwnerPerhatian(sesiToken) {
   const s = validasiSesi(sesiToken, 'OWNER');
   if (!s) { return responSesiHabis(); }
   const p = ambilItemPerhatian(s);
   const r = ringkasPerhatian(p.items, p.penanda);
-  return respon({ status: 'ok', jumlah_belum: r.jumlah_belum, terbaru: r.terbaru });
+  return respon({ status: 'ok', jumlah_belum: r.jumlah_belum, jumlah_teks: r.jumlah_teks, lebih: r.lebih, terbaru: r.terbaru });
 }
 
-/** Fungsi murni: jumlah belum dibaca + 3 item terbaru (baru=true kalau lebih baru dari penanda). */
-function ringkasPerhatian(items, penandaMs) {
-  return {
-    jumlah_belum: itemBelumDibaca(items, penandaMs).length,
-    terbaru: items.slice(0, 3).map(function (it) { return itemUntukHalaman(it, penandaMs); })
-  };
-}
-
-/** Aksi owner_perhatian_daftar: daftar lengkap yang belum dibaca. */
+/** Aksi owner_perhatian_daftar: maksimal 15 item terbaru yang belum dibaca. */
 function prosesOwnerPerhatianDaftar(sesiToken) {
   const s = validasiSesi(sesiToken, 'OWNER');
   if (!s) { return responSesiHabis(); }
   const p = ambilItemPerhatian(s);
-  const belum = itemBelumDibaca(p.items, p.penanda);
-  return respon({ status: 'ok', jumlah_belum: belum.length, daftar: belum.map(function (it) { return itemUntukHalaman(it, p.penanda); }) });
+  const r = daftarPerhatian(p.items, p.penanda);
+  return respon({ status: 'ok', jumlah_belum: r.jumlah_belum, jumlah_teks: r.jumlah_teks, lebih: r.lebih, daftar: r.daftar });
 }
 
-/** Aksi owner_tandai_dibaca: majukan penanda milik owner ini ke sekarang. */
-function prosesOwnerTandaiDibaca(sesiToken) {
+/** Aksi owner_tandai_dibaca { id } (satu item) atau { mode: 'semua' } (majukan semua_sampai ke sekarang). */
+function prosesOwnerTandaiDibaca(sesiToken, id, mode) {
   const s = validasiSesi(sesiToken, 'OWNER');
   if (!s) { return responSesiHabis(); }
-  PropertiesService.getScriptProperties().setProperty('dibaca_' + s.akun.id, String(Date.now()));
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(5000);
+  try {
+    const sekarang = Date.now();
+    let baru;
+    if (mode === 'semua') {
+      baru = tandaiSemuaPenanda(sekarang);
+    } else {
+      baru = tandaiSatuPenanda(bacaPenanda(s.akun.id, sekarang), id, sekarang);
+      if (!baru) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
+    }
+    PropertiesService.getScriptProperties().setProperty('dibaca_' + s.akun.id, JSON.stringify(baru));
+  } finally {
+    kunci.releaseLock();
+  }
   return respon({ status: 'ok' });
+}
+
+/**
+ * ---- Pemeliharaan harian ----
+ * pasangPemicuHarian(): jalankan SATU KALI dari editor Apps Script; membuat pemicu harian ~00:05
+ * (zona Asia/Jakarta) untuk resetSalahLoginHarian(). Tidak membuat pemicu ganda.
+ * resetSalahLoginHarian(): salah_login = 0 untuk semua akun yang BELUM terkunci. Akun terkunci tetap
+ * terkunci (kolom terkunci tidak disentuh).
+ */
+function pasangPemicuHarian() {
+  const sudahAda = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'resetSalahLoginHarian'; });
+  if (sudahAda) {
+    Logger.log('Pemicu harian sudah ada, tidak dibuat lagi.');
+    return 'Pemicu harian sudah ada';
+  }
+  ScriptApp.newTrigger('resetSalahLoginHarian').timeBased().everyDays(1).atHour(0).nearMinute(5).inTimezone(ZONA_ABSEN).create();
+  Logger.log('Pemicu harian dibuat: resetSalahLoginHarian sekitar 00:05 WIB.');
+  return 'Pemicu harian dibuat';
+}
+
+/** Fungsi murni: nomor baris (0 = baris data pertama) yang salah_login-nya harus direset: belum terkunci dan salah_login > 0. */
+function pilihBarisResetSalahLogin(rows) {
+  const hasil = [];
+  rows.forEach(function (r, i) {
+    if (r.terkunci !== true && Number(r.salah_login) > 0) { hasil.push(i); }
+  });
+  return hasil;
+}
+
+function resetSalahLoginHarian() {
+  const akun = bacaSheet('akun');
+  const kol = akun.header.indexOf('salah_login') + 1;
+  if (kol === 0) { return 0; }
+  const pilih = pilihBarisResetSalahLogin(akun.data);
+  pilih.forEach(function (i) { akun.sheet.getRange(akun.data[i]._baris, kol).setValue(0); });
+  Logger.log('resetSalahLoginHarian: ' + pilih.length + ' akun direset.');
+  return pilih.length;
+}
+
+/** Fungsi murni: dari semua nama properti, mana yang boleh dihapus sebagai sisa penahanan username palsu. */
+function pilihPropertiPalsuUntukDihapus(namaProperti, idOwnerAda) {
+  return namaProperti.filter(function (k) {
+    if (k.indexOf('palsu_') === 0) { return true; }
+    if (k.indexOf('tahan_') === 0) { return idOwnerAda.indexOf(k.slice(6)) === -1; }
+    return false;
+  });
+}
+
+/**
+ * Fungsi sekali jalan: hapus properti penahanan username palsu yang terlanjur tersimpan di Script
+ * Properties (penahanan username palsu kini hanya di CacheService). Penahanan akun owner yang nyata
+ * (tahan_<ID owner yang ada>), KODE_RAHASIA, dibaca_*, dan properti lain TIDAK disentuh.
+ */
+function bersihkanPenahananPalsu() {
+  const props = PropertiesService.getScriptProperties();
+  const idOwner = bacaSheet('akun').data.filter(function (r) { return r.role === 'OWNER'; }).map(function (r) { return String(r.id); });
+  const hapus = pilihPropertiPalsuUntukDihapus(Object.keys(props.getProperties()), idOwner);
+  hapus.forEach(function (k) { props.deleteProperty(k); });
+  Logger.log('bersihkanPenahananPalsu: ' + hapus.length + ' properti dihapus' + (hapus.length ? ': ' + hapus.join(', ') : '') + '.');
+  return hapus;
 }
 
 /**
