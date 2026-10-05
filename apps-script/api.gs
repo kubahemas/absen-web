@@ -422,7 +422,8 @@ function prosesDaftarHpToko(d) {
     return respon({ status: 'gagal', pesan: pesanUmum });
   }
 
-  if (hashDenganGaram(password, String(admin.id), kodeRahasia) !== admin.pw_hash) {
+  const cocokAdmin = cocokkanPassword(password, admin.id, kodeRahasia, admin.pw_hash);
+  if (!cocokAdmin.cocok) {
     const salahBaru = (Number(admin.salah_login) || 0) + 1;
     if (salahBaru >= 5) {
       perbaruiKolom(akun, admin, { salah_login: salahBaru, terkunci: true });
@@ -436,6 +437,7 @@ function prosesDaftarHpToko(d) {
     }
     return respon({ status: 'gagal', pesan: pesanUmum });
   }
+  if (cocokAdmin.migrasi) { perbaruiKolom(akun, admin, { pw_hash: cocokAdmin.hashBaru }); } // migrasi ke hash huruf kecil
   if (Number(admin.salah_login) !== 0) {
     perbaruiKolom(akun, admin, { salah_login: 0 });
   }
@@ -1261,6 +1263,25 @@ function tesServer() {
   ujiBebas('aktifkan kembali: yang melakukan bukan ADMIN ditolak, target tidak ada ditolak', bolehAktifkanKembali(rowsAktif, 'KARYAWAN', 'Ngawi', cari('K001')).boleh === false && bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', undefined).boleh === false);
   ujiBebas('aktifkan kembali: yang sudah aktif = tidak ada perubahan (idempoten)', bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', cari('K005')).sudahAktif === true);
 
+  // ---- Password tidak peka huruf besar-kecil + migrasi hash lama ----
+  const KODE_UJI = 'kode-rahasia-uji';
+  const hashBaruAdmin = hashPasswordBaru('Admin123', 'K010', KODE_UJI);
+  ujiBebas('password baru disimpan versi huruf kecil: hash "Admin123" = hash "admin123"', hashBaruAdmin === hashDenganGaram('admin123', 'K010', KODE_UJI) && hashBaruAdmin === hashPasswordBaru('ADMIN123', 'K010', KODE_UJI));
+  ujiBebas('login dengan huruf besar/kecil berbeda berhasil untuk hash baru (ADMIN123, admin123, adMIN123), tanpa migrasi', ['ADMIN123', 'admin123', 'adMIN123', 'Admin123'].every(function (p) { const c = cocokkanPassword(p, 'K010', KODE_UJI, hashBaruAdmin); return c.cocok === true && c.migrasi === false; }));
+  const hashLama = hashDenganGaram('Admin123', 'K010', KODE_UJI); // versi lama: persis seperti diketik
+  const cLama = cocokkanPassword('Admin123', 'K010', KODE_UJI, hashLama);
+  ujiBebas('hash versi lama: login dengan ketikan persis lama berhasil dan diminta migrasi ke hash huruf kecil', cLama.cocok === true && cLama.migrasi === true && cLama.hashBaru === hashBaruAdmin);
+  ujiBebas('setelah migrasi (pw_hash = hash huruf kecil) semua variasi huruf berhasil', ['ADMIN123', 'admin123', 'Admin123'].every(function (p) { return cocokkanPassword(p, 'K010', KODE_UJI, cLama.hashBaru).cocok; }));
+  ujiBebas('hash versi lama: ketikan dengan huruf berbeda dari yang dulu tidak cocok (tidak ada jalan masuk lain)', cocokkanPassword('admin123', 'K010', KODE_UJI, hashLama).cocok === false && cocokkanPassword('ADMIN123', 'K010', KODE_UJI, hashLama).cocok === false);
+  ujiBebas('password lama yang sudah huruf kecil: cocok langsung tanpa migrasi', (function () { const h = hashDenganGaram('kubahemas2026', 'OWN01', KODE_UJI); const c = cocokkanPassword('KubahEmas2026', 'OWN01', KODE_UJI, h); return c.cocok && c.migrasi === false; })());
+  const salahSekali = cocokkanPassword('salah-total1', 'K010', KODE_UJI, hashBaruAdmin);
+  ujiBebas('password salah = SATU kegagalan (kedua pembandingan gagal lalu satu hasil), hitungan salah naik 1 bukan 2', salahSekali.cocok === false && keputusanSalahPassword(2, t0).salahBaru === 3);
+  ujiBebas('salah password dengan id lain tidak cocok (garam id tetap berlaku)', cocokkanPassword('Admin123', 'K011', KODE_UJI, hashBaruAdmin).cocok === false);
+  ujiBebas('ganti password menyimpan versi huruf kecil (hash "KubahEmas2026" = hash "kubahemas2026")', hashPasswordBaru('KubahEmas2026', 'OWN01', KODE_UJI) === hashDenganGaram('kubahemas2026', 'OWN01', KODE_UJI));
+  ujiBebas('aturan password dievaluasi pada huruf kecil: OWNER123 sama dengan username owner123 ditolak; 8 karakter huruf+angka tanpa huruf besar diterima', !periksaKekuatanPassword(normalisasiPassword('OWNER123'), 'owner123').ok && periksaKekuatanPassword(normalisasiPassword('abcdefg1'), 'owner').ok && periksaKekuatanPassword(normalisasiPassword('ABCDEFG1'), 'owner').ok);
+  ujiBebas('password baru yang beda hanya huruf besar/kecil dari yang lama ditolak (sama setelah normalisasi)', !periksaKekuatanPassword(normalisasiPassword('KUBAHEMAS2026'), 'owner', normalisasiPassword('kubahemas2026')).ok);
+  ujiBebas('normalisasi aman untuk undefined/null/angka', normalisasiPassword(undefined) === '' && normalisasiPassword(null) === '' && normalisasiPassword(123456) === '123456');
+
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -1328,6 +1349,8 @@ function tesServer() {
   baris.push('  - Tambah karyawan dengan nama yang sama dengan karyawan aktif (huruf besar/kecil beda): ditolak dengan pesan jelas');
   baris.push('  - Aktifkan kembali karyawan nonaktif: saklar Tampilkan nonaktif -> tombol Aktifkan kembali; aktif jadi TRUE dengan ID sama, pin_hash/salah_login/terkunci tidak berubah, log AKTIFKAN_KARYAWAN; nama kembar dengan karyawan aktif ditolak');
   baris.push('  - Form Tambah karyawan: cabang bershift tunggal menampilkan catatan shift otomatis (tanpa dropdown), dan form tetap bisa disimpan walau shift tidak dipilih');
+  baris.push('  - Login admin/owner dengan huruf besar/kecil berbeda (ADMIN123 vs admin123) berhasil; akun lama yang berhasil login dengan ketikan persis lama: pw_hash otomatis berubah ke versi huruf kecil (kolom pw_hash berubah, salah_login tidak naik)');
+  baris.push('  - Salah password admin/owner 5x: dihitung per percobaan salah (satu kesalahan per percobaan, bukan dua)');
   baris.push('  - Reset PIN: karyawan yang terkunci bisa absen lagi dengan PIN baru (terkunci FALSE, salah_login 0); Nonaktifkan: nama hilang dari layar pilih nama, baris tetap di sheet');
   baris.push('  - Karyawan, Reset PIN, Nonaktifkan tercatat di sheet log (TAMBAH_KARYAWAN, RESET_PIN, NONAKTIFKAN_KARYAWAN) tanpa PIN');
   baris.push('  - Menu owner/admin: ketuk di mana saja di luar kotak menu menutup menu (HP dan laptop), ketuk di dalam kotak tidak menutup');
@@ -1618,7 +1641,8 @@ function prosesLoginOwner(d) {
     return jalurPasswordAwal(owner).boleh ? respon({ status: 'ok', perlu_password_baru: true }) : respon({ status: 'gagal', pesan: pesanUmum });
   }
 
-  if (hashDenganGaram(password, String(owner.id), kodeRahasia) !== owner.pw_hash) {
+  const cocokOwner = cocokkanPassword(password, owner.id, kodeRahasia, owner.pw_hash);
+  if (!cocokOwner.cocok) {
     const k = catatSalahOwner(c.akun, owner);
     if (k.tahanSampai) {
       return respon({ status: 'gagal', kode: 'DITAHAN', pesan: 'Salah password 5 kali. Login owner ditahan ' + TAHAN_LOGIN_OWNER_MENIT + ' menit' });
@@ -1626,6 +1650,7 @@ function prosesLoginOwner(d) {
     return respon({ status: 'gagal', pesan: pesanUmum });
   }
 
+  if (cocokOwner.migrasi) { perbaruiKolom(c.akun, owner, { pw_hash: cocokOwner.hashBaru }); } // migrasi ke hash huruf kecil
   if (Number(owner.salah_login) !== 0) { perbaruiKolom(c.akun, owner, { salah_login: 0 }); }
   return selesaikanLoginOwner(owner, d);
 }
@@ -1637,11 +1662,11 @@ function prosesAturPasswordOwner(d) {
   const c = cariOwner(d.username);
   const jalur = jalurPasswordAwal(c.owner);
   if (!jalur.boleh) { return respon({ status: 'gagal', pesan: 'Tidak bisa mengatur password lewat jalur ini' }); }
-  const kuat = periksaKekuatanPassword(d.password_baru, c.owner.nama);
+  const kuat = periksaKekuatanPassword(normalisasiPassword(d.password_baru), c.owner.nama);
   if (!kuat.ok) { return respon({ status: 'gagal', pesan: kuat.pesan }); }
 
   const owner = c.owner;
-  perbaruiKolom(c.akun, owner, { pw_hash: hashDenganGaram(String(d.password_baru), String(owner.id), kodeRahasia), ganti_pw: false, salah_login: 0 });
+  perbaruiKolom(c.akun, owner, { pw_hash: hashPasswordBaru(d.password_baru, owner.id, kodeRahasia), ganti_pw: false, salah_login: 0 });
   PropertiesService.getScriptProperties().deleteProperty('tahan_' + owner.id);
   cabutSesiAkun(owner.id, '');
   tambahLog({ jenis: 'KEAMANAN', oleh: owner.id, cabang: '', aksi: 'ATUR_PASSWORD_OWNER', target: 'akun', id: owner.id, alasan: 'Password owner diatur (pertama kali atau pemulihan)' });
@@ -2088,14 +2113,14 @@ function prosesOwnerGantiPassword(sesiToken, lama, baru) {
 
   const tahan = cekTahanOwner(akun, owner);
   if (tahan) { return respon({ status: 'gagal', kode: 'DITAHAN', pesan: tahan }); }
-  if (String(lama || '').length > 100 || hashDenganGaram(String(lama || ''), String(owner.id), kodeRahasia) !== owner.pw_hash) {
+  if (String(lama || '').length > 100 || !cocokkanPassword(String(lama || ''), owner.id, kodeRahasia, owner.pw_hash).cocok) {
     const k = catatSalahOwner(akun, owner);
     return respon({ status: 'gagal', pesan: k.tahanSampai ? 'Salah password 5 kali. Login owner ditahan ' + TAHAN_LOGIN_OWNER_MENIT + ' menit' : 'Password lama salah' });
   }
-  const kuat = periksaKekuatanPassword(baru, owner.nama, lama);
+  const kuat = periksaKekuatanPassword(normalisasiPassword(baru), owner.nama, normalisasiPassword(lama));
   if (!kuat.ok) { return respon({ status: 'gagal', pesan: kuat.pesan }); }
 
-  perbaruiKolom(akun, owner, { pw_hash: hashDenganGaram(String(baru), String(owner.id), kodeRahasia), ganti_pw: false, salah_login: 0 });
+  perbaruiKolom(akun, owner, { pw_hash: hashPasswordBaru(baru, owner.id, kodeRahasia), ganti_pw: false, salah_login: 0 });
   const n = cabutSesiAkun(owner.id, s.baris.id_sesi);
   tambahLog({ jenis: 'KEAMANAN', oleh: owner.id, cabang: '', aksi: 'GANTI_PASSWORD_OWNER', target: 'akun', id: owner.id, alasan: n + ' perangkat lain dikeluarkan' });
   return respon({ status: 'ok', pesan: 'Password diganti' });
@@ -2116,7 +2141,8 @@ function prosesLoginAdminToko(d, hp) {
   if (!admin || admin.cabang !== hp.cabang || admin.aktif !== true || admin.terkunci === true || admin.ganti_pw === true) {
     return respon({ status: 'gagal', pesan: pesanUmum });
   }
-  if (hashDenganGaram(password, String(admin.id), kodeRahasia) !== admin.pw_hash) {
+  const cocokAdmin = cocokkanPassword(password, admin.id, kodeRahasia, admin.pw_hash);
+  if (!cocokAdmin.cocok) {
     const salahBaru = (Number(admin.salah_login) || 0) + 1;
     if (salahBaru >= 5) {
       perbaruiKolom(akun, admin, { salah_login: salahBaru, terkunci: true });
@@ -2129,6 +2155,7 @@ function prosesLoginAdminToko(d, hp) {
     }
     return respon({ status: 'gagal', pesan: pesanUmum });
   }
+  if (cocokAdmin.migrasi) { perbaruiKolom(akun, admin, { pw_hash: cocokAdmin.hashBaru }); } // migrasi ke hash huruf kecil
   if (Number(admin.salah_login) !== 0) { perbaruiKolom(akun, admin, { salah_login: 0 }); }
 
   const sesi = buatSesi(admin.id, 'HPTOKO' + String(hp.id).replace(/[^A-Za-z0-9]/g, ''), 'HP toko ' + hp.id, SESI_ADMIN_TOKO_MENIT);
@@ -2594,6 +2621,35 @@ function siapkanFolderFoto() {
   return f.getUrl();
 }
 
+
+/**
+ * ---- Password TIDAK peka huruf besar-kecil (owner dan admin) ----
+ * Password dinormalisasi ke huruf kecil SEBELUM di-hash, saat dibuat/diganti maupun saat login
+ * (ADMIN123, admin123, adMIN123 sama). Username sudah tidak peka; PIN hanya angka.
+ * Migrasi tanpa reset massal: hash lama (password persis seperti dulu diketik) masih diterima SEKALI,
+ * lalu pw_hash langsung diperbarui ke versi huruf kecil.
+ */
+function normalisasiPassword(pw) {
+  return String(pw === undefined || pw === null ? '' : pw).toLowerCase();
+}
+
+/** Fungsi murni: hash password untuk DISIMPAN (versi huruf kecil). */
+function hashPasswordBaru(pw, id, kodeRahasia) {
+  return hashDenganGaram(normalisasiPassword(pw), String(id), kodeRahasia);
+}
+
+/**
+ * Fungsi murni: cocokkan password yang diketik dengan hash tersimpan.
+ * 1) hash versi huruf kecil; 2) kalau tidak cocok, hash password persis seperti diketik (versi lama).
+ * Kembalian { cocok:false } (SATU kegagalan, setelah KEDUA pembandingan gagal) atau { cocok:true, migrasi, hashBaru }.
+ */
+function cocokkanPassword(password, id, kodeRahasia, hashTersimpan) {
+  const hKecil = hashPasswordBaru(password, id, kodeRahasia);
+  if (hKecil === hashTersimpan) { return { cocok: true, migrasi: false }; }
+  const hAsli = hashDenganGaram(String(password === undefined || password === null ? '' : password), String(id), kodeRahasia);
+  if (hAsli === hashTersimpan) { return { cocok: true, migrasi: true, hashBaru: hKecil }; }
+  return { cocok: false };
+}
 
 var ZONA_ABSEN = 'Asia/Jakarta';
 var KUNCI_KODE_ALASAN = 'kode_alasan_';

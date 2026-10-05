@@ -1639,7 +1639,7 @@
       { t: 'Ada huruf dan angka', ok: /[A-Za-z]/.test(baru) && /[0-9]/.test(baru) },
       modePassword === 'AWAL'
         ? { t: 'Bukan 123456 atau username', ok: baru !== '' && baru !== '123456' && baru.toLowerCase() !== nama }
-        : { t: 'Tidak sama dengan password lama', ok: baru !== '' && baru !== pwLama.value && baru.toLowerCase() !== nama },
+        : { t: 'Tidak sama dengan password lama (huruf besar/kecil dianggap sama)', ok: baru !== '' && baru.toLowerCase() !== pwLama.value.toLowerCase() && baru.toLowerCase() !== nama },
       { t: 'Kedua password baru sama', ok: baru !== '' && baru === pwUlang.value }
     ];
     document.getElementById('cekDaftar').innerHTML = aturan.map(function (a) {
