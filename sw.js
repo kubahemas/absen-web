@@ -1,6 +1,6 @@
 // Service worker sederhana: hanya menyimpan file halaman.
 // Setiap kali kode halaman diubah, naikkan nomor VERSI_CACHE supaya HP memuat ulang file baru.
-const VERSI_CACHE = 'absen-v8';
+const VERSI_CACHE = 'absen-v9';
 
 const FILE_HALAMAN = [
   './',
