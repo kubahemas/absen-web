@@ -1120,8 +1120,8 @@ function tesServer() {
   const jumlahSkenario = baris.length;
   baris.push('');
   baris.push('TES MANUAL (butuh menulis ke sheet, jalankan sendiri di aplikasi):');
-  baris.push('  - Daftar HP, kartu Hari ini, dan Perlu perhatian pada data nyata: angka sama dengan sheet absensi dan log
-  - Login pertama owner: isi username "owner" saja, aplikasi minta password baru, lalu masuk ke beranda owner');
+  baris.push('  - Daftar HP, kartu Hari ini, dan Perlu perhatian pada data nyata: angka sama dengan sheet absensi dan log');
+  baris.push('  - Login pertama owner: isi username "owner" saja, aplikasi minta password baru, lalu masuk ke beranda owner');
   baris.push('  - sheet akun baris OWN01: pw_hash terisi dan ganti_pw jadi FALSE; sheet sesi bertambah 1 baris (aktif TRUE, kedaluwarsa 7 hari)');
   baris.push('  - Login owner dari perangkat/browser baru: sheet log ada baris LOGIN_PERANGKAT_BARU dan muncul di Perlu perhatian');
   baris.push('  - Daftarkan HP toko baru: muncul di Perlu perhatian owner (HP toko baru, oleh admin, jam, jarak)');
@@ -1131,7 +1131,7 @@ function tesServer() {
   baris.push('  - Dua owner (OWN01 dan OWN02): masing-masing login dengan username sendiri; keluarkan semua perangkat OWN01 tidak mengeluarkan OWN02; tahan 15 menit satu owner tidak menahan yang lain');
   baris.push('  - Username owner yang tidak ada dan password salah: pesan sama; setelah 5x username palsu juga ditahan (tes: ketik username ngawur 5x)');
   baris.push('  - Perlu perhatian: "tandai dibaca" memajukan penanda hanya untuk owner yang menekan (Script Properties dibaca_OWN01); owner lain masih melihat item sebagai baru');
-  baris.push('  - Ubah nama HP: owner boleh HP mana pun; admin hanya HP yang dipegangnya dan hanya kalau cabang admin sama; log UBAH_NAMA_HP_TOKO tercatat; label di layar utama HP ikut baru dalam sekitar 1 menit');
+  baris.push('  - Ubah nama HP: owner boleh HP mana pun; admin hanya HP yang dipegangnya dan hanya kalau cabang admin sama; hanya kolom nama yang berubah (panggilan, id, aktif, pw_hash tidak berubah); nama "=SUM(A1)" tersimpan sebagai teks; log UBAH_NAMA_HP_TOKO tercatat; label di layar utama HP ikut baru segera');
   baris.push('  - Masuk sebagai Admin di HP toko: keluar sendiri setelah 2 menit tanpa sentuhan dan saat kembali ke layar absen');
 
   const ringkas = (gagal === 0 ? 'SEMUA LULUS' : gagal + ' SKENARIO GAGAL') + ' (' + jumlahSkenario + ' skenario)';
