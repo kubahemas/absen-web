@@ -509,14 +509,25 @@ function cekKaryawanDanPin(id, pin, hp) {
  *  shift     = { masuk, tutup, pulang: 'HH:mm', toleransi: menit }
  *  jenis     = 'PULANG' | 'PULANG_LEMBUR'
  *  sudahMasuk, sudahPulang = boolean (kondisi baris absensi hari ini)
+ *  stSebelumnya = st_pulang yang sudah tercatat hari ini (kalau sudahPulang)
  * Kembalian: { ok:false, pesan } atau
  *  { ok:true, st_pulang, keterangan:'ALASAN_PULANG_AWAL'|'PEKERJAAN_LEMBUR'|null,
- *    acc:'MENUNGGU'|'', tingkat, durasi_menit }
+ *    acc:'MENUNGGU'|'', tingkat, durasi_menit, perubahan:''|'GANTI'|'REVISI' }
+ *  perubahan GANTI = pulang normal diganti jadi lembur; REVISI = lembur diperbarui.
  */
-function tentukanStatusPulang(detik, shift, jenis, sudahMasuk, sudahPulang) {
+function tentukanStatusPulang(detik, shift, jenis, sudahMasuk, sudahPulang, stSebelumnya) {
   if (!sudahMasuk) { return { ok: false, pesan: 'Belum absen masuk hari ini' }; }
-  if (sudahPulang) { return { ok: false, pesan: 'Sudah absen pulang hari ini' }; }
   if (jenis !== 'PULANG' && jenis !== 'PULANG_LEMBUR') { return { ok: false, pesan: 'Jenis absen pulang tidak dikenal' }; }
+
+  // Sudah absen pulang: PULANG biasa ditolak. LEMBUR boleh kalau sebelumnya PULANG NORMAL
+  // ("Ganti jadi lembur") atau LEMBUR DI TOKO ("Revisi lembur"); PULANG CEPAT tidak boleh.
+  let perubahan = '';
+  if (sudahPulang) {
+    if (jenis === 'PULANG') { return { ok: false, pesan: 'Sudah absen pulang hari ini' }; }
+    if (stSebelumnya === 'PULANG NORMAL') { perubahan = 'GANTI'; }
+    else if (stSebelumnya === 'LEMBUR DI TOKO') { perubahan = 'REVISI'; }
+    else { return { ok: false, pesan: 'Pulang awal tidak bisa diganti jadi lembur' }; }
+  }
 
   const detikPulang = jamKeDetik(shift.pulang);
   const detikTutup = jamKeDetik(shift.tutup);
@@ -531,7 +542,7 @@ function tentukanStatusPulang(detik, shift, jenis, sudahMasuk, sudahPulang) {
     const tingkat = durasiDetik <= 3600 ? 1 : (durasiDetik <= 7200 ? 2 : 3);
     return {
       ok: true, st_pulang: 'LEMBUR DI TOKO', keterangan: 'PEKERJAAN_LEMBUR', acc: 'MENUNGGU',
-      tingkat: tingkat, durasi_menit: Math.floor(durasiDetik / 60)
+      tingkat: tingkat, durasi_menit: Math.floor(durasiDetik / 60), perubahan: perubahan
     };
   }
 
@@ -560,7 +571,10 @@ function bacaKondisiPulang(akunDitemukan, tanggalHariIni) {
     shift = bacaShiftCabang(akunDitemukan.cabang).find(function (sh) { return String(sh.no) === String(baris.shift); }) || null;
     if (shift && shift.toleransi === null) { shift.toleransi = ambilNilaiUmum('toleransi_pulang_menit', 5); }
   }
-  return { absensi: absensi, baris: baris, sudahMasuk: sudahMasuk, sudahPulang: sudahPulang, shift: shift };
+  return {
+    absensi: absensi, baris: baris, sudahMasuk: sudahMasuk, sudahPulang: sudahPulang, shift: shift,
+    stPulang: baris ? String(baris.st_pulang) : ''
+  };
 }
 
 function prosesAbsenPulang(id, pin, jenis, hp) {
@@ -580,18 +594,19 @@ function prosesAbsenPulang(id, pin, jenis, hp) {
   }
 
   const kondisi = bacaKondisiPulang(akunDitemukan, tanggalHariIni);
-  if (kondisi.baris && kondisi.sudahMasuk && !kondisi.sudahPulang && !kondisi.shift) {
+  if (kondisi.baris && kondisi.sudahMasuk && !kondisi.shift) {
     return respon({ status: 'gagal', pesan: 'Jadwal shift karyawan tidak ditemukan, hubungi admin' });
   }
-  const hasil = tentukanStatusPulang(detik, kondisi.shift, jenis, kondisi.sudahMasuk, kondisi.sudahPulang);
+  const hasil = tentukanStatusPulang(detik, kondisi.shift, jenis, kondisi.sudahMasuk, kondisi.sudahPulang, kondisi.stPulang);
   if (!hasil.ok) {
     return respon({ status: 'gagal', pesan: hasil.pesan });
   }
 
   const info = {
-    id: akunDitemukan.id, nama: akunDitemukan.nama, panggilan: akunDitemukan.panggilan,
-    tanggal: tanggalHariIni, jam: jamSekarang, shift: kondisi.shift.nama,
-    st_pulang: hasil.st_pulang, acc: hasil.acc, tingkat: hasil.tingkat, durasi_menit: hasil.durasi_menit
+    id: akunDitemukan.id, nama: akunDitemukan.nama, panggilan: akunDitemukan.panggilan, cabang: akunDitemukan.cabang,
+    tanggal: tanggalHariIni, jam: jamSekarang, detik: detik, shift: kondisi.shift.nama,
+    st_pulang: hasil.st_pulang, acc: hasil.acc, tingkat: hasil.tingkat, durasi_menit: hasil.durasi_menit,
+    perubahan: hasil.perubahan || ''
   };
 
   if (hasil.keterangan) {
@@ -603,7 +618,8 @@ function prosesAbsenPulang(id, pin, jenis, hp) {
       status: 'ok', perlu_keterangan: true, kode_pending: info.kode,
       jenis_keterangan: hasil.keterangan, pilihan: ambilDaftarPengaturan(hasil.keterangan),
       nama: info.nama, panggilan: info.panggilan, jam: info.jam, shift: info.shift,
-      st_pulang: info.st_pulang, acc: info.acc, tingkat: info.tingkat, durasi_menit: info.durasi_menit
+      st_pulang: info.st_pulang, acc: info.acc, tingkat: info.tingkat, durasi_menit: info.durasi_menit,
+      perubahan: info.perubahan
     });
   }
 
@@ -629,9 +645,18 @@ function prosesSimpanPulang(id, kode, ket, hp) {
   const v = validasiKeterangan(info.kategori, ket);
   if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
 
+  // Periksa ulang terhadap kondisi sheet sekarang (pakai jam saat PIN benar): jangan sampai
+  // keadaan sudah berubah (misal sudah pulang dari HP lain) sejak keterangan diminta.
   const kondisi = bacaKondisiPulang(akun, info.tanggal);
-  if (!kondisi.sudahMasuk) { return respon({ status: 'gagal', pesan: 'Belum absen masuk hari ini' }); }
-  if (kondisi.sudahPulang) { return respon({ status: 'gagal', pesan: 'Sudah absen pulang hari ini' }); }
+  if (kondisi.baris && kondisi.sudahMasuk && !kondisi.shift) {
+    return respon({ status: 'gagal', pesan: 'Jadwal shift karyawan tidak ditemukan, hubungi admin' });
+  }
+  const jenis = info.st_pulang === 'LEMBUR DI TOKO' ? 'PULANG_LEMBUR' : 'PULANG';
+  const ulang = tentukanStatusPulang(info.detik, kondisi.shift, jenis, kondisi.sudahMasuk, kondisi.sudahPulang, kondisi.stPulang);
+  if (!ulang.ok) { return respon({ status: 'gagal', pesan: ulang.pesan }); }
+  if (ulang.st_pulang !== info.st_pulang || (ulang.perubahan || '') !== info.perubahan) {
+    return respon({ status: 'gagal', pesan: 'Data absen berubah, ulangi absen pulang' });
+  }
 
   tulisPulang(kondisi, info, v.teks);
   cache.remove(KUNCI_PULANG_PENDING + id);
@@ -657,13 +682,36 @@ function tulisPulang(kondisi, info, keterangan) {
     acc_pulang: info.acc
   };
   if (info.st_pulang === 'LEMBUR DI TOKO') { perubahan.lembur = info.tingkat + '|' + info.durasi_menit; }
+
+  // "Ganti jadi lembur" / "Revisi lembur": catat nilai sebelum dan sesudah di log.
+  let sebelum = '';
+  if (info.perubahan) { sebelum = ringkasanPulang(kondisi.absensi, kondisi.baris); }
   perbaruiKolom(kondisi.absensi, kondisi.baris, perubahan);
+  if (info.perubahan) {
+    tambahLog({
+      jenis: 'ABSENSI', oleh: info.id, cabang: info.cabang,
+      aksi: info.perubahan === 'GANTI' ? 'GANTI_JADI_LEMBUR' : 'REVISI_LEMBUR',
+      target: 'absensi ' + info.tanggal, id: info.id,
+      sebelum: sebelum, sesudah: ringkasanPulang(kondisi.absensi, kondisi.baris)
+    });
+  }
+}
+
+/** Ringkasan kolom pulang satu baris absensi (teks tampilan, supaya jam tidak berubah bentuk) untuk log. */
+function ringkasanPulang(absensi, baris) {
+  const ambil = function (kolom) {
+    const idx = absensi.header.indexOf(kolom);
+    return idx === -1 ? '' : String(absensi.sheet.getRange(baris._baris, idx + 1).getDisplayValue());
+  };
+  return 'pulang=' + ambil('pulang') + '; st=' + ambil('st_pulang') + '; lembur=' + ambil('lembur') +
+    '; ket=' + ambil('ket_pulang') + '; acc=' + ambil('acc_pulang');
 }
 
 function balasanPulang(info) {
   return {
     status: 'ok', pesan: 'Absen pulang berhasil', st_pulang: info.st_pulang, jam: info.jam, shift: info.shift,
-    nama: info.nama, panggilan: info.panggilan, acc: info.acc, tingkat: info.tingkat, durasi_menit: info.durasi_menit
+    nama: info.nama, panggilan: info.panggilan, acc: info.acc, tingkat: info.tingkat, durasi_menit: info.durasi_menit,
+    perubahan: info.perubahan
   };
 }
 
@@ -683,12 +731,13 @@ function tesServer() {
   let gagal = 0;
 
   // sudahMasuk/sudahPulang default true/false
-  function uji(nama, jam, shift, jenis, harap, sudahMasuk, sudahPulang) {
+  // stSebelumnya = st_pulang yang sudah tercatat (untuk skenario sudah pulang)
+  function uji(nama, jam, shift, jenis, harap, sudahMasuk, sudahPulang, stSebelumnya) {
     const h = tentukanStatusPulang(detik(jam), shift, jenis,
-      sudahMasuk === undefined ? true : sudahMasuk, sudahPulang === undefined ? false : sudahPulang);
+      sudahMasuk === undefined ? true : sudahMasuk, sudahPulang === undefined ? false : sudahPulang, stSebelumnya);
     let lulus = h.ok === harap.ok;
     if (lulus && harap.ok) {
-      ['st_pulang', 'keterangan', 'acc', 'tingkat', 'durasi_menit'].forEach(function (k) {
+      ['st_pulang', 'keterangan', 'acc', 'tingkat', 'durasi_menit', 'perubahan'].forEach(function (k) {
         if (harap[k] !== undefined && h[k] !== harap[k]) { lulus = false; }
       });
     }
@@ -722,7 +771,19 @@ function tesServer() {
   uji('18:30:01 lembur = tingkat 3', '18:30:01', s1, 'PULANG_LEMBUR', { ok: true, tingkat: 3 });
 
   uji('pulang dobel ditolak', '16:40:00', s1, 'PULANG', { ok: false, pesan: 'Sudah absen pulang' }, true, true);
-  uji('lembur dobel ditolak', '17:40:00', s1, 'PULANG_LEMBUR', { ok: false, pesan: 'Sudah absen pulang' }, true, true);
+  uji('lembur kedua = revisi, jam diperbarui, ACC MENUNGGU', '18:40:00', s1, 'PULANG_LEMBUR',
+    { ok: true, st_pulang: 'LEMBUR DI TOKO', acc: 'MENUNGGU', perubahan: 'REVISI', tingkat: 3, durasi_menit: 130 },
+    true, true, 'LEMBUR DI TOKO');
+  uji('revisi lembur tetap ACC ulang walau jam masih tingkat 1', '17:00:00', s1, 'PULANG_LEMBUR',
+    { ok: true, acc: 'MENUNGGU', perubahan: 'REVISI', tingkat: 1, durasi_menit: 30 }, true, true, 'LEMBUR DI TOKO');
+  uji('pulang normal lalu lembur = ganti jadi lembur', '17:00:00', s1, 'PULANG_LEMBUR',
+    { ok: true, st_pulang: 'LEMBUR DI TOKO', acc: 'MENUNGGU', perubahan: 'GANTI', tingkat: 1, durasi_menit: 30 },
+    true, true, 'PULANG NORMAL');
+  uji('ganti jadi lembur sebelum 16:36 ditolak', '16:35:00', s1, 'PULANG_LEMBUR', TOLAK, true, true, 'PULANG NORMAL');
+  uji('revisi lembur sebelum 16:36 ditolak', '16:20:00', s1, 'PULANG_LEMBUR', TOLAK, true, true, 'LEMBUR DI TOKO');
+  uji('pulang cepat lalu lembur ditolak', '17:00:00', s1, 'PULANG_LEMBUR', { ok: false, pesan: 'Pulang awal' }, true, true, 'PULANG CEPAT');
+  uji('pulang normal kedua ditolak', '17:00:00', s1, 'PULANG', { ok: false, pesan: 'Sudah absen pulang' }, true, true, 'PULANG NORMAL');
+  uji('pulang biasa setelah lembur ditolak', '17:00:00', s1, 'PULANG', { ok: false, pesan: 'Sudah absen pulang' }, true, true, 'LEMBUR DI TOKO');
   uji('pulang tanpa absen masuk ditolak', '16:40:00', s1, 'PULANG', { ok: false, pesan: 'Belum absen masuk' }, false, false);
   uji('jenis tidak dikenal ditolak', '16:40:00', s1, 'LAIN', TOLAK);
 

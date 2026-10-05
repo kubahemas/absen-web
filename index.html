@@ -875,7 +875,8 @@
     if (data.st_pulang === 'PULANG CEPAT') {
       pil = '<div class="pil merah-pil">Pulang awal ' + escHtml(data.jam) + ' ' + ket + '</div>';
     } else if (data.st_pulang === 'LEMBUR DI TOKO') {
-      pil = '<div class="pil">Lembur ' + escHtml(data.jam) + ' (' + teksDurasi(data.durasi_menit) + ')</div>';
+      const awal = data.perubahan === 'REVISI' ? 'Lembur direvisi' : (data.perubahan === 'GANTI' ? 'Diganti jadi lembur' : 'Lembur');
+      pil = '<div class="pil">' + awal + ' ' + escHtml(data.jam) + ' (' + teksDurasi(data.durasi_menit) + ')</div>';
     } else {
       pil = '<div class="pil">Pulang ' + escHtml(data.jam) + ' ' + ket + '</div>';
     }
