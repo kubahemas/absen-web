@@ -124,6 +124,66 @@
   #btnLanjut { height: 54px; flex-shrink: 0; border: 4px solid #5CC98A; border-radius: 26px; background: #1F8A4C; color: #FFFFFF; font-family: inherit; font-size: 18px; font-weight: 800; }
   #layarRingkasan .rinci { font-size: 15px; font-weight: 700; }
 
+  /* ---- Tombol umum (disalin dari mockup 26/27/51) ---- */
+  .btn-kembali { width: 56px; flex-shrink: 0; border: 3px solid #141111; border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: #141111; }
+  .btn-utama { flex-grow: 1; height: 54px; border: 4px solid #5CC98A; border-radius: 26px; background: #1F8A4C; color: #FFFFFF; font-family: inherit; font-size: 18px; font-weight: 800; }
+  .btn-utama:disabled { opacity: 0.5; }
+  .btn-gelap { flex: 1; height: 54px; border: none; border-radius: 18px; background: #141111; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 800; }
+  .btn-garis { flex: 1; height: 54px; border: 3px solid #141111; border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: #141111; }
+  .btn-merah-garis { min-height: 40px; border: 2px solid #B91C1C; border-radius: 999px; background: #FFFFFF; font-family: inherit; font-size: 12px; font-weight: 800; color: #B91C1C; padding: 0 12px; }
+  .btn-owner-masuk { align-self: center; border: 2px solid #333438; background: transparent; color: #333438; font-family: inherit; font-size: 13px; font-weight: 700; padding: 0 20px; border-radius: 999px; min-height: 44px; }
+  .badge-hitam { padding: 6px 12px; border-radius: 999px; background: #141111; color: #FFD62E; font-size: 12px; font-weight: 800; }
+  .pesan-form { min-height: 20px; font-size: 13px; font-weight: 700; color: #B91C1C; text-align: center; }
+
+  /* ---- Layar owner & admin (disalin dari mockup 23 Beranda owner, 31 Daftar perangkat, 26 Ganti password) ---- */
+  #layarLoginOwner, #layarPassword, #layarOwner, #layarLoginAdmin, #layarAdmin { padding: 16px 18px; gap: 12px; }
+  #layarOwner, #layarAdmin { gap: 16px; }
+  .baris-header { display: flex; justify-content: space-between; align-items: center; }
+  .baris-header img { height: 40px; width: auto; }
+  .isi-gulir { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px; }
+  .judul-blok .h.besar { font-size: 28px; }
+  .judul-blok .s { font-size: 13px; font-weight: 600; }
+  .kartu-perhatian { background: #FFFFFF; border-radius: 22px; padding: 14px 16px 6px; display: flex; flex-direction: column; }
+  .perhatian-atas { display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; }
+  .perhatian-atas .j { font-size: 15px; font-weight: 800; }
+  .badge-jumlah { padding: 2px 10px; border-radius: 999px; background: #B91C1C; color: #FFFFFF; font-size: 12px; font-weight: 800; }
+  .baris-perhatian { display: flex; align-items: center; gap: 10px; min-height: 52px; border-bottom: 1px solid #EEEAE0; padding: 6px 0; }
+  .baris-perhatian:last-child { border-bottom: none; }
+  .titik { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .teks-perhatian { flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .pt-j { font-size: 14px; font-weight: 800; color: #141111; }
+  .pt-s { font-size: 12px; font-weight: 600; color: #5A5B5E; }
+  .chip-merah { padding: 2px 8px; border-radius: 999px; background: #FDE8E8; color: #B91C1C; font-size: 11px; font-weight: 800; white-space: nowrap; }
+  .kartu-hp { background: #FFFFFF; border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .hp-baris { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .hp-id { font-size: 15px; font-weight: 800; }
+  .hp-nama { font-size: 13px; font-weight: 600; }
+  .hp-ket { font-size: 12px; font-weight: 700; color: #5A5B5E; }
+  .badge-aktif { padding: 4px 10px; border-radius: 999px; background: #141111; color: #FFD62E; font-size: 12px; font-weight: 800; }
+  .badge-nonaktif { padding: 4px 10px; border-radius: 999px; background: #D9D6CC; color: #3E3F42; font-size: 12px; font-weight: 800; }
+  .aksi-bawah { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+  .aksi-bawah .baris { display: flex; gap: 10px; }
+  .cek-daftar { display: flex; flex-direction: column; gap: 6px; }
+  .cek-baris { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 700; color: #5A5B5E; }
+  .cek-baris .bulat-cek { width: 18px; height: 18px; border-radius: 50%; background: #D9D6CC; color: #FFFFFF; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+  .cek-baris.ok { color: #15643A; }
+  .cek-baris.ok .bulat-cek { background: #1F8A4C; }
+  .kartu-putih .bidang .lbl { font-size: 12px; font-weight: 800; }
+  .catatan-kecil { font-size: 12px; font-weight: 600; }
+
+  /* ---- Dialog konfirmasi (disalin dari mockup 27 Keluarkan semua perangkat dan 51 Log out) ---- */
+  #dialog { position: fixed; inset: 0; height: 100dvh; display: none; box-sizing: border-box; padding: calc(22px + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom)); background: rgba(20,17,17,.55); flex-direction: column; justify-content: center; z-index: 30; }
+  #dialog.tampil { display: flex; }
+  .dialog-kartu { background: #FFFFFF; border-radius: 26px; padding: 22px 20px 20px; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 390px; margin: 0 auto; }
+  .dialog-judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; text-align: center; }
+  .dialog-sub { font-size: 13px; font-weight: 600; color: #3E3F42; text-align: center; }
+  .dialog-daftar { display: flex; flex-direction: column; max-height: 40vh; overflow-y: auto; }
+  .dialog-daftar .item { display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px solid #EEEAE0; text-align: left; }
+  .dialog-daftar .item .a { font-size: 14px; font-weight: 800; color: #141111; }
+  .dialog-daftar .item .b { font-size: 12px; font-weight: 600; color: #5A5B5E; }
+  .dialog-catatan { font-size: 12px; font-weight: 700; text-align: center; }
+  .dialog-tombol { display: flex; gap: 10px; }
+
   /* ---- Layar pilih nama + PIN ---- */
   #layarPilihNama { }
   .pilih-atas { padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 10px; }
@@ -244,6 +304,7 @@
     <div class="catatan-tengah" id="catatanJenis"></div>
     <div style="flex-grow:1"></div>
     <div class="catatan-tengah">Pilihan ini tidak bisa diubah sendiri.</div>
+    <button type="button" class="btn-owner-masuk" id="btnJenisOwner">Masuk sebagai Owner</button>
   </div>
 
   <div id="layarDaftarHp" class="layar">
@@ -273,6 +334,92 @@
       <div class="rinci" id="ringkasanIsi"></div>
     </div>
     <button type="button" id="btnLanjut">Lanjut</button>
+  </div>
+
+  <!-- Login owner -->
+  <div id="layarLoginOwner" class="layar">
+    <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam">Owner</div></div>
+    <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Masuk owner</div><div class="s">Login pertama? Isi username saja.</div></div></div>
+    <form class="kartu-putih" autocomplete="off" onsubmit="return false">
+      <div class="bidang"><label for="ownUsername">Username</label><input id="ownUsername" name="username_owner" autocomplete="off" autocapitalize="none" placeholder="owner"></div>
+      <div class="bidang"><label for="ownPassword">Password</label><input id="ownPassword" name="password_owner" type="password" autocomplete="new-password" placeholder="••••••••"></div>
+    </form>
+    <div class="pesan-form" id="pesanLoginOwner"></div>
+    <div style="flex-grow:1"></div>
+    <div class="bar-bawah">
+      <button type="button" class="btn-kembali" id="btnKembaliLoginOwner" aria-label="Kembali">‹</button>
+      <button type="button" class="btn-utama" id="btnMasukOwner">Masuk</button>
+    </div>
+  </div>
+
+  <!-- Buat password (login pertama / pemulihan) dan Ganti password owner -->
+  <div id="layarPassword" class="layar">
+    <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam">Owner</div></div>
+    <div class="judul-blok"><div class="garis"></div><div><div class="h besar" id="judulPassword">Buat password baru</div><div class="s" id="subPassword"></div></div></div>
+    <form class="kartu-putih" autocomplete="off" onsubmit="return false">
+      <div class="bidang" id="bidangLama"><label for="pwLama" class="lbl">Password lama</label><input id="pwLama" type="password" autocomplete="new-password" aria-label="Password lama"></div>
+      <div class="bidang"><label for="pwBaru" class="lbl">Password baru</label><input id="pwBaru" type="password" autocomplete="new-password" aria-label="Password baru"></div>
+      <div class="bidang"><label for="pwUlang" class="lbl">Ulangi password baru</label><input id="pwUlang" type="password" autocomplete="new-password" aria-label="Ulangi password baru"></div>
+      <div class="cek-daftar" id="cekDaftar"></div>
+    </form>
+    <div class="pesan-form" id="pesanPassword"></div>
+    <div style="flex-grow:1"></div>
+    <div class="catatan-kecil" id="catatPassword"></div>
+    <div class="bar-bawah">
+      <button type="button" class="btn-kembali" id="btnKembaliPassword" aria-label="Kembali">‹</button>
+      <button type="button" class="btn-utama" id="btnSimpanPassword">Simpan</button>
+    </div>
+  </div>
+
+  <!-- Beranda owner -->
+  <div id="layarOwner" class="layar">
+    <div class="isi-gulir">
+      <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam">Owner</div></div>
+      <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Beranda owner</div><div class="s" id="ownerSub">Memuat...</div></div></div>
+      <div class="kartu-perhatian">
+        <div class="perhatian-atas"><div class="j">Perlu perhatian</div><div class="badge-jumlah" id="ownerJumlah">0</div></div>
+        <div id="ownerPerhatian"></div>
+      </div>
+      <div class="judul-blok"><div class="garis"></div><div><div class="h" style="font-size:22px">HP toko</div><div class="s">Semua cabang</div></div></div>
+      <div id="ownerHp" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div class="catatan-kecil" id="ownerPesan" style="color:#B91C1C"></div>
+    </div>
+    <div class="aksi-bawah">
+      <div class="baris">
+        <button type="button" class="btn-garis" id="btnOwnerGantiPw">Ganti password</button>
+        <button type="button" class="btn-garis" id="btnOwnerKeluarkan">Keluarkan semua perangkat</button>
+      </div>
+      <div class="baris"><button type="button" class="btn-gelap" id="btnOwnerLogout">Log out</button></div>
+    </div>
+  </div>
+
+  <!-- Login admin di HP toko -->
+  <div id="layarLoginAdmin" class="layar">
+    <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Masuk sebagai Admin</div><div class="s">Cabang ini · password tidak disimpan</div></div></div>
+    <form class="kartu-putih" autocomplete="off" onsubmit="return false">
+      <div class="bidang"><label for="admUsername">Username (nama lengkap)</label><input id="admUsername" name="username_admin_toko" autocomplete="off" autocapitalize="words" placeholder="Nama lengkap admin"></div>
+      <div class="bidang"><label for="admPassword">Password</label><input id="admPassword" name="password_admin_toko" type="password" autocomplete="new-password" placeholder="••••••"></div>
+    </form>
+    <div class="pesan-form" id="pesanLoginAdmin"></div>
+    <div style="flex-grow:1"></div>
+    <div class="catatan-kecil">Keluar otomatis setelah 2 menit tanpa sentuhan.</div>
+    <div class="bar-bawah">
+      <button type="button" class="btn-kembali" id="btnKembaliLoginAdmin" aria-label="Kembali">‹</button>
+      <button type="button" class="btn-utama" id="btnMasukAdmin">Masuk</button>
+    </div>
+  </div>
+
+  <!-- Beranda admin (minimal: hanya yang sudah punya fungsi) -->
+  <div id="layarAdmin" class="layar">
+    <div class="isi-gulir">
+      <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam" id="admBadge">Admin</div></div>
+      <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Beranda admin</div><div class="s" id="admSub"></div></div></div>
+    </div>
+    <div class="catatan-kecil">Di HP toko keluar otomatis 2 menit.</div>
+    <div class="bar-bawah">
+      <button type="button" class="btn-garis" id="btnAdminHome">Home</button>
+      <button type="button" class="btn-gelap" id="btnAdminLogout">Log out</button>
+    </div>
   </div>
 
   <div id="layarUtama" class="layar">
@@ -307,7 +454,7 @@
       </button>
     </div>
     <div class="baris-admin">
-      <button class="belum-aktif" id="btnAdmin" type="button" disabled>Masuk sebagai Admin</button>
+      <button id="btnAdmin" type="button">Masuk sebagai Admin</button>
     </div>
   </div>
 
@@ -348,6 +495,8 @@
   </div>
 
 </div>
+
+<div id="dialog" role="dialog"></div>
 
 <div id="popup" class="popup" role="alertdialog" aria-live="assertive"></div>
 
@@ -418,6 +567,8 @@
     tutupPopup();
     tutupLayarAlasan();
     alasan = null;
+    bersihkanAdmin();
+    tutupDialog();
     hapusHp();
     daftarKaryawan = [];
     tampilLayar(layarJenis);
@@ -1125,9 +1276,329 @@
     tampilLayar(layarUtama);
   });
 
-  // ---- Mulai: ada token tersimpan = layar utama, kalau tidak = pilih jenis HP ----
+  // ================= OWNER (login di perangkat mana pun, tiket sesi 7 hari) =================
+  // Password TIDAK pernah disimpan di perangkat; yang disimpan hanya tiket sesi.
+  const KUNCI_SESI_OWNER = 'absen_sesi_owner';
+  const KUNCI_ID_PERANGKAT = 'absen_id_perangkat';
+  let sesiOwner = null;
+  let usernameOwnerSementara = ''; // dipakai antara layar login dan layar "buat password" (hanya di memori)
+  let modePassword = 'AWAL';       // AWAL = buat password pertama, GANTI = ganti password
+  let dataOwner = null;            // balasan owner_beranda terakhir
+  const layarLoginOwner = document.getElementById('layarLoginOwner');
+  const layarPassword = document.getElementById('layarPassword');
+  const layarOwner = document.getElementById('layarOwner');
+  const layarLoginAdmin = document.getElementById('layarLoginAdmin');
+  const layarAdmin = document.getElementById('layarAdmin');
+  const dialog = document.getElementById('dialog');
+
+  function kirimPost(isi) {
+    return fetch(CONFIG.webAppUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(isi)
+    }).then(function (r) { return r.json(); });
+  }
+
+  function acakHex(n) {
+    const a = new Uint8Array(n / 2);
+    crypto.getRandomValues(a);
+    return Array.prototype.map.call(a, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+  function idPerangkat() {
+    try {
+      let id = localStorage.getItem(KUNCI_ID_PERANGKAT);
+      if (!id) { id = acakHex(16); localStorage.setItem(KUNCI_ID_PERANGKAT, id); }
+      return id;
+    } catch (e) { return 'TAKDIKENAL'; }
+  }
+  function labelPerangkat() {
+    const ua = navigator.userAgent || '';
+    const sistem = /Android/.test(ua) ? 'Android' : (/iPhone|iPad/.test(ua) ? 'iPhone' : (/Windows/.test(ua) ? 'Windows' : (/Mac/.test(ua) ? 'Mac' : 'Perangkat')));
+    const peramban = /Edg\//.test(ua) ? 'Edge' : (/Firefox\//.test(ua) ? 'Firefox' : (/Chrome\//.test(ua) ? 'Chrome' : (/Safari\//.test(ua) ? 'Safari' : 'Browser')));
+    return sistem + ' · ' + peramban;
+  }
+
+  function bacaSesiOwner() { try { return localStorage.getItem(KUNCI_SESI_OWNER) || null; } catch (e) { return null; } }
+  function simpanSesiOwner(t) { sesiOwner = t; try { localStorage.setItem(KUNCI_SESI_OWNER, t); } catch (e) { /* tetap jalan selama halaman terbuka */ } }
+  function hapusSesiOwner() { sesiOwner = null; dataOwner = null; try { localStorage.removeItem(KUNCI_SESI_OWNER); } catch (e) { /* abaikan */ } }
+
+  function bukaDialog(html) { dialog.innerHTML = '<div class="dialog-kartu">' + html + '</div>'; dialog.classList.add('tampil'); }
+  function tutupDialog() { dialog.classList.remove('tampil'); dialog.innerHTML = ''; }
+
+  // ---- Masuk owner ----
+  const ownUsername = document.getElementById('ownUsername');
+  const ownPassword = document.getElementById('ownPassword');
+  const pesanLoginOwner = document.getElementById('pesanLoginOwner');
+  const btnMasukOwner = document.getElementById('btnMasukOwner');
+
+  function kosongkanLoginOwner() {
+    ownUsername.value = ''; ownPassword.value = ''; pesanLoginOwner.textContent = ''; btnMasukOwner.disabled = false;
+  }
+  document.getElementById('btnJenisOwner').addEventListener('click', function () { kosongkanLoginOwner(); tampilLayar(layarLoginOwner); });
+  document.getElementById('btnKembaliLoginOwner').addEventListener('click', function () { kosongkanLoginOwner(); tampilLayar(layarJenis); });
+
+  btnMasukOwner.addEventListener('click', function () {
+    const username = ownUsername.value.trim();
+    const password = ownPassword.value;
+    if (!username) { pesanLoginOwner.textContent = 'Isi username.'; return; }
+    pesanLoginOwner.textContent = 'Memeriksa...';
+    btnMasukOwner.disabled = true;
+    ownPassword.value = ''; // password tidak disimpan di mana pun
+    kirimPost({ aksi: 'login_owner', username: username, password: password, id_perangkat: idPerangkat(), label: labelPerangkat() })
+      .then(function (d) {
+        btnMasukOwner.disabled = false;
+        if (d.status === 'ok' && d.perlu_password_baru) {
+          usernameOwnerSementara = username;
+          bukaLayarPassword('AWAL');
+        } else if (d.status === 'ok' && d.sesi) {
+          kosongkanLoginOwner();
+          simpanSesiOwner(d.sesi);
+          tampilLayar(layarOwner);
+          muatBerandaOwner();
+        } else {
+          pesanLoginOwner.textContent = d.pesan || 'Login gagal.';
+        }
+      })
+      .catch(function () { btnMasukOwner.disabled = false; pesanLoginOwner.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; });
+  });
+
+  // ---- Buat password (login pertama / pemulihan) dan Ganti password ----
+  const pwLama = document.getElementById('pwLama');
+  const pwBaru = document.getElementById('pwBaru');
+  const pwUlang = document.getElementById('pwUlang');
+  const pesanPassword = document.getElementById('pesanPassword');
+  const btnSimpanPassword = document.getElementById('btnSimpanPassword');
+
+  function aturanPassword() {
+    const baru = pwBaru.value;
+    const nama = (modePassword === 'AWAL' ? usernameOwnerSementara : (dataOwner ? dataOwner.nama : 'owner')).toLowerCase();
+    const aturan = [
+      { t: 'Minimal 8 karakter', ok: baru.length >= 8 },
+      { t: 'Ada huruf dan angka', ok: /[A-Za-z]/.test(baru) && /[0-9]/.test(baru) },
+      modePassword === 'AWAL'
+        ? { t: 'Bukan 123456 atau username', ok: baru !== '' && baru !== '123456' && baru.toLowerCase() !== nama }
+        : { t: 'Tidak sama dengan password lama', ok: baru !== '' && baru !== pwLama.value && baru.toLowerCase() !== nama },
+      { t: 'Kedua password baru sama', ok: baru !== '' && baru === pwUlang.value }
+    ];
+    document.getElementById('cekDaftar').innerHTML = aturan.map(function (a) {
+      return '<div class="cek-baris' + (a.ok ? ' ok' : '') + '"><div class="bulat-cek">' + (a.ok ? '✓' : '') + '</div>' + escHtml(a.t) + '</div>';
+    }).join('');
+    return aturan.every(function (a) { return a.ok; });
+  }
+  [pwLama, pwBaru, pwUlang].forEach(function (el) { el.addEventListener('input', aturanPassword); });
+
+  function kosongkanPassword() {
+    pwLama.value = ''; pwBaru.value = ''; pwUlang.value = ''; pesanPassword.textContent = ''; btnSimpanPassword.disabled = false;
+  }
+  function bukaLayarPassword(mode) {
+    modePassword = mode;
+    kosongkanPassword();
+    document.getElementById('bidangLama').style.display = mode === 'GANTI' ? '' : 'none';
+    document.getElementById('judulPassword').textContent = mode === 'AWAL' ? 'Buat password baru' : 'Ganti password';
+    document.getElementById('subPassword').textContent = mode === 'AWAL' ? 'Login pertama owner' : 'Owner · ' + (dataOwner ? dataOwner.id : '');
+    document.getElementById('catatPassword').textContent = mode === 'AWAL' ? 'Password tidak disimpan di perangkat ini.' : 'Setelah diganti, perangkat lain otomatis keluar.';
+    aturanPassword();
+    tampilLayar(layarPassword);
+  }
+  document.getElementById('btnKembaliPassword').addEventListener('click', function () {
+    kosongkanPassword();
+    if (modePassword === 'AWAL') { usernameOwnerSementara = ''; tampilLayar(layarLoginOwner); } else { tampilLayar(layarOwner); }
+  });
+
+  btnSimpanPassword.addEventListener('click', function () {
+    if (!aturanPassword()) { pesanPassword.textContent = 'Lengkapi semua syarat di atas.'; return; }
+    const lama = pwLama.value, baru = pwBaru.value;
+    btnSimpanPassword.disabled = true;
+    pesanPassword.textContent = 'Menyimpan...';
+    pwLama.value = ''; pwBaru.value = ''; pwUlang.value = '';
+    const permintaan = modePassword === 'AWAL'
+      ? kirimPost({ aksi: 'atur_password_owner', username: usernameOwnerSementara, password_baru: baru, id_perangkat: idPerangkat(), label: labelPerangkat() })
+      : kirimPost({ aksi: 'owner_ganti_password', sesi: sesiOwner, lama: lama, baru: baru });
+    permintaan
+      .then(function (d) {
+        btnSimpanPassword.disabled = false;
+        if (d.kode === 'SESI_TIDAK_VALID') { sesiOwnerHabis(); return; }
+        if (d.status !== 'ok') { pesanPassword.textContent = d.pesan || 'Gagal menyimpan.'; return; }
+        if (modePassword === 'AWAL') {
+          usernameOwnerSementara = '';
+          simpanSesiOwner(d.sesi);
+          tampilLayar(layarOwner);
+          muatBerandaOwner();
+        } else {
+          tampilLayar(layarOwner);
+          muatBerandaOwner('Password diganti. Perangkat lain sudah dikeluarkan.');
+        }
+      })
+      .catch(function () { btnSimpanPassword.disabled = false; pesanPassword.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; });
+  });
+
+  // ---- Beranda owner ----
+  function sesiOwnerHabis() {
+    hapusSesiOwner();
+    tutupDialog();
+    tampilLayar(layarJenis);
+  }
+
+  function muatBerandaOwner(pesan) {
+    document.getElementById('ownerSub').textContent = 'Memuat...';
+    document.getElementById('ownerPesan').textContent = pesan || '';
+    kirimPost({ aksi: 'owner_beranda', sesi: sesiOwner })
+      .then(function (d) {
+        if (d.kode === 'SESI_TIDAK_VALID') { sesiOwnerHabis(); return; }
+        if (d.status !== 'ok') { document.getElementById('ownerSub').textContent = d.pesan || 'Gagal memuat.'; return; }
+        dataOwner = d;
+        renderBerandaOwner(d);
+      })
+      .catch(function () { document.getElementById('ownerSub').textContent = 'Tidak bisa terhubung ke server.'; });
+  }
+
+  function renderBerandaOwner(d) {
+    document.getElementById('ownerSub').textContent = d.nama + ' · ' + d.id;
+    document.getElementById('ownerJumlah').textContent = d.perhatian.length;
+    document.getElementById('ownerPerhatian').innerHTML = d.perhatian.length ? d.perhatian.map(function (p) {
+      return '<div class="baris-perhatian"><div class="titik" style="background:' + (p.tipe === 'HP_BARU' ? '#B91C1C' : '#B8860B') + '"></div>' +
+        '<div class="teks-perhatian"><div class="pt-j">' + escHtml(p.judul) + '</div><div class="pt-s">' + escHtml(p.sub) + '</div></div>' +
+        (p.info ? '<span class="chip-merah">' + escHtml(p.info) + '</span>' : '') + '</div>';
+    }).join('') : '<div class="baris-perhatian"><div class="pt-s">Tidak ada yang perlu diperhatikan (7 hari terakhir).</div></div>';
+    document.getElementById('ownerHp').innerHTML = d.hp_toko.length ? d.hp_toko.map(function (h, i) {
+      return '<div class="kartu-hp"><div class="hp-baris"><div><div class="hp-id">' + escHtml(h.id) + '</div><div class="hp-nama">' + escHtml(h.nama) + ' · ' + escHtml(h.cabang) + '</div></div>' +
+        '<div class="' + (h.aktif ? 'badge-aktif' : 'badge-nonaktif') + '">' + (h.aktif ? 'Aktif' : 'Nonaktif') + '</div></div>' +
+        (h.aktif ? '<div class="hp-baris"><div class="hp-ket">Aktif</div><button type="button" class="btn-merah-garis" data-nonaktif="' + i + '">Nonaktifkan</button></div>' : '') + '</div>';
+    }).join('') : '<div class="hp-ket">Belum ada HP toko terdaftar.</div>';
+  }
+
+  document.getElementById('ownerHp').addEventListener('click', function (e) {
+    const i = e.target.getAttribute('data-nonaktif');
+    if (i === null || !dataOwner) { return; }
+    const h = dataOwner.hp_toko[Number(i)];
+    bukaDialog(
+      '<div class="dialog-judul">Nonaktifkan HP?</div>' +
+      '<div class="dialog-sub">' + escHtml(h.id) + ' · ' + escHtml(h.nama) + '</div>' +
+      '<div class="dialog-catatan">HP ini akan ditolak pada permintaan berikutnya dan harus didaftarkan ulang.</div>' +
+      '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Nonaktifkan</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', function () {
+      document.getElementById('dlgYa').disabled = true;
+      kirimPost({ aksi: 'owner_nonaktifkan_hp', sesi: sesiOwner, id_hp: h.id })
+        .then(function (d) {
+          tutupDialog();
+          if (d.kode === 'SESI_TIDAK_VALID') { sesiOwnerHabis(); return; }
+          muatBerandaOwner(d.status === 'ok' ? h.id + ' dinonaktifkan.' : (d.pesan || 'Gagal.'));
+        })
+        .catch(function () { tutupDialog(); document.getElementById('ownerPesan').textContent = 'Tidak bisa terhubung ke server.'; });
+    });
+  });
+
+  document.getElementById('btnOwnerGantiPw').addEventListener('click', function () { bukaLayarPassword('GANTI'); });
+
+  document.getElementById('btnOwnerKeluarkan').addEventListener('click', function () {
+    const daftar = dataOwner ? dataOwner.perangkat_aktif : [];
+    bukaDialog(
+      '<div class="dialog-judul">Keluarkan semua perangkat?</div>' +
+      '<div class="dialog-sub">' + daftar.length + ' perangkat sedang login dengan akun owner</div>' +
+      '<div class="dialog-daftar">' + daftar.map(function (p) {
+        return '<div class="item"><div class="a">' + escHtml(p.label) + '</div><div class="b">' + (p.ini ? 'Perangkat ini · aktif sekarang' : 'Terakhir ' + escHtml(p.terakhir_aktif)) + '</div></div>';
+      }).join('') + '</div>' +
+      '<div class="dialog-catatan">Semua perangkat harus login ulang. Ganti password kalau ada perangkat yang tidak dikenal.</div>' +
+      '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Keluarkan semua</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', function () {
+      document.getElementById('dlgYa').disabled = true;
+      kirimPost({ aksi: 'owner_keluarkan_semua', sesi: sesiOwner })
+        .then(function () { sesiOwnerHabis(); })
+        .catch(function () { tutupDialog(); document.getElementById('ownerPesan').textContent = 'Tidak bisa terhubung ke server.'; });
+    });
+  });
+
+  document.getElementById('btnOwnerLogout').addEventListener('click', function () {
+    bukaDialog(
+      '<div class="dialog-judul">Log out?</div><div class="dialog-sub">Owner</div>' +
+      '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Log out</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', function () {
+      const t = sesiOwner;
+      sesiOwnerHabis();
+      kirimPost({ aksi: 'logout', sesi: t }).catch(function () { /* sesi lokal sudah dihapus */ });
+    });
+  });
+
+  // ================= ADMIN di HP toko (sesi pendek, keluar otomatis 2 menit tanpa sentuhan) =================
+  const BATAS_DIAM_ADMIN_MS = 2 * 60 * 1000;
+  let sesiAdmin = null;
+  let timerDiamAdmin = null;
+  const admUsername = document.getElementById('admUsername');
+  const admPassword = document.getElementById('admPassword');
+  const pesanLoginAdmin = document.getElementById('pesanLoginAdmin');
+  const btnMasukAdmin = document.getElementById('btnMasukAdmin');
+
+  function adminAktifDiLayar() { return layarLoginAdmin.classList.contains('aktif') || layarAdmin.classList.contains('aktif'); }
+  function mulaiDiamAdmin() {
+    clearTimeout(timerDiamAdmin);
+    timerDiamAdmin = setTimeout(function () { keluarAdmin(); }, BATAS_DIAM_ADMIN_MS);
+  }
+  // Setiap sentuhan mengulang hitungan 2 menit.
+  ['pointerdown', 'touchstart', 'keydown', 'input', 'scroll'].forEach(function (nama) {
+    document.addEventListener(nama, function () { if (adminAktifDiLayar()) { mulaiDiamAdmin(); } }, true);
+  });
+
+  // Bersihkan keadaan admin tanpa pindah layar (dipakai juga saat HP dicabut).
+  function bersihkanAdmin() {
+    clearTimeout(timerDiamAdmin);
+    const t = sesiAdmin;
+    sesiAdmin = null;
+    admUsername.value = ''; admPassword.value = ''; pesanLoginAdmin.textContent = ''; btnMasukAdmin.disabled = false;
+    if (dialog.classList.contains('tampil') && adminAktifDiLayar()) { tutupDialog(); }
+    if (t) { kirimPost({ aksi: 'logout', sesi: t }).catch(function () { /* sesi server berakhir sendiri */ }); }
+  }
+  function keluarAdmin() {
+    bersihkanAdmin();
+    tutupDialog();
+    tampilLayar(hpAktif ? layarUtama : layarJenis);
+  }
+
+  document.getElementById('btnAdmin').addEventListener('click', function () {
+    admUsername.value = ''; admPassword.value = ''; pesanLoginAdmin.textContent = '';
+    tampilLayar(layarLoginAdmin);
+    mulaiDiamAdmin();
+  });
+  document.getElementById('btnKembaliLoginAdmin').addEventListener('click', keluarAdmin);
+  document.getElementById('btnAdminHome').addEventListener('click', keluarAdmin);
+
+  btnMasukAdmin.addEventListener('click', function () {
+    const username = admUsername.value.trim(), password = admPassword.value;
+    if (!username || !password) { pesanLoginAdmin.textContent = 'Isi username dan password admin.'; return; }
+    btnMasukAdmin.disabled = true;
+    pesanLoginAdmin.textContent = 'Memeriksa...';
+    admPassword.value = ''; // password tidak disimpan di mana pun
+    kirimPost({ aksi: 'login_admin_toko', token: hpAktif.token, username: username, password: password })
+      .then(function (d) {
+        btnMasukAdmin.disabled = false;
+        if (d.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return; }
+        if (d.status !== 'ok') { pesanLoginAdmin.textContent = d.pesan || 'Login gagal.'; return; }
+        sesiAdmin = d.sesi;
+        admUsername.value = '';
+        pesanLoginAdmin.textContent = '';
+        document.getElementById('admBadge').textContent = 'Admin ' + d.cabang;
+        document.getElementById('admSub').textContent = d.nama;
+        tampilLayar(layarAdmin);
+        mulaiDiamAdmin();
+      })
+      .catch(function () { btnMasukAdmin.disabled = false; pesanLoginAdmin.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; });
+  });
+
+  document.getElementById('btnAdminLogout').addEventListener('click', function () {
+    bukaDialog(
+      '<div class="dialog-judul">Log out?</div><div class="dialog-sub">' + escHtml(document.getElementById('admSub').textContent) + ' · ' + escHtml(document.getElementById('admBadge').textContent) + '</div>' +
+      '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Log out</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', keluarAdmin);
+  });
+
+  // ---- Mulai: sesi owner = beranda owner; token HP toko = layar utama; kalau tidak = pilih jenis HP ----
   hpAktif = bacaHp();
-  if (hpAktif) {
+  sesiOwner = bacaSesiOwner();
+  if (sesiOwner) {
+    tampilLayar(layarOwner);
+    muatBerandaOwner();
+  } else if (hpAktif) {
     tampilkanLabelCabang();
     tampilLayar(layarUtama);
     muatDaftarKaryawan(); // sekaligus memeriksa token dan mengisi info shift di tombol
@@ -1141,6 +1612,10 @@
   window.addEventListener('popstate', function () {
     history.pushState({ absen: 1 }, '');
     if (wajib || popup.classList.contains('tampil')) { return; }
+    if (dialog.classList.contains('tampil')) { tutupDialog(); return; }
+    if (adminAktifDiLayar()) { keluarAdmin(); return; }
+    if (layarLoginOwner.classList.contains('aktif')) { kosongkanLoginOwner(); tampilLayar(layarJenis); return; }
+    if (layarPassword.classList.contains('aktif')) { document.getElementById('btnKembaliPassword').click(); return; }
     if (layarPilihNama.classList.contains('aktif')) { kembaliKeLayarUtama(); }
     else if (layarDaftarHp.classList.contains('aktif')) { kosongkanFormDaftar(); tampilLayar(layarJenis); }
   });

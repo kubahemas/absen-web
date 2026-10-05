@@ -92,8 +92,17 @@ function doPost(e) {
     return prosesDaftarHpToko(data);
   }
 
+  // Aksi owner dan logout memakai tiket sesi login (bukan token HP toko).
+  if (data.aksi === 'login_owner') { return prosesLoginOwner(data); }
+  if (data.aksi === 'atur_password_owner') { return prosesAturPasswordOwner(data); }
+  if (data.aksi === 'owner_beranda') { return prosesOwnerBeranda(data.sesi); }
+  if (data.aksi === 'owner_nonaktifkan_hp') { return prosesOwnerNonaktifkanHp(data.sesi, data.id_hp); }
+  if (data.aksi === 'owner_keluarkan_semua') { return prosesOwnerKeluarkanSemua(data.sesi); }
+  if (data.aksi === 'owner_ganti_password') { return prosesOwnerGantiPassword(data.sesi, data.lama, data.baru); }
+  if (data.aksi === 'logout') { return prosesLogout(data.sesi); }
+
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
-  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang'];
+  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
     const hp = validasiTokenHp(data.token);
     if (!hp) {
@@ -101,6 +110,7 @@ function doPost(e) {
     }
     if (data.aksi === 'daftar_karyawan') { return prosesDaftarKaryawan(hp); }
     if (data.aksi === 'tiket_waktu') { return prosesTiketWaktu(data.jenis, hp); }
+    if (data.aksi === 'login_admin_toko') { return prosesLoginAdminToko(data, hp); }
     if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp, data.tiket); }
     if (data.aksi === 'absen_pulang') { return prosesAbsenPulang(data.id, data.pin, data.jenis, hp, data.tiket); }
     if (data.aksi === 'simpan_pulang') { return prosesSimpanPulang(data.id, data.kode_pending, data.keterangan, hp); }
@@ -339,8 +349,8 @@ function prosesSimpanAlasan(id, kode, alasan, hp) {
  * Token asli (acak, 3 UUID v4 digabung = lebih dari 128 bit) dibuat di server,
  * dikirim ke HP sekali saat pendaftaran, TIDAK pernah disimpan di sheet/log.
  * Yang disimpan hanya hash-nya di akun.pw_hash baris role PERANGKAT.
- * Hasil validasi di-cache 10 menit (kunci = hash token), jadi menghapus baris
- * atau mengubah aktif jadi FALSE baru berlaku maksimal 10 menit kemudian.
+ * Hasil validasi di-cache 60 detik (kunci = hash token), jadi menghapus baris
+ * atau mengubah aktif jadi FALSE baru berlaku maksimal 60 detik kemudian (kecuali lewat tombol Nonaktifkan owner, yang menghapus cache langsung).
  */
 var GARAM_TOKEN_HP = 'TOKEN_HP';
 
@@ -364,7 +374,7 @@ function validasiTokenHp(token) {
   });
   if (!baris) { return null; }
   const hp = { id: baris.id, nama: baris.nama, cabang: baris.cabang };
-  cache.put(kunci, JSON.stringify(hp), 600);
+  cache.put(kunci, JSON.stringify(hp), 60);
   return hp;
 }
 
@@ -958,11 +968,465 @@ function tesServer() {
   const hl2 = tl2.ok ? tentukanStatusPulang(waktuDariMs(tl2.t).detik, s1, 'PULANG_LEMBUR', true, false) : null;
   ujiBebas('lembur: tiket 16:36:05 = diterima, tingkat 1, jam pulang 16:36', tl2.ok && hl2.ok && hl2.tingkat === 1 && waktuDariMs(tl2.t).jam === '16:36', JSON.stringify(hl2));
 
-  const ringkas = (gagal === 0 ? 'SEMUA LULUS' : gagal + ' SKENARIO GAGAL') + ' (' + baris.length + ' skenario)';
+  // ---- Owner: password, jalur pw_hash kosong, penahanan 15 menit, sesi 7 hari, keluarkan semua ----
+  ujiBebas('password lemah ditolak: terlalu pendek (Abc1234)', !periksaKekuatanPassword('Abc1234', 'owner').ok);
+  ujiBebas('password lemah ditolak: hanya huruf (abcdefgh)', !periksaKekuatanPassword('abcdefgh', 'owner').ok);
+  ujiBebas('password lemah ditolak: hanya angka (12345678)', !periksaKekuatanPassword('12345678', 'owner').ok);
+  ujiBebas('password lemah ditolak: 123456', !periksaKekuatanPassword('123456', 'owner').ok);
+  ujiBebas('password lemah ditolak: sama dengan username (owner123 vs owner123)', !periksaKekuatanPassword('owner123', 'owner123').ok);
+  ujiBebas('password lemah ditolak: sama dengan password lama', !periksaKekuatanPassword('KubahEmas2026', 'owner', 'KubahEmas2026').ok);
+  ujiBebas('password valid diterima (KubahEmas2026)', periksaKekuatanPassword('KubahEmas2026', 'owner', 'lama12345').ok);
+
+  const ownerKosong = { role: 'OWNER', aktif: true, pw_hash: '', ganti_pw: true };
+  ujiBebas('jalur pw_hash kosong: OWNER diterima', jalurPasswordAwal(ownerKosong).boleh === true);
+  ujiBebas('jalur pw_hash kosong: role ADMIN ditolak', jalurPasswordAwal({ role: 'ADMIN', aktif: true, pw_hash: '', ganti_pw: true }).boleh === false);
+  ujiBebas('jalur pw_hash kosong: role KARYAWAN ditolak', jalurPasswordAwal({ role: 'KARYAWAN', aktif: true, pw_hash: '', ganti_pw: true }).boleh === false);
+  ujiBebas('jalur pw_hash kosong: OWNER yang pw_hash-nya sudah terisi ditolak', jalurPasswordAwal({ role: 'OWNER', aktif: true, pw_hash: 'abc123', ganti_pw: true }).boleh === false);
+  ujiBebas('jalur pw_hash kosong: OWNER dengan ganti_pw FALSE ditolak', jalurPasswordAwal({ role: 'OWNER', aktif: true, pw_hash: '', ganti_pw: false }).boleh === false);
+  ujiBebas('jalur pw_hash kosong: OWNER tidak aktif ditolak', jalurPasswordAwal({ role: 'OWNER', aktif: false, pw_hash: '', ganti_pw: true }).boleh === false);
+  ujiBebas('jalur pw_hash kosong: akun tidak ada ditolak', jalurPasswordAwal(null).boleh === false);
+
+  const t0 = epoch('08:00:00');
+  let k4 = keputusanSalahPassword(3, t0);
+  ujiBebas('salah ke-4 belum ditahan', k4.salahBaru === 4 && k4.tahanSampai === null);
+  const k5 = keputusanSalahPassword(4, t0);
+  ujiBebas('salah ke-5 ditahan 15 menit', k5.salahBaru === 5 && k5.tahanSampai === t0 + 15 * 60000);
+  ujiBebas('masih ditahan di menit ke-14:59', masihDitahan(k5.tahanSampai, t0 + 14 * 60000 + 59000) === true);
+  ujiBebas('bebas lagi setelah 15 menit (bukan terkunci permanen)', masihDitahan(k5.tahanSampai, t0 + 15 * 60000 + 1000) === false);
+
+  const kedal = hitungKedaluwarsa(t0, 7);
+  ujiBebas('sesi 7 hari: masih berlaku di hari ke-6 23:00', sesiMasihBerlaku(kedal, t0 + 6 * 86400000 + 23 * 3600000) === true);
+  ujiBebas('sesi 7 hari: kedaluwarsa tepat setelah 7 hari', sesiMasihBerlaku(kedal, t0 + 7 * 86400000 + 60000) === false);
+
+  const sesiUji = [
+    { id_sesi: 'A', akun: 'OWN01', aktif: true }, { id_sesi: 'B', akun: 'OWN01', aktif: true },
+    { id_sesi: 'C', akun: 'OWN01', aktif: false }, { id_sesi: 'D', akun: 'K001', aktif: true }
+  ];
+  const semuaDicabut = cabutSesiPada(sesiUji, 'OWN01', '');
+  ujiBebas('keluarkan semua perangkat: semua sesi OWN01 nonaktif, akun lain tidak tersentuh',
+    semuaDicabut.filter(function (s) { return s.akun === 'OWN01' && s.aktif; }).length === 0 &&
+    semuaDicabut.filter(function (s) { return s.id_sesi === 'D'; })[0].aktif === true);
+  const kecualiB = cabutSesiPada(sesiUji, 'OWN01', 'B');
+  ujiBebas('ganti password: sesi lain dicabut, sesi perangkat ini (B) tetap aktif',
+    kecualiB.filter(function (s) { return s.id_sesi === 'A'; })[0].aktif === false && kecualiB.filter(function (s) { return s.id_sesi === 'B'; })[0].aktif === true);
+  ujiBebas('label perangkat dibersihkan dari karakter berbahaya', bersihkanLabel('HP|Samsung\n<A15>') === 'HP Samsung <A15>' && bersihkanLabel('') === 'Perangkat');
+
+  const jumlahSkenario = baris.length;
+  baris.push('');
+  baris.push('TES MANUAL (butuh menulis ke sheet, jalankan sendiri di aplikasi):');
+  baris.push('  - Login pertama owner: isi username "owner" saja, aplikasi minta password baru, lalu masuk ke beranda owner');
+  baris.push('  - sheet akun baris OWN01: pw_hash terisi dan ganti_pw jadi FALSE; sheet sesi bertambah 1 baris (aktif TRUE, kedaluwarsa 7 hari)');
+  baris.push('  - Login owner dari perangkat/browser baru: sheet log ada baris LOGIN_PERANGKAT_BARU dan muncul di Perlu perhatian');
+  baris.push('  - Daftarkan HP toko baru: muncul di Perlu perhatian owner (HP toko baru, oleh admin, jam, jarak)');
+  baris.push('  - Tombol Nonaktifkan: kolom aktif HP jadi FALSE, log NONAKTIFKAN_HP_TOKO, HP itu langsung ditolak (HP kembali ke layar "HP ini belum terdaftar")');
+  baris.push('  - Keluarkan semua perangkat: semua baris sesi OWN01 jadi aktif FALSE, perangkat lain diminta login lagi');
+  baris.push('  - Salah password owner 5x: pesan "ditahan 15 menit", log TAHAN_LOGIN_OWNER; sesudah 15 menit bisa login lagi');
+  baris.push('  - Masuk sebagai Admin di HP toko: keluar sendiri setelah 2 menit tanpa sentuhan dan saat kembali ke layar absen');
+
+  const ringkas = (gagal === 0 ? 'SEMUA LULUS' : gagal + ' SKENARIO GAGAL') + ' (' + jumlahSkenario + ' skenario)';
   const teks = baris.join('\n') + '\n\n' + ringkas;
   Logger.log(teks);
   try { SpreadsheetApp.getUi().alert(ringkas + '\n\nRincian ada di Log eksekusi.'); } catch (e) { /* tanpa jendela pesan */ }
   return teks;
+}
+
+/**
+ * ---- Sesi login (sheet sesi) dan akun owner / admin HP toko ----
+ * Sesi = tiket masuk acak (3 UUID); yang disimpan di sheet `sesi` hanya hash-nya
+ * (garam 'SESI' + KODE_RAHASIA). Password TIDAK pernah disimpan di perangkat.
+ * Owner: sesi 7 hari (pengaturan UMUM sesi_owner_hari), tidak ada batas jumlah perangkat,
+ * salah password 5x = login owner ditahan 15 menit, bukan terkunci permanen.
+ * Admin di HP toko: sesi pendek (SESI_ADMIN_TOKO_MENIT); aturan 2 menit tanpa sentuhan
+ * dijalankan di halaman HP toko.
+ * Pemulihan owner lupa password: kosongkan pw_hash dan set ganti_pw = TRUE di sheet akun.
+ */
+var GARAM_SESI = 'SESI';
+var SESI_ADMIN_TOKO_MENIT = 10;
+var TAHAN_LOGIN_OWNER_MENIT = 15;
+var PESAN_SESI_HABIS = 'Sesi berakhir, silakan login lagi';
+
+/** ---- Fungsi murni (dites oleh tesServer, tanpa sheet) ---- */
+
+/** Password baru: minimal 8 karakter, ada huruf dan angka, bukan 123456, bukan username, bukan sama dengan password lama. */
+function periksaKekuatanPassword(pw, username, lama) {
+  pw = String(pw || '');
+  if (pw.length < 8) { return { ok: false, pesan: 'Password minimal 8 karakter' }; }
+  if (pw.length > 100) { return { ok: false, pesan: 'Password terlalu panjang' }; }
+  if (!/[A-Za-z]/.test(pw) || !/[0-9]/.test(pw)) { return { ok: false, pesan: 'Password harus berisi huruf dan angka' }; }
+  if (pw === '123456') { return { ok: false, pesan: 'Password terlalu mudah ditebak' }; }
+  if (username && pw.toLowerCase() === String(username).trim().toLowerCase()) { return { ok: false, pesan: 'Password tidak boleh sama dengan username' }; }
+  if (lama !== undefined && lama !== null && pw === String(lama)) { return { ok: false, pesan: 'Password baru tidak boleh sama dengan password lama' }; }
+  return { ok: true };
+}
+
+/** Jalur "pw_hash kosong" HANYA untuk OWNER aktif dengan ganti_pw TRUE dan pw_hash kosong. */
+function jalurPasswordAwal(akun) {
+  if (!akun || akun.role !== 'OWNER') { return { boleh: false, pesan: 'Jalur ini hanya untuk owner' }; }
+  if (akun.aktif !== true) { return { boleh: false, pesan: 'Akun tidak aktif' }; }
+  if (String(akun.pw_hash) !== '') { return { boleh: false, pesan: 'Password sudah terisi' }; }
+  if (akun.ganti_pw !== true) { return { boleh: false, pesan: 'Akun tidak dalam mode atur password' }; }
+  return { boleh: true };
+}
+
+/** Hitung salah password owner: 5x berturut-turut = ditahan 15 menit (bukan terkunci permanen). */
+function keputusanSalahPassword(salahSebelumnya, sekarangMs) {
+  const salahBaru = salahSebelumnya + 1;
+  return { salahBaru: salahBaru, tahanSampai: salahBaru >= 5 ? sekarangMs + TAHAN_LOGIN_OWNER_MENIT * 60000 : null };
+}
+
+function masihDitahan(tahanSampaiMs, sekarangMs) {
+  return !!tahanSampaiMs && tahanSampaiMs > sekarangMs;
+}
+
+function hitungKedaluwarsa(sekarangMs, hari) { return sekarangMs + hari * 24 * 3600000; }
+
+function sesiMasihBerlaku(kedaluwarsaMs, sekarangMs) { return kedaluwarsaMs > sekarangMs; }
+
+/** Kembalikan daftar sesi dengan semua sesi milik akunId dicabut (aktif=false), kecuali kecualiIdSesi. */
+function cabutSesiPada(daftar, akunId, kecualiIdSesi) {
+  return daftar.map(function (s) {
+    const dicabut = String(s.akun) === String(akunId) && s.id_sesi !== kecualiIdSesi;
+    return { id_sesi: s.id_sesi, akun: s.akun, aktif: dicabut ? false : s.aktif };
+  });
+}
+
+/** Rapikan label perangkat dari client: tanpa '|' dan karakter kontrol, maksimal 60 karakter. */
+function bersihkanLabel(teks) {
+  return String(teks || '').replace(/[|\u0000-\u001f]/g, ' ').trim().slice(0, 60) || 'Perangkat';
+}
+
+/** ---- Akses sheet sesi ---- */
+
+function bacaSesi() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss.getSheetByName('sesi')) {
+    // Sheet sesi ada di rancangan (setup_spreadsheet.gs); dibuat di sini kalau spreadsheet lama belum punya.
+    const s = ss.insertSheet('sesi');
+    s.getRange(1, 1, 1, 8).setValues([['id_sesi', 'akun', 'perangkat', 'token_hash', 'dibuat', 'terakhir_aktif', 'kedaluwarsa', 'aktif']]);
+    s.setFrozenRows(1);
+  }
+  return bacaSheet('sesi');
+}
+
+function hashSesi(token) {
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  return hashDenganGaram(String(token), GARAM_SESI, kodeRahasia);
+}
+
+function teksWaktu(ms) { return Utilities.formatDate(new Date(ms), ZONA_ABSEN, 'yyyy-MM-dd HH:mm'); }
+
+/** Sel tanggal+jam (Date atau teks 'yyyy-MM-dd HH:mm') jadi ms epoch. */
+function msDariSel(nilai) {
+  if (nilai instanceof Date) { return nilai.getTime(); }
+  const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(String(nilai));
+  return m ? Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4]), Number(m[5])) - 7 * 3600000 : 0;
+}
+
+function buatSesi(akunId, idPerangkat, labelPerangkat, menit) {
+  const token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+  const sesi = bacaSesi();
+  const sekarang = Date.now();
+  const kedaluwarsa = sekarang + menit * 60000;
+  const baris = {
+    id_sesi: 'S-' + Utilities.getUuid().replace(/-/g, '').slice(0, 12), akun: akunId,
+    perangkat: idPerangkat + '|' + labelPerangkat, token_hash: hashSesi(token),
+    dibuat: teksWaktu(sekarang), terakhir_aktif: teksWaktu(sekarang), kedaluwarsa: teksWaktu(kedaluwarsa), aktif: true
+  };
+  sesi.sheet.appendRow(sesi.header.map(function (n) { return baris[n]; }));
+  return { token: token, id_sesi: baris.id_sesi, kedaluwarsa: kedaluwarsa };
+}
+
+/** Kembalikan { sesi (bacaan sheet), baris, akun } kalau tiket sesi sah (dan role cocok), kalau tidak null. */
+function validasiSesi(token, role) {
+  if (!token || typeof token !== 'string' || token.length < 32 || token.length > 200) { return null; }
+  if (!PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA')) { return null; }
+  const hash = hashSesi(token);
+  const sesi = bacaSesi();
+  const baris = sesi.data.find(function (r) { return r.token_hash === hash && r.aktif === true; });
+  if (!baris) { return null; }
+  const sekarang = Date.now();
+  if (!sesiMasihBerlaku(msDariSel(baris.kedaluwarsa), sekarang)) {
+    perbaruiKolom(sesi, baris, { aktif: false });
+    return null;
+  }
+  const akun = bacaSheet('akun').data.find(function (r) { return String(r.id) === String(baris.akun) && r.aktif === true; });
+  if (!akun || (role && akun.role !== role)) { return null; }
+  if (sekarang - msDariSel(baris.terakhir_aktif) > 60000) {
+    perbaruiKolom(sesi, baris, { terakhir_aktif: teksWaktu(sekarang) });
+  }
+  return { sesi: sesi, baris: baris, akun: akun };
+}
+
+/** Cabut semua sesi aktif milik satu akun (kecuali satu sesi). Kembalikan jumlah yang dicabut. */
+function cabutSesiAkun(akunId, kecualiIdSesi) {
+  const sesi = bacaSesi();
+  let n = 0;
+  sesi.data.forEach(function (r) {
+    if (String(r.akun) === String(akunId) && r.aktif === true && r.id_sesi !== kecualiIdSesi) {
+      perbaruiKolom(sesi, r, { aktif: false });
+      n++;
+    }
+  });
+  return n;
+}
+
+function perangkatPernahDipakai(akunId, idPerangkat) {
+  return bacaSesi().data.some(function (r) {
+    return String(r.akun) === String(akunId) && String(r.perangkat).indexOf(idPerangkat + '|') === 0;
+  });
+}
+
+function labelDariPerangkat(teks) {
+  const i = String(teks).indexOf('|');
+  return i === -1 ? String(teks) : String(teks).slice(i + 1);
+}
+
+function responSesiHabis() {
+  return respon({ status: 'gagal', kode: 'SESI_TIDAK_VALID', pesan: PESAN_SESI_HABIS });
+}
+
+function bersihkanIdPerangkat(id) {
+  return /^[A-Za-z0-9]{8,32}$/.test(String(id || '')) ? String(id) : 'TAKDIKENAL';
+}
+
+/** Selesaikan login owner: buat sesi 7 hari, catat log kalau perangkat baru. */
+function selesaikanLoginOwner(owner, d) {
+  const idPerangkat = bersihkanIdPerangkat(d.id_perangkat);
+  const label = bersihkanLabel(d.label);
+  const baru = !perangkatPernahDipakai(owner.id, idPerangkat);
+  const sesi = buatSesi(owner.id, idPerangkat, label, ambilNilaiUmum('sesi_owner_hari', 7) * 24 * 60);
+  if (baru) {
+    tambahLog({ jenis: 'KEAMANAN', oleh: owner.id, cabang: '', aksi: 'LOGIN_PERANGKAT_BARU', target: label, id: idPerangkat });
+  }
+  return respon({ status: 'ok', sesi: sesi.token, kedaluwarsa: teksWaktu(sesi.kedaluwarsa), nama: owner.nama, id: owner.id });
+}
+
+/** Catat satu password salah milik owner; 5x berturut-turut = ditahan 15 menit. */
+function catatSalahOwner(akun, owner) {
+  const k = keputusanSalahPassword(Number(owner.salah_login) || 0, Date.now());
+  perbaruiKolom(akun, owner, { salah_login: k.salahBaru });
+  if (k.tahanSampai) {
+    PropertiesService.getScriptProperties().setProperty('tahan_' + owner.id, String(k.tahanSampai));
+    tambahLog({
+      jenis: 'KEAMANAN', oleh: owner.id, cabang: '', aksi: 'TAHAN_LOGIN_OWNER', target: 'akun', id: owner.id,
+      alasan: 'Password salah 5 kali, login ditahan ' + TAHAN_LOGIN_OWNER_MENIT + ' menit'
+    });
+  }
+  return k;
+}
+
+/** Cek penahanan login owner; kembalikan pesan kalau masih ditahan, atau '' kalau bebas (dan bersihkan penahanan lama). */
+function cekTahanOwner(akun, owner) {
+  const props = PropertiesService.getScriptProperties();
+  const tahan = Number(props.getProperty('tahan_' + owner.id) || 0);
+  const sekarang = Date.now();
+  if (masihDitahan(tahan, sekarang)) {
+    return 'Login owner ditahan sampai ' + Utilities.formatDate(new Date(tahan), ZONA_ABSEN, 'HH:mm') + ' karena salah password 5 kali';
+  }
+  if (tahan) {
+    props.deleteProperty('tahan_' + owner.id);
+    perbaruiKolom(akun, owner, { salah_login: 0 });
+  }
+  return '';
+}
+
+function cariOwner(usernameMentah) {
+  const username = String(usernameMentah || '').trim().toLowerCase();
+  if (!username) { return { akun: null, owner: null }; }
+  const akun = bacaSheet('akun');
+  const owner = akun.data.find(function (r) { return String(r.nama).trim().toLowerCase() === username && r.role === 'OWNER'; });
+  return { akun: akun, owner: owner || null };
+}
+
+/** Aksi login_owner. Jalur pw_hash kosong: balas perlu_password_baru (belum login). */
+function prosesLoginOwner(d) {
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  if (!kodeRahasia) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const pesanUmum = 'Username atau password salah';
+  const password = String(d.password || '');
+  if (password.length > 100) { return respon({ status: 'gagal', pesan: pesanUmum }); }
+
+  const c = cariOwner(d.username);
+  if (!c.owner || c.owner.aktif !== true) { return respon({ status: 'gagal', pesan: pesanUmum }); }
+  const owner = c.owner;
+
+  const tahan = cekTahanOwner(c.akun, owner);
+  if (tahan) { return respon({ status: 'gagal', kode: 'DITAHAN', pesan: tahan }); }
+
+  if (String(owner.pw_hash) === '') {
+    // Hanya owner dengan ganti_pw TRUE yang boleh mengatur password pertama kali.
+    return jalurPasswordAwal(owner).boleh ? respon({ status: 'ok', perlu_password_baru: true }) : respon({ status: 'gagal', pesan: pesanUmum });
+  }
+
+  if (hashDenganGaram(password, String(owner.id), kodeRahasia) !== owner.pw_hash) {
+    const k = catatSalahOwner(c.akun, owner);
+    if (k.tahanSampai) {
+      return respon({ status: 'gagal', kode: 'DITAHAN', pesan: 'Salah password 5 kali. Login owner ditahan ' + TAHAN_LOGIN_OWNER_MENIT + ' menit' });
+    }
+    return respon({ status: 'gagal', pesan: pesanUmum });
+  }
+
+  if (Number(owner.salah_login) !== 0) { perbaruiKolom(c.akun, owner, { salah_login: 0 }); }
+  return selesaikanLoginOwner(owner, d);
+}
+
+/** Aksi atur_password_owner: password pertama (atau pemulihan: pw_hash dikosongkan, ganti_pw TRUE). */
+function prosesAturPasswordOwner(d) {
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  if (!kodeRahasia) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const c = cariOwner(d.username);
+  const jalur = jalurPasswordAwal(c.owner);
+  if (!jalur.boleh) { return respon({ status: 'gagal', pesan: 'Tidak bisa mengatur password lewat jalur ini' }); }
+  const kuat = periksaKekuatanPassword(d.password_baru, c.owner.nama);
+  if (!kuat.ok) { return respon({ status: 'gagal', pesan: kuat.pesan }); }
+
+  const owner = c.owner;
+  perbaruiKolom(c.akun, owner, { pw_hash: hashDenganGaram(String(d.password_baru), String(owner.id), kodeRahasia), ganti_pw: false, salah_login: 0 });
+  PropertiesService.getScriptProperties().deleteProperty('tahan_' + owner.id);
+  cabutSesiAkun(owner.id, '');
+  tambahLog({ jenis: 'KEAMANAN', oleh: owner.id, cabang: '', aksi: 'ATUR_PASSWORD_OWNER', target: 'akun', id: owner.id, alasan: 'Password owner diatur (pertama kali atau pemulihan)' });
+  return selesaikanLoginOwner(owner, d);
+}
+
+/** Aksi owner_beranda: kartu Perlu perhatian, daftar HP toko, perangkat yang sedang login. */
+function prosesOwnerBeranda(sesiToken) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  const semuaAkun = bacaSheet('akun').data;
+  const namaDari = function (id) {
+    const a = semuaAkun.find(function (r) { return String(r.id) === String(id); });
+    return a ? a.nama : String(id);
+  };
+  const hpToko = semuaAkun
+    .filter(function (r) { return r.role === 'PERANGKAT'; })
+    .map(function (r) { return { id: r.id, nama: r.nama, cabang: r.cabang, aktif: r.aktif === true }; });
+
+  // Perlu perhatian: informasi saja (7 hari terakhir), terbaru di atas.
+  const batas = Date.now() - 7 * 24 * 3600000;
+  const perhatian = [];
+  bacaSheet('log').data.forEach(function (r) {
+    const ms = msDariSel(r.waktu);
+    if (ms < batas) { return; }
+    if (r.jenis === 'PERANGKAT' && r.aksi === 'DAFTAR_HP_TOKO') {
+      const m = /jarak ke toko (\d+) m/.exec(String(r.alasan));
+      perhatian.push({
+        ms: ms, tipe: 'HP_BARU', judul: 'HP toko baru: ' + r.id + ' (' + r.target + ')',
+        sub: 'Cabang ' + r.cabang + ' · oleh ' + namaDari(r.oleh) + ' · ' + teksWaktu(ms),
+        info: m ? m[1] + ' m dari toko' : ''
+      });
+    } else if (r.jenis === 'KEAMANAN' && r.aksi === 'LOGIN_PERANGKAT_BARU' && String(r.oleh) === String(s.akun.id)) {
+      perhatian.push({ ms: ms, tipe: 'LOGIN_BARU', judul: 'Login owner dari perangkat baru', sub: r.target + ' · ' + teksWaktu(ms), info: '' });
+    }
+  });
+  perhatian.sort(function (a, b) { return b.ms - a.ms; });
+
+  const sekarang = Date.now();
+  const perangkatAktif = bacaSesi().data
+    .filter(function (r) { return String(r.akun) === String(s.akun.id) && r.aktif === true && sesiMasihBerlaku(msDariSel(r.kedaluwarsa), sekarang); })
+    .map(function (r) {
+      return { label: labelDariPerangkat(r.perangkat), terakhir_aktif: teksWaktu(msDariSel(r.terakhir_aktif)), ini: r.id_sesi === s.baris.id_sesi };
+    });
+
+  return respon({
+    status: 'ok', nama: s.akun.nama, id: s.akun.id,
+    perhatian: perhatian.slice(0, 20), hp_toko: hpToko, perangkat_aktif: perangkatAktif
+  });
+}
+
+/** Aksi owner_nonaktifkan_hp: aktif=FALSE dan hapus cache validasi token supaya HP langsung ditolak. */
+function prosesOwnerNonaktifkanHp(sesiToken, idHp) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  const akun = bacaSheet('akun');
+  const hp = akun.data.find(function (r) { return r.role === 'PERANGKAT' && String(r.id) === String(idHp); });
+  if (!hp) { return respon({ status: 'gagal', pesan: 'HP toko tidak ditemukan' }); }
+  if (hp.aktif === true) {
+    perbaruiKolom(akun, hp, { aktif: false });
+    CacheService.getScriptCache().remove('hp_' + hp.pw_hash);
+    tambahLog({
+      jenis: 'PERANGKAT', oleh: s.akun.id, cabang: hp.cabang, aksi: 'NONAKTIFKAN_HP_TOKO',
+      target: hp.nama, id: hp.id, sebelum: 'aktif=TRUE', sesudah: 'aktif=FALSE'
+    });
+  }
+  return respon({ status: 'ok', pesan: 'HP toko dinonaktifkan' });
+}
+
+/** Aksi owner_keluarkan_semua: cabut semua sesi owner (termasuk perangkat ini). */
+function prosesOwnerKeluarkanSemua(sesiToken) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  const n = cabutSesiAkun(s.akun.id, '');
+  tambahLog({ jenis: 'KEAMANAN', oleh: s.akun.id, cabang: '', aksi: 'KELUARKAN_SEMUA_PERANGKAT', target: 'sesi', id: s.akun.id, alasan: n + ' sesi dicabut' });
+  return respon({ status: 'ok', jumlah: n });
+}
+
+/** Aksi owner_ganti_password: perangkat lain otomatis keluar. */
+function prosesOwnerGantiPassword(sesiToken, lama, baru) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  const akun = bacaSheet('akun');
+  const owner = akun.data.find(function (r) { return String(r.id) === String(s.akun.id); });
+
+  const tahan = cekTahanOwner(akun, owner);
+  if (tahan) { return respon({ status: 'gagal', kode: 'DITAHAN', pesan: tahan }); }
+  if (String(lama || '').length > 100 || hashDenganGaram(String(lama || ''), String(owner.id), kodeRahasia) !== owner.pw_hash) {
+    const k = catatSalahOwner(akun, owner);
+    return respon({ status: 'gagal', pesan: k.tahanSampai ? 'Salah password 5 kali. Login owner ditahan ' + TAHAN_LOGIN_OWNER_MENIT + ' menit' : 'Password lama salah' });
+  }
+  const kuat = periksaKekuatanPassword(baru, owner.nama, lama);
+  if (!kuat.ok) { return respon({ status: 'gagal', pesan: kuat.pesan }); }
+
+  perbaruiKolom(akun, owner, { pw_hash: hashDenganGaram(String(baru), String(owner.id), kodeRahasia), ganti_pw: false, salah_login: 0 });
+  const n = cabutSesiAkun(owner.id, s.baris.id_sesi);
+  tambahLog({ jenis: 'KEAMANAN', oleh: owner.id, cabang: '', aksi: 'GANTI_PASSWORD_OWNER', target: 'akun', id: owner.id, alasan: n + ' perangkat lain dikeluarkan' });
+  return respon({ status: 'ok', pesan: 'Password diganti' });
+}
+
+/** Aksi login_admin_toko (wajib token HP toko): verifikasi admin cabang HP ini, sesi pendek. */
+function prosesLoginAdminToko(d, hp) {
+  const pesanUmum = 'Username atau password salah, atau akun bukan admin';
+  const kodeRahasia = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  if (!kodeRahasia) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const username = String(d.username || '').trim().toLowerCase();
+  const password = String(d.password || '');
+  if (!username || !password || password.length > 100) { return respon({ status: 'gagal', pesan: pesanUmum }); }
+
+  const akun = bacaSheet('akun');
+  const admin = akun.data.find(function (r) { return String(r.nama).trim().toLowerCase() === username && r.role === 'ADMIN'; });
+  // Admin harus dari cabang HP toko ini; cabang dari server, bukan kiriman HP.
+  if (!admin || admin.cabang !== hp.cabang || admin.aktif !== true || admin.terkunci === true || admin.ganti_pw === true) {
+    return respon({ status: 'gagal', pesan: pesanUmum });
+  }
+  if (hashDenganGaram(password, String(admin.id), kodeRahasia) !== admin.pw_hash) {
+    const salahBaru = (Number(admin.salah_login) || 0) + 1;
+    if (salahBaru >= 5) {
+      perbaruiKolom(akun, admin, { salah_login: salahBaru, terkunci: true });
+      tambahLog({
+        jenis: 'KEAMANAN', oleh: admin.id, cabang: admin.cabang, aksi: 'KUNCI_AKUN', target: 'akun', id: admin.id,
+        sebelum: 'terkunci=FALSE', sesudah: 'terkunci=TRUE', alasan: 'Password salah 5 kali saat masuk admin di HP toko'
+      });
+    } else {
+      perbaruiKolom(akun, admin, { salah_login: salahBaru });
+    }
+    return respon({ status: 'gagal', pesan: pesanUmum });
+  }
+  if (Number(admin.salah_login) !== 0) { perbaruiKolom(akun, admin, { salah_login: 0 }); }
+
+  const sesi = buatSesi(admin.id, 'HPTOKO' + String(hp.id).replace(/[^A-Za-z0-9]/g, ''), 'HP toko ' + hp.id, SESI_ADMIN_TOKO_MENIT);
+  return respon({ status: 'ok', sesi: sesi.token, nama: admin.nama, panggilan: admin.panggilan, cabang: admin.cabang });
+}
+
+/** Aksi logout: cabut satu sesi (owner atau admin). Selalu "ok" supaya aman dipanggil berulang. */
+function prosesLogout(sesiToken) {
+  if (sesiToken && typeof sesiToken === 'string' && sesiToken.length >= 32 && sesiToken.length <= 200 &&
+      PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA')) {
+    const hash = hashSesi(sesiToken);
+    const sesi = bacaSesi();
+    const baris = sesi.data.find(function (r) { return r.token_hash === hash && r.aktif === true; });
+    if (baris) { perbaruiKolom(sesi, baris, { aktif: false }); }
+  }
+  return respon({ status: 'ok' });
 }
 
 var ZONA_ABSEN = 'Asia/Jakarta';
