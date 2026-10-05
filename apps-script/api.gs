@@ -90,6 +90,7 @@ function doPost(e) {
   if (data.aksi === 'karyawan_tambah') { return prosesKaryawanTambah(data); }
   if (data.aksi === 'karyawan_reset_pin') { return prosesKaryawanResetPin(data); }
   if (data.aksi === 'karyawan_nonaktif') { return prosesKaryawanNonaktif(data); }
+  if (data.aksi === 'karyawan_aktifkan') { return prosesKaryawanAktifkan(data); }
 
   // Aksi owner dan logout memakai tiket sesi login (bukan token HP toko).
   if (data.aksi === 'login_owner') { return prosesLoginOwner(data); }
@@ -1236,6 +1237,30 @@ function tesServer() {
   const cacheGalat = { d: {}, get: function (k) { return this.d[k] || null; }, put: function (k, v) { this.d[k] = v; } };
   ujiBebas('galat folder dicatat paling banyak sekali per jam', perluCatatGalatFolder(cacheGalat, t0) === true && perluCatatGalatFolder(cacheGalat, t0 + 30 * 60000) === false && perluCatatGalatFolder(cacheGalat, t0 + 61 * 60000) === true);
 
+  // ---- Karyawan: shift opsional dan aktifkan kembali ----
+  const dasar = { nama: 'Wulan Sari', panggilan: 'Wulan', mulai_kerja: '2026-10-01' };
+  const tanpaShift = validasiDataKaryawan(Object.assign({}, dasar, { shift: '' }), [1]);
+  ujiBebas('shift opsional: cabang bershift tunggal otomatis memakainya', tanpaShift.ok && tanpaShift.shift === '1', JSON.stringify(tanpaShift));
+  ujiBebas('shift opsional: cabang bershift banyak, tidak dipilih = shift pertama', validasiDataKaryawan(Object.assign({}, dasar, { shift: '' }), [2, 1]).shift === '2' && validasiDataKaryawan(Object.assign({}, dasar, { shift: undefined }), [1, 2]).shift === '1');
+  ujiBebas('shift opsional: dipilih eksplisit tetap dihormati dan shift ngawur tetap ditolak', validasiDataKaryawan(Object.assign({}, dasar, { shift: '2' }), [1, 2]).shift === '2' && !validasiDataKaryawan(Object.assign({}, dasar, { shift: '7' }), [1, 2]).ok);
+  ujiBebas('shift opsional: cabang tanpa shift sama sekali ditolak dengan pesan jelas', !validasiDataKaryawan(Object.assign({}, dasar, { shift: '' }), []).ok && validasiDataKaryawan(Object.assign({}, dasar, { shift: '' }), []).pesan.indexOf('shift') !== -1);
+  const rowsAktif = [
+    { id: 'K001', nama: 'Budi Santoso', role: 'KARYAWAN', cabang: 'Ngawi', aktif: false },
+    { id: 'K002', nama: 'Siti Rohmah', role: 'KARYAWAN', cabang: 'Ngawi', aktif: false },
+    { id: 'K009', nama: 'siti rohmah', role: 'KARYAWAN', cabang: 'Ngawi', aktif: true },
+    { id: 'K003', nama: 'Rina', role: 'KARYAWAN', cabang: 'Pusat', aktif: false },
+    { id: 'K004', nama: 'Dewi', role: 'ADMIN', cabang: 'Ngawi', aktif: false },
+    { id: 'OWN01', nama: 'owner', role: 'OWNER', cabang: '', aktif: false },
+    { id: 'K005', nama: 'Joko', role: 'KARYAWAN', cabang: 'Ngawi', aktif: true }
+  ];
+  const cari = function (id) { return rowsAktif.filter(function (r) { return r.id === id; })[0]; };
+  ujiBebas('aktifkan kembali: karyawan nonaktif cabang admin boleh (ID tetap sama)', bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', cari('K001')).boleh === true && cari('K001').id === 'K001');
+  ujiBebas('aktifkan kembali: nama kembar dengan karyawan AKTIF lain ditolak (tanpa beda huruf besar/kecil)', bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', cari('K002')).boleh === false && bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', cari('K002')).pesan.indexOf('nama lengkap') !== -1);
+  ujiBebas('aktifkan kembali: cabang lain ditolak', bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', cari('K003')).boleh === false);
+  ujiBebas('aktifkan kembali: role ADMIN/OWNER/PERANGKAT ditolak', bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', cari('K004')).boleh === false && bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', cari('OWN01')).boleh === false && bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', { id: 'HPT-NGW-01', role: 'PERANGKAT', cabang: 'Ngawi', aktif: false, nama: 'HP' }).boleh === false);
+  ujiBebas('aktifkan kembali: yang melakukan bukan ADMIN ditolak, target tidak ada ditolak', bolehAktifkanKembali(rowsAktif, 'KARYAWAN', 'Ngawi', cari('K001')).boleh === false && bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', undefined).boleh === false);
+  ujiBebas('aktifkan kembali: yang sudah aktif = tidak ada perubahan (idempoten)', bolehAktifkanKembali(rowsAktif, 'ADMIN', 'Ngawi', cari('K005')).sudahAktif === true);
+
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -1301,6 +1326,8 @@ function tesServer() {
   baris.push('  - Foto pulang/lembur: setelah keterangan diisi, foto_pulang berisi tautan; id_pulang berawalan P- (pulang) atau L- (lembur); revisi/ganti jadi lembur mengosongkan foto_pulang lalu mengisinya dengan foto baru');
   baris.push('  - Tambah karyawan di HP toko (admin): ID baru K + nomor terbesar + 1, cabang ikut admin, pin_hash terisi, pw_hash KOSONG, aktif TRUE; batalkan di layar PIN = tidak ada baris baru');
   baris.push('  - Tambah karyawan dengan nama yang sama dengan karyawan aktif (huruf besar/kecil beda): ditolak dengan pesan jelas');
+  baris.push('  - Aktifkan kembali karyawan nonaktif: saklar Tampilkan nonaktif -> tombol Aktifkan kembali; aktif jadi TRUE dengan ID sama, pin_hash/salah_login/terkunci tidak berubah, log AKTIFKAN_KARYAWAN; nama kembar dengan karyawan aktif ditolak');
+  baris.push('  - Form Tambah karyawan: cabang bershift tunggal menampilkan catatan shift otomatis (tanpa dropdown), dan form tetap bisa disimpan walau shift tidak dipilih');
   baris.push('  - Reset PIN: karyawan yang terkunci bisa absen lagi dengan PIN baru (terkunci FALSE, salah_login 0); Nonaktifkan: nama hilang dari layar pilih nama, baris tetap di sheet');
   baris.push('  - Karyawan, Reset PIN, Nonaktifkan tercatat di sheet log (TAMBAH_KARYAWAN, RESET_PIN, NONAKTIFKAN_KARYAWAN) tanpa PIN');
   baris.push('  - Menu owner/admin: ketuk di mana saja di luar kotak menu menutup menu (HP dan laptop), ketuk di dalam kotak tidak menutup');
@@ -2177,12 +2204,18 @@ function namaSudahDipakai(rows, nama) {
 /** Fungsi murni: validasi data karyawan baru. shiftValid = daftar nomor shift cabang itu. */
 function validasiDataKaryawan(d, shiftValid) {
   const bersih = function (t) { return String(t === undefined || t === null ? '' : t).trim(); };
-  const nama = bersih(d.nama), panggilan = bersih(d.panggilan), shift = bersih(d.shift), mulai = bersih(d.mulai_kerja);
+  const nama = bersih(d.nama), panggilan = bersih(d.panggilan), mulai = bersih(d.mulai_kerja);
+  let shift = bersih(d.shift);
   const aman = function (t) { return !/[\u0000-\u001f\u007f]/.test(t) && !/^[=+\-@]/.test(t); };
   if (!nama || nama.length > 60) { return { ok: false, pesan: 'Nama lengkap wajib diisi (maksimal 60 karakter)' }; }
   if (!aman(nama)) { return { ok: false, pesan: 'Nama tidak boleh diawali = + - atau @' }; }
   if (!panggilan || panggilan.length > 30) { return { ok: false, pesan: 'Nama panggilan wajib diisi (maksimal 30 karakter)' }; }
   if (!aman(panggilan)) { return { ok: false, pesan: 'Nama panggilan tidak boleh diawali = + - atau @' }; }
+  // Shift TIDAK wajib: kosong = shift pertama cabang itu (cabang bershift tunggal otomatis memakainya).
+  if (shift === '') {
+    if (!shiftValid.length) { return { ok: false, pesan: 'Belum ada shift untuk cabang ini di sheet shift' }; }
+    shift = String(shiftValid[0]);
+  }
   if (shiftValid.map(String).indexOf(shift) === -1) { return { ok: false, pesan: 'Shift tidak dikenal di cabang ini' }; }
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(mulai);
   const tgl = m ? new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]))) : null;
@@ -2280,6 +2313,33 @@ function prosesKaryawanResetPin(d) {
   if (target.aktif !== true) { return respon({ status: 'gagal', pesan: 'Karyawan sudah nonaktif' }); }
   perbaruiKolom(akun, target, perubahanResetPin(hashDenganGaram(d.pin, String(target.id), kodeRahasia)));
   tambahLog({ jenis: 'KARYAWAN', oleh: a.s.akun.id, cabang: target.cabang, aksi: 'RESET_PIN', target: target.nama, id: target.id, sebelum: 'salah_login/terkunci diperiksa', sesudah: 'salah_login=0; terkunci=FALSE' });
+  return respon({ status: 'ok', id: target.id, nama: target.nama });
+}
+
+/**
+ * Fungsi murni: boleh mengaktifkan kembali karyawan nonaktif? Hanya KARYAWAN di cabang admin, dan
+ * ditolak kalau sudah ada akun AKTIF lain dengan nama lengkap yang sama (tanpa beda huruf besar/kecil).
+ */
+function bolehAktifkanKembali(rows, roleAktor, cabangAktor, target) {
+  const izin = bolehKelolaKaryawan(roleAktor, cabangAktor, target);
+  if (!izin.boleh) { return izin; }
+  if (target.aktif === true) { return { boleh: true, sudahAktif: true }; }
+  if (namaSudahDipakai(rows, target.nama)) { return { boleh: false, pesan: 'Sudah ada karyawan aktif dengan nama lengkap yang sama' }; }
+  return { boleh: true, sudahAktif: false };
+}
+
+/** Aksi karyawan_aktifkan { token, sesi, id }: aktif=TRUE dengan ID yang sama (riwayat tetap menyambung); pin_hash, salah_login, terkunci TIDAK diubah. */
+function prosesKaryawanAktifkan(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const akun = bacaSheet('akun');
+  const target = akun.data.find(function (r) { return String(r.id) === String(d.id); });
+  const izin = bolehAktifkanKembali(akun.data, a.s.akun.role, a.s.akun.cabang, target);
+  if (!izin.boleh) { return respon({ status: 'gagal', pesan: izin.pesan }); }
+  if (!izin.sudahAktif) {
+    perbaruiKolom(akun, target, { aktif: true });
+    tambahLog({ jenis: 'KARYAWAN', oleh: a.s.akun.id, cabang: target.cabang, aksi: 'AKTIFKAN_KARYAWAN', target: target.nama, id: target.id, sebelum: 'aktif=FALSE', sesudah: 'aktif=TRUE' });
+  }
   return respon({ status: 'ok', id: target.id, nama: target.nama });
 }
 
@@ -2564,7 +2624,7 @@ function bacaShiftCabang(cabang) {
   for (let i = 1; i < nilai.length; i++) {
     const r = {};
     header.forEach(function (nama, idx) { r[nama] = nilai[i][idx]; });
-    if (r.cabang !== cabang) continue;
+    if (String(r.cabang).trim().toLowerCase() !== String(cabang).trim().toLowerCase()) continue;
     const toleransi = parseInt(r.toleransi, 10);
     hasil.push({
       no: r.no,

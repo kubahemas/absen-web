@@ -209,6 +209,8 @@
   #layarPinBaru { gap: 12px; padding-top: 0; }
   .btn-tambah-besar { height: 66px; flex-shrink: 0; border: 4px solid #5CC98A; border-radius: 26px; background: #1F8A4C; color: #FFFFFF; font-family: inherit; font-size: 18px; font-weight: 800; white-space: nowrap; }
   .btn-lanjut-pin { height: 72px; font-size: 15px; }
+  .btn-tambah-besar:disabled { opacity: 0.5; }
+  .btn-aktifkan { flex: 1; min-height: 40px; border: 2px solid #1F8A4C; border-radius: 999px; background: #E3F4EA; color: #15643A; font-family: inherit; font-size: 12px; font-weight: 800; padding: 0 12px; white-space: nowrap; }
   .btn-nonaktif-segera { flex: 1; min-height: 40px; border: 2px dashed #9A9A9A; border-radius: 999px; background: #F2EFE6; color: #8A8B8E; font-family: inherit; font-size: 12px; font-weight: 800; padding: 0 12px; white-space: nowrap; cursor: not-allowed; }
   #layarPinBaru .kotak-pin { gap: 10px; }
   #layarPinBaru .pesan-form { min-height: 18px; }
@@ -521,7 +523,7 @@
     <div class="isi-gulir">
       <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam" id="kryBadge">Admin</div></div>
       <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Karyawan</div><div class="s" id="kryNama">Memuat...</div></div></div>
-      <button type="button" class="btn-tambah-besar" id="btnTambahKaryawan">+ Tambah karyawan baru</button>
+      <button type="button" class="btn-tambah-besar" id="btnTambahKaryawan" disabled>+ Tambah karyawan baru</button>
       <label class="saklar-baris" for="saklarKaryawan"><span>Tampilkan nonaktif</span><input type="checkbox" id="saklarKaryawan" role="switch"><span class="saklar"></span></label>
       <div id="daftarKaryawanAdmin" style="display:flex;flex-direction:column;gap:10px"></div>
       <div class="catatan-kecil" id="kryPesan" style="color:#B91C1C"></div>
@@ -535,7 +537,8 @@
     <form class="kartu-putih" autocomplete="off" onsubmit="return false">
       <div class="bidang"><label for="kNama">Nama lengkap (sekaligus username)</label><input id="kNama" maxlength="60" autocomplete="off" autocapitalize="words"></div>
       <div class="bidang"><label for="kPanggilan">Nama panggilan (tampil di pop-up)</label><input id="kPanggilan" maxlength="30" autocomplete="off" autocapitalize="words"></div>
-      <div class="bidang"><label for="kShift">Shift (pola diatur setelah tersimpan)</label><select id="kShift"></select></div>
+      <div class="bidang" id="bidangShift"><label for="kShift">Shift (pola diatur setelah tersimpan)</label><select id="kShift"></select></div>
+      <div class="catatan-abu" id="catatShift" style="display:none"></div>
       <div class="bidang"><label for="kMulai">Tanggal mulai kerja</label><input id="kMulai" type="date"></div>
       <div class="catatan-abu">ID otomatis · Cabang mengikuti admin · Role: Karyawan<div style="font-size:12px;font-weight:600;color:#5A5B5E;margin-top:4px">Role Admin hanya bisa diberikan owner.</div></div>
     </form>
@@ -2134,11 +2137,13 @@
   }
 
   function muatKaryawan() {
+    document.getElementById('btnTambahKaryawan').disabled = true; // data shift harus termuat dulu (panggilan server butuh beberapa detik)
     kirimPost({ aksi: 'karyawan_daftar', token: hpAktif.token, sesi: sesiAdmin, tampilkan_nonaktif: saklarKaryawan.checked })
       .then(function (d) {
         if (adminGagalUmum(d)) { return; }
         if (d.status !== 'ok') { pesanKaryawan(d.pesan || 'Gagal memuat.'); return; }
         karyawanData = d;
+        document.getElementById('btnTambahKaryawan').disabled = false;
         document.getElementById('kryBadge').textContent = 'Admin ' + d.cabang;
         document.getElementById('kryNama').textContent = 'Cabang ' + d.cabang + ' · ' + d.jumlah_aktif + ' aktif';
         document.getElementById('daftarKaryawanAdmin').innerHTML = d.daftar.length ? d.daftar.map(function (k, i) {
@@ -2146,7 +2151,8 @@
             '<div class="hp-nama">' + escHtml(k.panggilan) + ' · Shift ' + escHtml(k.shift) + ' · ' + escHtml(k.id) + '</div></div>' +
             (k.aktif ? '' : '<div class="badge-nonaktif">Nonaktif</div>') + '</div>' +
             (k.aktif ? '<div class="aksi-hp"><button type="button" class="btn-biasa-garis" data-kry="reset" data-i="' + i + '">Reset PIN</button>' +
-              '<button type="button" class="btn-merah-garis" data-kry="nonaktif" data-i="' + i + '">Nonaktifkan</button></div>' : '') +
+              '<button type="button" class="btn-merah-garis" data-kry="nonaktif" data-i="' + i + '">Nonaktifkan</button></div>'
+              : '<div class="aksi-hp"><button type="button" class="btn-aktifkan" data-kry="aktifkan" data-i="' + i + '">Aktifkan kembali</button></div>') +
             '<div class="aksi-hp"><button type="button" class="btn-nonaktif-segera" disabled aria-disabled="true">Daftar wajah · Segera</button></div></div>';
         }).join('') : '<div class="hp-ket">Belum ada karyawan untuk ditampilkan.</div>';
       })
@@ -2164,6 +2170,17 @@
     if (!k) { return; }
     if (tombol.getAttribute('data-kry') === 'reset') {
       bukaPinBaru('RESET', { id: k.id, nama: k.nama });
+      return;
+    }
+    if (tombol.getAttribute('data-kry') === 'aktifkan') {
+      tombol.disabled = true;
+      kirimPost({ aksi: 'karyawan_aktifkan', token: hpAktif.token, sesi: sesiAdmin, id: k.id })
+        .then(function (d) {
+          if (adminGagalUmum(d)) { return; }
+          pesanKaryawan(d.status === 'ok' ? k.nama + ' diaktifkan kembali.' : (d.pesan || 'Gagal.'));
+          muatKaryawan(); // baris pindah ke daftar aktif
+        })
+        .catch(function () { tombol.disabled = false; pesanKaryawan('Tidak bisa terhubung ke server.'); });
       return;
     }
     bukaDialog(
@@ -2199,10 +2216,18 @@
 
   document.getElementById('btnTambahKaryawan').addEventListener('click', function () {
     kNama.value = ''; kPanggilan.value = ''; kMulai.value = hariIniIso(); pesanTambahKaryawan.textContent = '';
-    const shifts = karyawanData ? karyawanData.daftar_shift : [];
+    if (!karyawanData) { pesanKaryawan('Data belum termuat, tunggu sebentar lalu ketuk lagi.'); return; }
+    const shifts = karyawanData.daftar_shift || [];
+    const teksShift = function (s) { return s.nama + ' (' + s.masuk + ' – ' + s.pulang + ')'; };
     kShift.innerHTML = shifts.map(function (s) {
-      return '<option value="' + escHtml(s.no) + '">' + escHtml(s.nama) + ' (' + escHtml(s.masuk) + ' – ' + escHtml(s.pulang) + ')</option>';
+      return '<option value="' + escHtml(s.no) + '">' + escHtml(teksShift(s)) + '</option>';
     }).join('');
+    // Shift tidak wajib: satu shift = otomatis (tanpa dropdown); lebih dari satu = dropdown, shift pertama bawaan.
+    const catat = document.getElementById('catatShift');
+    document.getElementById('bidangShift').style.display = shifts.length > 1 ? '' : 'none';
+    catat.style.display = shifts.length > 1 ? 'none' : '';
+    catat.textContent = shifts.length === 1 ? 'Shift otomatis: ' + teksShift(shifts[0]) : 'Belum ada shift untuk cabang ini di sheet shift.';
+    document.getElementById('btnLanjutPin').disabled = shifts.length === 0;
     tampilLayar(layarTambahKaryawan);
   });
   document.getElementById('btnKembaliTambah').addEventListener('click', function () { tampilLayar(layarKaryawan); });
@@ -2210,7 +2235,6 @@
   document.getElementById('btnLanjutPin').addEventListener('click', function () {
     const data = { nama: kNama.value.trim(), panggilan: kPanggilan.value.trim(), shift: kShift.value, mulai_kerja: kMulai.value };
     if (!data.nama || !data.panggilan) { pesanTambahKaryawan.textContent = 'Isi nama lengkap dan nama panggilan.'; return; }
-    if (!data.shift) { pesanTambahKaryawan.textContent = 'Pilih shift.'; return; }
     if (!data.mulai_kerja) { pesanTambahKaryawan.textContent = 'Isi tanggal mulai kerja.'; return; }
     pesanTambahKaryawan.textContent = '';
     bukaPinBaru('TAMBAH', data);
