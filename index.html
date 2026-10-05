@@ -202,6 +202,16 @@
   .isian-nama { height: 46px; border: 2px solid #333438; border-radius: 12px; background: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 700; color: #141111; padding: 0 12px; width: 100%; }
   .menu-lapis { position: fixed; inset: 0; height: 100dvh; display: none; z-index: 25; }
   .menu-lapis.tampil { display: block; }
+  /* lapisan latar menutupi SELURUH layar; wadah tidak menangkap ketukan, hanya kotak menu */
+  .menu-wadah { pointer-events: none; }
+  .menu-kartu { pointer-events: auto; }
+  #layarKaryawan, #layarTambahKaryawan { padding: 16px 18px; gap: 12px; }
+  #layarPinBaru { gap: 12px; padding-top: 0; }
+  .btn-tambah-besar { height: 66px; flex-shrink: 0; border: 4px solid #5CC98A; border-radius: 26px; background: #1F8A4C; color: #FFFFFF; font-family: inherit; font-size: 18px; font-weight: 800; white-space: nowrap; }
+  .btn-lanjut-pin { height: 72px; font-size: 15px; }
+  .btn-nonaktif-segera { flex: 1; min-height: 40px; border: 2px dashed #9A9A9A; border-radius: 999px; background: #F2EFE6; color: #8A8B8E; font-family: inherit; font-size: 12px; font-weight: 800; padding: 0 12px; white-space: nowrap; cursor: not-allowed; }
+  #layarPinBaru .kotak-pin { gap: 10px; }
+  #layarPinBaru .pesan-form { min-height: 18px; }
   .menu-kartu button.tutup { min-height: 44px; border-bottom: none; border-top: 1px solid #EEEAE0; font-weight: 600; color: #5A5B5E; justify-content: center; }
   .btn-centang { width: 40px; height: 40px; flex-shrink: 0; border: 2px solid #141111; border-radius: 50%; background: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 0; }
   .btn-centang:disabled { opacity: 0.4; }
@@ -504,6 +514,55 @@
     </div>
   </div>
 
+  <!-- Karyawan (admin di HP toko; disalin dari mockup 18 Admin - Daftar karyawan) -->
+  <div id="layarKaryawan" class="layar">
+    <div class="isi-gulir">
+      <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam" id="kryBadge">Admin</div></div>
+      <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Karyawan</div><div class="s" id="kryNama">Memuat...</div></div></div>
+      <button type="button" class="btn-tambah-besar" id="btnTambahKaryawan">+ Tambah karyawan baru</button>
+      <label class="saklar-baris" for="saklarKaryawan"><span>Tampilkan nonaktif</span><input type="checkbox" id="saklarKaryawan" role="switch"><span class="saklar"></span></label>
+      <div id="daftarKaryawanAdmin" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div class="catatan-kecil" id="kryPesan" style="color:#B91C1C"></div>
+    </div>
+    <div class="bar-bawah"><button type="button" class="btn-garis" id="btnKembaliKaryawan">Kembali</button></div>
+  </div>
+
+  <!-- Tambah karyawan (disalin dari mockup 19 Karyawan baru - data) -->
+  <div id="layarTambahKaryawan" class="layar">
+    <div class="judul-blok"><div class="garis"></div><div><div class="h">Karyawan baru</div><div class="s">Isi oleh admin</div></div></div>
+    <form class="kartu-putih" autocomplete="off" onsubmit="return false">
+      <div class="bidang"><label for="kNama">Nama lengkap (sekaligus username)</label><input id="kNama" maxlength="60" autocomplete="off" autocapitalize="words"></div>
+      <div class="bidang"><label for="kPanggilan">Nama panggilan (tampil di pop-up)</label><input id="kPanggilan" maxlength="30" autocomplete="off" autocapitalize="words"></div>
+      <div class="bidang"><label for="kShift">Shift (pola diatur setelah tersimpan)</label><select id="kShift"></select></div>
+      <div class="bidang"><label for="kMulai">Tanggal mulai kerja</label><input id="kMulai" type="date"></div>
+      <div class="catatan-abu">ID otomatis · Cabang mengikuti admin · Role: Karyawan<div style="font-size:12px;font-weight:600;color:#5A5B5E;margin-top:4px">Role Admin hanya bisa diberikan owner.</div></div>
+    </form>
+    <div class="pesan-form" id="pesanTambahKaryawan"></div>
+    <div style="flex-grow:1"></div>
+    <div class="bar-bawah">
+      <button type="button" class="btn-kembali" id="btnKembaliTambah" aria-label="Kembali">‹</button>
+      <button type="button" class="btn-utama btn-lanjut-pin" id="btnLanjutPin">Lanjut: serahkan HP ke karyawan</button>
+    </div>
+  </div>
+
+  <!-- Karyawan mengetik PIN dua kali (admin tidak melihat PIN) -->
+  <div id="layarPinBaru" class="layar">
+    <div class="judul-blok" style="padding:16px 18px 0"><div class="garis"></div><div><div class="h" id="pinBaruJudul">Halo</div><div class="s" id="pinBaruSub"></div></div></div>
+    <div class="kotak-pin">
+      <div class="pin-judul" id="pinBaruLangkah">Buat PIN 4 digit</div>
+      <div class="pin-ket" id="pinBaruKet">Admin tidak melihat PIN ini. Ketik dua kali.</div>
+      <div class="pin-titik" id="pinBaruTitik"><div></div><div></div><div></div><div></div></div>
+      <div class="pesan-form" id="pinBaruPesan"></div>
+      <div class="keypad" id="pinBaruKeypad">
+        <button type="button" data-d="1">1</button><button type="button" data-d="2">2</button><button type="button" data-d="3">3</button>
+        <button type="button" data-d="4">4</button><button type="button" data-d="5">5</button><button type="button" data-d="6">6</button>
+        <button type="button" data-d="7">7</button><button type="button" data-d="8">8</button><button type="button" data-d="9">9</button>
+        <button type="button" class="kosong" id="pinBaruBatal">Batal</button><button type="button" data-d="0">0</button><button type="button" id="pinBaruHapus" aria-label="Hapus angka">⌫</button>
+      </div>
+      <div class="pin-ket" id="pinBaruFoto">Foto wajah diambil saat absen sebagai bukti kehadiran dan disimpan 2 bulan.</div>
+    </div>
+  </div>
+
   <div id="layarUtama" class="layar">
     <div class="baris-atas">
       <img src="assets/logo.png" alt="Kubah Emas Indonesia">
@@ -594,6 +653,7 @@
 <div id="menuAdmin" class="menu-lapis" role="menu">
   <div class="menu-latar" id="menuLatarAdmin"></div>
   <div class="menu-wadah"><div class="menu-kartu">
+    <button type="button" id="btnMenuKaryawan" role="menuitem">Karyawan</button>
     <button type="button" id="btnMenuUbahNama" role="menuitem">Ubah nama HP ini</button>
     <button type="button" id="btnMenuAdminLogout" class="keluar" role="menuitem">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg><span>Log out</span>
@@ -1741,6 +1801,10 @@
   menuAdmin.querySelector('.menu-kartu').addEventListener('click', function (e) { if (e.target.closest('button')) { tutupMenuAdmin(); } });
   document.getElementById('btnTutupMenuAdmin').addEventListener('click', tutupMenuAdmin);
 
+  // Ketuk di MANA SAJA di lapisan latar (di luar kotak menu) menutup menu; ketuk di dalam kotak tidak menutup.
+  menuOwner.addEventListener('click', function (e) { if (!e.target.closest('.menu-kartu')) { tutupMenuOwner(); } });
+  menuAdmin.addEventListener('click', function (e) { if (!e.target.closest('.menu-kartu')) { tutupMenuAdmin(); } });
+
   // Tombol Esc (laptop): tutup kotak dialog dulu, kalau tidak ada tutup menu yang terbuka.
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') { return; }
@@ -1895,7 +1959,9 @@
   const pesanLoginAdmin = document.getElementById('pesanLoginAdmin');
   const btnMasukAdmin = document.getElementById('btnMasukAdmin');
 
-  function adminAktifDiLayar() { return layarLoginAdmin.classList.contains('aktif') || layarAdmin.classList.contains('aktif'); }
+  function adminAktifDiLayar() {
+    return [layarLoginAdmin, layarAdmin, layarKaryawan, layarTambahKaryawan, layarPinBaru].some(function (l) { return l.classList.contains('aktif'); });
+  }
   function mulaiDiamAdmin() {
     clearTimeout(timerDiamAdmin);
     timerDiamAdmin = setTimeout(function () { keluarAdmin(); }, BATAS_DIAM_ADMIN_MS);
@@ -1909,6 +1975,7 @@
   function bersihkanAdmin() {
     clearTimeout(timerDiamAdmin);
     tutupMenuAdmin();
+    resetPinBaru(); karyawanData = null;
     const t = sesiAdmin;
     sesiAdmin = null;
     admUsername.value = ''; admPassword.value = ''; pesanLoginAdmin.textContent = ''; btnMasukAdmin.disabled = false;
@@ -1949,6 +2016,201 @@
         mulaiDiamAdmin();
       })
       .catch(function () { btnMasukAdmin.disabled = false; pesanLoginAdmin.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; });
+  });
+
+  // ---- Karyawan (admin di HP toko): daftar, tambah, reset PIN, nonaktifkan ----
+  const layarKaryawan = document.getElementById('layarKaryawan');
+  const layarTambahKaryawan = document.getElementById('layarTambahKaryawan');
+  const layarPinBaru = document.getElementById('layarPinBaru');
+  const saklarKaryawan = document.getElementById('saklarKaryawan');
+  let karyawanData = null;   // balasan karyawan_daftar
+  let pinBaruMode = '';      // 'TAMBAH' | 'RESET'
+  let pinBaruData = null;    // data karyawan baru (TAMBAH) atau { id, nama } (RESET); hanya di memori
+  let pinBaruLangkah = 1;
+  let pinBaruPertama = '';
+  let pinBaruKetik = '';
+  let pinBaruMengirim = false;
+
+  function pesanKaryawan(teks) { document.getElementById('kryPesan').textContent = teks || ''; }
+
+  // Balasan gagal yang berlaku untuk semua aksi admin: HP dicabut atau sesi admin habis.
+  function adminGagalUmum(d) {
+    if (d && d.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return true; }
+    if (d && d.kode === 'SESI_TIDAK_VALID') { keluarAdmin(); return true; }
+    return false;
+  }
+
+  function bukaKaryawan() {
+    pesanKaryawan('');
+    tampilLayar(layarKaryawan);
+    muatKaryawan();
+  }
+
+  function muatKaryawan() {
+    kirimPost({ aksi: 'karyawan_daftar', token: hpAktif.token, sesi: sesiAdmin, tampilkan_nonaktif: saklarKaryawan.checked })
+      .then(function (d) {
+        if (adminGagalUmum(d)) { return; }
+        if (d.status !== 'ok') { pesanKaryawan(d.pesan || 'Gagal memuat.'); return; }
+        karyawanData = d;
+        document.getElementById('kryBadge').textContent = 'Admin ' + d.cabang;
+        document.getElementById('kryNama').textContent = 'Cabang ' + d.cabang + ' · ' + d.jumlah_aktif + ' aktif';
+        document.getElementById('daftarKaryawanAdmin').innerHTML = d.daftar.length ? d.daftar.map(function (k, i) {
+          return '<div class="kartu-hp"><div class="hp-baris"><div style="min-width:0"><div class="nama-hp-besar">' + escHtml(k.nama) + '</div>' +
+            '<div class="hp-nama">' + escHtml(k.panggilan) + ' · Shift ' + escHtml(k.shift) + ' · ' + escHtml(k.id) + '</div></div>' +
+            (k.aktif ? '' : '<div class="badge-nonaktif">Nonaktif</div>') + '</div>' +
+            (k.aktif ? '<div class="aksi-hp"><button type="button" class="btn-biasa-garis" data-kry="reset" data-i="' + i + '">Reset PIN</button>' +
+              '<button type="button" class="btn-merah-garis" data-kry="nonaktif" data-i="' + i + '">Nonaktifkan</button></div>' : '') +
+            '<div class="aksi-hp"><button type="button" class="btn-nonaktif-segera" disabled aria-disabled="true">Daftar wajah · Segera</button></div></div>';
+        }).join('') : '<div class="hp-ket">Belum ada karyawan untuk ditampilkan.</div>';
+      })
+      .catch(function () { pesanKaryawan('Tidak bisa terhubung ke server.'); });
+  }
+
+  document.getElementById('btnMenuKaryawan').addEventListener('click', bukaKaryawan);
+  saklarKaryawan.addEventListener('change', muatKaryawan);
+  document.getElementById('btnKembaliKaryawan').addEventListener('click', function () { tampilLayar(layarAdmin); });
+
+  document.getElementById('daftarKaryawanAdmin').addEventListener('click', function (e) {
+    const tombol = e.target.closest('button[data-kry]');
+    if (!tombol || !karyawanData) { return; }
+    const k = karyawanData.daftar[Number(tombol.getAttribute('data-i'))];
+    if (!k) { return; }
+    if (tombol.getAttribute('data-kry') === 'reset') {
+      bukaPinBaru('RESET', { id: k.id, nama: k.nama });
+      return;
+    }
+    bukaDialog(
+      '<div class="dialog-judul">Nonaktifkan karyawan?</div>' +
+      '<div class="dialog-sub">' + escHtml(k.nama) + ' · ' + escHtml(k.id) + '</div>' +
+      '<div class="dialog-catatan">Namanya tidak muncul lagi di daftar absen. Riwayat tetap tersimpan.</div>' +
+      '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Nonaktifkan</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', function () {
+      document.getElementById('dlgYa').disabled = true;
+      kirimPost({ aksi: 'karyawan_nonaktif', token: hpAktif.token, sesi: sesiAdmin, id: k.id })
+        .then(function (d) {
+          tutupDialog();
+          if (adminGagalUmum(d)) { return; }
+          pesanKaryawan(d.status === 'ok' ? k.nama + ' dinonaktifkan.' : (d.pesan || 'Gagal.'));
+          muatKaryawan();
+        })
+        .catch(function () { tutupDialog(); pesanKaryawan('Tidak bisa terhubung ke server.'); });
+    });
+  });
+
+  // ---- Tambah karyawan: admin mengisi data, lalu HP diserahkan ke karyawan untuk mengetik PIN dua kali ----
+  const kNama = document.getElementById('kNama');
+  const kPanggilan = document.getElementById('kPanggilan');
+  const kShift = document.getElementById('kShift');
+  const kMulai = document.getElementById('kMulai');
+  const pesanTambahKaryawan = document.getElementById('pesanTambahKaryawan');
+
+  function hariIniIso() {
+    const n = new Date();
+    return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+  }
+
+  document.getElementById('btnTambahKaryawan').addEventListener('click', function () {
+    kNama.value = ''; kPanggilan.value = ''; kMulai.value = hariIniIso(); pesanTambahKaryawan.textContent = '';
+    const shifts = karyawanData ? karyawanData.daftar_shift : [];
+    kShift.innerHTML = shifts.map(function (s) {
+      return '<option value="' + escHtml(s.no) + '">' + escHtml(s.nama) + ' (' + escHtml(s.masuk) + ' – ' + escHtml(s.pulang) + ')</option>';
+    }).join('');
+    tampilLayar(layarTambahKaryawan);
+  });
+  document.getElementById('btnKembaliTambah').addEventListener('click', function () { tampilLayar(layarKaryawan); });
+
+  document.getElementById('btnLanjutPin').addEventListener('click', function () {
+    const data = { nama: kNama.value.trim(), panggilan: kPanggilan.value.trim(), shift: kShift.value, mulai_kerja: kMulai.value };
+    if (!data.nama || !data.panggilan) { pesanTambahKaryawan.textContent = 'Isi nama lengkap dan nama panggilan.'; return; }
+    if (!data.shift) { pesanTambahKaryawan.textContent = 'Pilih shift.'; return; }
+    if (!data.mulai_kerja) { pesanTambahKaryawan.textContent = 'Isi tanggal mulai kerja.'; return; }
+    pesanTambahKaryawan.textContent = '';
+    bukaPinBaru('TAMBAH', data);
+  });
+
+  // ---- Layar PIN baru (dipakai Tambah karyawan dan Reset PIN): PIN 4 digit angka apa pun, ketik dua kali ----
+  function gambarPinBaru() {
+    document.querySelectorAll('#pinBaruTitik div').forEach(function (t, i) { t.classList.toggle('isi', i < pinBaruKetik.length); });
+    document.getElementById('pinBaruLangkah').textContent = pinBaruLangkah === 1 ? 'Buat PIN 4 digit' : 'Ulangi PIN';
+  }
+
+  function resetPinBaru() {
+    pinBaruMode = ''; pinBaruData = null; pinBaruLangkah = 1; pinBaruPertama = ''; pinBaruKetik = ''; pinBaruMengirim = false;
+    document.getElementById('pinBaruPesan').textContent = '';
+  }
+
+  function bukaPinBaru(mode, data) {
+    resetPinBaru();
+    pinBaruMode = mode;
+    pinBaruData = data;
+    document.getElementById('pinBaruJudul').textContent = mode === 'TAMBAH' ? 'Halo, ' + data.panggilan : 'PIN baru untuk ' + data.nama;
+    document.getElementById('pinBaruSub').textContent = mode === 'TAMBAH' ? 'Diisi sendiri oleh karyawan' : 'Diketik oleh karyawan, tanpa PIN awal';
+    document.getElementById('pinBaruFoto').style.display = mode === 'TAMBAH' ? '' : 'none';
+    gambarPinBaru();
+    tampilLayar(layarPinBaru);
+  }
+
+  function batalPinBaru() {
+    const mode = pinBaruMode;
+    resetPinBaru(); // tidak ada yang tersimpan kalau dibatalkan
+    tampilLayar(mode === 'TAMBAH' ? layarTambahKaryawan : layarKaryawan);
+  }
+  document.getElementById('pinBaruBatal').addEventListener('click', batalPinBaru);
+  document.getElementById('pinBaruHapus').addEventListener('click', function () {
+    if (pinBaruMengirim) { return; }
+    pinBaruKetik = pinBaruKetik.slice(0, -1); gambarPinBaru();
+  });
+
+  document.getElementById('pinBaruKeypad').addEventListener('click', function (e) {
+    const d = e.target.getAttribute('data-d');
+    if (d === null || pinBaruMengirim || pinBaruKetik.length >= 4) { return; }
+    pinBaruKetik += d;
+    gambarPinBaru();
+    if (pinBaruKetik.length < 4) { return; }
+    const pesan = document.getElementById('pinBaruPesan');
+    if (pinBaruLangkah === 1) {
+      pinBaruPertama = pinBaruKetik; pinBaruKetik = ''; pinBaruLangkah = 2; pesan.textContent = '';
+      setTimeout(gambarPinBaru, 150);
+      return;
+    }
+    if (pinBaruKetik !== pinBaruPertama) {
+      pinBaruPertama = ''; pinBaruKetik = ''; pinBaruLangkah = 1;
+      pesan.textContent = 'PIN tidak sama. Ulangi dari awal.';
+      setTimeout(gambarPinBaru, 150);
+      return;
+    }
+    // PIN dua kali sama: kirim data + PIN dalam SATU permintaan
+    pinBaruMengirim = true;
+    pesan.className = 'pesan-form'; pesan.textContent = 'Menyimpan...';
+    const pin = pinBaruKetik;
+    const body = pinBaruMode === 'TAMBAH'
+      ? { aksi: 'karyawan_tambah', token: hpAktif.token, sesi: sesiAdmin, nama: pinBaruData.nama, panggilan: pinBaruData.panggilan, shift: pinBaruData.shift, mulai_kerja: pinBaruData.mulai_kerja, pin: pin }
+      : { aksi: 'karyawan_reset_pin', token: hpAktif.token, sesi: sesiAdmin, id: pinBaruData.id, pin: pin };
+    const mode = pinBaruMode, nama = pinBaruData.nama;
+    pinBaruKetik = ''; pinBaruPertama = ''; // PIN tidak disimpan di halaman
+    kirimPost(body)
+      .then(function (d) {
+        pinBaruMengirim = false;
+        if (adminGagalUmum(d)) { return; }
+        if (d.status !== 'ok') {
+          // gagal (mis. nama kembar): balik ke form / daftar dengan pesan, tidak ada yang tersimpan
+          resetPinBaru();
+          if (mode === 'TAMBAH') { pesanTambahKaryawan.textContent = d.pesan || 'Gagal menyimpan.'; tampilLayar(layarTambahKaryawan); }
+          else { pesanKaryawan(d.pesan || 'Gagal.'); tampilLayar(layarKaryawan); muatKaryawan(); }
+          return;
+        }
+        resetPinBaru();
+        pesanKaryawan(mode === 'TAMBAH' ? nama + ' ditambahkan (ID ' + d.id + ').' : 'PIN ' + nama + ' sudah diganti.');
+        tampilLayar(layarKaryawan);
+        muatKaryawan();
+      })
+      .catch(function () {
+        pinBaruMengirim = false;
+        resetPinBaru();
+        if (mode === 'TAMBAH') { pesanTambahKaryawan.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; tampilLayar(layarTambahKaryawan); }
+        else { pesanKaryawan('Tidak bisa terhubung ke server.'); tampilLayar(layarKaryawan); }
+      });
   });
 
   // Admin hanya boleh mengubah nama HP toko yang sedang dipegangnya (token HP + sesi admin).
@@ -2000,6 +2262,9 @@
     if (menuOwner.classList.contains('tampil')) { tutupMenuOwner(); return; }
     if (menuAdmin.classList.contains('tampil')) { tutupMenuAdmin(); return; }
     if (layarPerhatian.classList.contains('aktif') || layarKelolaHp.classList.contains('aktif')) { tampilLayar(layarOwner); return; }
+    if (layarPinBaru.classList.contains('aktif')) { batalPinBaru(); return; }
+    if (layarTambahKaryawan.classList.contains('aktif')) { tampilLayar(layarKaryawan); return; }
+    if (layarKaryawan.classList.contains('aktif')) { tampilLayar(layarAdmin); return; }
     if (adminAktifDiLayar()) { keluarAdmin(); return; }
     if (layarLoginOwner.classList.contains('aktif')) { kosongkanLoginOwner(); tampilLayar(layarJenis); return; }
     if (layarPassword.classList.contains('aktif')) { document.getElementById('btnKembaliPassword').click(); return; }
