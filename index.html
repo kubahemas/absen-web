@@ -890,17 +890,39 @@
       '</div>', 4);
   }
 
-  function kirimAbsen() {
-    perbaruiKeypadKirim(true);
-    const body = modeAbsen === 'MASUK'
-      ? { aksi: 'absen_masuk', token: hpAktif.token, id: idTerpilih, pin: pinSaatIni }
-      : { aksi: 'absen_pulang', token: hpAktif.token, id: idTerpilih, pin: pinSaatIni, jenis: modeAbsen };
-    fetch(CONFIG.webAppUrl, {
+  // Tiket waktu: begitu tombol ditekan, minta jam server (ditandatangani) di latar belakang.
+  // Jam absen yang dicatat = jam di tiket (saat tombol ditekan), bukan saat PIN dimasukkan.
+  let tiketPromise = null;
+  function mintaTiket(mode) {
+    const jenis = mode === 'MASUK' ? 'MASUK' : (mode === 'PULANG' ? 'PULANG' : 'LEMBUR');
+    tiketPromise = fetch(CONFIG.webAppUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body)
+      body: JSON.stringify({ aksi: 'tiket_waktu', token: hpAktif.token, jenis: jenis })
     })
       .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return null; }
+        return d.status === 'ok' ? d.tiket : null;
+      })
+      .catch(function () { return null; });
+  }
+
+  function kirimAbsen() {
+    perbaruiKeypadKirim(true);
+    const id = idTerpilih, pin = pinSaatIni, mode = modeAbsen;
+    (tiketPromise || Promise.resolve(null))
+      .then(function (tiket) {
+        if (!tiket) { return { status: 'gagal', pesan: 'Waktu habis, tekan tombolnya lagi' }; }
+        const body = mode === 'MASUK'
+          ? { aksi: 'absen_masuk', token: hpAktif.token, id: id, pin: pin, tiket: tiket }
+          : { aksi: 'absen_pulang', token: hpAktif.token, id: id, pin: pin, jenis: mode, tiket: tiket };
+        return fetch(CONFIG.webAppUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(body)
+        }).then(function (r) { return r.json(); });
+      })
       .then(function (data) { tampilkanHasil(data); })
       .catch(function () { tampilkanHasil({ status: 'gagal', pesan: 'Tidak bisa terhubung ke server. Coba lagi.' }); });
   }
@@ -953,6 +975,7 @@
     document.querySelector('.pilih-judul').textContent =
       mode === 'MASUK' ? 'Absen masuk: pilih nama' : (mode === 'PULANG' ? 'Absen pulang: pilih nama' : 'Lembur: pilih nama');
     tampilLayar(layarPilihNama);
+    mintaTiket(mode);
     if (!daftarKaryawan.length && !mutaDaftarKaryawan) { muatDaftarKaryawan(); }
   }
   document.getElementById('btnMasuk').addEventListener('click', function () { bukaPilihNama('MASUK'); });

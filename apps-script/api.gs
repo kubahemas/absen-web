@@ -93,15 +93,16 @@ function doPost(e) {
   }
 
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
-  const aksiBertoken = ['daftar_karyawan', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang'];
+  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
     const hp = validasiTokenHp(data.token);
     if (!hp) {
       return respon({ status: 'gagal', kode: 'HP_TIDAK_TERDAFTAR', pesan: 'HP ini belum terdaftar atau sudah dinonaktifkan' });
     }
     if (data.aksi === 'daftar_karyawan') { return prosesDaftarKaryawan(hp); }
-    if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp); }
-    if (data.aksi === 'absen_pulang') { return prosesAbsenPulang(data.id, data.pin, data.jenis, hp); }
+    if (data.aksi === 'tiket_waktu') { return prosesTiketWaktu(data.jenis, hp); }
+    if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp, data.tiket); }
+    if (data.aksi === 'absen_pulang') { return prosesAbsenPulang(data.id, data.pin, data.jenis, hp, data.tiket); }
     if (data.aksi === 'simpan_pulang') { return prosesSimpanPulang(data.id, data.kode_pending, data.keterangan, hp); }
     return prosesSimpanAlasan(data.id, data.kode_alasan, data.alasan, hp);
   }
@@ -109,18 +110,128 @@ function doPost(e) {
   return respon({ status: 'gagal', pesan: 'Aksi tidak dikenali.' });
 }
 
-function prosesAbsenMasuk(id, pin, hp) {
+/**
+ * ---- Tiket waktu ----
+ * Jam absen = saat TOMBOL ditekan, bukan saat PIN dimasukkan. Begitu tombol ditekan, HP
+ * minta tiket (aksi tiket_waktu): jam server + jenis + cabang + masa berlaku, ditandatangani
+ * HMAC dengan KODE_RAHASIA. Saat PIN dikirim, tiket ikut; server memverifikasinya dan
+ * menghitung SEMUA status dari jam di tiket. Jam dari client tidak pernah dipercaya.
+ * Tiket sekali pakai untuk absen yang berhasil; PIN salah tidak menghabiskan tiket.
+ */
+var PESAN_TIKET = 'Waktu habis, tekan tombolnya lagi';
+
+function kunciTiket() {
+  const k = PropertiesService.getScriptProperties().getProperty('KODE_RAHASIA');
+  return k ? k + '|tiket' : '';
+}
+
+/** Buat tiket: base64url(payload JSON) + "." + base64url(HMAC-SHA256). */
+function buatTiket(payload, kunci) {
+  const p = Utilities.base64EncodeWebSafe(JSON.stringify(payload), Utilities.Charset.UTF_8);
+  const sig = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(p, kunci));
+  return p + '.' + sig;
+}
+
+function samaAman(a, b) {
+  if (a.length !== b.length) { return false; }
+  let beda = 0;
+  for (let i = 0; i < a.length; i++) { beda |= a.charCodeAt(i) ^ b.charCodeAt(i); }
+  return beda === 0;
+}
+
+/**
+ * Fungsi murni (tidak menyentuh sheet/cache): periksa tanda tangan, jenis, cabang, masa berlaku.
+ * Kembalian: { ok:true, t (ms jam tombol ditekan), nonce } atau { ok:false, pesan }.
+ */
+function periksaTiket(tiket, jenis, cabang, kunci, sekarangMs) {
+  const gagal = { ok: false, pesan: PESAN_TIKET };
+  if (typeof tiket !== 'string' || tiket.length > 600) { return gagal; }
+  const bagian = tiket.split('.');
+  if (bagian.length !== 2) { return gagal; }
+  let sigBenar;
+  try {
+    sigBenar = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(bagian[0], kunci));
+  } catch (e) { return gagal; }
+  if (!samaAman(sigBenar, bagian[1])) { return gagal; }
+  let p;
+  try {
+    p = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(bagian[0])).getDataAsString());
+  } catch (e) { return gagal; }
+  if (!p || p.j !== jenis || p.c !== cabang || typeof p.t !== 'number' || typeof p.e !== 'number' || !p.n) { return gagal; }
+  if (sekarangMs > p.e || p.t > sekarangMs + 5000) { return gagal; }
+  return { ok: true, t: p.t, nonce: String(p.n) };
+}
+
+/** Jam Jakarta dari ms epoch: { tanggal 'yyyy-MM-dd', jam 'HH:mm', detik sejak 00:00 }. */
+function waktuDariMs(ms) {
+  const d = new Date(ms);
+  const f = function (pola) { return Utilities.formatDate(d, ZONA_ABSEN, pola); };
+  return { tanggal: f('yyyy-MM-dd'), jam: f('HH:mm'), detik: Number(f('H')) * 3600 + Number(f('m')) * 60 + Number(f('s')) };
+}
+
+/** Tandai tiket terpakai. false kalau sudah pernah dipakai. cache = objek dengan get/put. */
+function klaimTiket(nonce, cache) {
+  const k = 'tiket_pakai_' + nonce;
+  if (cache.get(k)) { return false; }
+  cache.put(k, '1', 21600);
+  return true;
+}
+
+function klaimTiketServer(nonce) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    return klaimTiket(nonce, CacheService.getScriptCache());
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Aksi tiket_waktu: jenis MASUK | PULANG | LEMBUR. Wajib token HP toko (dicek di doPost). */
+function prosesTiketWaktu(jenis, hp) {
+  if (jenis !== 'MASUK' && jenis !== 'PULANG' && jenis !== 'LEMBUR') {
+    return respon({ status: 'gagal', pesan: 'Jenis tiket tidak dikenal' });
+  }
+  const kunci = kunciTiket();
+  if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const menit = ambilNilaiUmum('tiket_absen_menit', 3);
+  const t = Date.now();
+  const tiket = buatTiket({
+    j: jenis, t: t, e: t + menit * 60000, c: hp.cabang, n: Utilities.getUuid().replace(/-/g, '').slice(0, 16)
+  }, kunci);
+  return respon({ status: 'ok', tiket: tiket, jam_server: Utilities.formatDate(new Date(t), ZONA_ABSEN, 'yyyy-MM-dd HH:mm:ss') });
+}
+
+/**
+ * Fungsi murni: status absen masuk dari jam (detik sejak 00:00) dan shift { masuk }.
+ * < 60 detik setelah jam masuk = HADIR; mulai 60 detik = TELAT (menit dibulatkan ke bawah).
+ */
+function tentukanStatusMasuk(detik, shift, jendelaMenit) {
+  const detikMasuk = jamKeDetik(shift.masuk);
+  if (detik < detikMasuk - jendelaMenit * 60) {
+    return { ok: false, pesan: 'Absen masuk belum dibuka, mulai ' + detikKeJam(detikMasuk - jendelaMenit * 60) };
+  }
+  const selisih = detik - detikMasuk;
+  if (selisih >= 60) { return { ok: true, st_masuk: 'TELAT', telat_mnt: Math.floor(selisih / 60) }; }
+  return { ok: true, st_masuk: 'HADIR', telat_mnt: 0 };
+}
+
+function prosesAbsenMasuk(id, pin, hp, tiket) {
+  const kunci = kunciTiket();
+  if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const tk = periksaTiket(tiket, 'MASUK', hp.cabang, kunci, Date.now());
+  if (!tk.ok) { return respon({ status: 'gagal', pesan: tk.pesan }); }
+
   const cek = cekKaryawanDanPin(id, pin, hp);
   if (cek.gagal) { return cek.gagal; }
   const akunDitemukan = cek.akun;
 
+  // Semua waktu dari tiket (saat tombol ditekan).
   const zona = ZONA_ABSEN;
-  const sekarang = new Date();
-  const tanggalHariIni = Utilities.formatDate(sekarang, zona, 'yyyy-MM-dd');
-  const jamSekarang = Utilities.formatDate(sekarang, zona, 'HH:mm');
-  const detikSekarang = Number(Utilities.formatDate(sekarang, zona, 'H')) * 3600 +
-    Number(Utilities.formatDate(sekarang, zona, 'm')) * 60 +
-    Number(Utilities.formatDate(sekarang, zona, 's'));
+  const w = waktuDariMs(tk.t);
+  const tanggalHariIni = w.tanggal;
+  const jamSekarang = w.jam;
+  const detikSekarang = w.detik;
 
   const absensi = bacaSheet('absensi');
   const sudahAbsenMasuk = absensi.data.some(function (r) {
@@ -137,19 +248,13 @@ function prosesAbsenMasuk(id, pin, hp) {
   if (!shiftKaryawan || !shiftKaryawan.masuk) {
     return respon({ status: 'gagal', pesan: 'Jadwal shift karyawan tidak ditemukan, hubungi admin' });
   }
-  const detikMasuk = jamKeDetik(shiftKaryawan.masuk);
-  const jendelaDetik = ambilNilaiUmum('jendela_absen_menit', 60) * 60;
-  if (detikSekarang < detikMasuk - jendelaDetik) {
-    return respon({
-      status: 'gagal',
-      pesan: 'Absen masuk belum dibuka, mulai ' + detikKeJam(detikMasuk - jendelaDetik)
-    });
-  }
+  const status = tentukanStatusMasuk(detikSekarang, shiftKaryawan, ambilNilaiUmum('jendela_absen_menit', 60));
+  if (!status.ok) { return respon({ status: 'gagal', pesan: status.pesan }); }
+  const telat = status.st_masuk === 'TELAT';
+  const telatMnt = status.telat_mnt;
 
-  // Kurang dari 60 detik setelah jam masuk = HADIR; mulai 60 detik = TELAT.
-  const selisih = detikSekarang - detikMasuk;
-  const telat = selisih >= 60;
-  const telatMnt = telat ? Math.floor(selisih / 60) : 0;
+  // Tiket sekali pakai: hanya dihabiskan kalau absen benar-benar akan ditulis.
+  if (!klaimTiketServer(tk.nonce)) { return respon({ status: 'gagal', pesan: PESAN_TIKET }); }
 
   const barisBaru = {};
   absensi.header.forEach(function (nama) { barisBaru[nama] = ''; });
@@ -497,7 +602,7 @@ function cekKaryawanDanPin(id, pin, hp) {
  *
  * Alur: absen_pulang (id, pin, jenis PULANG | PULANG_LEMBUR).
  *  - PULANG NORMAL: langsung tersimpan.
- *  - PULANG CEPAT atau LEMBUR: alasan/keterangan WAJIB. Jam saat PIN benar dicatat di
+ *  - PULANG CEPAT atau LEMBUR: alasan/keterangan WAJIB. Jam saat TOMBOL ditekan (jam tiket) dicatat di
  *    cache (5 menit) dan balasannya meminta keterangan; BARU tersimpan ke sheet lewat
  *    aksi simpan_pulang (kode_pending + keterangan). Tidak ada keterangan = tidak tersimpan.
  * Aplikasi tidak menyimpan angka rupiah lembur; kolom `lembur` berisi "tingkat|menit".
@@ -577,17 +682,24 @@ function bacaKondisiPulang(akunDitemukan, tanggalHariIni) {
   };
 }
 
-function prosesAbsenPulang(id, pin, jenis, hp) {
+function prosesAbsenPulang(id, pin, jenis, hp, tiket) {
+  if (jenis !== 'PULANG' && jenis !== 'PULANG_LEMBUR') {
+    return respon({ status: 'gagal', pesan: 'Jenis absen pulang tidak dikenal' });
+  }
+  const kunci = kunciTiket();
+  if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const tk = periksaTiket(tiket, jenis === 'PULANG_LEMBUR' ? 'LEMBUR' : 'PULANG', hp.cabang, kunci, Date.now());
+  if (!tk.ok) { return respon({ status: 'gagal', pesan: tk.pesan }); }
+
   const cek = cekKaryawanDanPin(id, pin, hp);
   if (cek.gagal) { return cek.gagal; }
   const akunDitemukan = cek.akun;
 
-  const sekarang = new Date();
-  const tanggalHariIni = Utilities.formatDate(sekarang, ZONA_ABSEN, 'yyyy-MM-dd');
-  const jamSekarang = Utilities.formatDate(sekarang, ZONA_ABSEN, 'HH:mm');
-  const detik = Number(Utilities.formatDate(sekarang, ZONA_ABSEN, 'H')) * 3600 +
-    Number(Utilities.formatDate(sekarang, ZONA_ABSEN, 'm')) * 60 +
-    Number(Utilities.formatDate(sekarang, ZONA_ABSEN, 's'));
+  // Semua waktu dari tiket (saat tombol ditekan).
+  const w = waktuDariMs(tk.t);
+  const tanggalHariIni = w.tanggal;
+  const jamSekarang = w.jam;
+  const detik = w.detik;
 
   if (jenis === 'PULANG_LEMBUR' && akunDitemukan.role === 'ADMIN') {
     return respon({ status: 'gagal', pesan: 'Admin tidak mencatat lembur' });
@@ -609,8 +721,11 @@ function prosesAbsenPulang(id, pin, jenis, hp) {
     perubahan: hasil.perubahan || ''
   };
 
+  // Tiket sekali pakai: dihabiskan begitu absen diterima (ditulis, atau ditahan menunggu keterangan).
+  if (!klaimTiketServer(tk.nonce)) { return respon({ status: 'gagal', pesan: PESAN_TIKET }); }
+
   if (hasil.keterangan) {
-    // Wajib ada keterangan: simpan dulu di cache (jam = saat PIN benar), tulis ke sheet setelah diisi.
+    // Wajib ada keterangan: simpan dulu di cache (jam = saat tombol ditekan), tulis ke sheet setelah diisi.
     info.kategori = hasil.keterangan;
     info.kode = Utilities.getUuid().replace(/-/g, '').slice(0, 16);
     CacheService.getScriptCache().put(KUNCI_PULANG_PENDING + akunDitemukan.id, JSON.stringify(info), 300);
@@ -645,7 +760,7 @@ function prosesSimpanPulang(id, kode, ket, hp) {
   const v = validasiKeterangan(info.kategori, ket);
   if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
 
-  // Periksa ulang terhadap kondisi sheet sekarang (pakai jam saat PIN benar): jangan sampai
+  // Periksa ulang terhadap kondisi sheet sekarang (pakai jam tiket): jangan sampai
   // keadaan sudah berubah (misal sudah pulang dari HP lain) sejak keterangan diminta.
   const kondisi = bacaKondisiPulang(akun, info.tanggal);
   if (kondisi.baris && kondisi.sudahMasuk && !kondisi.shift) {
@@ -793,6 +908,55 @@ function tesServer() {
   uji('shift siang 22:06:00 lembur tingkat 1', '22:06:00', siang, 'PULANG_LEMBUR', { ok: true, tingkat: 1, durasi_menit: 6 });
   uji('shift siang 23:00:00 lembur tingkat 1', '23:00:00', siang, 'PULANG_LEMBUR', { ok: true, tingkat: 1 });
   uji('shift siang 23:00:01 lembur tingkat 2', '23:00:01', siang, 'PULANG_LEMBUR', { ok: true, tingkat: 2 });
+
+  // ---- Tiket waktu: jam yang dicatat = saat TOMBOL ditekan (jam di tiket), bukan saat PIN dikirim ----
+  const KUNCI_UJI = 'kunci-uji-tiket';
+  let nomorTiket = 0;
+  const epoch = function (jam) { return Date.UTC(2026, 9, 5) - 7 * 3600000 + detik(jam) * 1000; }; // jam Jakarta 5 Okt 2026
+  const bikinTiket = function (jenis, jamTombol, menit, cabang) {
+    nomorTiket++;
+    return buatTiket({ j: jenis, t: epoch(jamTombol), e: epoch(jamTombol) + menit * 60000, c: cabang || 'Ngawi', n: 'uji' + nomorTiket }, KUNCI_UJI);
+  };
+  function ujiBebas(nama, lulus, detail) {
+    if (!lulus) { gagal++; }
+    baris.push((lulus ? 'LULUS  ' : 'GAGAL  ') + nama + (lulus || !detail ? '' : '  -> ' + detail));
+  }
+
+  // 1. Tiket 07:45:50, PIN dikirim 07:46:10 = HADIR (dihitung dari jam tombol).
+  const t1 = periksaTiket(bikinTiket('MASUK', '07:45:50', 3), 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10'));
+  const s1m = t1.ok ? tentukanStatusMasuk(waktuDariMs(t1.t).detik, s1, 60) : null;
+  ujiBebas('tiket 07:45:50 + PIN 07:46:10 = HADIR', t1.ok && s1m.ok && s1m.st_masuk === 'HADIR' && waktuDariMs(t1.t).jam === '07:45', JSON.stringify(s1m));
+  // pembanding: kalau jam PIN yang dipakai, hasilnya TELAT
+  ujiBebas('(pembanding) jam 07:46:10 sendiri = TELAT 1 menit', tentukanStatusMasuk(detik('07:46:10'), s1, 60).telat_mnt === 1);
+
+  // 2-5. Penolakan
+  ujiBebas('tiket kedaluwarsa ditolak', !periksaTiket(bikinTiket('MASUK', '07:45:50', 3), 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:49:00')).ok);
+  ujiBebas('tiket masih berlaku di detik terakhir diterima', periksaTiket(bikinTiket('MASUK', '07:45:50', 3), 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:48:50')).ok);
+  ujiBebas('jenis salah ditolak (tiket PULANG dipakai MASUK)', !periksaTiket(bikinTiket('PULANG', '16:30:00', 3), 'MASUK', 'Ngawi', KUNCI_UJI, epoch('16:30:10')).ok);
+  ujiBebas('cabang salah ditolak', !periksaTiket(bikinTiket('MASUK', '07:45:50', 3, 'Pusat'), 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10')).ok);
+  ujiBebas('tiket dari masa depan ditolak', !periksaTiket(bikinTiket('MASUK', '07:50:00', 3), 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:45:00')).ok);
+  const asli = bikinTiket('MASUK', '07:45:50', 3);
+  const bagianAsli = asli.split('.');
+  const muatanPalsu = Utilities.base64EncodeWebSafe(JSON.stringify({ j: 'MASUK', t: epoch('07:40:00'), e: epoch('07:43:00') + 999999999, c: 'Ngawi', n: 'palsu' }), Utilities.Charset.UTF_8);
+  ujiBebas('tanda tangan dimanipulasi (muatan diganti) ditolak', !periksaTiket(muatanPalsu + '.' + bagianAsli[1], 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10')).ok);
+  ujiBebas('tanda tangan dirusak ditolak', !periksaTiket(bagianAsli[0] + '.' + bagianAsli[1].slice(0, -2) + 'AA', 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10')).ok);
+  ujiBebas('tiket dengan kunci lain ditolak', !periksaTiket(asli, 'MASUK', 'Ngawi', 'kunci-lain', epoch('07:46:10')).ok);
+  ujiBebas('tiket kosong/bukan teks ditolak', !periksaTiket('', 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10')).ok && !periksaTiket(null, 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10')).ok);
+
+  // 6. Sekali pakai (cache tiruan, tanpa CacheService)
+  const cacheTiruan = { d: {}, get: function (k) { return this.d[k] || null; }, put: function (k, v) { this.d[k] = v; } };
+  ujiBebas('tiket dipakai dua kali: pertama diterima, kedua ditolak', klaimTiket('n-sekali', cacheTiruan) === true && klaimTiket('n-sekali', cacheTiruan) === false);
+
+  // 7. Pulang dan lembur memakai jam tiket
+  const tp = periksaTiket(bikinTiket('PULANG', '16:29:50', 3), 'PULANG', 'Ngawi', KUNCI_UJI, epoch('16:30:10'));
+  const hp1 = tp.ok ? tentukanStatusPulang(waktuDariMs(tp.t).detik, s1, 'PULANG', true, false) : null;
+  ujiBebas('pulang: tiket 16:29:50 + PIN 16:30:10 = PULANG CEPAT', tp.ok && hp1.ok && hp1.st_pulang === 'PULANG CEPAT', JSON.stringify(hp1));
+  const tl1 = periksaTiket(bikinTiket('LEMBUR', '16:35:50', 3), 'LEMBUR', 'Ngawi', KUNCI_UJI, epoch('16:36:20'));
+  const hl1 = tl1.ok ? tentukanStatusPulang(waktuDariMs(tl1.t).detik, s1, 'PULANG_LEMBUR', true, false) : null;
+  ujiBebas('lembur: tiket 16:35:50 + PIN 16:36:20 = ditolak (tombol belum boleh)', tl1.ok && hl1.ok === false, JSON.stringify(hl1));
+  const tl2 = periksaTiket(bikinTiket('LEMBUR', '16:36:05', 3), 'LEMBUR', 'Ngawi', KUNCI_UJI, epoch('16:36:40'));
+  const hl2 = tl2.ok ? tentukanStatusPulang(waktuDariMs(tl2.t).detik, s1, 'PULANG_LEMBUR', true, false) : null;
+  ujiBebas('lembur: tiket 16:36:05 = diterima, tingkat 1, jam pulang 16:36', tl2.ok && hl2.ok && hl2.tingkat === 1 && waktuDariMs(tl2.t).jam === '16:36', JSON.stringify(hl2));
 
   const ringkas = (gagal === 0 ? 'SEMUA LULUS' : gagal + ' SKENARIO GAGAL') + ' (' + baris.length + ' skenario)';
   const teks = baris.join('\n') + '\n\n' + ringkas;
