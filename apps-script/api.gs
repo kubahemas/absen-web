@@ -96,6 +96,12 @@ function doPost(e) {
   if (data.aksi === 'login_owner') { return prosesLoginOwner(data); }
   if (data.aksi === 'atur_password_owner') { return prosesAturPasswordOwner(data); }
   if (data.aksi === 'owner_beranda') { return prosesOwnerBeranda(data.sesi); }
+  if (data.aksi === 'owner_perhatian') { return prosesOwnerPerhatian(data.sesi); }
+  if (data.aksi === 'owner_perhatian_daftar') { return prosesOwnerPerhatianDaftar(data.sesi); }
+  if (data.aksi === 'owner_tandai_dibaca') { return prosesOwnerTandaiDibaca(data.sesi); }
+  if (data.aksi === 'owner_hari_ini') { return prosesOwnerHariIni(data.sesi, data.cabang, data.shift); }
+  if (data.aksi === 'owner_daftar_hp') { return prosesOwnerDaftarHp(data.sesi, data.cabang, data.tampilkan_nonaktif); }
+  if (data.aksi === 'ubah_nama_hp') { return prosesUbahNamaHp(data); }
   if (data.aksi === 'owner_nonaktifkan_hp') { return prosesOwnerNonaktifkanHp(data.sesi, data.id_hp); }
   if (data.aksi === 'owner_keluarkan_semua') { return prosesOwnerKeluarkanSemua(data.sesi); }
   if (data.aksi === 'owner_ganti_password') { return prosesOwnerGantiPassword(data.sesi, data.lama, data.baru); }
@@ -1011,6 +1017,58 @@ function tesServer() {
     kecualiB.filter(function (s) { return s.id_sesi === 'A'; })[0].aktif === false && kecualiB.filter(function (s) { return s.id_sesi === 'B'; })[0].aktif === true);
   ujiBebas('label perangkat dibersihkan dari karakter berbahaya', bersihkanLabel('HP|Samsung\n<A15>') === 'HP Samsung <A15>' && bersihkanLabel('') === 'Perangkat');
 
+  // ---- Lebih dari satu owner ----
+  const akunUji = [
+    { id: 'OWN01', nama: 'owner', role: 'OWNER' }, { id: 'OWN02', nama: 'Bu Sari', role: 'OWNER' },
+    { id: 'K010', nama: 'Dewi Lestari', role: 'ADMIN' }
+  ];
+  ujiBebas('multi-owner: username "OWNER " (huruf besar/spasi) cocok ke OWN01', (temukanOwner(akunUji, 'OWNER ') || {}).id === 'OWN01');
+  ujiBebas('multi-owner: "bu sari" cocok ke OWN02, bukan OWN01', (temukanOwner(akunUji, 'bu sari') || {}).id === 'OWN02');
+  ujiBebas('multi-owner: nama admin tidak dianggap owner', temukanOwner(akunUji, 'Dewi Lestari') === null);
+  ujiBebas('multi-owner: username kosong / tidak ada = tidak ditemukan', temukanOwner(akunUji, '') === null && temukanOwner(akunUji, 'siapa') === null);
+  ujiBebas('penahanan dihitung per akun: OWN01 salah 4x tidak menahan OWN02', keputusanSalahPassword(4, t0).tahanSampai !== null && keputusanSalahPassword(0, t0).tahanSampai === null);
+
+  // ---- Perlu perhatian (sumber log, sama untuk semua owner, penanda dibaca per owner) ----
+  const namaUji = function (id) { return ({ K010: 'Dewi', OWN01: 'owner', OWN02: 'Bu Sari' })[id] || id; };
+  const logUji = [
+    { waktu: '2026-10-05 07:12', jenis: 'PERANGKAT', aksi: 'DAFTAR_HP_TOKO', oleh: 'K010', cabang: 'Ngawi', target: 'HP meja kasir', id: 'HPT-NGW-03', alasan: 'akurasi 18 m, jarak ke toko 42 m' },
+    { waktu: '2026-10-05 08:15', jenis: 'KEAMANAN', aksi: 'LOGIN_PERANGKAT_BARU', oleh: 'OWN02', cabang: '', target: 'Android · Chrome', id: 'abc12345' },
+    { waktu: '2026-10-04 09:00', jenis: 'KEAMANAN', aksi: 'LOGIN_PERANGKAT_BARU', oleh: 'OWN01', cabang: '', target: 'Windows · Edge', id: 'def67890' },
+    { waktu: '2026-10-03 10:00', jenis: 'PERANGKAT', aksi: 'DAFTAR_HP_TOKO', oleh: 'K010', cabang: 'Ngawi', target: 'HP Toko 2', id: 'HPT-NGW-02', alasan: 'akurasi 10 m, jarak ke toko 5 m' },
+    { waktu: '2026-10-02 11:00', jenis: 'KEAMANAN', aksi: 'KUNCI_AKUN', oleh: 'K001', cabang: 'Ngawi', target: 'akun', id: 'K001' },
+    { waktu: '2026-08-01 11:00', jenis: 'PERANGKAT', aksi: 'DAFTAR_HP_TOKO', oleh: 'K010', cabang: 'Ngawi', target: 'HP lama', id: 'HPT-NGW-01', alasan: '' }
+  ];
+  const batasUji = epoch('00:00:00') - 30 * 86400000;
+  const itemUji = rakitPerhatian(logUji, namaUji, batasUji);
+  ujiBebas('perhatian: hanya HP baru + login perangkat baru dalam 30 hari (4 item), log lain/lama diabaikan', itemUji.length === 4, itemUji.length + ' item');
+  ujiBebas('perhatian: terbaru di atas', itemUji[0].tipe === 'LOGIN_BARU' && itemUji[0].sub.indexOf('2026-10-05 08:15') !== -1 && itemUji[3].judul.indexOf('HPT-NGW-02') !== -1);
+  ujiBebas('perhatian: semua owner melihat item yang sama (login owner lain ikut tampil)', JSON.stringify(rakitPerhatian(logUji, namaUji, batasUji)) === JSON.stringify(itemUji) && itemUji[0].judul.indexOf('Bu Sari') !== -1 && itemUji[2].judul.indexOf('owner') !== -1);
+  ujiBebas('perhatian: jarak ke toko terbaca dari log', itemUji.filter(function (x) { return x.judul.indexOf('HPT-NGW-03') !== -1; })[0].info === '42 m dari toko');
+  ujiBebas('belum dibaca: penanda 0 = semua 4 item', itemBelumDibaca(itemUji, 0).length === 4);
+  ujiBebas('belum dibaca: penanda 4 Okt 12:00 = 2 item', itemBelumDibaca(itemUji, epoch('12:00:00') - 86400000).length === 2);
+  ujiBebas('belum dibaca: penanda = sekarang = 0 item (log tidak diubah, hanya penanda yang maju)', itemBelumDibaca(itemUji, epoch('23:59:59')).length === 0 && itemUji.length === 4);
+  ujiBebas('3 item terbaru', itemUji.slice(0, 3).length === 3);
+
+  // ---- Kartu "Hari ini" ----
+  const hariUji = [
+    { tanggal: '2026-10-05', cabang: 'Ngawi', shift: 1, masuk: '07:44', st_masuk: 'HADIR', pulang: '', acc_pulang: '' },
+    { tanggal: '2026-10-05', cabang: 'Ngawi', shift: 1, masuk: '07:50', st_masuk: 'TELAT', pulang: '16:31', acc_pulang: '' },
+    { tanggal: '2026-10-05', cabang: 'Ngawi', shift: 2, masuk: '13:50', st_masuk: 'TELAT', pulang: '22:00', acc_pulang: '' },
+    { tanggal: '2026-10-05', cabang: 'Pusat', shift: 1, masuk: '07:40', st_masuk: 'HADIR', pulang: '18:35', acc_pulang: 'MENUNGGU' },
+    { tanggal: '2026-10-04', cabang: 'Ngawi', shift: 1, masuk: '07:40', st_masuk: 'HADIR', pulang: '16:30', acc_pulang: 'MENUNGGU' }
+  ];
+  const sama = function (a, m, t, p, w) { return a.masuk === m && a.telat === t && a.pulang === p && a.menunggu_acc === w; };
+  ujiBebas('hari ini: semua cabang & shift (kemarin tidak dihitung)', sama(hitungHariIni(hariUji, '2026-10-05', '', ''), 4, 2, 3, 1), JSON.stringify(hitungHariIni(hariUji, '2026-10-05', '', '')));
+  ujiBebas('hari ini: filter cabang Ngawi', sama(hitungHariIni(hariUji, '2026-10-05', 'Ngawi', ''), 3, 2, 2, 0));
+  ujiBebas('hari ini: filter cabang Ngawi + shift 1', sama(hitungHariIni(hariUji, '2026-10-05', 'Ngawi', '1'), 2, 1, 1, 0));
+  ujiBebas('hari ini: filter cabang Pusat (lembur menunggu ACC)', sama(hitungHariIni(hariUji, '2026-10-05', 'Pusat', ''), 1, 0, 1, 1));
+
+  // ---- Ubah nama HP ----
+  ujiBebas('nama HP: spasi dan baris baru dirapikan', bersihkanNamaHp('  HP   Toko\n2 ') === 'HP Toko 2');
+  ujiBebas('nama HP: awalan rumus (=, +, -, @) dibuang', bersihkanNamaHp('=HYPERLINK("x")') === 'HYPERLINK("x")' && bersihkanNamaHp('@SUM(A1)') === 'SUM(A1)');
+  ujiBebas('nama HP: kosong/null tetap kosong (ditolak)', bersihkanNamaHp('') === '' && bersihkanNamaHp(null) === '' && bersihkanNamaHp('  ==  ') === '');
+  ujiBebas('nama HP: maksimal 40 karakter', bersihkanNamaHp('x'.repeat(60)).length === 40);
+
   const jumlahSkenario = baris.length;
   baris.push('');
   baris.push('TES MANUAL (butuh menulis ke sheet, jalankan sendiri di aplikasi):');
@@ -1021,6 +1079,10 @@ function tesServer() {
   baris.push('  - Tombol Nonaktifkan: kolom aktif HP jadi FALSE, log NONAKTIFKAN_HP_TOKO, HP itu langsung ditolak (HP kembali ke layar "HP ini belum terdaftar")');
   baris.push('  - Keluarkan semua perangkat: semua baris sesi OWN01 jadi aktif FALSE, perangkat lain diminta login lagi');
   baris.push('  - Salah password owner 5x: pesan "ditahan 15 menit", log TAHAN_LOGIN_OWNER; sesudah 15 menit bisa login lagi');
+  baris.push('  - Dua owner (OWN01 dan OWN02): masing-masing login dengan username sendiri; keluarkan semua perangkat OWN01 tidak mengeluarkan OWN02; tahan 15 menit satu owner tidak menahan yang lain');
+  baris.push('  - Username owner yang tidak ada dan password salah: pesan sama; setelah 5x username palsu juga ditahan (tes: ketik username ngawur 5x)');
+  baris.push('  - Perlu perhatian: "tandai dibaca" memajukan penanda hanya untuk owner yang menekan (Script Properties dibaca_OWN01); owner lain masih melihat item sebagai baru');
+  baris.push('  - Ubah nama HP: owner boleh HP mana pun; admin hanya HP yang dipegangnya dan hanya kalau cabang admin sama; log UBAH_NAMA_HP_TOKO tercatat; label di layar utama HP ikut baru dalam sekitar 1 menit');
   baris.push('  - Masuk sebagai Admin di HP toko: keluar sendiri setelah 2 menit tanpa sentuhan dan saat kembali ke layar absen');
 
   const ringkas = (gagal === 0 ? 'SEMUA LULUS' : gagal + ' SKENARIO GAGAL') + ' (' + jumlahSkenario + ' skenario)';
@@ -1220,9 +1282,7 @@ function cekTahanOwner(akun, owner) {
   const props = PropertiesService.getScriptProperties();
   const tahan = Number(props.getProperty('tahan_' + owner.id) || 0);
   const sekarang = Date.now();
-  if (masihDitahan(tahan, sekarang)) {
-    return 'Login owner ditahan sampai ' + Utilities.formatDate(new Date(tahan), ZONA_ABSEN, 'HH:mm') + ' karena salah password 5 kali';
-  }
+  if (masihDitahan(tahan, sekarang)) { return pesanTahan(tahan); }
   if (tahan) {
     props.deleteProperty('tahan_' + owner.id);
     perbaruiKolom(akun, owner, { salah_login: 0 });
@@ -1230,12 +1290,41 @@ function cekTahanOwner(akun, owner) {
   return '';
 }
 
-function cariOwner(usernameMentah) {
+/** Fungsi murni: cari baris role OWNER dengan username (nama) ini, tanpa beda huruf besar/kecil. Boleh ada lebih dari satu owner. */
+function temukanOwner(dataAkun, usernameMentah) {
   const username = String(usernameMentah || '').trim().toLowerCase();
-  if (!username) { return { akun: null, owner: null }; }
+  if (!username) { return null; }
+  return dataAkun.find(function (r) { return String(r.nama).trim().toLowerCase() === username && r.role === 'OWNER'; }) || null;
+}
+
+function cariOwner(usernameMentah) {
   const akun = bacaSheet('akun');
-  const owner = akun.data.find(function (r) { return String(r.nama).trim().toLowerCase() === username && r.role === 'OWNER'; });
-  return { akun: akun, owner: owner || null };
+  return { akun: akun, owner: temukanOwner(akun.data, usernameMentah) };
+}
+
+function pesanTahan(tahanMs) {
+  return 'Login owner ditahan sampai ' + Utilities.formatDate(new Date(tahanMs), ZONA_ABSEN, 'HH:mm') + ' karena salah password 5 kali';
+}
+
+/**
+ * Username owner yang tidak ada (atau akunnya tidak aktif) diperlakukan SAMA dengan password salah:
+ * pesan yang sama, dan juga ditahan 15 menit setelah 5x (hitungan di CacheService), supaya
+ * pesan login tidak membocorkan username mana yang ada.
+ */
+function gagalLoginOwnerPalsu(usernameMentah) {
+  const cache = CacheService.getScriptCache();
+  const sidik = Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, 'owner|' + String(usernameMentah || '').trim().toLowerCase())).slice(0, 24);
+  const sekarang = Date.now();
+  const tahan = Number(cache.get('palsu_tahan_' + sidik) || 0);
+  if (masihDitahan(tahan, sekarang)) { return respon({ status: 'gagal', kode: 'DITAHAN', pesan: pesanTahan(tahan) }); }
+  const k = keputusanSalahPassword(Number(cache.get('palsu_salah_' + sidik) || 0), sekarang);
+  if (k.tahanSampai) {
+    cache.put('palsu_tahan_' + sidik, String(k.tahanSampai), TAHAN_LOGIN_OWNER_MENIT * 60);
+    cache.remove('palsu_salah_' + sidik);
+    return respon({ status: 'gagal', kode: 'DITAHAN', pesan: 'Salah password 5 kali. Login owner ditahan ' + TAHAN_LOGIN_OWNER_MENIT + ' menit' });
+  }
+  cache.put('palsu_salah_' + sidik, String(k.salahBaru), TAHAN_LOGIN_OWNER_MENIT * 60);
+  return respon({ status: 'gagal', pesan: 'Username atau password salah' });
 }
 
 /** Aksi login_owner. Jalur pw_hash kosong: balas perlu_password_baru (belum login). */
@@ -1247,7 +1336,7 @@ function prosesLoginOwner(d) {
   if (password.length > 100) { return respon({ status: 'gagal', pesan: pesanUmum }); }
 
   const c = cariOwner(d.username);
-  if (!c.owner || c.owner.aktif !== true) { return respon({ status: 'gagal', pesan: pesanUmum }); }
+  if (!c.owner || c.owner.aktif !== true) { return gagalLoginOwnerPalsu(d.username); }
   const owner = c.owner;
 
   const tahan = cekTahanOwner(c.akun, owner);
@@ -1301,24 +1390,8 @@ function prosesOwnerBeranda(sesiToken) {
     .filter(function (r) { return r.role === 'PERANGKAT'; })
     .map(function (r) { return { id: r.id, nama: r.nama, cabang: r.cabang, aktif: r.aktif === true }; });
 
-  // Perlu perhatian: informasi saja (7 hari terakhir), terbaru di atas.
-  const batas = Date.now() - 7 * 24 * 3600000;
-  const perhatian = [];
-  bacaSheet('log').data.forEach(function (r) {
-    const ms = msDariSel(r.waktu);
-    if (ms < batas) { return; }
-    if (r.jenis === 'PERANGKAT' && r.aksi === 'DAFTAR_HP_TOKO') {
-      const m = /jarak ke toko (\d+) m/.exec(String(r.alasan));
-      perhatian.push({
-        ms: ms, tipe: 'HP_BARU', judul: 'HP toko baru: ' + r.id + ' (' + r.target + ')',
-        sub: 'Cabang ' + r.cabang + ' · oleh ' + namaDari(r.oleh) + ' · ' + teksWaktu(ms),
-        info: m ? m[1] + ' m dari toko' : ''
-      });
-    } else if (r.jenis === 'KEAMANAN' && r.aksi === 'LOGIN_PERANGKAT_BARU' && String(r.oleh) === String(s.akun.id)) {
-      perhatian.push({ ms: ms, tipe: 'LOGIN_BARU', judul: 'Login owner dari perangkat baru', sub: r.target + ' · ' + teksWaktu(ms), info: '' });
-    }
-  });
-  perhatian.sort(function (a, b) { return b.ms - a.ms; });
+  // Perlu perhatian: informasi saja, terbaru di atas (sumber log, sama untuk semua owner).
+  const perhatian = rakitPerhatian(bacaSheet('log').data, namaDari, Date.now() - BATAS_PERHATIAN_HARI * 24 * 3600000);
 
   const sekarang = Date.now();
   const perangkatAktif = bacaSesi().data
@@ -1331,6 +1404,201 @@ function prosesOwnerBeranda(sesiToken) {
     status: 'ok', nama: s.akun.nama, id: s.akun.id,
     perhatian: perhatian.slice(0, 20), hp_toko: hpToko, perangkat_aktif: perangkatAktif
   });
+}
+
+/**
+ * ---- Perlu perhatian (owner) ----
+ * Sumbernya log: pendaftaran HP toko baru dan login owner dari perangkat baru. SEMUA owner melihat
+ * item yang sama. Penanda "terakhir dibaca" disimpan per owner di Script Properties (dibaca_<ID>,
+ * ms epoch). Log tidak diubah atau dihapus; "tandai dibaca" hanya memajukan penanda.
+ */
+var BATAS_PERHATIAN_HARI = 30;
+
+/** Fungsi murni: dari baris log jadi daftar item perhatian (terbaru di atas) sejak batasMs. */
+function rakitPerhatian(logRows, namaDari, batasMs) {
+  const items = [];
+  logRows.forEach(function (r) {
+    const ms = msDariSel(r.waktu);
+    if (ms < batasMs) { return; }
+    if (r.jenis === 'PERANGKAT' && r.aksi === 'DAFTAR_HP_TOKO') {
+      const m = /jarak ke toko (\d+) m/.exec(String(r.alasan));
+      items.push({
+        ms: ms, tipe: 'HP_BARU', judul: 'HP toko baru: ' + r.id + ' (' + r.target + ')',
+        sub: 'Cabang ' + r.cabang + ' · oleh ' + namaDari(r.oleh) + ' · ' + teksWaktu(ms),
+        info: m ? m[1] + ' m dari toko' : ''
+      });
+    } else if (r.jenis === 'KEAMANAN' && r.aksi === 'LOGIN_PERANGKAT_BARU') {
+      items.push({
+        ms: ms, tipe: 'LOGIN_BARU', judul: 'Login ' + namaDari(r.oleh) + ' dari perangkat baru',
+        sub: r.target + ' · ' + teksWaktu(ms), info: ''
+      });
+    }
+  });
+  items.sort(function (a, b) { return b.ms - a.ms; });
+  return items;
+}
+
+/** Fungsi murni: item yang lebih baru dari penanda dibaca (penandaMs 0 = belum pernah membaca). */
+function itemBelumDibaca(items, penandaMs) {
+  return items.filter(function (it) { return it.ms > penandaMs; });
+}
+
+function bacaPenandaDibaca(idOwner) {
+  return Number(PropertiesService.getScriptProperties().getProperty('dibaca_' + idOwner) || 0);
+}
+
+function ambilItemPerhatian(s) {
+  const semuaAkun = bacaSheet('akun').data;
+  const namaDari = function (id) {
+    const a = semuaAkun.find(function (r) { return String(r.id) === String(id); });
+    return a ? a.nama : String(id);
+  };
+  const items = rakitPerhatian(bacaSheet('log').data, namaDari, Date.now() - BATAS_PERHATIAN_HARI * 24 * 3600000);
+  return { items: items, penanda: bacaPenandaDibaca(s.akun.id) };
+}
+
+function itemUntukHalaman(it, penanda) {
+  return { tipe: it.tipe, judul: it.judul, sub: it.sub, info: it.info, baru: it.ms > penanda };
+}
+
+/** Aksi owner_perhatian: jumlah belum dibaca + 3 item terbaru (yang belum dibaca ditandai baru=true). */
+function prosesOwnerPerhatian(sesiToken) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  const p = ambilItemPerhatian(s);
+  return respon({
+    status: 'ok', jumlah_belum: itemBelumDibaca(p.items, p.penanda).length,
+    terbaru: p.items.slice(0, 3).map(function (it) { return itemUntukHalaman(it, p.penanda); })
+  });
+}
+
+/** Aksi owner_perhatian_daftar: daftar lengkap yang belum dibaca. */
+function prosesOwnerPerhatianDaftar(sesiToken) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  const p = ambilItemPerhatian(s);
+  const belum = itemBelumDibaca(p.items, p.penanda);
+  return respon({ status: 'ok', jumlah_belum: belum.length, daftar: belum.map(function (it) { return itemUntukHalaman(it, p.penanda); }) });
+}
+
+/** Aksi owner_tandai_dibaca: majukan penanda milik owner ini ke sekarang. */
+function prosesOwnerTandaiDibaca(sesiToken) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  PropertiesService.getScriptProperties().setProperty('dibaca_' + s.akun.id, String(Date.now()));
+  return respon({ status: 'ok' });
+}
+
+/**
+ * ---- Kartu "Hari ini" (owner) ----
+ * Dari sheet absensi untuk tanggal hari ini: sudah masuk, telat, sudah pulang, menunggu ACC
+ * (acc_pulang = MENUNGGU). Filter cabang dan shift opsional. Tidak ada angka "belum absen".
+ */
+function hitungHariIni(rows, tanggal, cabang, shift) {
+  const a = { masuk: 0, telat: 0, pulang: 0, menunggu_acc: 0 };
+  rows.forEach(function (r) {
+    if (sebagaiTanggalTeks(r.tanggal, ZONA_ABSEN) !== tanggal) { return; }
+    if (cabang && r.cabang !== cabang) { return; }
+    if (shift !== '' && shift !== null && shift !== undefined && String(r.shift) !== String(shift)) { return; }
+    if (String(r.masuk) !== '') { a.masuk++; }
+    if (r.st_masuk === 'TELAT') { a.telat++; }
+    if (String(r.pulang) !== '') { a.pulang++; }
+    if (r.acc_pulang === 'MENUNGGU') { a.menunggu_acc++; }
+  });
+  return a;
+}
+
+/** Semua baris sheet shift (jam sebagai teks tampilan). */
+function bacaSemuaShift() {
+  const nilai = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('shift').getDataRange().getDisplayValues();
+  const header = nilai[0];
+  const hasil = [];
+  for (let i = 1; i < nilai.length; i++) {
+    const r = {};
+    header.forEach(function (nama, idx) { r[nama] = nilai[i][idx]; });
+    if (r.cabang) { hasil.push({ cabang: r.cabang, no: r.no, nama: r.nama, masuk: normalisasiJam(r.masuk) }); }
+  }
+  return hasil;
+}
+
+/** Aksi owner_hari_ini { sesi, cabang?, shift? }. */
+function prosesOwnerHariIni(sesiToken, cabang, shift) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  const cab = cabang === undefined || cabang === null ? '' : String(cabang).slice(0, 60);
+  const sh = shift === undefined || shift === null ? '' : String(shift).slice(0, 10);
+  const tanggal = Utilities.formatDate(new Date(), ZONA_ABSEN, 'yyyy-MM-dd');
+  const semuaShift = bacaSemuaShift();
+  const daftarCabang = [];
+  semuaShift.forEach(function (x) { if (daftarCabang.indexOf(x.cabang) === -1) { daftarCabang.push(x.cabang); } });
+  bacaSheet('pengaturan').data.forEach(function (r) {
+    if (r.kategori === 'CABANG' && daftarCabang.indexOf(String(r.nama)) === -1) { daftarCabang.push(String(r.nama)); }
+  });
+  return respon({
+    status: 'ok', tanggal: tanggal,
+    angka: hitungHariIni(bacaSheet('absensi').data, tanggal, cab, sh),
+    daftar_cabang: daftarCabang, tampilkan_dropdown_cabang: daftarCabang.length > 1,
+    daftar_shift: semuaShift
+  });
+}
+
+/** Aksi owner_daftar_hp { sesi, cabang?, tampilkan_nonaktif? }: baris role PERANGKAT; yang aktif=FALSE disembunyikan kecuali diminta. */
+function prosesOwnerDaftarHp(sesiToken, cabang, tampilkanNonaktif) {
+  const s = validasiSesi(sesiToken, 'OWNER');
+  if (!s) { return responSesiHabis(); }
+  const cab = cabang === undefined || cabang === null ? '' : String(cabang).slice(0, 60);
+  const semua = tampilkanNonaktif === true;
+  const daftar = bacaSheet('akun').data
+    .filter(function (r) { return r.role === 'PERANGKAT' && (!cab || r.cabang === cab) && (semua || r.aktif === true); })
+    .map(function (r) { return { id: r.id, nama: r.nama, cabang: r.cabang, aktif: r.aktif === true }; })
+    .sort(function (a, b) { return String(a.id) < String(b.id) ? -1 : 1; });
+  return respon({ status: 'ok', hp_toko: daftar });
+}
+
+/** Fungsi murni: nama HP yang aman ditulis ke sheet (tanpa karakter kontrol, tanpa awalan rumus = + - @), 1..40 karakter. */
+function bersihkanNamaHp(teks) {
+  return String(teks === undefined || teks === null ? '' : teks)
+    .replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim()
+    .replace(/^[=+\-@]+/, '').trim().slice(0, 40).trim();
+}
+
+/**
+ * Aksi ubah_nama_hp.
+ *  - Owner: { sesi (owner), id_hp, nama } boleh mengubah nama HP mana pun.
+ *  - Admin: { token (HP toko), sesi (admin), nama } hanya HP toko yang sedang dipegangnya, dan hanya
+ *    kalau cabang admin sama dengan cabang HP itu. id_hp dari client diabaikan.
+ */
+function prosesUbahNamaHp(d) {
+  const nama = bersihkanNamaHp(d.nama);
+  if (!nama) { return respon({ status: 'gagal', pesan: 'Nama HP tidak boleh kosong' }); }
+  let idHp, pelaku;
+  if (d.token) {
+    const hp = validasiTokenHp(d.token);
+    if (!hp) { return respon({ status: 'gagal', kode: 'HP_TIDAK_TERDAFTAR', pesan: 'HP ini belum terdaftar atau sudah dinonaktifkan' }); }
+    const s = validasiSesi(d.sesi, 'ADMIN');
+    if (!s) { return responSesiHabis(); }
+    if (s.akun.cabang !== hp.cabang) { return respon({ status: 'gagal', pesan: 'Admin hanya boleh mengubah nama HP di cabangnya' }); }
+    idHp = hp.id;
+    pelaku = s.akun;
+  } else {
+    const s = validasiSesi(d.sesi, 'OWNER');
+    if (!s) { return responSesiHabis(); }
+    idHp = String(d.id_hp || '');
+    pelaku = s.akun;
+  }
+  const akun = bacaSheet('akun');
+  const hpBaris = akun.data.find(function (r) { return r.role === 'PERANGKAT' && String(r.id) === String(idHp); });
+  if (!hpBaris) { return respon({ status: 'gagal', pesan: 'HP toko tidak ditemukan' }); }
+  const lama = String(hpBaris.nama);
+  if (lama !== nama) {
+    perbaruiKolom(akun, hpBaris, { nama: nama, panggilan: nama });
+    CacheService.getScriptCache().remove('hp_' + hpBaris.pw_hash); // supaya label cabang/nama di HP ikut baru
+    tambahLog({
+      jenis: 'PERANGKAT', oleh: pelaku.id, cabang: hpBaris.cabang, aksi: 'UBAH_NAMA_HP_TOKO',
+      target: nama, id: hpBaris.id, sebelum: lama, sesudah: nama
+    });
+  }
+  return respon({ status: 'ok', id_hp: hpBaris.id, nama: nama });
 }
 
 /** Aksi owner_nonaktifkan_hp: aktif=FALSE dan hapus cache validasi token supaya HP langsung ditolak. */
