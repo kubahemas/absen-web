@@ -107,7 +107,7 @@ function doPost(e) {
   if (data.aksi === 'logout') { return prosesLogout(data.sesi); }
 
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
-  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko'];
+  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
     const hp = validasiTokenHp(data.token);
     if (!hp) {
@@ -116,8 +116,9 @@ function doPost(e) {
     if (data.aksi === 'daftar_karyawan') { return prosesDaftarKaryawan(hp); }
     if (data.aksi === 'tiket_waktu') { return prosesTiketWaktu(data.jenis, hp); }
     if (data.aksi === 'login_admin_toko') { return prosesLoginAdminToko(data, hp); }
-    if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp, data.tiket); }
-    if (data.aksi === 'absen_pulang') { return prosesAbsenPulang(data.id, data.pin, data.jenis, hp, data.tiket); }
+    if (data.aksi === 'unggah_foto') { return prosesUnggahFoto(data, hp); }
+    if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp, data.tiket, data.tanpa_foto === true); }
+    if (data.aksi === 'absen_pulang') { return prosesAbsenPulang(data.id, data.pin, data.jenis, hp, data.tiket, data.tanpa_foto === true); }
     if (data.aksi === 'simpan_pulang') { return prosesSimpanPulang(data.id, data.kode_pending, data.keterangan, hp); }
     return prosesSimpanAlasan(data.id, data.kode_alasan, data.alasan, hp);
   }
@@ -231,7 +232,7 @@ function tentukanStatusMasuk(detik, shift, jendelaMenit) {
   return { ok: true, st_masuk: 'HADIR', telat_mnt: 0 };
 }
 
-function prosesAbsenMasuk(id, pin, hp, tiket) {
+function prosesAbsenMasuk(id, pin, hp, tiket, tanpaFoto) {
   const kunci = kunciTiket();
   if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
   const tk = periksaTiket(tiket, 'MASUK', hp.cabang, kunci, Date.now());
@@ -283,6 +284,8 @@ function prosesAbsenMasuk(id, pin, hp, tiket) {
   barisBaru.telat_mnt = telatMnt;
   barisBaru.ket_masuk = telat ? 'TIDAK DIISI' : '';
   barisBaru.cara_masuk = 'PIN';
+  barisBaru.id_masuk = buatIdAbsen('M', id, tk.t, hp.id);
+  if (tanpaFoto) { barisBaru.foto_masuk = TEKS_TANPA_FOTO; } // kamera ditolak/tidak ada: absen tetap tersimpan
 
   absensi.sheet.appendRow(absensi.header.map(function (nama) { return barisBaru[nama]; }));
 
@@ -296,7 +299,8 @@ function prosesAbsenMasuk(id, pin, hp, tiket) {
     panggilan: akunDitemukan.panggilan,
     tanggal: tanggalHariIni,
     jam: jamSekarang,
-    shift: shiftKaryawan.nama
+    shift: shiftKaryawan.nama,
+    id_absen: barisBaru.id_masuk
   };
   if (telat) {
     hasil.pilihan_alasan = ambilDaftarPengaturan('ALASAN_TELAT');
@@ -697,7 +701,7 @@ function bacaKondisiPulang(akunDitemukan, tanggalHariIni) {
   };
 }
 
-function prosesAbsenPulang(id, pin, jenis, hp, tiket) {
+function prosesAbsenPulang(id, pin, jenis, hp, tiket, tanpaFoto) {
   if (jenis !== 'PULANG' && jenis !== 'PULANG_LEMBUR') {
     return respon({ status: 'gagal', pesan: 'Jenis absen pulang tidak dikenal' });
   }
@@ -733,7 +737,9 @@ function prosesAbsenPulang(id, pin, jenis, hp, tiket) {
     id: akunDitemukan.id, nama: akunDitemukan.nama, panggilan: akunDitemukan.panggilan, cabang: akunDitemukan.cabang,
     tanggal: tanggalHariIni, jam: jamSekarang, detik: detik, shift: kondisi.shift.nama,
     st_pulang: hasil.st_pulang, acc: hasil.acc, tingkat: hasil.tingkat, durasi_menit: hasil.durasi_menit,
-    perubahan: hasil.perubahan || ''
+    perubahan: hasil.perubahan || '',
+    id_absen: buatIdAbsen(hasil.st_pulang === 'LEMBUR DI TOKO' ? 'L' : 'P', akunDitemukan.id, tk.t, hp.id),
+    tanpa_foto: tanpaFoto === true
   };
 
   // Tiket sekali pakai: dihabiskan begitu absen diterima (ditulis, atau ditahan menunggu keterangan).
@@ -809,8 +815,11 @@ function tulisPulang(kondisi, info, keterangan) {
     st_pulang: info.st_pulang,
     ket_pulang: keterangan,
     cara_pulang: 'PIN',
-    acc_pulang: info.acc
+    acc_pulang: info.acc,
+    id_pulang: info.id_absen
   };
+  // Foto: kamera tidak ada -> TANPA FOTO; absen pulang diganti/direvisi -> kolom foto dikosongkan supaya foto baru bisa diunggah
+  if (info.tanpa_foto) { perubahan.foto_pulang = TEKS_TANPA_FOTO; } else if (info.perubahan) { perubahan.foto_pulang = ''; }
   if (info.st_pulang === 'LEMBUR DI TOKO') { perubahan.lembur = info.tingkat + '|' + info.durasi_menit; }
 
   // "Ganti jadi lembur" / "Revisi lembur": catat nilai sebelum dan sesudah di log.
@@ -841,7 +850,7 @@ function balasanPulang(info) {
   return {
     status: 'ok', pesan: 'Absen pulang berhasil', st_pulang: info.st_pulang, jam: info.jam, shift: info.shift,
     nama: info.nama, panggilan: info.panggilan, acc: info.acc, tingkat: info.tingkat, durasi_menit: info.durasi_menit,
-    perubahan: info.perubahan
+    perubahan: info.perubahan, id_absen: info.id_absen
   };
 }
 
@@ -1184,6 +1193,30 @@ function tesServer() {
   ujiBebas('layar Karyawan: saklar nonaktif menampilkan K002 juga, tetap tanpa ADMIN/OWNER', saringDaftarKaryawan(akunDaftar, 'Ngawi', true).map(function (x) { return x.id; }).join(',') === 'K001,K002');
   ujiBebas('daftar nama di layar pilih nama: nonaktif (K002) tidak muncul, ADMIN aktif muncul, HP/owner/cabang lain tidak', daftarUntukPilihNama(akunDaftar, 'Ngawi').map(function (x) { return x.id; }).join(',') === 'K001,K003');
 
+  // ---- Foto absen: id absen, validasi gambar dan unggahan (tanpa menulis ke Drive/sheet) ----
+  ujiBebas('kode perangkat dari ID HP toko: HPT-NGW-03 = T3, HPT-NGW-10 = T10', kodePerangkatDariHp('HPT-NGW-03') === 'T3' && kodePerangkatDariHp('HPT-NGW-10') === 'T10' && kodePerangkatDariHp('aneh') === 'T0');
+  ujiBebas('id absen memakai jam tiket: M-K001-261005-074512-T3 dan L untuk lembur', buatIdAbsen('M', 'K001', epoch('07:45:12'), 'HPT-NGW-03') === 'M-K001-261005-074512-T3' && buatIdAbsen('L', 'K002', epoch('18:35:09'), 'HPT-NGW-01') === 'L-K002-261005-183509-T1', buatIdAbsen('M', 'K001', epoch('07:45:12'), 'HPT-NGW-03'));
+  const jpegUji = '/9j/' + 'A'.repeat(396);
+  ujiBebas('gambar JPEG kecil diterima (juga dengan awalan data:image/jpeg;base64,)', periksaGambarJpeg(jpegUji).ok && periksaGambarJpeg('data:image/jpeg;base64,' + jpegUji).ok);
+  ujiBebas('gambar bukan JPEG ditolak (PNG, data URI png, GIF)', !periksaGambarJpeg('iVBO' + 'A'.repeat(396)).ok && !periksaGambarJpeg('data:image/png;base64,' + jpegUji).ok && !periksaGambarJpeg('R0lG' + 'A'.repeat(396)).ok);
+  ujiBebas('gambar 300 KB pas diterima, sedikit di atasnya ditolak, 375 KB ditolak', periksaGambarJpeg('/9j/' + 'A'.repeat(409600 - 4)).ok === true && periksaGambarJpeg('/9j/' + 'A'.repeat(409600)).ok === false && periksaGambarJpeg('/9j/' + 'A'.repeat(500000)).ok === false);
+  ujiBebas('gambar kosong/bukan teks/karakter aneh/terlalu pendek ditolak', !periksaGambarJpeg('').ok && !periksaGambarJpeg(null).ok && !periksaGambarJpeg(12345).ok && !periksaGambarJpeg('/9j/' + '!'.repeat(396)).ok && !periksaGambarJpeg('/9j/AAAA').ok);
+
+  const hpFoto = { cabang: 'Ngawi' };
+  const hariFoto = '2026-10-05';
+  const barisFoto = { tanggal: '2026-10-05', cabang: 'Ngawi', id_masuk: 'M-K001-261005-074512-T3', foto_masuk: '', id_pulang: 'P-K001-261005-163100-T3', foto_pulang: TEKS_TANPA_FOTO };
+  const pFoto = { jenis: 'MASUK', id_absen: barisFoto.id_masuk, gambar: jpegUji };
+  ujiBebas('unggah foto valid diterima (baris ada, cabang sama, hari ini, kolom kosong)', validasiUnggahFoto(pFoto, barisFoto, hpFoto, hariFoto).ok === true);
+  ujiBebas('unggah foto: absen tidak ada ditolak', !validasiUnggahFoto(pFoto, null, hpFoto, hariFoto).ok && cariBarisAbsen([barisFoto], 'MASUK', 'M-K999-261005-000000-T3') === null);
+  ujiBebas('unggah foto: cabang beda ditolak', !validasiUnggahFoto(pFoto, barisFoto, { cabang: 'Pusat' }, hariFoto).ok);
+  ujiBebas('unggah foto: bukan tanggal hari ini ditolak', !validasiUnggahFoto(pFoto, barisFoto, hpFoto, '2026-10-06').ok);
+  ujiBebas('unggah foto: sudah ada foto (tautan) ditolak', !validasiUnggahFoto(pFoto, Object.assign({}, barisFoto, { foto_masuk: 'https://drive.google.com/file/d/abc' }), hpFoto, hariFoto).ok);
+  ujiBebas('unggah foto: kolom berisi TANPA FOTO masih boleh diisi foto', validasiUnggahFoto({ jenis: 'PULANG', id_absen: barisFoto.id_pulang, gambar: jpegUji }, barisFoto, hpFoto, hariFoto).ok === true);
+  ujiBebas('unggah foto: ukuran terlalu besar atau bukan JPEG ditolak', !validasiUnggahFoto({ jenis: 'MASUK', id_absen: barisFoto.id_masuk, gambar: '/9j/' + 'A'.repeat(500000) }, barisFoto, hpFoto, hariFoto).ok && !validasiUnggahFoto({ jenis: 'MASUK', id_absen: barisFoto.id_masuk, gambar: 'iVBO' + 'A'.repeat(396) }, barisFoto, hpFoto, hariFoto).ok);
+  ujiBebas('unggah foto: jenis tidak dikenal ditolak', !validasiUnggahFoto({ jenis: 'LAIN', gambar: jpegUji }, barisFoto, hpFoto, hariFoto).ok);
+  ujiBebas('unggah foto: tanda "tanpa foto" diterima tanpa gambar, tapi tetap dicek cabang dan sudah-ada-foto', validasiUnggahFoto({ jenis: 'MASUK', tanpa_foto: true }, barisFoto, hpFoto, hariFoto).tanpa === true && !validasiUnggahFoto({ jenis: 'MASUK', tanpa_foto: true }, barisFoto, { cabang: 'Pusat' }, hariFoto).ok);
+  ujiBebas('cari baris absen: masuk lewat id_masuk, pulang lewat id_pulang (tidak tertukar)', cariBarisAbsen([barisFoto], 'MASUK', barisFoto.id_masuk) === barisFoto && cariBarisAbsen([barisFoto], 'MASUK', barisFoto.id_pulang) === null && cariBarisAbsen([barisFoto], 'PULANG', barisFoto.id_pulang) === barisFoto);
+
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -1241,6 +1274,10 @@ function tesServer() {
   baris.push('  - Username owner yang tidak ada dan password salah: pesan sama; setelah 5x username palsu juga ditahan (tes: ketik username ngawur 5x)');
   baris.push('  - Perlu perhatian: "tandai dibaca" memajukan penanda hanya untuk owner yang menekan (Script Properties dibaca_OWN01); owner lain masih melihat item sebagai baru');
   baris.push('  - Ubah nama HP: owner boleh HP mana pun; admin hanya HP yang dipegangnya dan hanya kalau cabang admin sama; hanya kolom nama yang berubah (panggilan, id, aktif, pw_hash tidak berubah); nama "=SUM(A1)" tersimpan sebagai teks; log UBAH_NAMA_HP_TOKO tercatat; label di layar utama HP ikut baru segera');
+  baris.push('  - Jalankan siapkanFolderFoto sekali (setujui izin Drive): folder "Absensi Foto Kubah Emas" muncul di Drive (privat), Script Properties FOLDER_FOTO_ID terisi; jalankan lagi = tidak membuat folder baru');
+  baris.push('  - Absen masuk di HP toko dengan kamera diizinkan: absen tersimpan dan pop-up tampil DULU, beberapa detik kemudian foto_masuk berisi tautan Drive (berkas M-K...-T...jpg di folder), id_masuk terisi');
+  baris.push('  - Absen dengan kamera ditolak (izin kamera diblokir): absen tetap tersimpan, foto_masuk = TANPA FOTO');
+  baris.push('  - Foto pulang/lembur: setelah keterangan diisi, foto_pulang berisi tautan; id_pulang berawalan P- (pulang) atau L- (lembur); revisi/ganti jadi lembur mengosongkan foto_pulang lalu mengisinya dengan foto baru');
   baris.push('  - Tambah karyawan di HP toko (admin): ID baru K + nomor terbesar + 1, cabang ikut admin, pin_hash terisi, pw_hash KOSONG, aktif TRUE; batalkan di layar PIN = tidak ada baris baru');
   baris.push('  - Tambah karyawan dengan nama yang sama dengan karyawan aktif (huruf besar/kecil beda): ditolak dengan pesan jelas');
   baris.push('  - Reset PIN: karyawan yang terkunci bisa absen lagi dengan PIN baru (terkunci FALSE, salah_login 0); Nonaktifkan: nama hilang dari layar pilih nama, baris tetap di sheet');
@@ -2238,6 +2275,138 @@ function prosesKaryawanNonaktif(d) {
     tambahLog({ jenis: 'KARYAWAN', oleh: a.s.akun.id, cabang: target.cabang, aksi: 'NONAKTIFKAN_KARYAWAN', target: target.nama, id: target.id, sebelum: 'aktif=TRUE', sesudah: 'aktif=FALSE' });
   }
   return respon({ status: 'ok', id: target.id, nama: target.nama });
+}
+
+/**
+ * ---- Foto absen di HP toko ----
+ * Kamera depan HP toko memotret otomatis saat PIN dikirim. Absen disimpan DULU (tanpa menunggu foto);
+ * foto dikirim di latar belakang lewat aksi unggah_foto dengan id absen (id_masuk / id_pulang di sheet
+ * absensi). Foto disimpan di SATU folder Drive privat milik akun bisnis (ID folder di Script Properties
+ * FOLDER_FOTO_ID, dibuat oleh siapkanFolderFoto()); tautannya ditulis ke foto_masuk / foto_pulang.
+ * Kamera tidak ada/ditolak atau unggahan gagal: kolom foto diisi "TANPA FOTO" dan absen tetap sah.
+ * Belum ada: penghapusan otomatis 2 bulan dan tampilan foto di aplikasi (gelombang berikutnya).
+ */
+var TEKS_TANPA_FOTO = 'TANPA FOTO';
+var MAKS_FOTO_BYTE = 300 * 1024;
+
+/** Fungsi murni: "HPT-NGW-03" -> "T3" (kode perangkat di id absen). */
+function kodePerangkatDariHp(idHp) {
+  const m = /-(\d+)$/.exec(String(idHp));
+  return m ? 'T' + Number(m[1]) : 'T0';
+}
+
+/**
+ * Fungsi murni: id absen = {M/P/L}-{id karyawan}-{YYMMDD}-{HHMMSS}-{kode perangkat}, dari jam di tiket
+ * (saat tombol ditekan). Contoh: M-K001-260928-074512-T3. M=masuk, P=pulang, L=lembur.
+ */
+function buatIdAbsen(huruf, idKaryawan, ms, idHp) {
+  const d = new Date(ms);
+  return huruf + '-' + idKaryawan + '-' + Utilities.formatDate(d, ZONA_ABSEN, 'yyMMdd') + '-' + Utilities.formatDate(d, ZONA_ABSEN, 'HHmmss') + '-' + kodePerangkatDariHp(idHp);
+}
+
+/** Fungsi murni: cari baris absensi dari id absen untuk jenis MASUK (id_masuk) atau PULANG (id_pulang). */
+function cariBarisAbsen(rows, jenis, idAbsen) {
+  const kolom = jenis === 'MASUK' ? 'id_masuk' : 'id_pulang';
+  return rows.find(function (r) { return String(r[kolom]) === String(idAbsen); }) || null;
+}
+
+/**
+ * Fungsi murni: periksa gambar base64. Harus JPEG (cek 3 byte awal FF D8 FF), maksimal 300 KB.
+ * Boleh berawalan "data:image/jpeg;base64,". Kembalian { ok, bytes } atau { ok:false, pesan }.
+ */
+function periksaGambarJpeg(gambar) {
+  if (typeof gambar !== 'string' || !gambar) { return { ok: false, pesan: 'Gambar kosong' }; }
+  let b64 = gambar.trim();
+  const awalan = /^data:([^;,]*);base64,/i.exec(b64);
+  if (awalan) {
+    if (awalan[1].toLowerCase() !== 'image/jpeg') { return { ok: false, pesan: 'Tipe berkas harus JPEG' }; }
+    b64 = b64.slice(awalan[0].length);
+  }
+  b64 = b64.replace(/\s+/g, '');
+  if (b64.length < 100) { return { ok: false, pesan: 'Gambar terlalu kecil atau rusak' }; }
+  const taksiran = Math.floor(b64.length * 3 / 4) - (b64.slice(-2) === '==' ? 2 : (b64.slice(-1) === '=' ? 1 : 0));
+  if (taksiran > MAKS_FOTO_BYTE) { return { ok: false, pesan: 'Foto terlalu besar (maksimal 300 KB)' }; }
+  if (!/^[A-Za-z0-9+\/]+={0,2}$/.test(b64) || b64.length % 4 !== 0) { return { ok: false, pesan: 'Gambar tidak valid' }; }
+  let bytes;
+  try { bytes = Utilities.base64Decode(b64); } catch (e) { return { ok: false, pesan: 'Gambar tidak valid' }; }
+  if (bytes.length > MAKS_FOTO_BYTE) { return { ok: false, pesan: 'Foto terlalu besar (maksimal 300 KB)' }; }
+  if (bytes.length < 3 || bytes[0] !== -1 || bytes[1] !== -40 || bytes[2] !== -1) { return { ok: false, pesan: 'Tipe berkas harus JPEG' }; }
+  return { ok: true, bytes: bytes };
+}
+
+/**
+ * Fungsi murni: validasi unggah foto terhadap baris absensi.
+ *  p = { id_absen, jenis, gambar?, tanpa_foto? }; baris = hasil cariBarisAbsen (atau null); hp = { cabang }.
+ * Kembalian { ok:true, tanpa:true } | { ok:true, bytes } | { ok:false, pesan }.
+ */
+function validasiUnggahFoto(p, baris, hp, tanggalHariIni) {
+  if (p.jenis !== 'MASUK' && p.jenis !== 'PULANG') { return { ok: false, pesan: 'Jenis foto harus MASUK atau PULANG' }; }
+  if (!baris) { return { ok: false, pesan: 'Absen tidak ditemukan' }; }
+  if (baris.cabang !== hp.cabang) { return { ok: false, pesan: 'Absen ini bukan milik cabang HP ini' }; }
+  if (sebagaiTanggalTeks(baris.tanggal, ZONA_ABSEN) !== tanggalHariIni) { return { ok: false, pesan: 'Foto hanya bisa diunggah di hari absen' }; }
+  const sekarangIsi = String(p.jenis === 'MASUK' ? baris.foto_masuk : baris.foto_pulang);
+  if (sekarangIsi !== '' && sekarangIsi !== TEKS_TANPA_FOTO) { return { ok: false, pesan: 'Absen ini sudah punya foto' }; }
+  if (p.tanpa_foto === true) { return { ok: true, tanpa: true }; }
+  const g = periksaGambarJpeg(p.gambar);
+  return g.ok ? { ok: true, bytes: g.bytes } : g;
+}
+
+/** Aksi unggah_foto { token, id_absen, jenis, gambar | tanpa_foto }: wajib token HP toko (dicek di doPost). */
+function prosesUnggahFoto(d, hp) {
+  const idAbsen = String(d.id_absen || '');
+  if (!/^[MPL]-[A-Za-z0-9]{1,20}-\d{6}-\d{6}-T\d{1,3}$/.test(idAbsen)) { return respon({ status: 'gagal', pesan: 'Id absen tidak valid' }); }
+  if ((d.jenis === 'MASUK' && idAbsen.charAt(0) !== 'M') || (d.jenis === 'PULANG' && idAbsen.charAt(0) === 'M')) {
+    return respon({ status: 'gagal', pesan: 'Id absen tidak cocok dengan jenis foto' });
+  }
+  const kunciLock = LockService.getScriptLock();
+  kunciLock.waitLock(15000);
+  try {
+    const absensi = bacaSheet('absensi');
+    const baris = cariBarisAbsen(absensi.data, d.jenis, idAbsen);
+    const v = validasiUnggahFoto(d, baris, hp, Utilities.formatDate(new Date(), ZONA_ABSEN, 'yyyy-MM-dd'));
+    if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
+    const kolom = d.jenis === 'MASUK' ? 'foto_masuk' : 'foto_pulang';
+    if (v.tanpa) {
+      perbaruiKolom(absensi, baris, (function () { const o = {}; o[kolom] = TEKS_TANPA_FOTO; return o; })());
+      return respon({ status: 'ok', pesan: 'Ditandai tanpa foto' });
+    }
+    const idFolder = PropertiesService.getScriptProperties().getProperty('FOLDER_FOTO_ID');
+    if (!idFolder) { return respon({ status: 'gagal', pesan: 'Folder foto belum disiapkan (jalankan siapkanFolderFoto di editor Apps Script)' }); }
+    let berkas;
+    try {
+      const folder = DriveApp.getFolderById(idFolder);
+      berkas = folder.createFile(Utilities.newBlob(v.bytes, 'image/jpeg', idAbsen + '.jpg'));
+      try { berkas.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE); } catch (e) { /* folder privat sudah cukup */ }
+    } catch (e) {
+      return respon({ status: 'gagal', pesan: 'Foto tidak bisa disimpan ke Drive' });
+    }
+    perbaruiKolom(absensi, baris, (function () { const o = {}; o[kolom] = berkas.getUrl(); return o; })());
+    return respon({ status: 'ok', pesan: 'Foto tersimpan' });
+  } finally {
+    kunciLock.releaseLock();
+  }
+}
+
+/**
+ * Jalankan SATU KALI oleh pemilik dari editor Apps Script: membuat folder Drive privat untuk foto absen,
+ * menyimpan ID-nya di Script Properties (FOLDER_FOTO_ID), dan sekaligus memicu persetujuan izin Drive.
+ * Kalau folder sudah ada, tidak dibuat ulang.
+ */
+function siapkanFolderFoto() {
+  const props = PropertiesService.getScriptProperties();
+  const idLama = props.getProperty('FOLDER_FOTO_ID');
+  if (idLama) {
+    try {
+      const f = DriveApp.getFolderById(idLama);
+      Logger.log('Folder foto sudah ada: ' + f.getName() + ' -> ' + f.getUrl());
+      return f.getUrl();
+    } catch (e) { /* folder lama tidak bisa dibuka: buat baru */ }
+  }
+  const folder = DriveApp.createFolder('Absensi Foto Kubah Emas');
+  folder.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE);
+  props.setProperty('FOLDER_FOTO_ID', folder.getId());
+  Logger.log('Folder foto dibuat: ' + folder.getName() + ' -> ' + folder.getUrl());
+  return folder.getUrl();
 }
 
 var ZONA_ABSEN = 'Asia/Jakarta';

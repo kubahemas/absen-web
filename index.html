@@ -241,7 +241,9 @@
 
   /* ---- Layar pilih nama + PIN ---- */
   #layarPilihNama { }
-  .pilih-atas { padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .pilih-atas { padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .lingkar-kamera { position: absolute; top: 12px; right: 18px; width: 64px; height: 64px; border-radius: 50%; overflow: hidden; border: 3px solid #333438; background: #000000; }
+  .lingkar-kamera video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   .pilih-judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700; }
   .huruf-label { font-size: 13px; font-weight: 700; }
   .huruf-daftar { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -602,6 +604,7 @@
 
   <div id="layarPilihNama" class="layar">
     <div class="pilih-atas">
+      <div class="lingkar-kamera" id="kotakKamera" style="display:none"><video id="pratinjauKamera" playsinline muted autoplay></video></div>
       <div class="pilih-judul">Pilih nama</div>
       <div class="huruf-label">Huruf depan nama</div>
       <div class="huruf-daftar" id="hurufDaftar"></div>
@@ -722,6 +725,7 @@
   const semuaLayar = document.querySelectorAll('.layar');
   function tampilLayar(el) {
     semuaLayar.forEach(function (l) { l.classList.toggle('aktif', l === el); });
+    if (el !== layarPilihNama) { matikanKamera(); }
     window.scrollTo(0, 0);
   }
   const layarJenis = document.getElementById('layarJenis');
@@ -909,6 +913,7 @@
     pinSaatIni = '';
     tampilkanPinTitik();
     perbaruiKeypad();
+    if (idTerpilih) { nyalakanKamera(); } else { matikanKamera(); }
   });
 
   function tampilkanPinTitik() {
@@ -1065,6 +1070,7 @@
       // 30 detik tanpa sentuhan: kembali ke layar utama.
       // Telat: alasan tetap TIDAK DIISI. Pulang cepat/lembur: belum tersimpan sama sekali.
       const batalPulang = alasan && alasan.mode !== 'TELAT';
+      if (batalPulang) { fotoMenunggu = null; }
       tutupLayarAlasan();
       alasan = null;
       if (batalPulang) { tampilGagal('Absen pulang dibatalkan dan belum tersimpan. Silakan ulangi.'); } else { kembaliKeLayarUtama(); }
@@ -1159,6 +1165,7 @@
         alasan = null;
         if (data.status === 'ok' && !masuk) {
           tampilPulang(data, data.panggilan || panggilanSimpan);
+          mulaiUnggah(data.id_absen, 'PULANG');
         } else if (data.status === 'ok') {
           bukaPopupOtomatis('hadir', TEMA.hijau,
             '<div class="kartu">' +
@@ -1178,6 +1185,7 @@
   });
 
   document.getElementById('btnBatalAlasan').addEventListener('click', function () {
+    fotoMenunggu = null;
     tutupLayarAlasan();
     alasan = null;
     kembaliKeLayarUtama();
@@ -1233,15 +1241,91 @@
       .catch(function () { return null; });
   }
 
+  // ---- Foto absen otomatis (kamera depan) ----
+  // Kamera menyala begitu nama dipilih (supaya tidak menunda), memotret otomatis saat PIN dikirim, lalu mati.
+  // Foto dikecilkan (sisi terpanjang 640 px, JPEG kualitas sedang) dan diunggah di LATAR BELAKANG setelah absen
+  // tersimpan. Kamera ditolak/tidak ada atau unggahan gagal = kolom foto diisi "TANPA FOTO"; absen tetap sah.
+  const videoKamera = document.getElementById('pratinjauKamera');
+  const kotakKamera = document.getElementById('kotakKamera');
+  let streamKamera = null;
+  let kameraMemulai = false;
+  let fotoMenunggu = null; // data URL JPEG yang menunggu diunggah
+
+  function nyalakanKamera() {
+    if (streamKamera || kameraMemulai || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { return; }
+    kameraMemulai = true;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }, audio: false })
+      .then(function (stream) {
+        kameraMemulai = false;
+        if (!layarPilihNama.classList.contains('aktif') || !idTerpilih) {
+          stream.getTracks().forEach(function (t) { t.stop(); }); // layar sudah ditinggalkan
+          return;
+        }
+        streamKamera = stream;
+        videoKamera.srcObject = stream;
+        const p = videoKamera.play();
+        if (p && p.catch) { p.catch(function () { /* tetap bisa memotret setelah video siap */ }); }
+        kotakKamera.style.display = 'block';
+      })
+      .catch(function () { kameraMemulai = false; /* ditolak / tidak ada: absen tanpa foto */ });
+  }
+
+  function matikanKamera() {
+    if (streamKamera) { streamKamera.getTracks().forEach(function (t) { t.stop(); }); }
+    streamKamera = null;
+    if (videoKamera) { videoKamera.srcObject = null; }
+    if (kotakKamera) { kotakKamera.style.display = 'none'; }
+  }
+
+  // Ambil satu bingkai SEKARANG (saat PIN dikirim). Null kalau kamera belum siap.
+  function tangkapFoto() {
+    if (!streamKamera || !videoKamera.videoWidth || !videoKamera.videoHeight) { return null; }
+    try {
+      const w = videoKamera.videoWidth, h = videoKamera.videoHeight;
+      const skala = Math.min(1, 640 / Math.max(w, h));
+      const kanvas = document.createElement('canvas');
+      kanvas.width = Math.round(w * skala);
+      kanvas.height = Math.round(h * skala);
+      kanvas.getContext('2d').drawImage(videoKamera, 0, 0, kanvas.width, kanvas.height);
+      return kanvas.toDataURL('image/jpeg', 0.6);
+    } catch (e) { return null; }
+  }
+
+  function cobaUnggah(idAbsen, jenis, foto, sisa) {
+    return kirimPost({ aksi: 'unggah_foto', token: hpAktif.token, id_absen: idAbsen, jenis: jenis, gambar: foto })
+      .then(function (d) {
+        if (d.status === 'ok' || d.kode === 'HP_TIDAK_TERDAFTAR') { return true; }
+        throw new Error('gagal');
+      })
+      .catch(function () { return sisa > 0 ? cobaUnggah(idAbsen, jenis, foto, sisa - 1) : false; });
+  }
+
+  // Unggah di latar belakang (coba ulang sekali). Gagal = tandai TANPA FOTO.
+  function mulaiUnggah(idAbsen, jenis) {
+    const foto = fotoMenunggu;
+    fotoMenunggu = null;
+    if (!foto || !idAbsen || !hpAktif) { return; }
+    const token = hpAktif.token;
+    cobaUnggah(idAbsen, jenis, foto, 1).then(function (ok) {
+      if (!ok) {
+        kirimPost({ aksi: 'unggah_foto', token: token, id_absen: idAbsen, jenis: jenis, tanpa_foto: true }).catch(function () { /* kolom foto tetap kosong */ });
+      }
+    });
+  }
+
   function kirimAbsen() {
     perbaruiKeypadKirim(true);
     const id = idTerpilih, pin = pinSaatIni, mode = modeAbsen;
+    // Foto otomatis saat PIN dikirim (tanpa tombol); kamera langsung dimatikan. Tidak ada foto = TANPA FOTO.
+    fotoMenunggu = tangkapFoto();
+    matikanKamera();
+    const tanpaFoto = !fotoMenunggu;
     (tiketPromise || Promise.resolve(null))
       .then(function (tiket) {
         if (!tiket) { return { status: 'gagal', pesan: 'Waktu habis, tekan tombolnya lagi' }; }
         const body = mode === 'MASUK'
-          ? { aksi: 'absen_masuk', token: hpAktif.token, id: id, pin: pin, tiket: tiket }
-          : { aksi: 'absen_pulang', token: hpAktif.token, id: id, pin: pin, jenis: mode, tiket: tiket };
+          ? { aksi: 'absen_masuk', token: hpAktif.token, id: id, pin: pin, tiket: tiket, tanpa_foto: tanpaFoto }
+          : { aksi: 'absen_pulang', token: hpAktif.token, id: id, pin: pin, jenis: mode, tiket: tiket, tanpa_foto: tanpaFoto };
         return fetch(CONFIG.webAppUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1259,6 +1343,7 @@
   function tampilkanHasil(data) {
     if (data.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return; }
     if (data.status !== 'ok') {
+      fotoMenunggu = null; // absen tidak tersimpan: foto dibuang
       tampilGagal(data.pesan);
       return;
     }
@@ -1275,10 +1360,12 @@
         bukaLayarAlasan();
       } else {
         tampilPulang(data, panggilan);
+        mulaiUnggah(data.id_absen, 'PULANG'); // foto menyusul di latar belakang, tidak menunda pop-up
       }
       return;
     }
     if (data.st_masuk === 'TELAT') { tampilTelat(data, panggilan); } else { tampilHadir(data, panggilan); }
+    mulaiUnggah(data.id_absen, 'MASUK');
   }
 
   function kembaliKeLayarUtama() {
