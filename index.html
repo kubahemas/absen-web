@@ -253,6 +253,17 @@
   .segmen-btn { flex: 1; min-height: 40px; border: none; border-radius: 999px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 800; color: #141111; white-space: nowrap; }
   .segmen-btn.aktif { background: #141111; color: #FFD62E; }
 
+  /* ---- Absen luar dan riwayat (HP pribadi) ---- */
+  #layarLuar, #layarRiwayat { padding: 16px 18px; gap: 12px; position: relative; }
+  .lingkar-kamera.luar { top: 58px; right: 18px; }
+  .status-gps { font-size: 14px; font-weight: 700; color: #15643A; }
+  .status-gps.galat { color: #B91C1C; }
+  .chip-baris { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip-st { padding: 3px 9px; border-radius: 999px; background: #F2EFE6; font-size: 11px; font-weight: 800; white-space: nowrap; }
+  .chip-acc { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; white-space: nowrap; background: #FFF4C2; color: #141111; }
+  .chip-acc.acc-diterima { background: #E3F4EA; color: #15643A; }
+  .chip-acc.acc-ditolak { background: #FDE8E8; color: #B91C1C; }
+
   /* ---- Layar pilih nama + PIN ---- */
   #layarPilihNama { }
   .pilih-atas { padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 10px; position: relative; }
@@ -641,6 +652,43 @@
     </div>
   </div>
 
+  <!-- Absen luar (HP pribadi): tujuan + keperluan, GPS wajib, foto otomatis -->
+  <div id="layarLuar" class="layar">
+    <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam">Absen luar</div></div>
+    <div class="lingkar-kamera luar" id="kotakKameraLuar" style="display:none"><video id="videoLuar" playsinline muted autoplay></video></div>
+    <div class="judul-blok"><div class="garis"></div><div><div class="h besar" id="luarJudul">Absen luar</div><div class="s" id="luarSub">Lokasi dan foto wajib</div></div></div>
+    <form class="kartu-putih" id="bidangLuarForm" autocomplete="off" onsubmit="return false">
+      <div class="bidang"><label for="luarTujuan">Tujuan (tempat / nama klien)</label><input id="luarTujuan" maxlength="100" autocomplete="off"></div>
+      <div class="bidang"><label for="luarKeperluan">Keperluan</label><input id="luarKeperluan" maxlength="100" autocomplete="off"></div>
+    </form>
+    <div class="kartu-putih">
+      <div class="judul-kartu">Lokasi (GPS) wajib</div>
+      <div class="status-gps" id="luarGps">Mengambil lokasi...</div>
+      <button type="button" class="btn-biasa-garis" id="btnGpsUlang" style="display:none">Coba lagi</button>
+    </div>
+    <div class="pesan-form" id="pesanLuar"></div>
+    <div style="flex-grow:1"></div>
+    <div class="bar-bawah" id="barLuarMasuk">
+      <button type="button" class="btn-kembali" id="btnKembaliLuarMasuk" aria-label="Kembali">‹</button>
+      <button type="button" class="btn-utama btn-lanjut-pin" id="btnKirimMasuk" disabled>KIRIM ABSEN MASUK</button>
+    </div>
+    <div class="aksi-bawah" id="barLuarPulang">
+      <div class="baris">
+        <button type="button" class="btn-kembali" id="btnKembaliLuarPulang" aria-label="Kembali">‹</button>
+        <button type="button" class="btn-utama btn-lanjut-pin" id="btnKirimPulang" disabled>PULANG</button>
+      </div>
+      <div class="baris"><button type="button" class="btn-gelap" id="btnKirimLembur" disabled>PULANG + LEMBUR</button></div>
+    </div>
+  </div>
+
+  <!-- Riwayat absen milik sendiri -->
+  <div id="layarRiwayat" class="layar">
+    <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam">Riwayat</div></div>
+    <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Riwayat absen</div><div class="s" id="riwayatSub">31 hari terakhir</div></div></div>
+    <div class="isi-gulir"><div id="daftarRiwayat" style="display:flex;flex-direction:column;gap:10px"></div></div>
+    <div class="bar-bawah"><button type="button" class="btn-garis" id="btnKembaliRiwayat">Kembali</button></div>
+  </div>
+
   <div id="layarUtama" class="layar">
     <div class="baris-atas">
       <img src="assets/logo.png" alt="Kubah Emas Indonesia">
@@ -806,7 +854,7 @@
   const semuaLayar = document.querySelectorAll('.layar');
   function tampilLayar(el) {
     semuaLayar.forEach(function (l) { l.classList.toggle('aktif', l === el); });
-    if (el !== layarPilihNama) { matikanKamera(); }
+    if (el !== layarPilihNama && el !== layarLuar) { matikanKamera(); }
     window.scrollTo(0, 0);
   }
   const layarJenis = document.getElementById('layarJenis');
@@ -1062,6 +1110,7 @@
     tutupPopup();
     popup.className = 'popup tampil ' + kelas;
     popup.innerHTML = html;
+    sisipkanCatatanLuar();
     setTema(tema);
     popup.onclick = tutupPopupDanReset;
     timerPopup = setTimeout(tutupPopupDanReset, detik * 1000);
@@ -1126,6 +1175,7 @@
         '<button type="button" class="tombol-alasan" id="btnIsiAlasan">ISI ALASAN TELAT</button>' +
         '<div class="petunjuk-merah">Isi dalam <b id="sisaDetik">' + batas + '</b> detik.</div>' +
       '</div>';
+    sisipkanCatatanLuar();
     document.getElementById('btnIsiAlasan').addEventListener('click', function () {
       tutupPopup();
       bukaLayarAlasan();
@@ -1231,8 +1281,8 @@
     const masuk = alasan.mode === 'TELAT';
     const panggilanSimpan = alasan.panggilan;
     const body = masuk
-      ? { aksi: 'simpan_alasan', token: hpAktif.token, id: alasan.id, kode_alasan: alasan.kode, alasan: { pilihan: alasan.pilihan, teks: teks } }
-      : { aksi: 'simpan_pulang', token: hpAktif.token, id: alasan.id, kode_pending: alasan.kode, keterangan: { pilihan: alasan.pilihan, teks: teks } };
+      ? { aksi: 'simpan_alasan', token: kredAbsen().token, sesi: kredAbsen().sesi, id: alasan.id, kode_alasan: alasan.kode, alasan: { pilihan: alasan.pilihan, teks: teks } }
+      : { aksi: 'simpan_pulang', token: kredAbsen().token, sesi: kredAbsen().sesi, id: alasan.id, kode_pending: alasan.kode, keterangan: { pilihan: alasan.pilihan, teks: teks } };
     fetch(CONFIG.webAppUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1326,19 +1376,23 @@
   // Kamera menyala begitu nama dipilih (supaya tidak menunda), memotret otomatis saat PIN dikirim, lalu mati.
   // Foto dikecilkan (sisi terpanjang 640 px, JPEG kualitas sedang) dan diunggah di LATAR BELAKANG setelah absen
   // tersimpan. Kamera ditolak/tidak ada atau unggahan gagal = kolom foto diisi "TANPA FOTO"; absen tetap sah.
-  const videoKamera = document.getElementById('pratinjauKamera');
-  const kotakKamera = document.getElementById('kotakKamera');
+  let videoKamera = document.getElementById('pratinjauKamera');
+  let kotakKamera = document.getElementById('kotakKamera');
   let streamKamera = null;
   let kameraMemulai = false;
   let fotoMenunggu = null; // data URL JPEG yang menunggu diunggah
 
-  function nyalakanKamera() {
+  // video/kotak/masihDi opsional: bawaan = pratinjau di layar pilih nama; layar absen luar memakai elemennya sendiri.
+  function nyalakanKamera(video, kotak, masihDi) {
     if (streamKamera || kameraMemulai || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { return; }
+    videoKamera = video || document.getElementById('pratinjauKamera');
+    kotakKamera = kotak || document.getElementById('kotakKamera');
+    const masihDiLayar = masihDi || function () { return layarPilihNama.classList.contains('aktif') && !!idTerpilih; };
     kameraMemulai = true;
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }, audio: false })
       .then(function (stream) {
         kameraMemulai = false;
-        if (!layarPilihNama.classList.contains('aktif') || !idTerpilih) {
+        if (!masihDiLayar()) {
           stream.getTracks().forEach(function (t) { t.stop(); }); // layar sudah ditinggalkan
           return;
         }
@@ -1373,7 +1427,7 @@
   }
 
   function cobaUnggah(idAbsen, jenis, foto, sisa) {
-    return kirimPost({ aksi: 'unggah_foto', token: hpAktif.token, id_absen: idAbsen, jenis: jenis, gambar: foto })
+    return kirimPost({ aksi: 'unggah_foto', token: kredAbsen().token, sesi: kredAbsen().sesi, id_absen: idAbsen, jenis: jenis, gambar: foto })
       .then(function (d) {
         if (d.status === 'ok' || d.kode === 'HP_TIDAK_TERDAFTAR') { return true; }
         throw new Error('gagal');
@@ -1385,11 +1439,11 @@
   function mulaiUnggah(idAbsen, jenis) {
     const foto = fotoMenunggu;
     fotoMenunggu = null;
-    if (!foto || !idAbsen || !hpAktif) { return; }
-    const token = hpAktif.token;
+    if (!foto || !idAbsen || (!hpAktif && !sesiPribadi)) { return; }
+    const kred = kredAbsen(); // diambil sekarang: modeLuar bisa berubah saat pop-up ditutup
     cobaUnggah(idAbsen, jenis, foto, 1).then(function (ok) {
       if (!ok) {
-        kirimPost({ aksi: 'unggah_foto', token: token, id_absen: idAbsen, jenis: jenis, tanpa_foto: true }).catch(function () { /* kolom foto tetap kosong */ });
+        kirimPost({ aksi: 'unggah_foto', token: kred.token, sesi: kred.sesi, id_absen: idAbsen, jenis: jenis, tanpa_foto: true }).catch(function () { /* kolom foto tetap kosong */ });
       }
     });
   }
@@ -1460,6 +1514,7 @@
     document.querySelectorAll('#hurufDaftar button').forEach(function (b) { b.classList.remove('aktif'); });
     if (daftarKaryawan.length) { isiSelectNama(daftarKaryawan); }
     modeAbsen = 'MASUK';
+    if (modeLuar) { modeLuar = false; tampilLayar(layarPribadi); muatStatusHariIni(); return; } // absen luar: kembali ke beranda HP pribadi
     tampilLayar(hpAktif ? layarUtama : layarJenis);
   }
 
@@ -2636,14 +2691,230 @@
     });
   }
 
-  // Tombol Segera di Bagian 1 (diisi Bagian 2): ABSEN MASUK, ABSEN PULANG, RIWAYAT ABSEN
-  ['btnPribMasuk', 'btnPribPulang', 'btnPribRiwayat'].forEach(function (id) {
+
+  // ================= ABSEN LUAR (HP pribadi) =================
+  // ABSEN MASUK / PULANG di HP pribadi = absen luar: tujuan + keperluan, GPS WAJIB, foto otomatis (kamera depan).
+  // Jam dari tiket waktu saat tombol ditekan; status sama persis dengan HP toko; semua berstatus MENUNGGU persetujuan.
+  const layarLuar = document.getElementById('layarLuar');
+  const layarRiwayat = document.getElementById('layarRiwayat');
+  let modeLuar = false;       // true selama alur absen luar (sampai kembali ke beranda pribadi)
+  let luarMode = '';          // 'MASUK' | 'PULANG'
+  let luarTiket = null;       // Promise<string|null>: tiket saat ABSEN MASUK/PULANG ditekan
+  let luarPerluForm = true;   // tujuan + keperluan wajib?
+  let luarMengirim = false;
+  let gpsLuar = null;         // { lat, lng, akurasi }
+  let gpsPantau = null;
+  let gpsTimerLuar = null;
+  let statusHariIni = null;   // balasan pribadi_hari_ini
+
+  // Kredensial untuk aksi absen: token HP toko, atau sesi HP pribadi saat absen luar.
+  function kredAbsen() {
+    return modeLuar && sesiPribadi ? { token: undefined, sesi: sesiPribadi } : { token: hpAktif ? hpAktif.token : undefined, sesi: undefined };
+  }
+
+  function mintaTiketPribadi(jenis) {
+    return kirimPost({ aksi: 'tiket_waktu', sesi: sesiPribadi, jenis: jenis })
+      .then(function (d) {
+        if (pribadiGagalSesi(d)) { return null; }
+        return d.status === 'ok' ? d.tiket : null;
+      })
+      .catch(function () { return null; });
+  }
+
+  // ---- Beranda: status hari ini menentukan tombol ----
+  function sesudahBukaBerandaPribadi() { muatStatusHariIni(); }
+
+  function muatStatusHariIni() {
+    kirimPost({ aksi: 'pribadi_hari_ini', sesi: sesiPribadi })
+      .then(function (d) {
+        if (pribadiGagalSesi(d) || d.status !== 'ok') { return; }
+        statusHariIni = d;
+        gambarStatusPribadi();
+      })
+      .catch(function () { /* tombol tetap bisa dipakai; server yang memutuskan */ });
+  }
+
+  function aturTombolPribadi(id, aktif) {
     const el = document.getElementById(id);
-    el.disabled = true;
-    el.classList.add('belum-aktif');
-  });
-  document.getElementById('subPribMasuk').textContent = 'Segera';
-  document.getElementById('subPribPulang').textContent = 'Segera';
+    el.disabled = !aktif;
+    el.classList.toggle('belum-aktif', !aktif);
+  }
+
+  function gambarStatusPribadi() {
+    const d = statusHariIni;
+    if (!d) { return; }
+    document.getElementById('subPribMasuk').textContent = d.sudah_masuk ? 'Sudah masuk ' + d.jam_masuk : 'Absen luar';
+    document.getElementById('subPribPulang').textContent = d.sudah_pulang ? 'Sudah pulang ' + d.jam_pulang + ' · ketuk untuk lembur' : (d.sudah_masuk ? 'Absen luar' : 'Belum absen masuk');
+    document.getElementById('pribStatus').textContent = !d.sudah_masuk ? 'Belum absen hari ini.' : ('Masuk ' + d.jam_masuk + (d.sudah_pulang ? ' · Pulang ' + d.jam_pulang : ' · belum pulang'));
+    aturTombolPribadi('btnPribMasuk', !d.sudah_masuk);
+    aturTombolPribadi('btnPribPulang', d.sudah_masuk);
+  }
+
+  document.getElementById('btnPribMasuk').addEventListener('click', function () { bukaLuar('MASUK'); });
+  document.getElementById('btnPribPulang').addEventListener('click', function () { bukaLuar('PULANG'); });
+  document.getElementById('btnPribRiwayat').addEventListener('click', bukaRiwayat);
+
+  // ---- Layar absen luar ----
+  function setStatusGps(teks, galat) {
+    const el = document.getElementById('luarGps');
+    el.textContent = teks;
+    el.classList.toggle('galat', !!galat);
+    document.getElementById('btnGpsUlang').style.display = galat ? '' : 'none';
+  }
+
+  function hentikanPantauGps() {
+    if (gpsPantau !== null) { navigator.geolocation.clearWatch(gpsPantau); gpsPantau = null; }
+    clearTimeout(gpsTimerLuar);
+  }
+
+  function perbaruiTombolLuar() {
+    const siap = !!gpsLuar && !luarMengirim;
+    ['btnKirimMasuk', 'btnKirimPulang', 'btnKirimLembur'].forEach(function (id) { document.getElementById(id).disabled = !siap; });
+  }
+
+  function mulaiGpsLuar() {
+    hentikanPantauGps();
+    gpsLuar = null;
+    perbaruiTombolLuar();
+    if (!navigator.geolocation) { setStatusGps('Browser ini tidak mendukung lokasi. Absen luar tidak bisa dilanjutkan.', true); return; }
+    setStatusGps('Mengambil lokasi...', false);
+    let terbaik = null;
+    gpsPantau = navigator.geolocation.watchPosition(function (pos) {
+      if (!terbaik || pos.coords.accuracy < terbaik.accuracy) { terbaik = pos.coords; }
+      gpsLuar = { lat: terbaik.latitude, lng: terbaik.longitude, akurasi: terbaik.accuracy };
+      setStatusGps('Lokasi terkunci (akurasi ' + Math.round(terbaik.accuracy) + ' m)', false);
+      perbaruiTombolLuar();
+      if (terbaik.accuracy <= 30) { hentikanPantauGps(); }
+    }, function (err) {
+      if (err.code === 1 || err.code === 2) {
+        hentikanPantauGps();
+        gpsLuar = null;
+        perbaruiTombolLuar();
+        setStatusGps(pesanLokasi(err) + ' Absen luar tidak bisa dilanjutkan tanpa lokasi.', true);
+      }
+    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+    gpsTimerLuar = setTimeout(function () {
+      if (gpsPantau !== null) { navigator.geolocation.clearWatch(gpsPantau); gpsPantau = null; }
+      if (!gpsLuar) { setStatusGps('Lokasi belum didapat. Pindah ke tempat terbuka lalu coba lagi.', true); }
+    }, 20000);
+  }
+  document.getElementById('btnGpsUlang').addEventListener('click', mulaiGpsLuar);
+
+  function bukaLuar(mode) {
+    luarMode = mode;
+    modeLuar = true;
+    luarMengirim = false;
+    fotoMenunggu = null;
+    document.getElementById('luarTujuan').value = '';
+    document.getElementById('luarKeperluan').value = '';
+    document.getElementById('pesanLuar').textContent = '';
+    // Pulang: form hanya kalau absen masuk hari ini BUKAN absen luar (mis. masuk di HP toko)
+    luarPerluForm = mode === 'MASUK' || !(statusHariIni && statusHariIni.cara_masuk === 'LUAR');
+    document.getElementById('bidangLuarForm').style.display = luarPerluForm ? '' : 'none';
+    document.getElementById('luarJudul').textContent = mode === 'MASUK' ? 'Absen luar: masuk' : 'Absen luar: pulang';
+    document.getElementById('luarSub').textContent = mode === 'MASUK' ? 'Isi tujuan dan keperluan' : (luarPerluForm ? 'Isi tujuan dan keperluan, lalu pilih' : 'Pilih PULANG atau PULANG + LEMBUR');
+    document.getElementById('barLuarMasuk').style.display = mode === 'MASUK' ? '' : 'none';
+    document.getElementById('barLuarPulang').style.display = mode === 'MASUK' ? 'none' : '';
+    luarTiket = mintaTiketPribadi(mode === 'MASUK' ? 'MASUK' : 'PULANG'); // jam = saat tombol ditekan
+    tampilLayar(layarLuar);
+    nyalakanKamera(document.getElementById('videoLuar'), document.getElementById('kotakKameraLuar'), function () { return layarLuar.classList.contains('aktif'); });
+    mulaiGpsLuar();
+  }
+
+  function keluarLuar() {
+    hentikanPantauGps();
+    matikanKamera();
+    fotoMenunggu = null;
+    modeLuar = false;
+    tampilLayar(layarPribadi);
+    muatStatusHariIni();
+  }
+  document.getElementById('btnKembaliLuarMasuk').addEventListener('click', keluarLuar);
+  document.getElementById('btnKembaliLuarPulang').addEventListener('click', keluarLuar);
+
+  // pulangJenis: 'PULANG' atau 'PULANG_LEMBUR' (hanya untuk absen pulang)
+  function kirimLuar(pulangJenis) {
+    if (luarMengirim) { return; }
+    const pesan = document.getElementById('pesanLuar');
+    const tujuan = document.getElementById('luarTujuan').value.trim();
+    const keperluan = document.getElementById('luarKeperluan').value.trim();
+    if (luarPerluForm && (!tujuan || !keperluan)) { pesan.textContent = 'Isi tujuan dan keperluan.'; return; }
+    if (!gpsLuar) { pesan.textContent = 'Lokasi belum didapat. Absen luar butuh lokasi.'; return; }
+    luarMengirim = true;
+    perbaruiTombolLuar();
+    pesan.textContent = 'Mengirim...';
+    const gps = gpsLuar;
+    hentikanPantauGps();
+    // Foto otomatis saat dikirim; kamera dimatikan. Tidak ada foto = TANPA FOTO (absen tetap sah).
+    fotoMenunggu = tangkapFoto();
+    matikanKamera();
+    const tanpaFoto = !fotoMenunggu;
+    const mode = luarMode;
+    // Pulang + lembur: tiket LEMBUR diminta saat tombol itu ditekan (jam = saat itu)
+    const tiketP = mode === 'PULANG' && pulangJenis === 'PULANG_LEMBUR' ? mintaTiketPribadi('LEMBUR') : luarTiket;
+    tiketP
+      .then(function (tiket) {
+        if (!tiket) { return { status: 'gagal', pesan: 'Waktu habis, tekan tombolnya lagi' }; }
+        const dasar = { sesi: sesiPribadi, tiket: tiket, tujuan: tujuan, keperluan: keperluan, gps: gps, tanpa_foto: tanpaFoto };
+        const body = mode === 'MASUK'
+          ? Object.assign({ aksi: 'absen_luar_masuk' }, dasar)
+          : Object.assign({ aksi: 'absen_luar_pulang', jenis: pulangJenis }, dasar);
+        return kirimPost(body);
+      })
+      .then(function (d) { luarMengirim = false; selesaiLuar(d); })
+      .catch(function () { luarMengirim = false; selesaiLuar({ status: 'gagal', pesan: 'Tidak bisa terhubung ke server. Coba lagi.' }); });
+  }
+
+  // Hasil absen luar memakai pop-up yang sama dengan HP toko (HADIR / TELAT + alasan, pulang cepat / lembur + keterangan).
+  function selesaiLuar(d) {
+    if (pribadiGagalSesi(d)) { return; }
+    modeAbsen = luarMode === 'MASUK' ? 'MASUK' : 'PULANG';
+    idTerpilih = profilPribadi ? profilPribadi.id : '';
+    panggilanTerpilih = profilPribadi ? profilPribadi.panggilan : '';
+    tampilkanHasil(d);
+  }
+
+  document.getElementById('btnKirimMasuk').addEventListener('click', function () { kirimLuar(''); });
+  document.getElementById('btnKirimPulang').addEventListener('click', function () { kirimLuar('PULANG'); });
+  document.getElementById('btnKirimLembur').addEventListener('click', function () { kirimLuar('PULANG_LEMBUR'); });
+
+  // Catatan di pop-up setelah absen luar
+  function sisipkanCatatanLuar() {
+    if (!modeLuar) { return; }
+    const judul = popup.querySelector('.judul-popup');
+    if (!judul || /Tidak tersimpan|Alasan tersimpan/.test(judul.textContent)) { return; }
+    const kartu = popup.querySelector('.kartu');
+    if (!kartu || kartu.querySelector('.catatan-luar')) { return; }
+    const catatan = document.createElement('div');
+    catatan.className = 'pil-menunggu catatan-luar';
+    catatan.textContent = 'Absen luar tercatat, menunggu persetujuan admin.';
+    const petunjuk = kartu.querySelector('.petunjuk, .petunjuk-merah, .tombol-alasan');
+    kartu.insertBefore(catatan, petunjuk || null);
+  }
+
+  // ---- Riwayat absen (milik sendiri) ----
+  function bukaRiwayat() {
+    document.getElementById('daftarRiwayat').innerHTML = '<div class="hp-ket"><span class="putar"></span>Memuat...</div>';
+    tampilLayar(layarRiwayat);
+    kirimPost({ aksi: 'pribadi_riwayat', sesi: sesiPribadi })
+      .then(function (d) {
+        if (pribadiGagalSesi(d)) { return; }
+        if (d.status !== 'ok') { document.getElementById('daftarRiwayat').innerHTML = '<div class="hp-ket">' + escHtml(d.pesan || 'Gagal memuat.') + '</div>'; return; }
+        document.getElementById('riwayatSub').textContent = '31 hari terakhir · ' + d.daftar.length + ' hari';
+        const chipAcc = function (label, acc) {
+          return acc ? '<span class="chip-acc acc-' + escHtml(acc.toLowerCase()) + '">' + escHtml(label) + ' ' + escHtml(acc) + '</span>' : '';
+        };
+        document.getElementById('daftarRiwayat').innerHTML = d.daftar.length ? d.daftar.map(function (r) {
+          return '<div class="kartu-hp"><div class="hp-baris"><div class="nama-hp-besar">' + escHtml(tglTampil(r.tanggal)) + '</div>' +
+            (r.luar ? '<div class="badge-aktif">Luar</div>' : '') + '</div>' +
+            '<div class="hp-nama">Masuk ' + escHtml(r.masuk || '-') + ' · Pulang ' + escHtml(r.pulang || '-') + '</div>' +
+            '<div class="chip-baris">' + (r.st_masuk ? '<span class="chip-st">' + escHtml(r.st_masuk) + '</span>' : '') + (r.st_pulang ? '<span class="chip-st">' + escHtml(r.st_pulang) + '</span>' : '') +
+            chipAcc('Masuk', r.acc_masuk) + chipAcc('Pulang', r.acc_pulang) + '</div></div>';
+        }).join('') : '<div class="hp-ket">Belum ada absen dalam 31 hari terakhir.</div>';
+      })
+      .catch(function () { document.getElementById('daftarRiwayat').innerHTML = '<div class="hp-ket">Tidak bisa terhubung ke server.</div>'; });
+  }
+  document.getElementById('btnKembaliRiwayat').addEventListener('click', function () { tampilLayar(layarPribadi); });
 
   // ---- Mulai: sesi owner = beranda owner; sesi HP pribadi = beranda pribadi; token HP toko = layar utama; kalau tidak = pilih jenis HP ----
   hpAktif = bacaHp();
@@ -2684,6 +2955,8 @@
     if (layarTambahKaryawan.classList.contains('aktif')) { tampilLayar(layarKaryawan); return; }
     if (layarKaryawan.classList.contains('aktif')) { tampilLayar(modePribadiAdmin ? layarPribadi : layarAdmin); return; }
     if (menuPribadi.classList.contains('tampil')) { tutupMenuPribadi(); return; }
+    if (layarLuar.classList.contains('aktif')) { keluarLuar(); return; }
+    if (layarRiwayat.classList.contains('aktif')) { tampilLayar(layarPribadi); return; }
     if (layarLoginPribadi.classList.contains('aktif')) { kosongkanLoginPribadi(); tampilLayar(layarJenis); return; }
     if (layarKredensialAdmin.classList.contains('aktif')) { document.getElementById('btnKembaliKredensial').click(); return; }
     if (adminAktifDiLayar()) { keluarAdmin(); return; }

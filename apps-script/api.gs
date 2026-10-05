@@ -111,6 +111,16 @@ function doPost(e) {
   if (data.aksi === 'pribadi_profil') { return prosesPribadiProfil(data); }
   if (data.aksi === 'pribadi_keluarkan_semua') { return prosesPribadiKeluarkanSemua(data); }
 
+  // Absen luar HP pribadi: sesi HP pribadi sebagai pengganti token HP toko.
+  if (data.aksi === 'tiket_waktu' && !data.token) { return prosesTiketPribadi(data); }
+  if (data.aksi === 'unggah_foto' && !data.token) { return prosesUnggahFotoPribadi(data); }
+  if (data.aksi === 'simpan_alasan' && !data.token) { return prosesSimpanAlasanPribadi(data); }
+  if (data.aksi === 'simpan_pulang' && !data.token) { return prosesSimpanPulangPribadi(data); }
+  if (data.aksi === 'absen_luar_masuk') { return prosesAbsenLuarMasuk(data); }
+  if (data.aksi === 'absen_luar_pulang') { return prosesAbsenLuarPulang(data); }
+  if (data.aksi === 'pribadi_hari_ini') { return prosesPribadiHariIni(data); }
+  if (data.aksi === 'pribadi_riwayat') { return prosesPribadiRiwayat(data); }
+
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
   const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
@@ -164,7 +174,7 @@ function samaAman(a, b) {
  * Fungsi murni (tidak menyentuh sheet/cache): periksa tanda tangan, jenis, cabang, masa berlaku.
  * Kembalian: { ok:true, t (ms jam tombol ditekan), nonce } atau { ok:false, pesan }.
  */
-function periksaTiket(tiket, jenis, cabang, kunci, sekarangMs) {
+function periksaTiket(tiket, jenis, cabang, kunci, sekarangMs, akunId) {
   const gagal = { ok: false, pesan: PESAN_TIKET };
   if (typeof tiket !== 'string' || tiket.length > 600) { return gagal; }
   const bagian = tiket.split('.');
@@ -179,6 +189,8 @@ function periksaTiket(tiket, jenis, cabang, kunci, sekarangMs) {
     p = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(bagian[0])).getDataAsString());
   } catch (e) { return gagal; }
   if (!p || p.j !== jenis || p.c !== cabang || typeof p.t !== 'number' || typeof p.e !== 'number' || !p.n) { return gagal; }
+  // Tiket HP pribadi terikat ke akun (p.a); tiket HP toko tidak punya p.a. Keduanya tidak bisa saling dipakai.
+  if (akunId ? p.a !== akunId : p.a) { return gagal; }
   if (sekarangMs > p.e || p.t > sekarangMs + 5000) { return gagal; }
   return { ok: true, t: p.t, nonce: String(p.n) };
 }
@@ -209,7 +221,7 @@ function klaimTiketServer(nonce) {
 }
 
 /** Aksi tiket_waktu: jenis MASUK | PULANG | LEMBUR. Wajib token HP toko (dicek di doPost). */
-function prosesTiketWaktu(jenis, hp) {
+function prosesTiketWaktu(jenis, hp, akunId) {
   if (jenis !== 'MASUK' && jenis !== 'PULANG' && jenis !== 'LEMBUR') {
     return respon({ status: 'gagal', pesan: 'Jenis tiket tidak dikenal' });
   }
@@ -217,9 +229,9 @@ function prosesTiketWaktu(jenis, hp) {
   if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
   const menit = ambilNilaiUmum('tiket_absen_menit', 3);
   const t = Date.now();
-  const tiket = buatTiket({
-    j: jenis, t: t, e: t + menit * 60000, c: hp.cabang, n: Utilities.getUuid().replace(/-/g, '').slice(0, 16)
-  }, kunci);
+  const muatan = { j: jenis, t: t, e: t + menit * 60000, c: hp.cabang, n: Utilities.getUuid().replace(/-/g, '').slice(0, 16) };
+  if (akunId) { muatan.a = akunId; } // HP pribadi: tiket terikat ke akun
+  const tiket = buatTiket(muatan, kunci);
   return respon({ status: 'ok', tiket: tiket, jam_server: Utilities.formatDate(new Date(t), ZONA_ABSEN, 'yyyy-MM-dd HH:mm:ss') });
 }
 
@@ -245,7 +257,15 @@ function prosesAbsenMasuk(id, pin, hp, tiket, tanpaFoto) {
 
   const cek = cekKaryawanDanPin(id, pin, hp);
   if (cek.gagal) { return cek.gagal; }
-  const akunDitemukan = cek.akun;
+  return catatAbsenMasuk({ akun: cek.akun, tk: tk, idHp: hp.id, tanpaFoto: tanpaFoto, luar: null });
+}
+
+/**
+ * Inti absen masuk (dipakai HP toko dan absen luar HP pribadi): status dari jam tiket, tulis baris absensi.
+ * c = { akun, tk, idHp ('HPT-..' atau 'PRIBADI'), tanpaFoto, luar: null | { tujuan, keperluan, gps } }
+ */
+function catatAbsenMasuk(c) {
+  const akunDitemukan = c.akun, tk = c.tk, id = c.akun.id, tanpaFoto = c.tanpaFoto, luar = c.luar;
 
   // Semua waktu dari tiket (saat tombol ditekan).
   const zona = ZONA_ABSEN;
@@ -287,16 +307,20 @@ function prosesAbsenMasuk(id, pin, hp, tiket, tanpaFoto) {
   barisBaru.masuk = jamSekarang;
   barisBaru.st_masuk = telat ? 'TELAT' : 'HADIR';
   barisBaru.telat_mnt = telatMnt;
-  barisBaru.ket_masuk = telat ? 'TIDAK DIISI' : '';
-  barisBaru.cara_masuk = 'PIN';
-  barisBaru.id_masuk = buatIdAbsen('M', id, tk.t, hp.id);
+  const ketLuar = luar ? susunKetLuar(luar.tujuan, luar.keperluan) : '';
+  barisBaru.ket_masuk = gabungKet(telat ? 'TIDAK DIISI' : '', ketLuar);
+  barisBaru.cara_masuk = luar ? 'LUAR' : 'PIN';
+  barisBaru.acc_masuk = accAwalLuar(luar);
+  barisBaru.id_masuk = buatIdAbsen('M', id, tk.t, c.idHp);
   if (tanpaFoto) { barisBaru.foto_masuk = TEKS_TANPA_FOTO; } // kamera ditolak/tidak ada: absen tetap tersimpan
 
   absensi.sheet.appendRow(absensi.header.map(function (nama) { return barisBaru[nama]; }));
+  if (luar) { tulisTeksSel(absensi, absensi.sheet.getLastRow(), 'gps_masuk', teksGps(luar.gps)); }
 
   const hasil = {
     status: 'ok',
     pesan: 'Absen masuk berhasil',
+    luar: !!luar,
     st_masuk: barisBaru.st_masuk,
     telat_mnt: telatMnt,
     karyawan: id,
@@ -337,7 +361,7 @@ function prosesSimpanAlasan(id, kode, alasan, hp) {
   const baris = absensi.data.find(function (r) {
     return String(r.karyawan) === String(id) && sebagaiTanggalTeks(r.tanggal, zona) === tanggalHariIni;
   });
-  if (!baris || baris.cabang !== hp.cabang || baris.ket_masuk !== 'TIDAK DIISI') {
+  if (!baris || baris.cabang !== hp.cabang || String(baris.ket_masuk).indexOf('TIDAK DIISI') !== 0) {
     return respon({ status: 'gagal', pesan: 'Alasan tidak bisa disimpan' });
   }
 
@@ -353,7 +377,7 @@ function prosesSimpanAlasan(id, kode, alasan, hp) {
     return respon({ status: 'gagal', pesan: 'Keterangan wajib diisi kalau memilih Lainnya' });
   }
 
-  perbaruiKolom(absensi, baris, { ket_masuk: teks ? pilihan + ': ' + teks : pilihan });
+  perbaruiKolom(absensi, baris, { ket_masuk: ketSetelahAlasan(baris.ket_masuk, teks ? pilihan + ': ' + teks : pilihan) });
   cache.remove(KUNCI_KODE_ALASAN + id);
   return respon({ status: 'ok', pesan: 'Alasan tersimpan' });
 }
@@ -722,7 +746,15 @@ function prosesAbsenPulang(id, pin, jenis, hp, tiket, tanpaFoto) {
 
   const cek = cekKaryawanDanPin(id, pin, hp);
   if (cek.gagal) { return cek.gagal; }
-  const akunDitemukan = cek.akun;
+  return catatAbsenPulang({ akun: cek.akun, tk: tk, jenis: jenis, idHp: hp.id, tanpaFoto: tanpaFoto, luar: null });
+}
+
+/**
+ * Inti absen pulang/lembur (dipakai HP toko dan absen luar HP pribadi).
+ * c = { akun, tk, jenis, idHp, tanpaFoto, luar: null | { tujuan, keperluan, gps } }
+ */
+function catatAbsenPulang(c) {
+  const akunDitemukan = c.akun, tk = c.tk, jenis = c.jenis, tanpaFoto = c.tanpaFoto;
 
   // Semua waktu dari tiket (saat tombol ditekan).
   const w = waktuDariMs(tk.t);
@@ -742,13 +774,18 @@ function prosesAbsenPulang(id, pin, jenis, hp, tiket, tanpaFoto) {
   if (!hasil.ok) {
     return respon({ status: 'gagal', pesan: hasil.pesan });
   }
+  // Absen luar: tujuan dan keperluan wajib kalau absen masuk hari ini BUKAN absen luar (mis. masuk di HP toko).
+  if (c.luar && perluFormLuar(kondisi.baris ? kondisi.baris.cara_masuk : '') && (!c.luar.tujuan || !c.luar.keperluan)) {
+    return respon({ status: 'gagal', pesan: 'Tujuan dan keperluan wajib diisi' });
+  }
 
   const info = {
     id: akunDitemukan.id, nama: akunDitemukan.nama, panggilan: akunDitemukan.panggilan, cabang: akunDitemukan.cabang,
     tanggal: tanggalHariIni, jam: jamSekarang, detik: detik, shift: kondisi.shift.nama,
-    st_pulang: hasil.st_pulang, acc: hasil.acc, tingkat: hasil.tingkat, durasi_menit: hasil.durasi_menit,
+    st_pulang: hasil.st_pulang, acc: c.luar ? accAwalLuar(c.luar) : hasil.acc, tingkat: hasil.tingkat, durasi_menit: hasil.durasi_menit,
     perubahan: hasil.perubahan || '',
-    id_absen: buatIdAbsen(hasil.st_pulang === 'LEMBUR DI TOKO' ? 'L' : 'P', akunDitemukan.id, tk.t, hp.id),
+    luar: !!c.luar, ket_luar: c.luar ? susunKetLuar(c.luar.tujuan, c.luar.keperluan) : '', gps_teks: c.luar ? teksGps(c.luar.gps) : '',
+    id_absen: buatIdAbsen(hasil.st_pulang === 'LEMBUR DI TOKO' ? 'L' : 'P', akunDitemukan.id, tk.t, c.idHp),
     tanpa_foto: tanpaFoto === true
   };
 
@@ -823,8 +860,8 @@ function tulisPulang(kondisi, info, keterangan) {
   const perubahan = {
     pulang: info.jam,
     st_pulang: info.st_pulang,
-    ket_pulang: keterangan,
-    cara_pulang: 'PIN',
+    ket_pulang: gabungKet(keterangan, info.ket_luar),
+    cara_pulang: info.luar ? 'LUAR' : 'PIN',
     acc_pulang: info.acc,
     id_pulang: info.id_absen
   };
@@ -836,6 +873,7 @@ function tulisPulang(kondisi, info, keterangan) {
   let sebelum = '';
   if (info.perubahan) { sebelum = ringkasanPulang(kondisi.absensi, kondisi.baris); }
   perbaruiKolom(kondisi.absensi, kondisi.baris, perubahan);
+  if (info.luar && info.gps_teks) { tulisTeksSel(kondisi.absensi, kondisi.baris._baris, 'gps_pulang', info.gps_teks); }
   if (info.perubahan) {
     tambahLog({
       jenis: 'ABSENSI', oleh: info.id, cabang: info.cabang,
@@ -860,7 +898,7 @@ function balasanPulang(info) {
   return {
     status: 'ok', pesan: 'Absen pulang berhasil', st_pulang: info.st_pulang, jam: info.jam, shift: info.shift,
     nama: info.nama, panggilan: info.panggilan, acc: info.acc, tingkat: info.tingkat, durasi_menit: info.durasi_menit,
-    perubahan: info.perubahan, id_absen: info.id_absen
+    perubahan: info.perubahan, id_absen: info.id_absen, luar: !!info.luar
   };
 }
 
@@ -1312,6 +1350,43 @@ function tesServer() {
   ujiBebas('ACC: admin pada absennya sendiri ditolak (hanya owner), admin cabang lain ditolak, admin cabang sendiri milik orang lain boleh', !bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K010', cabang: 'Ngawi' }).boleh && !bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K001', cabang: 'Pusat' }).boleh && bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K001', cabang: 'Ngawi' }).boleh);
   ujiBebas('ACC: owner boleh semua cabang termasuk item milik admin; KARYAWAN/tanpa aktor ditolak', bolehMemutuskanKonfirmasi({ role: 'OWNER', id: 'OWN01', cabang: '' }, { karyawan: 'K010', cabang: 'Pusat' }).boleh && !bolehMemutuskanKonfirmasi({ role: 'KARYAWAN', id: 'K001', cabang: 'Ngawi' }, { karyawan: 'K002', cabang: 'Ngawi' }).boleh && !bolehMemutuskanKonfirmasi(null, { karyawan: 'K002', cabang: 'Ngawi' }).boleh);
 
+  // ---- Gelombang 2 bagian 2: absen luar (HP pribadi) ----
+  const tiketPribadi = buatTiket({ j: 'MASUK', t: epoch('07:45:50'), e: epoch('07:45:50') + 180000, c: 'Ngawi', n: 'pribadi1', a: 'K001' }, KUNCI_UJI);
+  const tp1 = periksaTiket(tiketPribadi, 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10'), 'K001');
+  ujiBebas('tiket waktu dengan sesi HP pribadi: tiket terikat akun, jam dari tiket (07:45:50 + kirim 07:46:10 = HADIR)', tp1.ok && tentukanStatusMasuk(waktuDariMs(tp1.t).detik, s1, 60).st_masuk === 'HADIR');
+  ujiBebas('tiket pribadi: akun lain ditolak, dan tidak bisa dipakai di HP toko (tanpa akun)', !periksaTiket(tiketPribadi, 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10'), 'K002').ok && !periksaTiket(tiketPribadi, 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10')).ok);
+  ujiBebas('tiket HP toko (tanpa akun) tidak bisa dipakai di HP pribadi', !periksaTiket(bikinTiket('MASUK', '07:45:50', 3), 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:46:10'), 'K001').ok);
+  ujiBebas('tiket pribadi: jenis salah, kedaluwarsa, cabang salah tetap ditolak', !periksaTiket(tiketPribadi, 'PULANG', 'Ngawi', KUNCI_UJI, epoch('07:46:10'), 'K001').ok && !periksaTiket(tiketPribadi, 'MASUK', 'Ngawi', KUNCI_UJI, epoch('07:50:00'), 'K001').ok && !periksaTiket(tiketPribadi, 'MASUK', 'Pusat', KUNCI_UJI, epoch('07:46:10'), 'K001').ok);
+  ujiBebas('status absen luar = status HP toko (fungsi yang sama): masuk 07:46:00 TELAT 1 menit, pulang 16:29:59 pulang cepat, lembur 17:30:01 tingkat 2', tentukanStatusMasuk(detik('07:46:00'), s1, 60).telat_mnt === 1 && tentukanStatusPulang(detik('16:29:59'), s1, 'PULANG', true, false).st_pulang === 'PULANG CEPAT' && tentukanStatusPulang(detik('17:30:01'), s1, 'PULANG_LEMBUR', true, false).tingkat === 2);
+
+  const gpsOk = { lat: -7.404412, lng: 111.446212, akurasi: 18.4 };
+  ujiBebas('GPS wajib: tanpa lokasi atau lokasi tidak lengkap ditolak', !validasiAbsenLuar({ tujuan: 'a', keperluan: 'b' }, true).ok && !validasiAbsenLuar({ tujuan: 'a', keperluan: 'b', gps: { lat: 1, lng: 2 } }, true).ok && !validasiAbsenLuar({ tujuan: 'a', keperluan: 'b', gps: null }, true).ok);
+  ujiBebas('GPS divalidasi tipe dan rentang (teks, lat 91, lng 181, akurasi negatif, NaN ditolak)', [{ lat: '1', lng: 2, akurasi: 3 }, { lat: 91, lng: 2, akurasi: 3 }, { lat: 1, lng: 181, akurasi: 3 }, { lat: 1, lng: 2, akurasi: -1 }, { lat: NaN, lng: 2, akurasi: 3 }, { lat: 1, lng: 2, akurasi: 200000 }].every(function (g) { return !validasiAbsenLuar({ tujuan: 'a', keperluan: 'b', gps: g }, true).ok; }));
+  ujiBebas('akurasi buruk (350 m) tetap diterima tapi ditandai; akurasi 100 m tidak ditandai', validasiAbsenLuar({ tujuan: 'a', keperluan: 'b', gps: { lat: 1, lng: 2, akurasi: 350 } }, true).ok && akurasiBuruk('1,2,350') === true && akurasiBuruk('1,2,100') === false && akurasiBuruk('1,2,18') === false && akurasiBuruk('rusak') === false);
+  ujiBebas('GPS disimpan "lat,lng,akurasi" (lat dan lng di awal)', teksGps(gpsOk) === '-7.404412,111.446212,18' && akurasiDariGps(teksGps(gpsOk)) === 18);
+  ujiBebas('tujuan dan keperluan masuk luar wajib (1..100 karakter), 101 karakter ditolak', !validasiAbsenLuar({ tujuan: '', keperluan: 'b', gps: gpsOk }, true).ok && !validasiAbsenLuar({ tujuan: 'a', keperluan: '  ', gps: gpsOk }, true).ok && !validasiAbsenLuar({ tujuan: 'x'.repeat(101), keperluan: 'b', gps: gpsOk }, true).ok && validasiAbsenLuar({ tujuan: 'x'.repeat(100), keperluan: 'b', gps: gpsOk }, true).ok);
+  ujiBebas('pulang luar tanpa form diterima di sisi validasi (wajib tidaknya ditentukan cara absen masuk)', validasiAbsenLuar({ gps: gpsOk }, false).ok === true);
+  ujiBebas('pulang luar setelah masuk di HP toko (PIN) meminta tujuan dan keperluan; setelah masuk luar tidak perlu mengulang', perluFormLuar('PIN') === true && perluFormLuar('') === true && perluFormLuar('LUAR') === false);
+  ujiBebas('absen luar berstatus MENUNGGU (masuk dan pulang); absen HP toko tidak berubah', accAwalLuar({ tujuan: 'a' }) === 'MENUNGGU' && accAwalLuar(null) === '');
+  ujiBebas('keterangan luar: "LUAR: tujuan / keperluan", digabung dengan alasan memakai " | "', susunKetLuar('Toko Madiun', 'Antar barang') === 'LUAR: Toko Madiun / Antar barang' && gabungKet('Macet', 'LUAR: a / b') === 'Macet | LUAR: a / b' && gabungKet('', 'LUAR: a / b') === 'LUAR: a / b' && gabungKet('', '') === '');
+  ujiBebas('alasan telat luar: "TIDAK DIISI | LUAR: x" menjadi "Macet | LUAR: x" (bagian luar tetap)', ketSetelahAlasan('TIDAK DIISI | LUAR: a / b', 'Macet') === 'Macet | LUAR: a / b' && ketSetelahAlasan('TIDAK DIISI', 'Hujan: deras') === 'Hujan: deras');
+  ujiBebas('id absen HP pribadi memakai kode perangkat P dan foto bisa dibentuk jalurnya', kodePerangkatDariHp('PRIBADI') === 'P' && buatIdAbsen('M', 'K001', epoch('07:45:12'), 'PRIBADI') === 'M-K001-261005-074512-P' && jalurFoto({ tanggal: '2026-10-05', cabang: 'Ngawi', karyawan: 'K001', nama: 'Budi', shift: 1, id_masuk: 'M-K001-261005-074512-P' }, 'MASUK').namaBerkas === '051026_MASUK1_0745.jpg');
+  const barisPribadi = { tanggal: '2026-10-05', cabang: 'Ngawi', karyawan: 'K001', id_masuk: 'M-K001-261005-074512-P', foto_masuk: '' };
+  ujiBebas('unggah foto sesi HP pribadi: absen milik akun itu diterima, milik orang lain ditolak', validasiUnggahFoto({ jenis: 'MASUK', id_absen: barisPribadi.id_masuk, gambar: jpegUji }, barisPribadi, { cabang: 'Ngawi', akunId: 'K001' }, '2026-10-05').ok === true && !validasiUnggahFoto({ jenis: 'MASUK', id_absen: barisPribadi.id_masuk, gambar: jpegUji }, barisPribadi, { cabang: 'Ngawi', akunId: 'K002' }, '2026-10-05').ok);
+  ujiBebas('jam dari teks tampilan sel: 07:45, 7:45:00, 4:30:00 PM = 16:30, 12:05 AM = 00:05, kosong', jamDariTampilan('07:45') === '07:45' && jamDariTampilan('7:45:00') === '07:45' && jamDariTampilan('4:30:00 PM') === '16:30' && jamDariTampilan('12:05:00 AM') === '00:05' && jamDariTampilan('') === '');
+  const absenAll = [
+    { tanggal: '2026-10-05', karyawan: 'K001', masuk: '07:44', pulang: '16:31', st_masuk: 'HADIR', st_pulang: 'PULANG NORMAL', cara_masuk: 'PIN', cara_pulang: 'PIN', acc_masuk: '', acc_pulang: '' },
+    { tanggal: '2026-10-04', karyawan: 'K001', masuk: '08:10', pulang: '', st_masuk: 'TELAT', st_pulang: '', cara_masuk: 'LUAR', cara_pulang: '', acc_masuk: 'MENUNGGU', acc_pulang: '' },
+    { tanggal: '2026-10-05', karyawan: 'K002', masuk: '07:50', pulang: '', st_masuk: 'TELAT', st_pulang: '', cara_masuk: 'PIN', cara_pulang: '', acc_masuk: '', acc_pulang: '' },
+    { tanggal: '2026-08-01', karyawan: 'K001', masuk: '07:40', pulang: '16:30', st_masuk: 'HADIR', st_pulang: 'PULANG NORMAL', cara_masuk: 'PIN', cara_pulang: 'PIN', acc_masuk: '', acc_pulang: '' },
+    { tanggal: '2026-09-20', karyawan: 'K001', masuk: '07:41', pulang: '16:30', st_masuk: 'HADIR', st_pulang: 'PULANG NORMAL', cara_masuk: 'LUAR', cara_pulang: 'LUAR', acc_masuk: 'DITERIMA', acc_pulang: 'DITOLAK' }
+  ];
+  const rw = rakitRiwayat(absenAll, 'K001', '2026-09-04', 50);
+  ujiBebas('riwayat hanya milik sendiri (K002 tidak ikut), 31 hari terakhir (Agustus tidak), terbaru dulu', rw.length === 3 && rw.every(function (x) { return ['2026-10-05', '2026-10-04', '2026-09-20'].indexOf(x.tanggal) !== -1; }) && rw[0].tanggal === '2026-10-05' && rw[2].tanggal === '2026-09-20');
+  ujiBebas('riwayat: persetujuan hanya tampil untuk absen luar (kosong untuk HP toko), pulang membawa acc_pulang', rw[0].acc_masuk === '' && rw[0].luar === false && rw[1].acc_masuk === 'MENUNGGU' && rw[1].luar === true && rw[2].acc_masuk === 'DITERIMA' && rw[2].acc_pulang === 'DITOLAK');
+  const banyakAbsen = []; for (let n = 0; n < 80; n++) { banyakAbsen.push({ tanggal: '2026-10-' + ('0' + (1 + (n % 5))).slice(-2), karyawan: 'K001', masuk: '07:45', pulang: '', st_masuk: 'HADIR', st_pulang: '', cara_masuk: 'PIN', cara_pulang: '', acc_masuk: '', acc_pulang: '' }); }
+  ujiBebas('riwayat dibatasi 50 baris', rakitRiwayat(banyakAbsen, 'K001', '2026-09-01', 50).length === 50);
+
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -1381,6 +1456,11 @@ function tesServer() {
   baris.push('  - Admin baru (pw_hash kosong, ganti_pw TRUE diisi pemilik di sheet): login pertama dengan nama saja membuka layar Buat kata sandi dan PIN; sesudahnya pw_hash dan pin_hash terisi, ganti_pw FALSE, dan sheet sesi bertambah satu baris (kolom perangkat berawalan HPP, kolom kedaluwarsa kosong)');
   baris.push('  - Reset PIN / Nonaktifkan karyawan dari HP toko atau HP pribadi admin: karyawan yang sedang masuk di HP pribadi langsung ditolak pada permintaan berikutnya (sesi di sheet jadi aktif FALSE)');
   baris.push('  - Karyawan lama dengan PIN 4 angka tidak bisa absen lagi sampai admin menjalankan Reset PIN (PIN baru 5 angka)');
+  baris.push('  - Absen luar masuk di HP pribadi: isi tujuan + keperluan, lokasi terkunci, KIRIM: baris absensi dengan cara_masuk LUAR, acc_masuk MENUNGGU, ket_masuk "LUAR: tujuan / keperluan", gps_masuk "lat,lng,akurasi" (teks, bukan angka), id_masuk berakhiran -P, foto menyusul ke folder Drive');
+  baris.push('  - Izin lokasi ditolak: absen luar tidak bisa dilanjutkan (pesan jelas, tombol Coba lagi); akurasi 350 m tetap bisa dikirim');
+  baris.push('  - Telat lewat absen luar: pop-up TELAT + alasan; ket_masuk menjadi "Macet | LUAR: ..." (bagian luar tetap)');
+  baris.push('  - Pulang luar setelah masuk di HP toko: form tujuan/keperluan muncul; setelah masuk luar: tanpa form; PULANG + LEMBUR mengikuti aturan jam lembur; acc_pulang MENUNGGU, cara_pulang LUAR');
+  baris.push('  - Riwayat absen di HP pribadi: hanya milik sendiri, 31 hari terakhir, paling banyak 50 baris, jam masuk/pulang benar (bukan terbalik AM/PM)');
   baris.push('  - Aktifkan kembali karyawan nonaktif: saklar Tampilkan nonaktif -> tombol Aktifkan kembali; aktif jadi TRUE dengan ID sama, pin_hash/salah_login/terkunci tidak berubah, log AKTIFKAN_KARYAWAN; nama kembar dengan karyawan aktif ditolak');
   baris.push('  - Form Tambah karyawan: cabang bershift tunggal menampilkan catatan shift otomatis (tanpa dropdown), dan form tetap bisa disimpan walau shift tidak dipilih');
   baris.push('  - Login admin/owner dengan huruf besar/kecil berbeda (ADMIN123 vs admin123) berhasil; akun lama yang berhasil login dengan ketikan persis lama: pw_hash otomatis berubah ke versi huruf kecil (kolom pw_hash berubah, salah_login tidak naik)');
@@ -2457,6 +2537,7 @@ var MAKS_FOTO_BYTE = 300 * 1024;
 
 /** Fungsi murni: "HPT-NGW-03" -> "T3" (kode perangkat di id absen). */
 function kodePerangkatDariHp(idHp) {
+  if (idHp === 'PRIBADI') { return 'P'; } // HP pribadi (absen luar)
   const m = /-(\d+)$/.exec(String(idHp));
   return m ? 'T' + Number(m[1]) : 'T0';
 }
@@ -2509,6 +2590,7 @@ function validasiUnggahFoto(p, baris, hp, tanggalHariIni) {
   if (p.jenis !== 'MASUK' && p.jenis !== 'PULANG') { return { ok: false, pesan: 'Jenis foto harus MASUK atau PULANG' }; }
   if (!baris) { return { ok: false, pesan: 'Absen tidak ditemukan' }; }
   if (baris.cabang !== hp.cabang) { return { ok: false, pesan: 'Absen ini bukan milik cabang HP ini' }; }
+  if (hp.akunId !== undefined && String(baris.karyawan) !== String(hp.akunId)) { return { ok: false, pesan: 'Absen ini bukan milik akun ini' }; }
   if (sebagaiTanggalTeks(baris.tanggal, ZONA_ABSEN) !== tanggalHariIni) { return { ok: false, pesan: 'Foto hanya bisa diunggah di hari absen' }; }
   const sekarangIsi = String(p.jenis === 'MASUK' ? baris.foto_masuk : baris.foto_pulang);
   if (sekarangIsi !== '' && sekarangIsi !== TEKS_TANPA_FOTO) { return { ok: false, pesan: 'Absen ini sudah punya foto' }; }
@@ -2541,7 +2623,7 @@ function jalurFoto(baris, jenis) {
   const tanggal = sebagaiTanggalTeks(baris.tanggal, ZONA_ABSEN);
   const t = /^(\d{4})-(\d{2})-(\d{2})$/.exec(tanggal);
   const idAbsen = String(jenis === 'MASUK' ? baris.id_masuk : baris.id_pulang);
-  const j = /-(\d{2})(\d{2})\d{2}-T\d+$/.exec(idAbsen);
+  const j = /-(\d{2})(\d{2})\d{2}-(?:T\d+|P)$/.exec(idAbsen);
   if (!t || !j) { return null; }
   const orang = bersihkanNamaBerkas(String(baris.karyawan) + '_' + (bersihkanNamaBerkas(baris.nama) || 'TANPA NAMA'));
   return {
@@ -2621,7 +2703,7 @@ function catatGalatFolder(pesan) {
 /** Aksi unggah_foto { token, id_absen, jenis, gambar | tanpa_foto }: wajib token HP toko (dicek di doPost). */
 function prosesUnggahFoto(d, hp) {
   const idAbsen = String(d.id_absen || '');
-  if (!/^[MPL]-[A-Za-z0-9]{1,20}-\d{6}-\d{6}-T\d{1,3}$/.test(idAbsen)) { return respon({ status: 'gagal', pesan: 'Id absen tidak valid' }); }
+  if (!/^[MPL]-[A-Za-z0-9]{1,20}-\d{6}-\d{6}-(?:T\d{1,3}|P)$/.test(idAbsen)) { return respon({ status: 'gagal', pesan: 'Id absen tidak valid' }); }
   if ((d.jenis === 'MASUK' && idAbsen.charAt(0) !== 'M') || (d.jenis === 'PULANG' && idAbsen.charAt(0) === 'M')) {
     return respon({ status: 'gagal', pesan: 'Id absen tidak cocok dengan jenis foto' });
   }
@@ -2902,6 +2984,236 @@ function prosesPribadiKeluarkanSemua(d) {
   const n = cabutSesiAkun(p.id, '');
   tambahLog({ jenis: 'KEAMANAN', oleh: p.id, cabang: p.cabang, aksi: 'KELUARKAN_SEMUA_PERANGKAT', target: 'sesi', id: p.id, alasan: n + ' sesi dicabut' });
   return respon({ status: 'ok', jumlah: n });
+}
+
+/**
+ * ---- Absen LUAR (HP pribadi) ----
+ * ABSEN MASUK/PULANG di HP pribadi = absen luar. Jam dari tiket waktu (saat tombol ditekan; tiket terikat ke akun),
+ * status (HADIR/TELAT, pulang cepat/normal/lembur, tingkat) memakai logika YANG SAMA dengan HP toko
+ * (catatAbsenMasuk / catatAbsenPulang), shift mengikuti akun.
+ * Kolom yang dipakai: cara_masuk / cara_pulang = LUAR; ket_masuk / ket_pulang = "LUAR: tujuan / keperluan"
+ * (digabung dengan alasan telat / keterangan pulang dengan pemisah " | "); gps_masuk / gps_pulang = "lat,lng,akurasi";
+ * acc_masuk / acc_pulang = MENUNGGU (nilai akhir: DITERIMA atau DITOLAK, diputuskan di Konfirmasi).
+ * GPS WAJIB; akurasi buruk (> 100 m) tetap diterima dan hanya ditandai di Konfirmasi.
+ */
+var BATAS_AKURASI_TANDAI_M = 100;
+
+/** Fungsi murni: teks keterangan luar yang disimpan di kolom keterangan. */
+function susunKetLuar(tujuan, keperluan) {
+  const t = String(tujuan || '').trim(), k = String(keperluan || '').trim();
+  if (t && k) { return 'LUAR: ' + t + ' / ' + k; }
+  if (t || k) { return 'LUAR: ' + (t || k); }
+  return '';
+}
+
+/** Fungsi murni: gabungkan potongan keterangan yang tidak kosong dengan " | ". */
+function gabungKet() {
+  return Array.prototype.slice.call(arguments).filter(function (x) { return String(x || '') !== ''; }).join(' | ');
+}
+
+/** Fungsi murni: ket_masuk setelah alasan telat diisi: alasan + bagian " | LUAR: ..." yang sudah ada. */
+function ketSetelahAlasan(ketLama, alasanTeks) {
+  const i = String(ketLama).indexOf(' | ');
+  return alasanTeks + (i >= 0 ? String(ketLama).slice(i) : '');
+}
+
+/** Fungsi murni: nilai acc awal: absen luar selalu MENUNGGU. */
+function accAwalLuar(luar) { return luar ? 'MENUNGGU' : ''; }
+
+/** Fungsi murni: form tujuan dan keperluan wajib kecuali absen masuk hari itu juga absen luar. */
+function perluFormLuar(caraMasuk) { return String(caraMasuk || '') !== 'LUAR'; }
+
+/** Fungsi murni: "lat,lng,akurasi" (lat dan lng di awal supaya mudah dibuka di peta). */
+function teksGps(g) {
+  return Number(g.lat.toFixed(6)) + ',' + Number(g.lng.toFixed(6)) + ',' + Math.round(g.akurasi);
+}
+
+/** Fungsi murni: akurasi (meter) dari teks "lat,lng,akurasi"; null kalau tidak terbaca. */
+function akurasiDariGps(teks) {
+  const p = String(teks || '').split(',');
+  if (p.length < 3) { return null; }
+  const a = Number(p[2]);
+  return isFinite(a) ? a : null;
+}
+
+function akurasiBuruk(teks) {
+  const a = akurasiDariGps(teks);
+  return a !== null && a > BATAS_AKURASI_TANDAI_M;
+}
+
+/**
+ * Fungsi murni: validasi absen luar. GPS WAJIB dan divalidasi tipe/rentangnya (akurasi buruk tidak menolak).
+ * wajibForm = tujuan dan keperluan wajib (1..100 karakter); kalau tidak wajib, boleh kosong tapi tetap dicek bila ada.
+ */
+function validasiAbsenLuar(d, wajibForm) {
+  const bersih = function (t) { return String(t === undefined || t === null ? '' : t).trim(); };
+  const tujuan = bersih(d.tujuan), keperluan = bersih(d.keperluan);
+  const aman = function (t) { return !/[\u0000-\u001f\u007f]/.test(t); };
+  if (wajibForm && (!tujuan || !keperluan)) { return { ok: false, pesan: 'Tujuan dan keperluan wajib diisi' }; }
+  if (tujuan.length > 100 || keperluan.length > 100) { return { ok: false, pesan: 'Tujuan dan keperluan maksimal 100 karakter' }; }
+  if (!aman(tujuan) || !aman(keperluan)) { return { ok: false, pesan: 'Tujuan dan keperluan tidak valid' }; }
+  const g = d.gps;
+  if (!g || typeof g.lat !== 'number' || typeof g.lng !== 'number' || typeof g.akurasi !== 'number' ||
+      !isFinite(g.lat) || !isFinite(g.lng) || !isFinite(g.akurasi) ||
+      Math.abs(g.lat) > 90 || Math.abs(g.lng) > 180 || g.akurasi < 0 || g.akurasi > 100000) {
+    return { ok: false, pesan: 'Lokasi (GPS) wajib untuk absen luar' };
+  }
+  return { ok: true, tujuan: tujuan, keperluan: keperluan, gps: { lat: g.lat, lng: g.lng, akurasi: g.akurasi } };
+}
+
+/** Tulis teks ke satu sel sebagai TEKS biasa (supaya "lat,lng,akurasi" tidak dibaca Sheets sebagai angka/rumus). */
+function tulisTeksSel(bacaan, nomorBaris, namaKolom, teks) {
+  const kol = bacaan.header.indexOf(namaKolom) + 1;
+  if (kol < 1) { return; }
+  const sel = bacaan.sheet.getRange(nomorBaris, kol);
+  sel.setNumberFormat('@');
+  sel.setValue(teks);
+}
+
+function akunPribadiLengkap(p) {
+  return bacaSheet('akun').data.find(function (r) { return String(r.id) === String(p.id) && r.aktif === true; }) || null;
+}
+
+/** Aksi tiket_waktu dengan sesi HP pribadi (tanpa token HP toko): tiket terikat ke akun. */
+function prosesTiketPribadi(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  return prosesTiketWaktu(d.jenis, { cabang: p.cabang }, p.id);
+}
+
+/** Aksi absen_luar_masuk { sesi, tiket, tujuan, keperluan, gps:{lat,lng,akurasi}, tanpa_foto }. */
+function prosesAbsenLuarMasuk(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  const kunci = kunciTiket();
+  if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const tk = periksaTiket(d.tiket, 'MASUK', p.cabang, kunci, Date.now(), p.id);
+  if (!tk.ok) { return respon({ status: 'gagal', pesan: tk.pesan }); }
+  const v = validasiAbsenLuar(d, true);
+  if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
+  const akun = akunPribadiLengkap(p);
+  if (!akun) { return responSesiPribadiHabis(); }
+  return catatAbsenMasuk({ akun: akun, tk: tk, idHp: 'PRIBADI', tanpaFoto: d.tanpa_foto === true, luar: { tujuan: v.tujuan, keperluan: v.keperluan, gps: v.gps } });
+}
+
+/** Aksi absen_luar_pulang { sesi, tiket, jenis: PULANG | PULANG_LEMBUR, tujuan?, keperluan?, gps, tanpa_foto }. */
+function prosesAbsenLuarPulang(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  if (d.jenis !== 'PULANG' && d.jenis !== 'PULANG_LEMBUR') { return respon({ status: 'gagal', pesan: 'Jenis absen pulang tidak dikenal' }); }
+  const kunci = kunciTiket();
+  if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const tk = periksaTiket(d.tiket, d.jenis === 'PULANG_LEMBUR' ? 'LEMBUR' : 'PULANG', p.cabang, kunci, Date.now(), p.id);
+  if (!tk.ok) { return respon({ status: 'gagal', pesan: tk.pesan }); }
+  const v = validasiAbsenLuar(d, false); // wajib tidaknya form dicek di catatAbsenPulang (tergantung cara absen masuk)
+  if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
+  const akun = akunPribadiLengkap(p);
+  if (!akun) { return responSesiPribadiHabis(); }
+  return catatAbsenPulang({ akun: akun, tk: tk, jenis: d.jenis, idHp: 'PRIBADI', tanpaFoto: d.tanpa_foto === true, luar: { tujuan: v.tujuan, keperluan: v.keperluan, gps: v.gps } });
+}
+
+function prosesSimpanAlasanPribadi(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  return prosesSimpanAlasan(p.id, d.kode_alasan, d.alasan, { cabang: p.cabang });
+}
+
+function prosesSimpanPulangPribadi(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  return prosesSimpanPulang(p.id, d.kode_pending, d.keterangan, { cabang: p.cabang });
+}
+
+/** Aksi unggah_foto dengan sesi HP pribadi: hanya untuk absen milik akun itu. */
+function prosesUnggahFotoPribadi(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  return prosesUnggahFoto(d, { cabang: p.cabang, akunId: p.id });
+}
+
+/** Fungsi murni: jam "HH:mm" dari teks tampilan sel (mis. "07:45", "7:45:00", "4:30:00 PM"). */
+function jamDariTampilan(teks) {
+  const m = /(\d{1,2}):(\d{2})(?::\d{2})?\s*([AaPp][Mm])?/.exec(String(teks));
+  if (!m) { return ''; }
+  let h = Number(m[1]);
+  const ap = m[3] ? m[3].toUpperCase() : '';
+  if (ap === 'PM' && h < 12) { h += 12; }
+  if (ap === 'AM' && h === 12) { h = 0; }
+  return ('0' + h).slice(-2) + ':' + m[2];
+}
+
+/**
+ * Fungsi murni: riwayat milik SATU akun: tanggal >= tanggalMulai, terbaru dulu, paling banyak `maks` baris.
+ * rows = { tanggal 'yyyy-MM-dd', karyawan, masuk, pulang (jam teks), st_masuk, st_pulang, cara_masuk, cara_pulang, acc_masuk, acc_pulang }.
+ */
+function rakitRiwayat(rows, akunId, tanggalMulai, maks) {
+  return rows
+    .filter(function (r) { return String(r.karyawan) === String(akunId) && r.tanggal >= tanggalMulai; })
+    .sort(function (a, b) { return a.tanggal < b.tanggal ? 1 : (a.tanggal > b.tanggal ? -1 : 0); })
+    .slice(0, maks)
+    .map(function (r) {
+      return {
+        tanggal: r.tanggal, masuk: r.masuk, pulang: r.pulang, st_masuk: r.st_masuk, st_pulang: r.st_pulang,
+        luar: r.cara_masuk === 'LUAR' || r.cara_pulang === 'LUAR',
+        acc_masuk: r.cara_masuk === 'LUAR' ? r.acc_masuk : '', acc_pulang: r.acc_pulang
+      };
+    });
+}
+
+/** Baca baris absensi milik satu akun dari bawah ke atas (tidak membaca seluruh sheet): berhenti setelah lewat tanggalMulai. */
+function bacaAbsensiAkun(akunId, tanggalMulai) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('absensi');
+  const terakhir = sheet.getLastRow();
+  if (terakhir < 2) { return []; }
+  const lebar = sheet.getLastColumn();
+  const header = sheet.getRange(1, 1, 1, lebar).getValues()[0];
+  const iMasuk = header.indexOf('masuk'), iPulang = header.indexOf('pulang');
+  const hasil = [];
+  let akhir = terakhir, dibaca = 0;
+  while (akhir >= 2 && dibaca < 3000) {
+    const awal = Math.max(2, akhir - 199);
+    const rentang = sheet.getRange(awal, 1, akhir - awal + 1, lebar);
+    const v = rentang.getValues(), tampil = rentang.getDisplayValues();
+    let terlama = '9999-99-99';
+    for (let i = v.length - 1; i >= 0; i--) {
+      const r = {};
+      header.forEach(function (nama, idx) { r[nama] = v[i][idx]; });
+      const tgl = sebagaiTanggalTeks(r.tanggal, ZONA_ABSEN);
+      if (String(tgl) < terlama) { terlama = String(tgl); }
+      if (String(r.karyawan) === String(akunId)) {
+        r.tanggal = String(tgl);
+        r.masuk = String(r.masuk) === '' ? '' : jamDariTampilan(tampil[i][iMasuk]);
+        r.pulang = String(r.pulang) === '' ? '' : jamDariTampilan(tampil[i][iPulang]);
+        hasil.push(r);
+      }
+    }
+    dibaca += v.length;
+    if (terlama < tanggalMulai) { break; }
+    akhir = awal - 1;
+  }
+  return hasil;
+}
+
+/** Aksi pribadi_hari_ini { sesi }: ringkasan absen hari ini (untuk beranda dan form pulang). */
+function prosesPribadiHariIni(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  const hariIni = Utilities.formatDate(new Date(), ZONA_ABSEN, 'yyyy-MM-dd');
+  const baris = bacaAbsensiAkun(p.id, hariIni).filter(function (r) { return r.tanggal === hariIni; })[0] || null;
+  return respon({
+    status: 'ok', tanggal: hariIni,
+    sudah_masuk: !!baris && baris.masuk !== '', sudah_pulang: !!baris && baris.pulang !== '',
+    jam_masuk: baris ? baris.masuk : '', jam_pulang: baris ? baris.pulang : '',
+    cara_masuk: baris ? String(baris.cara_masuk) : '', st_pulang: baris ? String(baris.st_pulang) : ''
+  });
+}
+
+/** Aksi pribadi_riwayat { sesi }: milik sendiri, 31 hari terakhir, paling banyak 50 baris. */
+function prosesPribadiRiwayat(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  const mulai = Utilities.formatDate(new Date(Date.now() - 31 * 86400000), ZONA_ABSEN, 'yyyy-MM-dd');
+  return respon({ status: 'ok', daftar: rakitRiwayat(bacaAbsensiAkun(p.id, mulai), p.id, mulai, 50) });
 }
 
 var ZONA_ABSEN = 'Asia/Jakarta';
