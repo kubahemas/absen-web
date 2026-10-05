@@ -1217,6 +1217,25 @@ function tesServer() {
   ujiBebas('unggah foto: tanda "tanpa foto" diterima tanpa gambar, tapi tetap dicek cabang dan sudah-ada-foto', validasiUnggahFoto({ jenis: 'MASUK', tanpa_foto: true }, barisFoto, hpFoto, hariFoto).tanpa === true && !validasiUnggahFoto({ jenis: 'MASUK', tanpa_foto: true }, barisFoto, { cabang: 'Pusat' }, hariFoto).ok);
   ujiBebas('cari baris absen: masuk lewat id_masuk, pulang lewat id_pulang (tidak tertukar)', cariBarisAbsen([barisFoto], 'MASUK', barisFoto.id_masuk) === barisFoto && cariBarisAbsen([barisFoto], 'MASUK', barisFoto.id_pulang) === null && cariBarisAbsen([barisFoto], 'PULANG', barisFoto.id_pulang) === barisFoto);
 
+  // ---- Foto: jalur folder dan nama berkas, pemilihan folder akar ----
+  const barisJalur = { tanggal: '2026-10-06', cabang: 'Ngawi', karyawan: 'K001', nama: 'Ahmad Fauzi', shift: 1, id_masuk: 'M-K001-261006-075512-T1', id_pulang: 'P-K001-261006-163100-T1' };
+  const jm = jalurFoto(barisJalur, 'MASUK');
+  ujiBebas('jalur foto contoh kesepakatan: Ngawi/2026/10/K001_Ahmad Fauzi + 061026_MASUK1_0755.jpg', jm.segmen.join('/') === 'Ngawi/2026/10/K001_Ahmad Fauzi' && jm.namaBerkas === '061026_MASUK1_0755.jpg', JSON.stringify(jm));
+  const jp = jalurFoto(Object.assign({}, barisJalur, { shift: 2 }), 'PULANG');
+  ujiBebas('jalur foto pulang shift 2: 061026_PULANG2_1631.jpg (jam dari id absen, nomor shift dari baris)', jp.namaBerkas === '061026_PULANG2_1631.jpg', JSON.stringify(jp));
+  ujiBebas('lembur memakai kata PULANG di nama berkas (id berawalan L-)', jalurFoto(Object.assign({}, barisJalur, { id_pulang: 'L-K001-261006-183509-T1' }), 'PULANG').namaBerkas === '061026_PULANG1_1835.jpg');
+  const jAkhir = jalurFoto(Object.assign({}, barisJalur, { tanggal: '2026-12-31', id_masuk: 'M-K001-261231-235959-T1' }), 'MASUK');
+  ujiBebas('tahun, bulan, tanggal dari baris absensi: 31 Des 2026 jam 23:59 = 2026/12 dan 311226_MASUK1_2359.jpg', jAkhir.segmen[1] === '2026' && jAkhir.segmen[2] === '12' && jAkhir.namaBerkas === '311226_MASUK1_2359.jpg');
+  ujiBebas('jalur foto: id absen tidak valid atau tanggal rusak = null (tidak menebak)', jalurFoto(Object.assign({}, barisJalur, { id_masuk: 'asal' }), 'MASUK') === null && jalurFoto(Object.assign({}, barisJalur, { tanggal: 'besok' }), 'MASUK') === null);
+  ujiBebas('karakter terlarang dibuang dari nama (/ \ : * ? " < > |) dan spasi dirapikan', bersihkanNamaBerkas('  Ahmad / Fauzi: *"<x>"?|\  ') === 'Ahmad Fauzi x' && bersihkanNamaBerkas('A/B') === 'AB' && bersihkanNamaBerkas('   ') === '');
+  const jKotor = jalurFoto(Object.assign({}, barisJalur, { nama: 'Ahmad/Fauzi:*?"<>|', cabang: 'Nga/wi' }), 'MASUK');
+  ujiBebas('nama karyawan/cabang terlarang dibersihkan di jalur folder', jKotor.segmen[3] === 'K001_AhmadFauzi' && jKotor.segmen[0] === 'Ngawi', JSON.stringify(jKotor.segmen));
+  ujiBebas('folder akar: ID terisi dipakai (dipangkas spasi)', JSON.stringify(keputusanFolderAkar('  1onHwdnNJ2_Ix-MOdZSCTros-AqexMZCV \n')) === JSON.stringify({ mode: 'ID', id: '1onHwdnNJ2_Ix-MOdZSCTros-AqexMZCV' }));
+  ujiBebas('folder akar: kosong, spasi, atau baris tidak ada = jalur bawaan', keputusanFolderAkar('').mode === 'BAWAAN' && keputusanFolderAkar('   ').mode === 'BAWAAN' && keputusanFolderAkar(undefined).mode === 'BAWAAN' && keputusanFolderAkar(null).mode === 'BAWAAN');
+  ujiBebas('folder akar: ID salah TIDAK fallback ke bawaan (tetap mode ID)', keputusanFolderAkar('id-ngawur').mode === 'ID' && keputusanFolderAkar(12345).mode === 'ID');
+  const cacheGalat = { d: {}, get: function (k) { return this.d[k] || null; }, put: function (k, v) { this.d[k] = v; } };
+  ujiBebas('galat folder dicatat paling banyak sekali per jam', perluCatatGalatFolder(cacheGalat, t0) === true && perluCatatGalatFolder(cacheGalat, t0 + 30 * 60000) === false && perluCatatGalatFolder(cacheGalat, t0 + 61 * 60000) === true);
+
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -1274,8 +1293,10 @@ function tesServer() {
   baris.push('  - Username owner yang tidak ada dan password salah: pesan sama; setelah 5x username palsu juga ditahan (tes: ketik username ngawur 5x)');
   baris.push('  - Perlu perhatian: "tandai dibaca" memajukan penanda hanya untuk owner yang menekan (Script Properties dibaca_OWN01); owner lain masih melihat item sebagai baru');
   baris.push('  - Ubah nama HP: owner boleh HP mana pun; admin hanya HP yang dipegangnya dan hanya kalau cabang admin sama; hanya kolom nama yang berubah (panggilan, id, aktif, pw_hash tidak berubah); nama "=SUM(A1)" tersimpan sebagai teks; log UBAH_NAMA_HP_TOKO tercatat; label di layar utama HP ikut baru segera');
-  baris.push('  - Jalankan siapkanFolderFoto sekali (setujui izin Drive): folder "Absensi Foto Kubah Emas" muncul di Drive (privat), Script Properties FOLDER_FOTO_ID terisi; jalankan lagi = tidak membuat folder baru');
-  baris.push('  - Absen masuk di HP toko dengan kamera diizinkan: absen tersimpan dan pop-up tampil DULU, beberapa detik kemudian foto_masuk berisi tautan Drive (berkas M-K...-T...jpg di folder), id_masuk terisi');
+  baris.push('  - Jalankan siapkanFolderFoto sekali (setujui izin Drive): Log eksekusi menyebut nama, ID, dan tautan folder akar; dengan folder_foto_id terisi dipakai folder itu, dengan kosong dibuat/dipakai "FOTO ABSEN WEB" di folder yang sama dengan spreadsheet; ID salah = pesan GAGAL tanpa membuat folder lain');
+  baris.push('  - Foto pertama sebuah cabang/bulan/orang membuat subfolder otomatis (Cabang/Tahun/Bulan/ID_Nama); foto berikutnya memakai folder yang sama (tidak kembar); nama berkas contoh 061026_MASUK1_0755.jpg');
+  baris.push('  - folder_foto_id diisi ID yang salah: absen tetap tersimpan, foto = TANPA FOTO, sheet log ada satu baris FOTO_FOLDER_ERROR (maksimal sekali per jam)');
+  baris.push('  - Absen masuk di HP toko dengan kamera diizinkan: absen tersimpan dan pop-up tampil DULU, beberapa detik kemudian foto_masuk berisi tautan Drive (berkas DDMMYY_MASUK<shift>_HHMM.jpg), id_masuk terisi');
   baris.push('  - Absen dengan kamera ditolak (izin kamera diblokir): absen tetap tersimpan, foto_masuk = TANPA FOTO');
   baris.push('  - Foto pulang/lembur: setelah keterangan diisi, foto_pulang berisi tautan; id_pulang berawalan P- (pulang) atau L- (lembur); revisi/ganti jadi lembur mengosongkan foto_pulang lalu mengisinya dengan foto baru');
   baris.push('  - Tambah karyawan di HP toko (admin): ID baru K + nomor terbesar + 1, cabang ikut admin, pin_hash terisi, pw_hash KOSONG, aktif TRUE; batalkan di layar PIN = tidak ada baris baru');
@@ -2281,8 +2302,9 @@ function prosesKaryawanNonaktif(d) {
  * ---- Foto absen di HP toko ----
  * Kamera depan HP toko memotret otomatis saat PIN dikirim. Absen disimpan DULU (tanpa menunggu foto);
  * foto dikirim di latar belakang lewat aksi unggah_foto dengan id absen (id_masuk / id_pulang di sheet
- * absensi). Foto disimpan di SATU folder Drive privat milik akun bisnis (ID folder di Script Properties
- * FOLDER_FOTO_ID, dibuat oleh siapkanFolderFoto()); tautannya ditulis ke foto_masuk / foto_pulang.
+ * absensi). Foto disimpan di Drive dengan struktur folder per cabang/tahun/bulan/orang (lihat bawah); folder
+ * akar dari pengaturan UMUM folder_foto_id (kosong = "FOTO ABSEN WEB" di folder induk spreadsheet); tautannya
+ * ditulis ke foto_masuk / foto_pulang. Folder dibuat tanpa tautan publik.
  * Kamera tidak ada/ditolak atau unggahan gagal: kolom foto diisi "TANPA FOTO" dan absen tetap sah.
  * Belum ada: penghapusan otomatis 2 bulan dan tampilan foto di aplikasi (gelombang berikutnya).
  */
@@ -2351,6 +2373,107 @@ function validasiUnggahFoto(p, baris, hp, tanggalHariIni) {
   return g.ok ? { ok: true, bytes: g.bytes } : g;
 }
 
+/**
+ * ---- Struktur folder foto di Drive (kesepakatan) ----
+ * FOTO ABSEN WEB / <Cabang> / <Tahun 4 digit> / <Bulan 2 digit> / <ID>_<Nama lengkap> / <DDMMYY>_<MASUK|PULANG><nomor shift>_<HHMM>.jpg
+ * Contoh: FOTO ABSEN WEB/Ngawi/2026/10/K001_Ahmad Fauzi/061026_MASUK1_0755.jpg
+ * Semua nama dibentuk di SERVER dari baris absensi yang dirujuk (tanggal baris, nomor shift di baris,
+ * jam dari id absen yang berasal dari jam tiket), BUKAN dari jam unggah dan bukan dari input client.
+ */
+
+/** Fungsi murni: buang karakter terlarang di nama berkas/folder Drive ( / \ : * ? " < > | dan karakter kontrol), rapikan spasi. */
+function bersihkanNamaBerkas(teks) {
+  const t = String(teks === undefined || teks === null ? '' : teks)
+    .replace(/[\/\\:*?"<>|\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim();
+  return t.slice(0, 80).trim();
+}
+
+/**
+ * Fungsi murni: jalur folder (di bawah folder akar) dan nama berkas untuk satu foto.
+ * baris = baris absensi (tanggal 'yyyy-MM-dd', cabang, karyawan, nama, shift, id_masuk/id_pulang); jenis = MASUK | PULANG.
+ * HHMM diambil dari id absen baris itu (jam tiket saat tombol ditekan), bukan dari waktu unggah.
+ */
+function jalurFoto(baris, jenis) {
+  const tanggal = sebagaiTanggalTeks(baris.tanggal, ZONA_ABSEN);
+  const t = /^(\d{4})-(\d{2})-(\d{2})$/.exec(tanggal);
+  const idAbsen = String(jenis === 'MASUK' ? baris.id_masuk : baris.id_pulang);
+  const j = /-(\d{2})(\d{2})\d{2}-T\d+$/.exec(idAbsen);
+  if (!t || !j) { return null; }
+  const orang = bersihkanNamaBerkas(String(baris.karyawan) + '_' + (bersihkanNamaBerkas(baris.nama) || 'TANPA NAMA'));
+  return {
+    segmen: [bersihkanNamaBerkas(baris.cabang) || 'TANPA CABANG', t[1], t[2], orang],
+    namaBerkas: t[3] + t[2] + t[1].slice(2) + '_' + jenis + bersihkanNamaBerkas(baris.shift) + '_' + j[1] + j[2] + '.jpg'
+  };
+}
+
+/**
+ * Fungsi murni: pilih folder akar dari nilai pengaturan UMUM folder_foto_id.
+ *  - terisi (setelah dipangkas) -> { mode:'ID', id }: dipakai APA ADANYA; kalau tidak valid/tidak bisa diakses
+ *    TIDAK ada fallback (absen tanpa foto + catat kesalahan);
+ *  - kosong atau barisnya tidak ada -> { mode:'BAWAAN' }: folder "FOTO ABSEN WEB" di folder induk spreadsheet.
+ */
+function keputusanFolderAkar(nilai) {
+  const id = nilai === undefined || nilai === null ? '' : String(nilai).trim();
+  return id ? { mode: 'ID', id: id } : { mode: 'BAWAAN' };
+}
+
+/** Fungsi murni: apakah kesalahan folder perlu dicatat ke log? Paling banyak sekali per jam (cache = objek get/put). */
+function perluCatatGalatFolder(cache, sekarangMs) {
+  const terakhir = Number(cache.get('foto_folder_error') || 0);
+  if (terakhir && sekarangMs - terakhir < 3600000) { return false; }
+  cache.put('foto_folder_error', String(sekarangMs), 3600);
+  return true;
+}
+
+function ambilTeksUmum(nama) {
+  const baris = bacaSheet('pengaturan').data.find(function (r) { return r.kategori === 'UMUM' && r.nama === nama; });
+  return baris && baris.nilai !== undefined && baris.nilai !== null ? String(baris.nilai).trim() : '';
+}
+
+var NAMA_FOLDER_AKAR_BAWAAN = 'FOTO ABSEN WEB';
+
+/** Folder akar foto: { folder } atau { galat }. Tidak pernah membuat folder di tempat lain kalau ID terisi tapi salah. */
+function ambilFolderAkar() {
+  const k = keputusanFolderAkar(ambilTeksUmum('folder_foto_id'));
+  if (k.mode === 'ID') {
+    try {
+      const f = DriveApp.getFolderById(k.id);
+      f.getName(); // memastikan benar-benar bisa diakses
+      return { folder: f };
+    } catch (e) {
+      return { galat: 'folder_foto_id tidak valid atau tidak bisa diakses: ' + k.id };
+    }
+  }
+  try {
+    const induk = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId()).getParents();
+    const folderInduk = induk.hasNext() ? induk.next() : DriveApp.getRootFolder();
+    const ada = folderInduk.getFoldersByName(NAMA_FOLDER_AKAR_BAWAAN);
+    return { folder: ada.hasNext() ? ada.next() : folderInduk.createFolder(NAMA_FOLDER_AKAR_BAWAAN) };
+  } catch (e) {
+    return { galat: 'folder akar bawaan tidak bisa disiapkan: ' + e.message };
+  }
+}
+
+/** Satu anak folder bernama `nama` di `induk`: ID dicari di cache dulu, lalu di Drive, dibuat kalau belum ada (dipanggil di dalam kunci). */
+function ambilAtauBuatFolder(induk, nama) {
+  const cache = CacheService.getScriptCache();
+  const kunci = 'fd_' + induk.getId() + '|' + nama;
+  const idCache = cache.get(kunci);
+  if (idCache) {
+    try { return DriveApp.getFolderById(idCache); } catch (e) { /* cache usang: cari lagi */ }
+  }
+  const ada = induk.getFoldersByName(nama);
+  const folder = ada.hasNext() ? ada.next() : induk.createFolder(nama);
+  cache.put(kunci, folder.getId(), 21600);
+  return folder;
+}
+
+function catatGalatFolder(pesan) {
+  if (perluCatatGalatFolder(CacheService.getScriptCache(), Date.now())) {
+    tambahLog({ jenis: 'KESALAHAN', oleh: 'SISTEM', cabang: '', aksi: 'FOTO_FOLDER_ERROR', target: 'folder foto', id: '', alasan: String(pesan).slice(0, 200) });
+  }
+}
+
 /** Aksi unggah_foto { token, id_absen, jenis, gambar | tanpa_foto }: wajib token HP toko (dicek di doPost). */
 function prosesUnggahFoto(d, hp) {
   const idAbsen = String(d.id_absen || '');
@@ -2359,28 +2482,35 @@ function prosesUnggahFoto(d, hp) {
     return respon({ status: 'gagal', pesan: 'Id absen tidak cocok dengan jenis foto' });
   }
   const kunciLock = LockService.getScriptLock();
-  kunciLock.waitLock(15000);
+  kunciLock.waitLock(15000); // juga mencegah folder kembar saat dua unggahan bersamaan
   try {
     const absensi = bacaSheet('absensi');
     const baris = cariBarisAbsen(absensi.data, d.jenis, idAbsen);
     const v = validasiUnggahFoto(d, baris, hp, Utilities.formatDate(new Date(), ZONA_ABSEN, 'yyyy-MM-dd'));
     if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
     const kolom = d.jenis === 'MASUK' ? 'foto_masuk' : 'foto_pulang';
-    if (v.tanpa) {
-      perbaruiKolom(absensi, baris, (function () { const o = {}; o[kolom] = TEKS_TANPA_FOTO; return o; })());
-      return respon({ status: 'ok', pesan: 'Ditandai tanpa foto' });
+    const tulisKolom = function (nilai) { const o = {}; o[kolom] = nilai; perbaruiKolom(absensi, baris, o); };
+    if (v.tanpa) { tulisKolom(TEKS_TANPA_FOTO); return respon({ status: 'ok', pesan: 'Ditandai tanpa foto' }); }
+
+    const akar = ambilFolderAkar();
+    if (akar.galat) {
+      // Folder akar bermasalah: JANGAN fallback ke tempat lain. Absen tetap sah, foto = TANPA FOTO.
+      catatGalatFolder(akar.galat);
+      tulisKolom(TEKS_TANPA_FOTO);
+      return respon({ status: 'ok', pesan: 'Folder foto bermasalah, ditandai tanpa foto' });
     }
-    const idFolder = PropertiesService.getScriptProperties().getProperty('FOLDER_FOTO_ID');
-    if (!idFolder) { return respon({ status: 'gagal', pesan: 'Folder foto belum disiapkan (jalankan siapkanFolderFoto di editor Apps Script)' }); }
+    const jalur = jalurFoto(baris, d.jenis);
+    if (!jalur) { return respon({ status: 'gagal', pesan: 'Data absen tidak lengkap untuk membentuk nama foto' }); }
     let berkas;
     try {
-      const folder = DriveApp.getFolderById(idFolder);
-      berkas = folder.createFile(Utilities.newBlob(v.bytes, 'image/jpeg', idAbsen + '.jpg'));
-      try { berkas.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE); } catch (e) { /* folder privat sudah cukup */ }
+      let folder = akar.folder;
+      jalur.segmen.forEach(function (nama) { folder = ambilAtauBuatFolder(folder, nama); });
+      berkas = folder.createFile(Utilities.newBlob(v.bytes, 'image/jpeg', jalur.namaBerkas));
     } catch (e) {
+      catatGalatFolder('Gagal menyimpan foto ke Drive: ' + e.message);
       return respon({ status: 'gagal', pesan: 'Foto tidak bisa disimpan ke Drive' });
     }
-    perbaruiKolom(absensi, baris, (function () { const o = {}; o[kolom] = berkas.getUrl(); return o; })());
+    tulisKolom(berkas.getUrl());
     return respon({ status: 'ok', pesan: 'Foto tersimpan' });
   } finally {
     kunciLock.releaseLock();
@@ -2388,26 +2518,22 @@ function prosesUnggahFoto(d, hp) {
 }
 
 /**
- * Jalankan SATU KALI oleh pemilik dari editor Apps Script: membuat folder Drive privat untuk foto absen,
- * menyimpan ID-nya di Script Properties (FOLDER_FOTO_ID), dan sekaligus memicu persetujuan izin Drive.
- * Kalau folder sudah ada, tidak dibuat ulang.
+ * Jalankan SATU KALI oleh pemilik dari editor Apps Script: memastikan folder akar foto sesuai pengaturan
+ * (folder_foto_id; kalau kosong dipakai/dibuat "FOTO ABSEN WEB" di folder induk spreadsheet), memicu
+ * persetujuan izin Drive, dan menulis nama, ID, dan tautan folder akar ke Log eksekusi.
+ * Tidak membuat folder di tempat lain; kalau ID terisi tapi salah, hanya melaporkan galatnya.
  */
 function siapkanFolderFoto() {
-  const props = PropertiesService.getScriptProperties();
-  const idLama = props.getProperty('FOLDER_FOTO_ID');
-  if (idLama) {
-    try {
-      const f = DriveApp.getFolderById(idLama);
-      Logger.log('Folder foto sudah ada: ' + f.getName() + ' -> ' + f.getUrl());
-      return f.getUrl();
-    } catch (e) { /* folder lama tidak bisa dibuka: buat baru */ }
+  const akar = ambilFolderAkar();
+  if (akar.galat) {
+    Logger.log('GAGAL: ' + akar.galat);
+    return akar.galat;
   }
-  const folder = DriveApp.createFolder('Absensi Foto Kubah Emas');
-  folder.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE);
-  props.setProperty('FOLDER_FOTO_ID', folder.getId());
-  Logger.log('Folder foto dibuat: ' + folder.getName() + ' -> ' + folder.getUrl());
-  return folder.getUrl();
+  const f = akar.folder;
+  Logger.log('Folder akar foto: ' + f.getName() + ' | ID: ' + f.getId() + ' | ' + f.getUrl());
+  return f.getUrl();
 }
+
 
 var ZONA_ABSEN = 'Asia/Jakarta';
 var KUNCI_KODE_ALASAN = 'kode_alasan_';

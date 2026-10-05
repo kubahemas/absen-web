@@ -142,6 +142,7 @@ function buatDefinisiSheet(kodeRahasia) {
         ['UMUM', 'sesi_owner_hari', 7, '', ''],
         ['UMUM', 'sinkron_karyawan_menit', 30, '', ''],
         ['UMUM', 'tiket_absen_menit', 3, '', ''],
+        ['UMUM', 'folder_foto_id', '', '', ''],
         ['CABANG', 'Ngawi', 'NGW', '', ''],
         ['JENIS_IZIN', 'Sakit', '', 'biasa', ''],
         ['JENIS_IZIN', 'Keperluan pribadi', '', 'biasa', ''],
