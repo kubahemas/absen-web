@@ -18,8 +18,8 @@ window.fetch = function (url, opsi) {
 (async function () {
   try {
     el('btnJenisPribadi').click(); await tunggu(100);
-    el('btnModeLogin').click();
-    ok('mode admin: kolom kata sandi tampil, keypad tersembunyi, tombol Masuk tampil', el('bagianSandiLogin').style.display !== 'none' && el('bagianPinLogin').style.display === 'none' && el('btnMasukPribadi').style.display !== 'none');
+    
+    ok('satu kolom Password, tanpa keypad PIN dan tanpa tautan admin', !!el('pribRahasia') && !el('lpKeypad') && !el('btnModeLogin'));
     el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12';
     el('btnMasukPribadi').click(); await tunggu(600);
     var lg = panggilan.filter(function (x) { return x.aksi === 'login_pribadi'; })[0];
@@ -29,9 +29,9 @@ window.fetch = function (url, opsi) {
     ok('sudah masuk tapi belum waktunya lembur (lembur_boleh=false dari server): MASUK nonaktif, PULANG aktif, LEMBUR nonaktif', el('btnPribMasuk').disabled && !el('btnPribPulang').disabled && el('btnPribLembur').disabled);
     laluLembur = true; el('btnPribPulang').click(); await tunggu(300); el('btnKembaliLuarPulang').click(); await tunggu(500);
     ok('setelah jam lembur (lembur_boleh=true dari server): LEMBUR aktif', !el('btnPribLembur').disabled);
-    el('btnPribMenuAdmin').click(); await tunggu(200);
+    el('btnMenuPribadi').click(); await tunggu(200);
     var m = Array.prototype.map.call(document.querySelectorAll('#menuPribadiIsi button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim() + (b.disabled ? '[x]' : ''); });
     H.push('       menu: ' + m.join(' | '));
-    ok('menu admin memuat 9 item mockup + Keluarkan semua + Log out', m.length >= 11 && /Konfirmasi/.test(m[0]) && /Absen manual.*\[x\]/.test(m[1]) && /Karyawan$/.test(m[5]) && /Dashboard bulanan.*\[x\]/.test(m[7]));
+    ok('menu ikon akun memuat Akun saya + item admin + Keluarkan semua + Log out', m.length >= 12 && /Akun saya/.test(m[0]) && /Konfirmasi/.test(m[1]) && /Absen manual.*\[x\]/.test(m[2]) && /Karyawan$/.test(m[6]) && /Dashboard bulanan.*\[x\]/.test(m[8]));
   } catch (e) { H.push('GAGAL  galat uji: ' + e.message); }
 })();

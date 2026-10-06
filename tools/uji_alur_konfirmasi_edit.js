@@ -22,10 +22,9 @@ window.fetch = function (url, opsi) {
 (async function () {
   try {
     el('btnJenisPribadi').click(); await tunggu(100);
-    el('btnModeLogin').click(); el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12';
+    el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12';
     el('btnMasukPribadi').click(); await tunggu(700);
-    el('btnPribMenuAdmin').click(); await tunggu(200);
-    document.querySelector('#menuPribadiIsi button[data-menu="konfirmasi"]').click(); await tunggu(600);
+    el('btnPribMenuAdmin').click(); await tunggu(600);
     var kartu = el('daftarKonfirmasi').querySelectorAll('.kartu-konf');
     ok('2 kartu tampil', kartu.length === 2);
     ok('penanda "Lokasi di dalam area toko" tampil hanya pada pengajuan yang ditandai server', /Lokasi di dalam area toko/.test(kartu[0].textContent) && !/Lokasi di dalam area toko/.test(kartu[1].textContent));

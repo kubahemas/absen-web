@@ -21,11 +21,10 @@ window.fetch = function (url, opsi) {
 (async function () {
   try {
     el('btnJenisPribadi').click(); await tunggu(100);
-    el('btnModeLogin').click(); el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12';
+    el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12';
     el('btnMasukPribadi').click(); await tunggu(700);
     ok('kartu Menu admin menampilkan jumlah 4', el('pribMenuAdminJumlah').textContent === '4');
-    el('btnPribMenuAdmin').click(); await tunggu(200);
-    document.querySelector('#menuPribadiIsi button[data-menu="konfirmasi"]').click(); await tunggu(600);
+    el('btnPribMenuAdmin').click(); await tunggu(600);
     ok('Konfirmasi terbuka dari menu admin', aktif() === 'layarKonfirmasi');
     ok('judul Konfirmasi, badge "Admin Ngawi", catatan owner tersembunyi', el('konfJudul').textContent === 'Konfirmasi' && el('konfBadge').textContent === 'Admin Ngawi' && el('konfCatatan').style.display === 'none');
     var chips = Array.prototype.map.call(el('konfChips').querySelectorAll('button'), function (b) { return b.textContent + (b.disabled ? '[x]' : ''); });

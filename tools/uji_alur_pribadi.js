@@ -24,12 +24,12 @@ navigator.geolocation.clearWatch = function () {};
   try {
     el('btnJenisPribadi').click(); await tunggu(100);
     ok('layar login HP pribadi terbuka', aktif() === 'layarLoginPribadi');
-    ok('keypad PIN tampil, kolom kata sandi tersembunyi', el('bagianPinLogin').style.display !== 'none' && el('bagianSandiLogin').style.display === 'none');
+    ok('satu kolom Password, tanpa keypad PIN dan tanpa tautan admin', !!el('pribRahasia') && !el('lpKeypad') && !el('btnModeLogin'));
     el('pribNama').value = 'Budi Santoso';
-    '12345'.split('').forEach(function (d) { document.querySelector('#lpKeypad button[data-d="' + d + '"]').click(); });
+    el('pribRahasia').value = '12345'; el('btnMasukPribadi').click();
     await tunggu(500);
     var lg = panggilan.filter(function (x) { return x.aksi === 'login_pribadi'; })[0];
-    ok('angka kelima langsung mengirim login (rahasia = PIN 5 angka)', !!lg && lg.rahasia === '12345' && lg.nama === 'Budi Santoso');
+    ok('tombol Login mengirim (rahasia = PIN 5 angka)', !!lg && lg.rahasia === '12345' && lg.nama === 'Budi Santoso');
     ok('masuk ke beranda HP pribadi', aktif() === 'layarPribadi');
     ok('sapaan memakai nama lengkap', el('pribSapa').textContent === 'Halo, Budi Santoso');
     ok('tidak ada tombol Riwayat absen', !el('btnPribRiwayat'));

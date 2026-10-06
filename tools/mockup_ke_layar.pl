@@ -22,6 +22,8 @@ $t =~ s/\.\.\/assets\//assets\//g;
 # wadah luar: 390x844 tetap -> fluid
 $t =~ s/width:\s*390px;\s*height:\s*844px;/width: 100%; min-height: 100dvh;/;
 $t =~ s/(<\/?)button([^>]*)>/$1button$2>/g;
+# aplikasi memakai box-sizing: border-box global, mockup memakai bawaan browser (content-box): samakan per elemen yang belum menyebutnya
+$t =~ s{<(?!button|input|select|textarea)(\w+)([^>]*?) style="([^"]*)"}{ my ($g,$a,$s)=($1,$2,$3); $s =~ /box-sizing/ ? "<$g$a style=\"$s\"" : "<$g$a style=\"box-sizing: content-box; $s\"" }ge;
 $t =~ s/^\s+|\s+$//g;
 my $o = "<div id=\"$id\" class=\"layar\">\n$t\n</div>\n";
 if ($keluar) { open my $w,'>:utf8',$keluar or die; print $w $o; close $w; print STDERR "Ditulis: $keluar (", length($o), " karakter)\n"; } else { print $o; }

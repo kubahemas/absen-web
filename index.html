@@ -279,7 +279,9 @@
   .dialog-tombol { display: flex; gap: 10px; }
 
   /* ---- HP pribadi: tombol menu besar, jumlah di menu, filter Aktif | Nonaktif ---- */
-  #layarLoginPribadi, #layarKredensialAdmin { padding: 16px 18px; gap: 12px; }
+  #layarKredensialAdmin { padding: 16px 18px; gap: 12px; }
+  #layarLoginPribadi { padding: 0; }
+  #pesanLoginPribadi:empty { display: none; }
   #layarPribadi { padding: 0; }
   #layarPribadi { gap: 16px; }
   /* ---- Beranda HP pribadi (disalin dari mockup 30-32 dan 46) ---- */
@@ -287,6 +289,11 @@
   .pb-atas { display: flex; justify-content: space-between; align-items: center; }
   .pb-atas img { height: 44px; width: auto; }
   .pb-kanan { display: flex; gap: 8px; align-items: center; }
+  /* ikon segarkan kecil di semua home (berputar dan nonaktif selama memuat) */
+  .btn-segarkan { width: 36px; height: 36px; border: 2px solid var(--abu); border-radius: 50%; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; padding: 0; }
+  .btn-segarkan:disabled { opacity: .55; cursor: default; }
+  .btn-segarkan.memuat svg { animation: segarkan-putar .8s linear infinite; }
+  @keyframes segarkan-putar { to { transform: rotate(360deg); } }
   .pb-lencana { display: flex; align-items: center; gap: 6px; padding: 6px 12px 6px 8px; border-radius: 999px; background: var(--emas-lencana); color: var(--putih); font-size: 14px; font-weight: 800; letter-spacing: 0.5px; }
   .pb-akun { width: 44px; height: 44px; border: none; border-radius: 50%; background: var(--abu); display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
   .pb-absen-grup { display: flex; flex-direction: column; gap: 12px; }
@@ -319,9 +326,8 @@
   .segmen-btn.aktif { background: var(--hitam); color: var(--kuning); }
 
   /* ---- Absen luar dan riwayat (HP pribadi) ---- */
-  #layarLuar, #layarRiwayat { padding: 16px 18px; gap: 12px; position: relative; }
-  .lingkar-kamera.luar { top: 58px; right: 18px; }
-  #layarLoginPribadi .kotak-pin { flex-grow: 0; border-radius: 22px; padding-bottom: 20px; }
+  #layarRiwayat { padding: 16px 18px; gap: 12px; position: relative; }
+  #layarLuar, #layarAkun { padding: 0; }
   .area-tujuan { height: 92px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; color: var(--hitam); padding: 10px; box-sizing: border-box; resize: none; width: 100%; }
   .status-gps { font-size: 14px; font-weight: 700; color: var(--hijau-tua); }
   .status-gps.galat { color: var(--merah); }
@@ -706,36 +712,34 @@
     </div>
   </div>
 
-  <!-- Login HP pribadi (karyawan: PIN 5 angka, admin: kata sandi) -->
-  <div id="layarLoginPribadi" class="layar">
-    <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam">HP pribadi</div></div>
-    <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Masuk</div><div class="s" id="subLoginPribadi">Ketik nama lengkap dan PIN 5 angka</div></div></div>
-    <form class="kartu-putih" autocomplete="off" onsubmit="return false">
-      <div class="bidang"><label for="pribNama">Nama lengkap</label><input id="pribNama" name="nama_pribadi" autocomplete="off" autocapitalize="words" maxlength="60"></div>
-      <div id="bagianSandiLogin" style="display:none">
-        <div class="bidang"><label for="pribRahasia">Kata sandi admin</label><input id="pribRahasia" name="rahasia_pribadi" type="password" autocomplete="new-password" maxlength="100"></div>
-        <div class="catatan-hijau">Admin baru? Isi nama saja, lalu buat kata sandi dan PIN.</div>
-      </div>
-    </form>
-    <div class="kotak-pin" id="bagianPinLogin">
-      <div class="pin-judul">PIN 5 angka</div>
-      <div class="pin-titik" id="lpTitik"><div></div><div></div><div></div><div></div><div></div></div>
-      <div class="keypad" id="lpKeypad">
-        <button type="button" data-d="1">1</button><button type="button" data-d="2">2</button><button type="button" data-d="3">3</button>
-        <button type="button" data-d="4">4</button><button type="button" data-d="5">5</button><button type="button" data-d="6">6</button>
-        <button type="button" data-d="7">7</button><button type="button" data-d="8">8</button><button type="button" data-d="9">9</button>
-        <button type="button" class="kosong" disabled aria-hidden="true"></button><button type="button" data-d="0">0</button><button type="button" id="lpHapus" aria-label="Hapus angka">⌫</button>
-      </div>
-      <div class="pin-ket">Angka kelima langsung masuk</div>
-    </div>
-    <button type="button" class="tautan-kecil" id="btnModeLogin">Masuk sebagai admin (kata sandi)</button>
-    <div class="pesan-form" id="pesanLoginPribadi"></div>
-    <div style="flex-grow:1"></div>
-    <div class="bar-bawah">
-      <button type="button" class="btn-kembali" id="btnKembaliLoginPribadi" aria-label="Kembali">‹</button>
-      <button type="button" class="btn-utama" id="btnMasukPribadi" style="display:none">Masuk</button>
-    </div>
-  </div>
+  <!-- Login HP pribadi: disalin dari mockup 29 (satu kolom Password: PIN karyawan atau kata sandi admin; server yang membedakan) -->
+<div id="layarLoginPribadi" class="layar">
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; position: relative; overflow: hidden">
+<div style="box-sizing: content-box; padding: 30px 24px 0; display: flex; flex-direction: column; gap: 22px; position: relative; width: 194px; height: 78px">
+<img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 78px; width: auto; align-self: flex-start">
+
+</div>
+
+<div style="box-sizing: content-box; flex-grow: 1; position: relative"><img src="assets/orang_transparan.png" alt="Karyawan Kubah Emas berseragam" style="box-sizing: content-box; position: absolute; top: 58px; height: 343px; width: 272px; opacity: 1; left: 123px"></div>
+<div style="box-sizing: content-box; background: var(--putih); border-radius: 30px 30px 0 0; padding: 24px 24px 28px; display: flex; flex-direction: column; gap: 14px; position: relative">
+<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px">
+<label for="pribNama" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Username (nama lengkap)</label>
+<input id="pribNama" name="nama_pribadi" autocomplete="off" autocapitalize="words" maxlength="60" style="height: 52px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 16px; font-weight: 600; color: var(--hitam); padding: 0 14px; box-sizing: border-box; width: 100%">
+</div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px">
+<label for="pribRahasia" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Password</label>
+<input id="pribRahasia" name="rahasia_pribadi" type="password" autocomplete="new-password" maxlength="100" style="height: 52px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 16px; font-weight: 600; color: var(--hitam); padding: 0 14px; box-sizing: border-box; width: 100%">
+</div>
+<div id="kotakTerkunciLogin" style="display: none; gap: 10px; align-items: center; background: var(--merah-muda); border: 2px solid var(--merah); border-radius: 14px; padding: 12px 14px; color: var(--merah); font-size: 14px; font-weight: 800"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg><span>Akun terkunci. Hubungi admin.</span></div>
+<div class="pesan-form" id="pesanLoginPribadi" style="text-align: center"></div>
+<button type="button" id="btnMasukPribadi" style="height: 72px; margin-top: 4px; border: 4px solid var(--merah-garis); border-radius: 999px; background: var(--merah-tombol); color: var(--putih); font-family: inherit; font-size: 26px; font-weight: 800">Login</button>
+<div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks); text-align: center; line-height: 1.45">Cukup login sekali. Lupa password? Hubungi admin.</div>
+</div>
+<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch; max-width: 180px; flex-direction: row; position: absolute; left: 25px; top: 116px">
+<div style="box-sizing: content-box; width: 7px; background: var(--hitam); flex-shrink: 0"></div>
+<div style="box-sizing: content-box; font-size: 17px; font-weight: 800; line-height: 1.35; width: 312px; height: 94px">Selamat bekerja karyawan terbaik Toko Kubah Emas!</div>
+</div></div>
+</div>
 
   <!-- Admin baru: buat kata sandi dan PIN (satu permintaan) -->
   <div id="layarKredensialAdmin" class="layar">
@@ -763,6 +767,7 @@
       <div class="pb-atas">
         <img src="assets/logo.png" alt="Kubah Emas Indonesia">
         <div class="pb-kanan">
+          <button type="button" class="btn-segarkan" id="btnSegarkanPribadi" aria-label="Segarkan"><svg aria-hidden="true" fill="none" height="18" stroke="var(--abu)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="18"><path d="M20 11a8 8 0 0 0-14.9-3"></path><path d="M4 4v4h4"></path><path d="M4 13a8 8 0 0 0 14.9 3"></path><path d="M20 20v-4h-4"></path></svg></button>
           <div class="pb-lencana" id="pribLabel" style="display:none"><span id="pribLabelTeks"></span></div>
           <button type="button" class="pb-akun" id="btnMenuPribadi" aria-label="Akun saya" aria-haspopup="true"><span id="pribBadge" hidden>Menu</span>
             <svg aria-hidden="true" fill="none" height="22" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="22"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
@@ -800,10 +805,7 @@
           <div class="t">Report</div><div class="sg">Segera</div>
         </button>
       </div>
-      <button type="button" class="pb-menu-admin" id="btnPribMenuAdmin" style="display:none">
-        <div class="k"><div class="a">Menu admin</div><div class="b">Konfirmasi, absen manual, jadwal, karyawan</div></div>
-        <div class="jml" id="pribMenuAdminJumlah"></div>
-      </button>
+      <button type="button" class="btn-konf-kartu" id="btnPribMenuAdmin" style="display:none"><div class="k"><div class="t">Konfirmasi data karyawan</div><div class="s">Absen luar, lembur, pulang cepat milik karyawan</div></div><div class="jml" id="pribMenuAdminJumlah"></div></button>
       <div style="flex-grow:1"></div>
       <div class="catatan-kecil" id="pribPesan" style="color:var(--merah);text-align:center"></div>
       <div class="pb-catatan">Absen di HP ini perlu ACC admin.</div>
@@ -811,30 +813,28 @@
   </div>
 
   
-  <!-- Absen luar (HP pribadi): tujuan + keperluan, GPS wajib, foto otomatis -->
+  <!-- Absen luar (HP pribadi): disalin dari mockup 33. Beda sengaja: tanpa chip Keperluan (satu kolom Keterangan ketik bebas, minimal 5 karakter); pengenalan wajah belum ada ("Segera"); foto otomatis dari kamera depan -->
   <div id="layarLuar" class="layar">
-    <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam">Absen luar</div></div>
-    <div class="lingkar-kamera luar" id="kotakKameraLuar" style="display:none"><video id="videoLuar" playsinline muted autoplay></video></div>
-    <div class="judul-blok"><div class="garis"></div><div><div class="h besar" id="luarJudul">Absen luar</div><div class="s" id="luarSub">Lokasi, foto, dan keterangan wajib</div></div></div>
-    <div class="kartu-putih" id="bidangLuarForm">
-      <div class="bidang"><label for="luarKet">Keterangan (wajib, minimal 5 karakter)</label><textarea id="luarKet" class="area-tujuan" maxlength="100" autocomplete="off" placeholder="Contoh: pasang AC di rumah Bu Sri, Jl. Merdeka 12"></textarea></div>
-    </div>
-    <div class="kartu-putih">
-      <div class="judul-kartu">Lokasi (GPS) wajib</div>
-      <div class="status-gps" id="luarGps">Mengambil lokasi...</div>
-      <button type="button" class="btn-biasa-garis" id="btnGpsUlang" style="display:none">Coba lagi</button>
-    </div>
-    <div class="pesan-form" id="pesanLuar"></div>
-    <div style="flex-grow:1"></div>
-    <div class="bar-bawah" id="barLuarMasuk">
-      <button type="button" class="btn-kembali" id="btnKembaliLuarMasuk" aria-label="Kembali">‹</button>
-      <button type="button" class="btn-utama btn-lanjut-pin" id="btnKirimMasuk" disabled>KIRIM</button>
-    </div>
-    <div class="bar-bawah" id="barLuarPulang">
-      <button type="button" class="btn-kembali" id="btnKembaliLuarPulang" aria-label="Kembali">‹</button>
-      <button type="button" class="btn-utama btn-lanjut-pin" id="btnKirimPulang" disabled>KIRIM</button>
-    </div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px">
+<div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div id="luarJudul" style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700">ABSEN MASUK LUAR</div></div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div id="kotakKameraLuar" style="box-sizing: content-box; position: relative; overflow: hidden; width: 60px; height: 60px; border-radius: 50%; background: var(--krem); border: 6px solid var(--hijau); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center"><span>Foto otomatis</span><video id="videoLuar" playsinline muted autoplay style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1)"></video></div>
+<div id="luarNama" style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700">Budi Santoso</div>
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 700; color: var(--abu-teks)">Pengenalan wajah · Segera</div>
+<div id="luarGpsPil" style="box-sizing: content-box; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--putih); font-size: 13px; font-weight: 700"><svg aria-hidden="true" fill="none" height="18" stroke="var(--hijau)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="18"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span id="luarGps">Mengambil lokasi...</span><button type="button" id="btnGpsUlang" style="display: none; border: none; background: transparent; font-family: inherit; font-size: 13px; font-weight: 800; color: var(--merah); text-decoration: underline">Coba lagi</button></div>
+</div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="luarKet" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Keterangan tujuan (nama klien atau alamat), wajib minimal 5 karakter</label><textarea id="luarKet" maxlength="100" autocomplete="off" placeholder="Contoh: pasang AC di rumah Bu Sri, Jl. Merdeka 12" style="height: 92px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; color: var(--hitam); padding: 10px; box-sizing: border-box; resize: none; width: 100%"></textarea></div>
+<div class="pesan-form" id="pesanLuar"></div>
+<div style="box-sizing: content-box; flex-grow: 1"></div>
+<div id="barLuarMasuk" style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button id="btnKembaliLuarMasuk" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button">‹</button><button id="btnKirimMasuk" disabled style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700" type="button">KIRIM</button></div>
+<div id="barLuarPulang" style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button id="btnKembaliLuarPulang" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button">‹</button><button id="btnKirimPulang" disabled style="flex-grow: 1; height: 54px; border: 4px solid var(--merah-garis); border-radius: 26px; background: var(--merah-tombol); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700" type="button">KIRIM</button></div>
+</div>
   </div>
+
+  <!-- Akun saya (HP pribadi): disalin dari mockup 44; Shift bawaan, HP terikat, Ganti password dan Ganti PIN belum ada fiturnya ("Segera") -->
+<div id="layarAkun" class="layar">
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 16px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 40px; width: auto"/></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Akun saya</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Data diatur admin cabang</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 6px 16px; display: flex; flex-direction: column; gap: 0px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Nama lengkap / username</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunNama">Budi Santoso</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">ID karyawan</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunId">EMP012</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Cabang</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunCabang">Ngawi</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Shift bawaan</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span style="color: var(--abu-teks)">Segera</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; "><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">HP terikat</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span style="color: var(--abu-teks)">Segera</span></div></div></div><button disabled style="opacity: .55; min-height: 64px; border: none; border-radius: 20px; background: var(--abu); color: var(--putih); font-family: inherit; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; text-align: left" type="button"><div style="box-sizing: content-box; display: flex; flex-direction: column"><div style="box-sizing: content-box; font-size: 16px; font-weight: 800; color: var(--kuning)">Ganti password</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Untuk login di HP ini · Segera</div></div><div style="box-sizing: content-box; font-size: 20px; font-weight: 800; color: var(--kuning)">›</div></button><button disabled style="opacity: .55; min-height: 64px; border: none; border-radius: 20px; background: var(--abu); color: var(--putih); font-family: inherit; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; text-align: left" type="button"><div style="box-sizing: content-box; display: flex; flex-direction: column"><div style="box-sizing: content-box; font-size: 16px; font-weight: 800; color: var(--kuning)">Ganti PIN</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Untuk absen di HP toko · Segera</div></div><div style="box-sizing: content-box; font-size: 20px; font-weight: 800; color: var(--kuning)">›</div></button></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600; line-height: 1.45; text-align: center">Ganti HP? Minta admin reset ikatan HP.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button id="btnAkunHome" aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button">Home</button></div></div>
+</div>
 
   <!-- Riwayat absen milik sendiri -->
   <div id="layarRiwayat" class="layar">
@@ -2756,51 +2756,30 @@
   const pesanLoginPribadi = document.getElementById('pesanLoginPribadi');
   const btnMasukPribadi = document.getElementById('btnMasukPribadi');
 
-  // Karyawan: keypad PIN 5 angka (angka kelima langsung masuk). Admin: tautan "Masuk sebagai admin" mengganti ke kolom kata sandi.
-  let lpPin = '';
-  let lpModeAdmin = false;
-  function gambarTitikLogin() {
-    document.querySelectorAll('#lpTitik div').forEach(function (d, i) { d.classList.toggle('isi', i < lpPin.length); });
+  // Satu kolom Password (mockup 29): PIN 5 angka untuk karyawan, kata sandi untuk admin. Server yang membedakan dari peran akun.
+  function tampilPesanLogin(teks, kode) {
+    const kotak = document.getElementById('kotakTerkunciLogin');
+    const terkunci = kode === 'TERKUNCI';
+    kotak.style.display = terkunci ? 'flex' : 'none';
+    pesanLoginPribadi.textContent = terkunci ? '' : (teks || '');
   }
-  function aturModeLogin(admin) {
-    lpModeAdmin = admin;
-    lpPin = ''; gambarTitikLogin(); pribRahasia.value = '';
-    document.getElementById('bagianPinLogin').style.display = admin ? 'none' : '';
-    document.getElementById('bagianSandiLogin').style.display = admin ? '' : 'none';
-    btnMasukPribadi.style.display = admin ? '' : 'none';
-    document.getElementById('btnModeLogin').textContent = admin ? 'Masuk dengan PIN' : 'Masuk sebagai admin (kata sandi)';
-    document.getElementById('subLoginPribadi').textContent = admin ? 'Admin: nama lengkap dan kata sandi' : 'Ketik nama lengkap dan PIN 5 angka';
-    pesanLoginPribadi.textContent = '';
-  }
-  function kosongkanLoginPribadi() { pribNama.value = ''; pribRahasia.value = ''; pesanLoginPribadi.textContent = ''; btnMasukPribadi.disabled = false; aturModeLogin(false); }
+  function kosongkanLoginPribadi() { pribNama.value = ''; pribRahasia.value = ''; tampilPesanLogin(''); btnMasukPribadi.disabled = false; }
   document.getElementById('btnJenisPribadi').addEventListener('click', function () {
     kosongkanLoginPribadi();
     document.getElementById('catatanJenis').textContent = '';
     tampilLayar(layarLoginPribadi);
   });
-  document.getElementById('btnKembaliLoginPribadi').addEventListener('click', function () { kosongkanLoginPribadi(); tampilLayar(layarJenis); });
-
-  document.getElementById('btnModeLogin').addEventListener('click', function () { aturModeLogin(!lpModeAdmin); });
-  document.getElementById('lpHapus').addEventListener('click', function () { lpPin = lpPin.slice(0, -1); gambarTitikLogin(); });
-  document.getElementById('lpKeypad').addEventListener('click', function (e) {
-    const b = e.target.closest('button[data-d]');
-    if (!b || lpPin.length >= 5 || btnMasukPribadi.disabled) { return; }
-    lpPin += b.getAttribute('data-d');
-    gambarTitikLogin();
-    if (lpPin.length === 5) {
-      if (!pribNama.value.trim()) { pesanLoginPribadi.textContent = 'Isi nama lengkap dulu.'; lpPin = ''; gambarTitikLogin(); return; }
-      kirimLoginPribadi();
-    }
-  });
   btnMasukPribadi.addEventListener('click', kirimLoginPribadi);
+  [pribNama, pribRahasia].forEach(function (el) { el.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); kirimLoginPribadi(); } }); });
 
   function kirimLoginPribadi() {
+    if (btnMasukPribadi.disabled) { return; }
     const nama = pribNama.value.trim();
-    const rahasia = lpModeAdmin ? pribRahasia.value : lpPin;
-    if (!nama) { pesanLoginPribadi.textContent = 'Isi nama lengkap.'; return; }
-    pesanLoginPribadi.textContent = 'Memeriksa...';
+    const rahasia = pribRahasia.value; // boleh kosong: admin baru (kata sandi belum dibuat) cukup mengisi nama
+    if (!nama) { tampilPesanLogin('Isi username (nama lengkap).'); return; }
+    tampilPesanLogin('Memeriksa...');
     btnMasukPribadi.disabled = true;
-    pribRahasia.value = ''; lpPin = ''; gambarTitikLogin(); // PIN / kata sandi tidak disimpan di mana pun
+    pribRahasia.value = ''; // PIN / kata sandi tidak disimpan di mana pun
     kirimPost({ aksi: 'login_pribadi', nama: nama, rahasia: rahasia, id_perangkat: idPerangkat(), label: labelPerangkat() })
       .then(function (d) {
         btnMasukPribadi.disabled = false;
@@ -2813,10 +2792,10 @@
           simpanSesiPribadi(d);
           bukaBerandaPribadi();
         } else {
-          pesanLoginPribadi.textContent = d.pesan || 'Gagal masuk.';
+          tampilPesanLogin(d.pesan || 'Gagal masuk.', d.kode);
         }
       })
-      .catch(function () { btnMasukPribadi.disabled = false; pesanLoginPribadi.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; });
+      .catch(function () { btnMasukPribadi.disabled = false; tampilPesanLogin('Tidak bisa terhubung ke server. Coba lagi.'); });
   }
 
   // ---- Admin baru: buat kata sandi + PIN, dikirim dalam satu permintaan ----
@@ -2865,6 +2844,7 @@
     const admin = profilPribadi && profilPribadi.role === 'ADMIN';
     const ikonKeluar = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>';
     document.getElementById('menuPribadiIsi').innerHTML =
+      '<button type="button" data-menu="akun" role="menuitem">Akun saya</button>' +
       (admin ? '<button type="button" data-menu="konfirmasi" role="menuitem"' + (typeof bukaKonfirmasiPribadi === 'function' ? '' : ' disabled') + '>Konfirmasi<span class="jumlah-menu" id="jumlahKonfirmasiMenu">' + (typeof bukaKonfirmasiPribadi === 'function' ? '' : 'Segera') + '</span></button>' +
         segeraMenu('Absen manual') + segeraMenu('Data absensi') + segeraMenu('Jadwal shift') + segeraMenu('Input izin') +
         '<button type="button" data-menu="karyawan" role="menuitem">Karyawan</button>' +
@@ -2885,11 +2865,20 @@
     if (!tombol || tombol.disabled) { return; }
     const aksi = tombol.getAttribute('data-menu');
     tutupMenuPribadi();
-    if (aksi === 'karyawan') { modePribadiAdmin = true; bukaKaryawan(); }
+    if (aksi === 'akun') { bukaAkun(); }
+    else if (aksi === 'karyawan') { modePribadiAdmin = true; bukaKaryawan(); }
     else if (aksi === 'konfirmasi') { if (typeof bukaKonfirmasiPribadi === 'function') { bukaKonfirmasiPribadi(); } }
     else if (aksi === 'keluarkan') { dialogKeluarkanSemuaPribadi(); }
     else if (aksi === 'logout') { dialogLogoutPribadi(); }
   });
+
+  function bukaAkun() {
+    document.getElementById('akunNama').textContent = profilPribadi ? profilPribadi.nama : '';
+    document.getElementById('akunId').textContent = profilPribadi ? profilPribadi.id : '';
+    document.getElementById('akunCabang').textContent = profilPribadi ? profilPribadi.cabang : '';
+    tampilLayar(layarAkun);
+  }
+  document.getElementById('btnAkunHome').addEventListener('click', function () { tampilLayar(layarPribadi); });
 
   function dialogLogoutPribadi() {
     bukaDialog(
@@ -2924,6 +2913,7 @@
   // Jam dari tiket waktu saat tombol ditekan; status sama persis dengan HP toko; semua berstatus MENUNGGU persetujuan.
   const layarLuar = document.getElementById('layarLuar');
   const layarRiwayat = document.getElementById('layarRiwayat');
+  const layarAkun = document.getElementById('layarAkun');
   let modeLuar = false;       // true selama alur absen luar (sampai kembali ke beranda pribadi)
   let luarMode = '';          // 'MASUK' | 'PULANG'
   let luarTiket = null;       // Promise<string|null>: tiket saat ABSEN MASUK/PULANG ditekan
@@ -2957,7 +2947,7 @@
   setInterval(function () { if (sesiPribadi && layarPribadi.classList.contains('aktif') && !modeLuar) { muatStatusHariIni(); } }, 60000);
 
   function muatStatusHariIni() {
-    kirimPost({ aksi: 'pribadi_hari_ini', sesi: sesiPribadi })
+    return kirimPost({ aksi: 'pribadi_hari_ini', sesi: sesiPribadi })
       .then(function (d) {
         if (pribadiGagalSesi(d) || d.status !== 'ok') { return; }
         statusHariIni = d;
@@ -2986,13 +2976,14 @@
   document.getElementById('btnPribMasuk').addEventListener('click', function () { bukaLuar('MASUK'); });
   document.getElementById('btnPribPulang').addEventListener('click', function () { bukaLuar('PULANG'); });
   document.getElementById("btnPribLembur").addEventListener("click", function () { if (!this.disabled) { bukaLuar("LEMBUR"); } });
-  document.getElementById("btnPribMenuAdmin").addEventListener("click", bukaMenuPribadi);
+  document.getElementById("btnPribMenuAdmin").addEventListener("click", bukaKonfirmasiPribadi);
 
   // ---- Layar absen luar ----
   function setStatusGps(teks, galat) {
     const el = document.getElementById('luarGps');
     el.textContent = teks;
     el.classList.toggle('galat', !!galat);
+    const pil = document.getElementById('luarGpsPil'); pil.style.background = galat ? 'var(--merah-muda)' : 'var(--putih)'; el.style.color = galat ? 'var(--merah)' : '';
     document.getElementById('btnGpsUlang').style.display = galat ? '' : 'none';
   }
 
@@ -3050,10 +3041,10 @@
     fotoMenunggu = null;
     document.getElementById('luarKet').value = '';
     document.getElementById('pesanLuar').textContent = '';
-    document.getElementById('luarJudul').textContent = mode === 'MASUK' ? 'Absen luar: masuk' : (mode === 'LEMBUR' ? 'Absen luar: lembur' : 'Absen luar: pulang');
-    document.getElementById('luarSub').textContent = 'Lokasi, foto, dan keterangan wajib';
-    document.getElementById('barLuarMasuk').style.display = mode === 'MASUK' ? '' : 'none';
-    document.getElementById('barLuarPulang').style.display = mode === 'MASUK' ? 'none' : '';
+    document.getElementById('luarJudul').textContent = mode === 'MASUK' ? 'ABSEN MASUK LUAR' : (mode === 'LEMBUR' ? 'ABSEN LEMBUR LUAR' : 'ABSEN PULANG LUAR');
+    document.getElementById('luarNama').textContent = profilPribadi ? profilPribadi.nama : '';
+    document.getElementById('barLuarMasuk').style.display = mode === 'MASUK' ? 'flex' : 'none';
+    document.getElementById('barLuarPulang').style.display = mode === 'MASUK' ? 'none' : 'flex';
     luarTiket = mintaTiketPribadi(mode === 'MASUK' ? 'MASUK' : (mode === 'LEMBUR' ? 'LEMBUR' : 'PULANG')); // jam = saat tombol ditekan
     tampilLayar(layarLuar);
     nyalakanKamera(document.getElementById('videoLuar'), document.getElementById('kotakKameraLuar'), function () { return layarLuar.classList.contains('aktif'); });
@@ -3406,7 +3397,7 @@
     if (mode === 'OWNER') { dasar.sesi = sesiOwner; }
     else if (mode === 'PRIBADI') { dasar.sesi = sesiPribadi; }
     else { dasar.token = hpAktif ? hpAktif.token : undefined; dasar.sesi = sesiAdmin; }
-    kirimPost(dasar)
+    return kirimPost(dasar)
       .then(function (d) {
         const el = document.getElementById(idElemen);
         if (el && d.status === 'ok') { el.textContent = d.jumlah > 0 ? d.jumlah_teks : ''; }
@@ -3422,10 +3413,27 @@
   function sesudahBukaMenuPribadi() { muatJumlahKonfirmasi('PRIBADI', 'jumlahKonfirmasiMenu'); }
   // jumlah di kotak Konfirmasi beranda owner dan admin HP toko (diperbarui saat beranda dibuka dan saat kembali dari layar Konfirmasi)
   function segarkanJumlahBeranda() {
-    if (sesiOwner && layarOwner.classList.contains('aktif')) { muatJumlahKonfirmasi('OWNER', 'ownerKonfJumlah'); }
-    if (sesiAdmin && layarAdmin.classList.contains('aktif')) { muatJumlahKonfirmasi('TOKO', 'admKonfJumlah'); }
-    if (sesiPribadi && layarPribadi.classList.contains('aktif') && profilPribadi && profilPribadi.role === 'ADMIN') { muatJumlahKonfirmasi('PRIBADI', 'pribMenuAdminJumlah'); }
+    const tugas = [];
+    if (sesiOwner && layarOwner.classList.contains('aktif')) { tugas.push(muatJumlahKonfirmasi('OWNER', 'ownerKonfJumlah')); }
+    if (sesiAdmin && layarAdmin.classList.contains('aktif')) { tugas.push(muatJumlahKonfirmasi('TOKO', 'admKonfJumlah')); }
+    if (sesiPribadi && layarPribadi.classList.contains('aktif') && profilPribadi && profilPribadi.role === 'ADMIN') { tugas.push(muatJumlahKonfirmasi('PRIBADI', 'pribMenuAdminJumlah')); }
+    return Promise.all(tugas);
   }
+  // Segarkan beranda: ikon kecil di tiap home + otomatis saat aplikasi dibuka atau kembali ke layar depan.
+  let sedangSegarkan = false;
+  function segarkanBeranda() {
+    if (sedangSegarkan) { return Promise.resolve(); }
+    const tugas = [segarkanJumlahBeranda()];
+    if (sesiPribadi && layarPribadi.classList.contains('aktif') && !modeLuar) { tugas.push(muatStatusHariIni()); }
+    sedangSegarkan = true;
+    document.querySelectorAll('.btn-segarkan').forEach(function (b) { b.disabled = true; b.classList.add('memuat'); });
+    return Promise.all(tugas).catch(function () {}).then(function () {
+      sedangSegarkan = false;
+      document.querySelectorAll('.btn-segarkan').forEach(function (b) { b.disabled = false; b.classList.remove('memuat'); });
+    });
+  }
+  document.querySelectorAll('.btn-segarkan').forEach(function (b) { b.addEventListener('click', segarkanBeranda); });
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { segarkanBeranda(); } });
   document.getElementById('btnMenuAdmin').addEventListener('click', function () { muatJumlahKonfirmasi('TOKO', 'jumlahKonfirmasiToko'); });
 
   // ---- Mulai: sesi owner = beranda owner; sesi HP pribadi = beranda pribadi; token HP toko = layar utama; kalau tidak = pilih jenis HP ----
@@ -3470,6 +3478,7 @@
     if (layarLuar.classList.contains('aktif')) { keluarLuar(); return; }
     if (layarKonfirmasi.classList.contains('aktif')) { keluarKonfirmasi(); return; }
     if (layarRiwayat.classList.contains('aktif')) { tampilLayar(layarPribadi); return; }
+    if (layarAkun.classList.contains('aktif')) { tampilLayar(layarPribadi); return; }
     if (layarLoginPribadi.classList.contains('aktif')) { kosongkanLoginPribadi(); tampilLayar(layarJenis); return; }
     if (layarKredensialAdmin.classList.contains('aktif')) { document.getElementById('btnKembaliKredensial').click(); return; }
     if (adminAktifDiLayar()) { keluarAdmin(); return; }
