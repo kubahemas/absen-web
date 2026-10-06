@@ -107,3 +107,33 @@ Kolom pertama semua sheet selalu **Cabang**.
 - `absensi`: nilai `tanda` baru `SHIFT_BEDA`; kolom `alasan_kosong` tidak perlu (pakai ket = "TIDAK DIISI").
 - `pengaturan`: per cabang `libur_minggu_[kode cabang]` (TRUE/FALSE), `ukuran_panduan_wajah` (60), `batas_izin_lewat_hari` (2), `sesi_owner_hari` (7), `sinkron_karyawan_menit` (30).
 - Sheet baru ke-9 `sesi`: id_sesi, akun, perangkat, token_hash, dibuat, terakhir_aktif, kedaluwarsa, aktif.
+
+## Perubahan dari mockup
+
+Daftar resmi selisih antara mockup (`docs/mockup/layar/`) dan aplikasi. Rincian per layar ada di `docs/audit-mockup.md` (audit 2026-10-06, berbasis pembandingan kode/markup, bukan visual). Status "belum disinkron ke mockup" = keputusan sadar, mockup belum diperbarui. Status "PENYIMPANGAN: harus diperbaiki" = aplikasi harus mengikuti mockup. Mockup bukan acuan untuk baris keputusan sadar; yang berlaku keputusan di tabel ini.
+
+| Tanggal | Layar | Apa yang berubah | Alasan | Status |
+|---|---|---|---|---|
+| 2026-10-05/06 | Login HP pribadi (29) | Nama lengkap + PIN 5 angka (karyawan) atau kata sandi minimal 8 karakter (admin); sesi sampai Log out; HP tidak terikat. Mockup: password 6 angka, terikat ke HP | Disederhanakan | belum disinkron ke mockup |
+| 2026-10-05/06 | PIN karyawan dan admin (09, 61) | 5 angka (mockup 4 angka) | Disederhanakan | belum disinkron ke mockup |
+| 2026-10-05/06 | Semua layar kata sandi | Kata sandi tidak peka huruf besar-kecil | Mengurangi salah ketik | belum disinkron ke mockup |
+| 2026-10-05/06 | Kelola HP toko (80) | Layar baru di menu owner: filter cabang, saklar nonaktif, Ubah nama, Nonaktifkan | Owner perlu mengelola HP toko | belum disinkron ke mockup |
+| 2026-10-05/06 | Menu admin HP toko (50) | Item "Ubah nama HP ini" | Nama HP mudah dikenali | belum disinkron ke mockup |
+| 2026-10-05/06 | Layar Karyawan admin (58) | Filter Aktif/Nonaktif, Tambah, Reset PIN, Nonaktifkan, Aktifkan kembali, tombol "Daftar wajah" nonaktif ("Segera") | Kelola karyawan tanpa pengenalan wajah | belum disinkron ke mockup |
+| 2026-10-05/06 | Tampilan tanggal | dd/MM/yy (contoh 05/10/26) | Ringkas | belum disinkron ke mockup |
+| 2026-10-05/06 | Beranda owner (71) dan menu owner (72) | Diringkas: Hari ini dan Perlu perhatian (kartu selalu tampil, angka 0 bila kosong); menu 4 item + Konfirmasi | Dikerjakan bertahap | belum disinkron ke mockup (kotak Konfirmasi data admin, Perlu evaluasi, grafik telat dan item menu lain: lihat penyimpangan) |
+| 2026-10-05/06 | Foto absen | Struktur folder Drive `FOTO ABSEN WEB/Cabang/Tahun/Bulan/ID_Nama/DDMMYY_JENIS+SHIFT_HHMM.jpg` | Bukan tampilan | belum disinkron ke mockup |
+| 2026-10-06 | Beranda HP pribadi (30–32, 46) | Ada tombol "Riwayat absen" yang tidak ada di mockup; tidak ada baris tiga kotak Izin/Cuti, Tukar shift, Report; tidak ada LEMBUR, kartu pengajuan menunggu ACC, lencana label performa (badge berisi nama dan membuka menu) | Dikerjakan bertahap | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Tombol absen HP pribadi (30) | Tinggi 112 px, ikon 56 px (mockup 104 px dan 52 px), ada sub-teks; tidak ada LEMBUR dan tiga kotak di bawahnya | Tata letak belum disalin dari mockup | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Absen luar (33) | Dua kolom teks bebas (tujuan, keperluan) alih-alih chip keperluan dari `KEPERLUAN_LUAR` + keterangan tujuan | Belum ada aksi server pembaca daftar | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Konfirmasi (28, 49, 71) | Hanya item menu; admin tanpa kartu "Menunggu konfirmasi" di beranda; owner tanpa kotak "Konfirmasi data admin" dan layar khusus data admin; owner dilaporkan tidak bisa ACC (penyebab belum dipastikan) | Dikerjakan bertahap | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Tukar shift (42, 43, 56) dan terkait (55, 57, 59) | Belum ada sama sekali | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Pop-up HP toko (10, 11, 14, 15, 17, 35) | Kotak "Bulan ini" (Masuk, Telat, Izin/cuti, Sisa cuti) tidak ada | Statistik bulanan belum dibuat di server | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Layar utama HP toko (01, 02) | Tidak ada kartu "Hari ini tidak masuk" dan layar jadwal shift hari ini; tombol absen 112 px (mockup 104) | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Beranda dan menu admin (49, 50) | Beranda hanya judul + Home/Log out; menu 4 item (mockup 10 item) | Dikerjakan bertahap | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Pengenalan wajah dan peringatan (03–08, 13, 18, 19, 21, 34) | Belum ada (absen lewat nama + PIN) | Tahap 1 nomor 6–7 belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Mockup 45, 63 (aturan lama) | Password awal 123456, PIN awal 1234, password 6 angka, ikatan HP/"Lepas HP" tidak berlaku lagi | Dibatalkan | belum disinkron ke mockup (mockup perlu dikoreksi, jangan ditiru) |
+| 2026-10-06 | Layar HP pribadi: Report, Izin/Cuti, Akun saya (36–45) | Belum ada | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Layar admin dan owner lain (22, 24, 25, 53–55, 62–77, 81–82) | Belum ada | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
+
+Catatan koreksi audit (2026-10-06): dugaan awal bahwa layar login HP pribadi di mockup memakai keypad angka **tidak terbukti**; mockup 29 memakai kolom ketik biasa seperti app. Keypad ada di mockup untuk PIN HP toko (09), buat PIN karyawan (61), dan absen luar cadangan PIN (34); dua yang pertama sudah ada di app (5 digit), yang ketiga belum.
