@@ -295,6 +295,7 @@
   .pb-absen .judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 30px; font-weight: 700; white-space: nowrap; }
   #btnPribMasuk { background: var(--hijau); border-color: var(--hijau-garis); }
   #btnPribPulang { background: var(--merah-tombol); border-color: var(--merah-garis); }
+  .pb-catatan-luar { font-size: 12px; font-weight: 700; text-align: center; margin-top: -4px; }
   .pb-lembur { height: 62px; border: none; border-radius: 20px; background: var(--hitam); color: var(--putih); font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 28px; }
   .pb-lembur .judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; }
   .pb-tiga { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -320,9 +321,6 @@
   /* ---- Absen luar dan riwayat (HP pribadi) ---- */
   #layarLuar, #layarRiwayat { padding: 16px 18px; gap: 12px; position: relative; }
   .lingkar-kamera.luar { top: 58px; right: 18px; }
-  .chip-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .chip-grid button { min-height: 40px; border: none; border-radius: 14px; background: var(--krem); color: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700; padding: 0 4px; }
-  .chip-grid button.pilih { background: var(--hitam); color: var(--kuning); }
   #layarLoginPribadi .kotak-pin { flex-grow: 0; border-radius: 22px; padding-bottom: 20px; }
   .area-tujuan { height: 92px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; color: var(--hitam); padding: 10px; box-sizing: border-box; resize: none; width: 100%; }
   .status-gps { font-size: 14px; font-weight: 700; color: var(--hijau-tua); }
@@ -355,6 +353,12 @@
   .konf-nama { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
   .konf-detail { font-size: 13px; color: var(--abu-teks); overflow-wrap: anywhere; }
   .kartu-konf .link-maps { font-size: 14px; display: flex; align-items: center; gap: 6px; min-height: 32px; }
+  .chip-toko { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--kuning-muda); font-size: 12px; font-weight: 800; }
+  .konf-edit { align-self: flex-start; min-height: 32px; padding: 0 12px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--abu); flex-shrink: 0; }
+  .konf-form { display: flex; flex-direction: column; gap: 8px; }
+  .konf-form label { font-size: 13px; font-weight: 700; }
+  .konf-form input[type="time"] { height: 46px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 16px; font-weight: 700; color: var(--hitam); padding: 0 12px; }
+  .konf-form-pesan { min-height: 18px; font-size: 13px; font-weight: 700; color: var(--merah); }
   .konf-aksi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .konf-aksi button { height: 46px; border-radius: 999px; font-family: inherit; font-size: 15px; font-weight: 800; white-space: nowrap; }
   .konf-aksi .acc { border: none; background: var(--abu); color: var(--kuning); }
@@ -587,7 +591,7 @@
           <button type="button" class="btn-kecil" id="btnLihatSemua">Lihat semua</button>
         </div>
       </div>
-      <button type="button" class="btn-konf-kartu" id="btnOwnerKonf"><div class="k"><div class="t">Konfirmasi data admin</div><div class="s">Absen luar, lembur, pulang cepat</div></div><div class="jml" id="ownerKonfJumlah"></div></button>
+      <button type="button" class="btn-konf-kartu" id="btnOwnerKonf"><div class="k"><div class="t">Konfirmasi data admin</div><div class="s">Absen luar, lembur, pulang cepat milik admin</div></div><div class="jml" id="ownerKonfJumlah"></div></button>
       <div class="catatan-kecil" id="ownerPesan" style="color:var(--merah)"></div>
     </div>
   </div>
@@ -775,6 +779,7 @@
           <div class="lingkar"><svg aria-hidden="true" fill="none" height="28" stroke="var(--merah-tombol)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="28"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div>
           <div class="judul">ABSEN PULANG</div><span id="subPribPulang" hidden></span>
         </button>
+        <div class="pb-catatan-luar">Hanya untuk absen tugas di luar toko</div>
         <div style="height:4px"></div>
         <button class="pb-lembur belum-aktif" id="btnPribLembur" type="button" disabled>
           <svg aria-hidden="true" fill="none" height="22" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="22"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
@@ -810,10 +815,9 @@
   <div id="layarLuar" class="layar">
     <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam">Absen luar</div></div>
     <div class="lingkar-kamera luar" id="kotakKameraLuar" style="display:none"><video id="videoLuar" playsinline muted autoplay></video></div>
-    <div class="judul-blok"><div class="garis"></div><div><div class="h besar" id="luarJudul">Absen luar</div><div class="s" id="luarSub">Lokasi dan foto wajib</div></div></div>
+    <div class="judul-blok"><div class="garis"></div><div><div class="h besar" id="luarJudul">Absen luar</div><div class="s" id="luarSub">Lokasi, foto, dan keterangan wajib</div></div></div>
     <div class="kartu-putih" id="bidangLuarForm">
-      <div class="bidang"><div class="judul-kartu">Keperluan</div><div class="chip-grid" id="luarChips"></div><div class="pin-ket" id="luarChipsKet">Memuat daftar...</div></div>
-      <div class="bidang"><label for="luarTujuan">Keterangan tujuan (nama klien atau alamat)</label><textarea id="luarTujuan" class="area-tujuan" maxlength="100" autocomplete="off"></textarea></div>
+      <div class="bidang"><label for="luarKet">Keterangan (wajib, minimal 5 karakter)</label><textarea id="luarKet" class="area-tujuan" maxlength="100" autocomplete="off" placeholder="Contoh: pasang AC di rumah Bu Sri, Jl. Merdeka 12"></textarea></div>
     </div>
     <div class="kartu-putih">
       <div class="judul-kartu">Lokasi (GPS) wajib</div>
@@ -2923,7 +2927,6 @@
   let modeLuar = false;       // true selama alur absen luar (sampai kembali ke beranda pribadi)
   let luarMode = '';          // 'MASUK' | 'PULANG'
   let luarTiket = null;       // Promise<string|null>: tiket saat ABSEN MASUK/PULANG ditekan
-  let luarPerluForm = true;   // tujuan + keperluan wajib?
   let luarMengirim = false;
   let gpsLuar = null;         // { lat, lng, akurasi }
   let gpsPantau = null;
@@ -2950,6 +2953,9 @@
     if (profilPribadi && profilPribadi.role === "ADMIN") { muatJumlahKonfirmasi("PRIBADI", "pribMenuAdminJumlah"); }
   }
 
+  // Penanda lembur_boleh bergantung pada jam: segarkan tiap 60 detik selama beranda terbuka.
+  setInterval(function () { if (sesiPribadi && layarPribadi.classList.contains('aktif') && !modeLuar) { muatStatusHariIni(); } }, 60000);
+
   function muatStatusHariIni() {
     kirimPost({ aksi: 'pribadi_hari_ini', sesi: sesiPribadi })
       .then(function (d) {
@@ -2974,7 +2980,7 @@
     document.getElementById('pribStatus').textContent = !d.sudah_masuk ? 'Belum absen hari ini.' : ('Masuk ' + d.jam_masuk + (d.sudah_pulang ? ' · Pulang ' + d.jam_pulang : ' · belum pulang'));
     aturTombolPribadi('btnPribMasuk', !d.sudah_masuk);
     aturTombolPribadi("btnPribPulang", d.sudah_masuk);
-    aturTombolPribadi("btnPribLembur", d.sudah_masuk && d.st_pulang !== "PULANG CEPAT");
+    aturTombolPribadi("btnPribLembur", d.lembur_boleh === true); // jam server + aturan sama dengan lembur HP toko (dihitung server)
   }
 
   document.getElementById('btnPribMasuk').addEventListener('click', function () { bukaLuar('MASUK'); });
@@ -3028,47 +3034,27 @@
   }
   document.getElementById('btnGpsUlang').addEventListener('click', mulaiGpsLuar);
 
-  // Pilihan keperluan: daftar KEPERLUAN_LUAR dari server (aksi pribadi_keperluan_luar); satu pilihan, "Lainnya" tetap wajib isi tujuan.
-  let luarKeperluanPilih = '';
-  function gambarChipKeperluan(daftar) {
-    const kotak = document.getElementById('luarChips');
-    kotak.innerHTML = daftar.map(function (k) { return '<button type="button" data-kep="' + escHtml(k) + '">' + escHtml(k) + '</button>'; }).join('');
-    document.getElementById('luarChipsKet').textContent = daftar.length ? '' : 'Daftar keperluan kosong. Hubungi owner.';
+  // Pesan untuk layar: teks mentah balasan server (mis. pesan teknis) tidak ditampilkan; hanya pesan Indonesia yang dikenal.
+  const POLA_PESAN_LUAR = /^(Keterangan|Lokasi|Waktu habis|Absen masuk belum dibuka|Lembur baru bisa|Sudah absen|Belum absen|Jadwal shift|Pulang awal|Admin tidak mencatat|Sesi berakhir)/;
+  function pesanLuarRamah(d) {
+    const p = String((d && d.pesan) || '');
+    if (POLA_PESAN_LUAR.test(p) && p.length <= 140) { return p; }
+    return 'Absen luar belum bisa dikirim. Pastikan koneksi baik dan aplikasi sudah versi terbaru, lalu coba lagi. Kalau terus gagal, hubungi admin.';
   }
-  function muatKeperluanLuar() {
-    document.getElementById('luarChips').innerHTML = '';
-    document.getElementById('luarChipsKet').textContent = 'Memuat daftar...';
-    kirimPost({ aksi: 'pribadi_keperluan_luar', sesi: sesiPribadi })
-      .then(function (d) {
-        if (pribadiGagalSesi(d)) { return; }
-        if (d.status === 'ok') { gambarChipKeperluan(d.daftar || []); } else { document.getElementById('luarChipsKet').textContent = d.pesan || 'Gagal memuat daftar.'; }
-      })
-      .catch(function () { document.getElementById('luarChipsKet').textContent = 'Tidak bisa memuat daftar keperluan. Kembali lalu coba lagi.'; });
-  }
-  document.getElementById('luarChips').addEventListener('click', function (e) {
-    const b = e.target.closest('button[data-kep]');
-    if (!b) { return; }
-    luarKeperluanPilih = b.getAttribute('data-kep');
-    this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('pilih', x === b); });
-  });
 
   function bukaLuar(mode) {
+
     luarMode = mode;
     modeLuar = true;
     luarMengirim = false;
     fotoMenunggu = null;
-    document.getElementById('luarTujuan').value = '';
-    luarKeperluanPilih = '';
+    document.getElementById('luarKet').value = '';
     document.getElementById('pesanLuar').textContent = '';
-    // Pulang: form hanya kalau absen masuk hari ini BUKAN absen luar (mis. masuk di HP toko)
-    luarPerluForm = mode === 'MASUK' || !(statusHariIni && statusHariIni.cara_masuk === 'LUAR');
-    document.getElementById('bidangLuarForm').style.display = luarPerluForm ? '' : 'none';
     document.getElementById('luarJudul').textContent = mode === 'MASUK' ? 'Absen luar: masuk' : (mode === 'LEMBUR' ? 'Absen luar: lembur' : 'Absen luar: pulang');
-    document.getElementById('luarSub').textContent = luarPerluForm ? 'Pilih keperluan dan isi tujuan' : 'Tekan KIRIM untuk absen pulang';
+    document.getElementById('luarSub').textContent = 'Lokasi, foto, dan keterangan wajib';
     document.getElementById('barLuarMasuk').style.display = mode === 'MASUK' ? '' : 'none';
     document.getElementById('barLuarPulang').style.display = mode === 'MASUK' ? 'none' : '';
     luarTiket = mintaTiketPribadi(mode === 'MASUK' ? 'MASUK' : (mode === 'LEMBUR' ? 'LEMBUR' : 'PULANG')); // jam = saat tombol ditekan
-    if (luarPerluForm) { muatKeperluanLuar(); }
     tampilLayar(layarLuar);
     nyalakanKamera(document.getElementById('videoLuar'), document.getElementById('kotakKameraLuar'), function () { return layarLuar.classList.contains('aktif'); });
     mulaiGpsLuar();
@@ -3089,10 +3075,8 @@
   function kirimLuar(pulangJenis) {
     if (luarMengirim) { return; }
     const pesan = document.getElementById('pesanLuar');
-    const tujuan = document.getElementById('luarTujuan').value.trim();
-    const keperluan = luarKeperluanPilih;
-    if (luarPerluForm && !keperluan) { pesan.textContent = 'Pilih keperluan.'; return; }
-    if (luarPerluForm && !tujuan) { pesan.textContent = 'Isi keterangan tujuan.'; return; }
+    const keterangan = document.getElementById('luarKet').value.trim();
+    if (keterangan.length < 5) { pesan.textContent = 'Keterangan wajib diisi, minimal 5 karakter.'; return; }
     if (!gpsLuar) { pesan.textContent = 'Lokasi belum didapat. Absen luar butuh lokasi.'; return; }
     luarMengirim = true;
     perbaruiTombolLuar();
@@ -3109,7 +3093,7 @@
     tiketP
       .then(function (tiket) {
         if (!tiket) { return { status: 'gagal', pesan: 'Waktu habis, tekan tombolnya lagi' }; }
-        const dasar = { sesi: sesiPribadi, tiket: tiket, tujuan: tujuan, keperluan: keperluan, gps: gps, tanpa_foto: tanpaFoto };
+        const dasar = { sesi: sesiPribadi, tiket: tiket, keterangan: keterangan, gps: gps, tanpa_foto: tanpaFoto };
         const body = mode === 'MASUK'
           ? Object.assign({ aksi: 'absen_luar_masuk' }, dasar)
           : Object.assign({ aksi: 'absen_luar_pulang', jenis: pulangJenis }, dasar);
@@ -3122,6 +3106,7 @@
   // Hasil absen luar memakai pop-up yang sama dengan HP toko (HADIR / TELAT + alasan, pulang cepat / lembur + keterangan).
   function selesaiLuar(d) {
     if (pribadiGagalSesi(d)) { return; }
+    if (d.status !== 'ok') { d = { status: 'gagal', pesan: pesanLuarRamah(d) }; }
     modeAbsen = luarMode === 'MASUK' ? 'MASUK' : 'PULANG';
     idTerpilih = profilPribadi ? profilPribadi.id : '';
     panggilanTerpilih = profilPribadi ? profilPribadi.panggilan : '';
@@ -3243,11 +3228,13 @@
       gps = (it.akurasi_buruk ? '<div><span class="chip-merah">Akurasi buruk</span></div>' : '') +
         (aman ? '<a class="link-maps" href="' + escHtml(it.maps) + '" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg><span>Buka di Google Maps</span></a>' : '');
     }
-    return '<div class="kartu-konf" data-id="' + escHtml(it.id) + '" data-kel="' + escHtml(it.kelompok) + '">' +
+    const tandaToko = it.dalam_area_toko ? '<div><span class="chip-toko">Lokasi di dalam area toko</span></div>' : '';
+    return '<div class="kartu-konf" data-id="' + escHtml(it.id) + '" data-kel="' + escHtml(it.kelompok) + '" data-jam="' + escHtml(it.jam || '') + '" data-ket="' + escHtml(it.ket_edit || '') + '">' +
       '<div class="konf-baris"><button type="button" class="konf-foto" data-konf="foto" aria-label="Lihat foto">Foto</button>' +
       '<div class="konf-isi"><div class="konf-tipe">' + escHtml(tipe) + '</div><div class="konf-nama">' + escHtml(it.nama) + '</div>' +
-      '<div class="konf-detail">' + escHtml(detail.join(', ')) + '</div></div></div>' +
-      '<div class="foto-konf" data-slot="foto"></div>' + gps +
+      '<div class="konf-detail">' + escHtml(detail.join(', ')) + '</div></div>' +
+      (it.luar ? '<button type="button" class="konf-edit" data-konf="edit">Edit</button>' : '') + '</div>' +
+      '<div class="foto-konf" data-slot="foto"></div>' + tandaToko + gps +
       '<div class="konf-aksi"><button type="button" class="acc" data-konf="acc">ACC</button><button type="button" class="tolak" data-konf="tolak">Tolak</button></div></div>';
   }
 
@@ -3290,7 +3277,7 @@
         if (d.status !== 'ok') { pesanKonf(d.pesan || 'Gagal memuat.'); return; }
         konfJumlahTeks = d.jumlah_teks;
         konfTotal = d.total;
-        document.getElementById('konfSub').textContent = (modeKonf === 'OWNER') ? (d.total ? d.jumlah_teks + ' menunggu keputusan' : 'Tidak ada yang menunggu') : '';
+        document.getElementById('konfSub').textContent = (modeKonf === 'OWNER') ? (d.total ? 'Pengajuan milik admin · ' + d.jumlah_teks + ' menunggu' : 'Tidak ada pengajuan admin yang menunggu') : '';
         let html = '';
         d.daftar.forEach(function (it) { html += kartuKonfirmasi(it); });
         daftarKonfirmasi.insertAdjacentHTML('beforeend', html);
@@ -3312,7 +3299,7 @@
     // yang diputuskan hilang dari daftar server: geser offset supaya "Muat lagi" tidak melewatkan item
     konfOffset = Math.max(0, konfOffset - 1);
     konfTotal = Math.max(0, konfTotal - 1);
-    document.getElementById('konfSub').textContent = (modeKonf === 'OWNER') ? (konfTotal ? (konfTotal > 99 ? '99+' : konfTotal) + ' menunggu keputusan' : 'Tidak ada yang menunggu') : '';
+    document.getElementById('konfSub').textContent = (modeKonf === 'OWNER') ? (konfTotal ? 'Pengajuan milik admin · ' + (konfTotal > 99 ? '99+' : konfTotal) + ' menunggu' : 'Tidak ada pengajuan admin yang menunggu') : '';
     gambarChipKonf();
     if (sebelum && sebelum.classList.contains('judul-kelompok') && (!sesudah || sesudah.classList.contains('judul-kelompok'))) { sebelum.remove(); }
     if (!daftarKonfirmasi.querySelector('.kartu-konf')) { konfOffset = 0; konfKelompokTerakhir = ''; daftarKonfirmasi.innerHTML = ''; muatKonfirmasi(); }
@@ -3332,11 +3319,59 @@
       .catch(function () { pesanKonf('Tidak bisa terhubung ke server.'); kartu.querySelectorAll('button').forEach(function (b) { b.disabled = false; }); });
   }
 
+  // Edit pengajuan absen luar (jam dan keterangan saja). Pesan dari server hanya ditampilkan bila pesan Indonesia yang dikenal.
+  const POLA_PESAN_EDIT = /^(Jam|Keterangan|Pengajuan|Hanya|Admin|Owner|Absen|Lembur|Jadwal|Item|Pulang)/;
+  function pesanEditRamah(d) {
+    const p = String((d && d.pesan) || '');
+    return POLA_PESAN_EDIT.test(p) && p.length <= 160 ? p : 'Perubahan belum bisa disimpan. Coba lagi, atau pastikan aplikasi sudah versi terbaru.';
+  }
+  function simpanEditKonfirmasi(kartu) {
+    const form = kartu.querySelector('.konf-form');
+    const pesan = form.querySelector('.konf-form-pesan');
+    const jam = form.querySelector('.konf-jam').value;
+    const ket = form.querySelector('.konf-ket-edit').value.trim();
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(jam)) { pesan.textContent = 'Isi jam dengan benar.'; return; }
+    if (ket.length < 5) { pesan.textContent = 'Keterangan wajib diisi, minimal 5 karakter.'; return; }
+    form.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+    pesan.textContent = 'Menyimpan...';
+    kirimPost(Object.assign({ aksi: 'konfirmasi_edit', id: kartu.getAttribute('data-id'), jam: jam, keterangan: ket }, kredKonf()))
+      .then(function (d) {
+        if (konfGagalSesi(d)) { return; }
+        if (d.status === 'ok') {
+          pesanKonf('Pengajuan diperbarui. Masih menunggu ACC.');
+          konfOffset = 0; daftarKonfirmasi.innerHTML = ''; muatKonfirmasi();
+          return;
+        }
+        pesan.textContent = pesanEditRamah(d);
+        form.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
+      })
+      .catch(function () { pesan.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; form.querySelectorAll('button').forEach(function (b) { b.disabled = false; }); });
+  }
+
   daftarKonfirmasi.addEventListener('click', function (e) {
     const tombol = e.target.closest('button[data-konf]');
     if (!tombol) { return; }
     const kartu = tombol.closest('.kartu-konf');
     const aksi = tombol.getAttribute('data-konf');
+    if (aksi === 'edit') {
+      if (kartu.querySelector('.konf-form')) { return; }
+      kartu.querySelector('.konf-aksi').style.display = 'none';
+      const form = document.createElement('div');
+      form.className = 'konf-form';
+      form.innerHTML = '<label>Jam (JJ:MM)</label><input type="time" class="konf-jam" value="' + escHtml(kartu.getAttribute('data-jam') || '') + '">' +
+        '<label>Keterangan (wajib, minimal 5 karakter)</label><textarea class="area-tujuan konf-ket-edit" maxlength="100">' + escHtml(kartu.getAttribute('data-ket') || '') + '</textarea>' +
+        '<div class="konf-form-pesan"></div>' +
+        '<div class="konf-aksi"><button type="button" class="acc" data-konf="simpan-edit">Simpan</button><button type="button" class="tolak" data-konf="batal-edit">Batal</button></div>';
+      kartu.appendChild(form);
+      return;
+    }
+    if (aksi === 'batal-edit') {
+      const f = kartu.querySelector('.konf-form');
+      if (f) { f.remove(); }
+      kartu.querySelector('.konf-aksi').style.display = '';
+      return;
+    }
+    if (aksi === 'simpan-edit') { simpanEditKonfirmasi(kartu); return; }
     if (aksi === 'acc') { putuskanKonfirmasi(kartu, 'ACC'); return; }
     if (aksi === 'tolak') {
       // konfirmasi singkat sebelum TOLAK

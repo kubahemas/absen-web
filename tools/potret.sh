@@ -12,6 +12,7 @@ DIRW="$(cygpath -w "$(cd "$(dirname "$OUT")" && pwd)")"
 NAMA="$(basename "$OUT")"
 BS='\'
 OUTW="${DIRW}${BS}${NAMA}"
+rm -f "$OUT"
 HAR="$AKAR/__potret_h.html"
 if [ "$MODE" = "mockup" ]; then
   SRC="docs/mockup/layar/$ARG"; SRC="${SRC// /%20}"

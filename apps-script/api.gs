@@ -126,8 +126,8 @@ function doPost(e) {
   if (data.aksi === 'konfirmasi_jumlah') { return prosesKonfirmasiJumlah(data); }
   if (data.aksi === 'konfirmasi_daftar') { return prosesKonfirmasiDaftar(data); }
   if (data.aksi === 'konfirmasi_putuskan') { return prosesKonfirmasiPutuskan(data); }
+  if (data.aksi === 'konfirmasi_edit') { return prosesKonfirmasiEdit(data); }
   if (data.aksi === 'ambil_foto') { return prosesAmbilFoto(data); }
-
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
   const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
@@ -314,7 +314,7 @@ function catatAbsenMasuk(c) {
   barisBaru.masuk = jamSekarang;
   barisBaru.st_masuk = telat ? 'TELAT' : 'HADIR';
   barisBaru.telat_mnt = telatMnt;
-  const ketLuar = luar ? susunKetLuar(luar.tujuan, luar.keperluan) : '';
+  const ketLuar = luar ? susunKetLuar(luar.keterangan, '', luar.dalamToko) : '';
   barisBaru.ket_masuk = gabungKet(telat ? 'TIDAK DIISI' : '', ketLuar);
   barisBaru.cara_masuk = luar ? 'LUAR' : 'PIN';
   barisBaru.acc_masuk = accAwalLuar(luar);
@@ -781,17 +781,13 @@ function catatAbsenPulang(c) {
   if (!hasil.ok) {
     return respon({ status: 'gagal', pesan: hasil.pesan });
   }
-  // Absen luar: tujuan dan keperluan wajib kalau absen masuk hari ini BUKAN absen luar (mis. masuk di HP toko).
-  if (c.luar && perluFormLuar(kondisi.baris ? kondisi.baris.cara_masuk : '') && (!c.luar.tujuan || !c.luar.keperluan)) {
-    return respon({ status: 'gagal', pesan: 'Tujuan dan keperluan wajib diisi' });
-  }
 
   const info = {
     id: akunDitemukan.id, nama: akunDitemukan.nama, panggilan: akunDitemukan.panggilan, cabang: akunDitemukan.cabang,
     tanggal: tanggalHariIni, jam: jamSekarang, detik: detik, shift: kondisi.shift.nama,
     st_pulang: hasil.st_pulang, acc: c.luar ? accAwalLuar(c.luar) : hasil.acc, tingkat: hasil.tingkat, durasi_menit: hasil.durasi_menit,
     perubahan: hasil.perubahan || '',
-    luar: !!c.luar, ket_luar: c.luar ? susunKetLuar(c.luar.tujuan, c.luar.keperluan) : '', gps_teks: c.luar ? teksGps(c.luar.gps) : '',
+    luar: !!c.luar, ket_luar: c.luar ? susunKetLuar(c.luar.keterangan, '', c.luar.dalamToko) : '', gps_teks: c.luar ? teksGps(c.luar.gps) : '',
     id_absen: buatIdAbsen(hasil.st_pulang === 'LEMBUR DI TOKO' ? 'L' : 'P', akunDitemukan.id, tk.t, c.idHp),
     tanpa_foto: tanpaFoto === true
   };
@@ -1354,8 +1350,6 @@ function tesServer() {
   ujiBebas('pencabutan sesi menghapus cache validasi: kunci sp_ + hash hanya untuk sesi AKTIF milik akun itu', JSON.stringify(kunciCacheSesi(sesiCabut, 'K001')) === JSON.stringify(['sp_ha', 'sp_hb']) && kunciCacheSesi(sesiCabut, 'K999').length === 0);
   const adminNgawi = { role: 'ADMIN', id: 'K010', cabang: 'Ngawi' };
   ujiBebas('akses admin lintas cabang ditolak (karyawan Pusat oleh admin Ngawi)', !bolehKelolaKaryawan('ADMIN', 'Ngawi', { role: 'KARYAWAN', cabang: 'Pusat' }).boleh && bolehKelolaKaryawan('ADMIN', 'Ngawi', { role: 'KARYAWAN', cabang: 'Ngawi' }).boleh);
-  ujiBebas('ACC: admin pada absennya sendiri ditolak (hanya owner), admin cabang lain ditolak, admin cabang sendiri milik orang lain boleh', !bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K010', cabang: 'Ngawi' }).boleh && !bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K001', cabang: 'Pusat' }).boleh && bolehMemutuskanKonfirmasi(adminNgawi, { karyawan: 'K001', cabang: 'Ngawi' }).boleh);
-  ujiBebas('ACC: owner boleh semua cabang termasuk item milik admin; KARYAWAN/tanpa aktor ditolak', bolehMemutuskanKonfirmasi({ role: 'OWNER', id: 'OWN01', cabang: '' }, { karyawan: 'K010', cabang: 'Pusat' }).boleh && !bolehMemutuskanKonfirmasi({ role: 'KARYAWAN', id: 'K001', cabang: 'Ngawi' }, { karyawan: 'K002', cabang: 'Ngawi' }).boleh && !bolehMemutuskanKonfirmasi(null, { karyawan: 'K002', cabang: 'Ngawi' }).boleh);
 
   // ---- Gelombang 2 bagian 2: absen luar (HP pribadi) ----
   const tiketPribadi = buatTiket({ j: 'MASUK', t: epoch('07:45:50'), e: epoch('07:45:50') + 180000, c: 'Ngawi', n: 'pribadi1', a: 'K001' }, KUNCI_UJI);
@@ -1367,16 +1361,7 @@ function tesServer() {
   ujiBebas('status absen luar = status HP toko (fungsi yang sama): masuk 07:46:00 TELAT 1 menit, pulang 16:29:59 pulang cepat, lembur 17:30:01 tingkat 2', tentukanStatusMasuk(detik('07:46:00'), s1, 60).telat_mnt === 1 && tentukanStatusPulang(detik('16:29:59'), s1, 'PULANG', true, false).st_pulang === 'PULANG CEPAT' && tentukanStatusPulang(detik('17:30:01'), s1, 'PULANG_LEMBUR', true, false).tingkat === 2);
 
   const gpsOk = { lat: -7.404412, lng: 111.446212, akurasi: 18.4 };
-  ujiBebas('GPS wajib: tanpa lokasi atau lokasi tidak lengkap ditolak', !validasiAbsenLuar({ tujuan: 'a', keperluan: 'b' }, true).ok && !validasiAbsenLuar({ tujuan: 'a', keperluan: 'b', gps: { lat: 1, lng: 2 } }, true).ok && !validasiAbsenLuar({ tujuan: 'a', keperluan: 'b', gps: null }, true).ok);
-  ujiBebas('GPS divalidasi tipe dan rentang (teks, lat 91, lng 181, akurasi negatif, NaN ditolak)', [{ lat: '1', lng: 2, akurasi: 3 }, { lat: 91, lng: 2, akurasi: 3 }, { lat: 1, lng: 181, akurasi: 3 }, { lat: 1, lng: 2, akurasi: -1 }, { lat: NaN, lng: 2, akurasi: 3 }, { lat: 1, lng: 2, akurasi: 200000 }].every(function (g) { return !validasiAbsenLuar({ tujuan: 'a', keperluan: 'b', gps: g }, true).ok; }));
-  ujiBebas('akurasi buruk (350 m) tetap diterima tapi ditandai; akurasi 100 m tidak ditandai', validasiAbsenLuar({ tujuan: 'a', keperluan: 'b', gps: { lat: 1, lng: 2, akurasi: 350 } }, true).ok && akurasiBuruk('1,2,350') === true && akurasiBuruk('1,2,100') === false && akurasiBuruk('1,2,18') === false && akurasiBuruk('rusak') === false);
   ujiBebas('GPS disimpan "lat,lng,akurasi" (lat dan lng di awal)', teksGps(gpsOk) === '-7.404412,111.446212,18' && akurasiDariGps(teksGps(gpsOk)) === 18);
-  ujiBebas('tujuan dan keperluan masuk luar wajib (1..100 karakter), 101 karakter ditolak', !validasiAbsenLuar({ tujuan: '', keperluan: 'b', gps: gpsOk }, true).ok && !validasiAbsenLuar({ tujuan: 'a', keperluan: '  ', gps: gpsOk }, true).ok && !validasiAbsenLuar({ tujuan: 'x'.repeat(101), keperluan: 'b', gps: gpsOk }, true).ok && validasiAbsenLuar({ tujuan: 'x'.repeat(100), keperluan: 'b', gps: gpsOk }, true).ok);
-  ujiBebas('pulang luar tanpa form diterima di sisi validasi (wajib tidaknya ditentukan cara absen masuk)', validasiAbsenLuar({ gps: gpsOk }, false).ok === true);
-  const dKep = ["Survey", "Pengiriman", "Lainnya"];
-  ujiBebas("keperluan harus ada di daftar KEPERLUAN_LUAR (tanpa beda huruf besar-kecil); di luar daftar ditolak", validasiAbsenLuar({ tujuan: "a", keperluan: "survey", gps: gpsOk }, true, dKep).ok === true && validasiAbsenLuar({ tujuan: "a", keperluan: "Santai", gps: gpsOk }, true, dKep).ok === false && validasiAbsenLuar({ tujuan: "a", keperluan: "Lainnya", gps: gpsOk }, true, dKep).ok === true);
-  ujiBebas("daftar KEPERLUAN_LUAR kosong atau tidak diberikan: tidak diperiksa terhadap daftar; pulang luar tanpa keperluan tetap diterima", validasiAbsenLuar({ tujuan: "a", keperluan: "apa saja", gps: gpsOk }, true, []).ok === true && validasiAbsenLuar({ gps: gpsOk }, false, dKep).ok === true);
-  ujiBebas('pulang luar setelah masuk di HP toko (PIN) meminta tujuan dan keperluan; setelah masuk luar tidak perlu mengulang', perluFormLuar('PIN') === true && perluFormLuar('') === true && perluFormLuar('LUAR') === false);
   ujiBebas('absen luar berstatus MENUNGGU (masuk dan pulang); absen HP toko tidak berubah', accAwalLuar({ tujuan: 'a' }) === 'MENUNGGU' && accAwalLuar(null) === '');
   ujiBebas('keterangan luar: "LUAR: tujuan / keperluan", digabung dengan alasan memakai " | "', susunKetLuar('Toko Madiun', 'Antar barang') === 'LUAR: Toko Madiun / Antar barang' && gabungKet('Macet', 'LUAR: a / b') === 'Macet | LUAR: a / b' && gabungKet('', 'LUAR: a / b') === 'LUAR: a / b' && gabungKet('', '') === '');
   ujiBebas('alasan telat luar: "TIDAK DIISI | LUAR: x" menjadi "Macet | LUAR: x" (bagian luar tetap)', ketSetelahAlasan('TIDAK DIISI | LUAR: a / b', 'Macet') === 'Macet | LUAR: a / b' && ketSetelahAlasan('TIDAK DIISI', 'Hujan: deras') === 'Hujan: deras');
@@ -1408,7 +1393,8 @@ function tesServer() {
     buatAbs({ karyawan: 'K004', nama: 'Joko', jam_masuk: '07:40', acc_masuk: '', jam_pulang: '16:30', st_pulang: 'PULANG NORMAL' }),
     buatAbs({ karyawan: 'K005', nama: 'Andi', jam_masuk: '07:50', cara_masuk: 'LUAR', acc_masuk: 'DITERIMA', jam_pulang: '16:30', st_pulang: 'PULANG NORMAL', acc_pulang: 'DITOLAK' })
   ];
-  const itemKonf = rakitItemKonfirmasi(barisKonf);
+  const petaRoleUji = { K010: 'ADMIN' };
+  const itemKonf = rakitItemKonfirmasi(barisKonf, petaRoleUji);
   ujiBebas('konfirmasi: hanya yang MENUNGGU jadi item (K004 normal dan K005 yang sudah diputuskan tidak)', itemKonf.length === 5 && itemKonf.every(function (x) { return ['K001', 'K002', 'K003', 'K010'].indexOf(x.karyawan) !== -1; }), String(itemKonf.length));
   ujiBebas('konfirmasi: satu baris = dua item terpisah (masuk dan pulang K001), id "ID|tanggal|JENIS"', itemKonf.filter(function (x) { return x.karyawan === 'K001'; }).map(function (x) { return x.id; }).sort().join(',') === 'K001|2026-10-05|MASUK,K001|2026-10-05|PULANG');
   const kel = function (id) { return itemKonf.filter(function (x) { return x.id === id; })[0].kelompok; };
@@ -1424,9 +1410,7 @@ function tesServer() {
   const lihatAdmin = saringItemKonfirmasi(itemKonf, adminK, '');
   ujiBebas('hak lihat admin: hanya cabangnya, BUKAN absen sendiri (K010 tidak), cabang lain (K003 Pusat) tidak', lihatAdmin.every(function (x) { return x.cabang === 'Ngawi' && x.karyawan !== 'K010'; }) && lihatAdmin.length === 3, String(lihatAdmin.length));
   const lihatOwner = saringItemKonfirmasi(itemKonf, { role: 'OWNER', id: 'OWN01', cabang: '' }, '');
-  ujiBebas('hak lihat owner: semua cabang termasuk item milik admin (5 item); filter cabang Pusat = 1', lihatOwner.length === 5 && lihatOwner.some(function (x) { return x.karyawan === 'K010'; }) && saringItemKonfirmasi(itemKonf, { role: 'OWNER', id: 'OWN01', cabang: '' }, 'Pusat').length === 1);
   ujiBebas('hak lihat: KARYAWAN atau tanpa aktor tidak melihat apa pun', saringItemKonfirmasi(itemKonf, { role: 'KARYAWAN', id: 'K001', cabang: 'Ngawi' }, '').length === 0 && saringItemKonfirmasi(itemKonf, null, '').length === 0);
-  ujiBebas('hak putuskan: admin cabang lain ditolak, admin pada item sendiri ditolak, owner boleh semua', !bolehMemutuskanKonfirmasi(adminK, { karyawan: 'K003', cabang: 'Pusat' }).boleh && !bolehMemutuskanKonfirmasi(adminK, { karyawan: 'K010', cabang: 'Ngawi' }).boleh && bolehMemutuskanKonfirmasi({ role: 'OWNER', id: 'OWN01', cabang: '' }, { karyawan: 'K010', cabang: 'Ngawi' }).boleh);
   ujiBebas('satu keputusan per item: hanya MENUNGGU bisa diputuskan (DITERIMA/DITOLAK/kosong tidak)', bisaDiputuskan('MENUNGGU') === true && ['DITERIMA', 'DITOLAK', '', undefined].every(function (x) { return bisaDiputuskan(x) === false; }));
   ujiBebas('id item: bentuk sah diurai, bentuk lain ditolak (injeksi, jenis salah, tanggal rusak)', JSON.stringify(parseIdItem('K001|2026-10-05|MASUK')) === JSON.stringify({ karyawan: 'K001', tanggal: '2026-10-05', jenis: 'MASUK' }) && parseIdItem('K001|2026-10-05|LAIN') === null && parseIdItem('K001|besok|MASUK') === null && parseIdItem("K001|2026-10-05|MASUK'--") === null && parseIdItem('') === null && parseIdItem(null) === null);
   const banyakItem = []; for (let n = 0; n < 45; n++) { banyakItem.push({ id: 'K' + n, kelompok: n % 3 === 0 ? 'PULANG_CEPAT' : (n % 3 === 1 ? 'LUAR' : 'LEMBUR'), tanggal: '2026-10-' + ('0' + (1 + (n % 9))).slice(-2), jam: '07:' + ('0' + (n % 60)).slice(-2) }); }
@@ -1436,6 +1420,58 @@ function tesServer() {
   ujiBebas('jumlah: 99 tampil 99, 100 tampil "99+"', jumlahTeks(0) === '0' && jumlahTeks(99) === '99' && jumlahTeks(100) === '99+' && jumlahTeks(250) === '99+');
   ujiBebas('foto: ID berkas Drive dari tautan; kosong, TANPA FOTO, tautan asing = null', idBerkasDrive('https://drive.google.com/file/d/ABCDEFGHIJ1234/view?usp=drivesdk') === 'ABCDEFGHIJ1234' && idBerkasDrive('https://drive.google.com/open?id=XYZabc_123-456') === 'XYZabc_123-456' && idBerkasDrive('TANPA FOTO') === null && idBerkasDrive('') === null && idBerkasDrive('https://contoh.com/gambar.jpg') === null);
   ujiBebas('kartu Hari ini konsisten dengan Konfirmasi: menunggu ACC menghitung item masuk DAN pulang yang MENUNGGU', hitungHariIni([{ tanggal: '2026-10-05', cabang: 'Ngawi', shift: 1, masuk: '07:44', st_masuk: 'HADIR', pulang: '16:31', acc_masuk: 'MENUNGGU', acc_pulang: 'MENUNGGU' }, { tanggal: '2026-10-05', cabang: 'Ngawi', shift: 1, masuk: '07:50', st_masuk: 'TELAT', pulang: '', acc_masuk: 'DITERIMA', acc_pulang: '' }], '2026-10-05', '', '').menunggu_acc === 2);
+
+  // ---- Paket perbaikan: absen luar ketik bebas, penanda area toko, aturan konfirmasi, edit, lembur HP pribadi ----
+  const gpsToko = { lat: -7.4044, lng: 111.4462, akurasi: 10 };
+  // 1) keterangan ketik bebas, wajib minimal 5 karakter (masuk, pulang, lembur: validasinya satu)
+  ujiBebas('absen luar: keterangan wajib minimal 5 karakter setelah spasi dipotong (kosong, 4 huruf, spasi saja, "  ab  " ditolak; 5 huruf diterima)', ['', '   ', 'abcd', '  ab  ', '  abc  ', undefined, null].every(function (x) { return !validasiAbsenLuar({ keterangan: x, gps: gpsOk }).ok; }) && validasiAbsenLuar({ keterangan: 'abcde', gps: gpsOk }).ok === true && validasiAbsenLuar({ keterangan: '  survey  ', gps: gpsOk }).keterangan === 'survey');
+  ujiBebas('absen luar: maksimal 100 karakter, karakter kontrol ditolak, tanda | diganti / (supaya tidak merusak pemisah kolom)', validasiAbsenLuar({ keterangan: 'x'.repeat(101), gps: gpsOk }).ok === false && validasiAbsenLuar({ keterangan: 'x'.repeat(100), gps: gpsOk }).ok === true && validasiAbsenLuar({ keterangan: 'abc\u0007def', gps: gpsOk }).ok === false && validasiAbsenLuar({ keterangan: 'antar | barang', gps: gpsOk }).keterangan === 'antar / barang');
+  ujiBebas('absen luar: kolom tujuan/keperluan lama diabaikan (tanpa keterangan tetap ditolak)', validasiAbsenLuar({ tujuan: 'Toko Madiun', keperluan: 'Survey', gps: gpsOk }).ok === false);
+  ujiBebas('absen luar: GPS tetap wajib dan divalidasi tipe/rentangnya (tanpa lokasi, teks, lat 91, lng 181, akurasi negatif, NaN ditolak)', !validasiAbsenLuar({ keterangan: 'abcde' }).ok && !validasiAbsenLuar({ keterangan: 'abcde', gps: null }).ok && !validasiAbsenLuar({ keterangan: 'abcde', gps: { lat: 1, lng: 2 } }).ok && [{ lat: '1', lng: 2, akurasi: 3 }, { lat: 91, lng: 2, akurasi: 3 }, { lat: 1, lng: 181, akurasi: 3 }, { lat: 1, lng: 2, akurasi: -1 }, { lat: NaN, lng: 2, akurasi: 3 }].every(function (g) { return !validasiAbsenLuar({ keterangan: 'abcde', gps: g }).ok; }));
+  ujiBebas('akurasi buruk (350 m) tetap diterima tapi ditandai; 100 m tidak ditandai', validasiAbsenLuar({ keterangan: 'abcde', gps: { lat: 1, lng: 2, akurasi: 350 } }).ok && akurasiBuruk('1,2,350') === true && akurasiBuruk('1,2,100') === false);
+  ujiBebas('keterangan disimpan "LUAR: keterangan"; data lama "LUAR: tujuan / keperluan" tetap bisa dibaca', susunKetLuar('Pasang AC rumah Bu Sri', '') === 'LUAR: Pasang AC rumah Bu Sri' && uraiKetLuar('LUAR: Madiun / Antar').teks === 'Madiun / Antar' && uraiKetLuar('LUAR: Madiun / Antar').luar === true);
+  // 3) penanda di dalam area toko
+  const titikToko = [{ lat: -7.4044, lng: 111.4462 }];
+  const dekat50 = { lat: -7.4044 + 0.00045, lng: 111.4462 }, jauh150 = { lat: -7.4044 + 0.00135, lng: 111.4462 };
+  ujiBebas('area toko: ±50 m dari toko = di dalam (radius 100), ±150 m = di luar, radius 200 membuat 150 m di dalam', dalamRadiusToko(dekat50, titikToko, 100) === true && dalamRadiusToko(jauh150, titikToko, 100) === false && dalamRadiusToko(jauh150, titikToko, 200) === true && Math.round(jarakMeter(dekat50.lat, dekat50.lng, -7.4044, 111.4462)) >= 45 && Math.round(jarakMeter(dekat50.lat, dekat50.lng, -7.4044, 111.4462)) <= 55);
+  ujiBebas('area toko: tanpa titik toko = di luar; salah satu dari beberapa HP toko cukup; koordinat gps_daftar "lat,lng,akurasi" dibaca, yang rusak diabaikan', dalamRadiusToko(dekat50, [], 100) === false && dalamRadiusToko(dekat50, [{ lat: 0, lng: 0 }, titikToko[0]], 100) === true && titikDariGps('-7.4044,111.4462,18').lat === -7.4044 && titikDariGps('rusak') === null && titikDariGps('') === null && titikDariGps('91,10,5') === null && titikDariGps(',,') === null);
+  ujiBebas('penanda area toko di keterangan: "LUAR [AREA TOKO]: ..." (absen tetap diterima, tanpa kolom baru), terbaca kembali, dan tidak muncul di teks keterangan', susunKetLuar('Pasang AC rumah Bu Sri', '', true) === 'LUAR [AREA TOKO]: Pasang AC rumah Bu Sri' && uraiKetLuar('Macet | LUAR [AREA TOKO]: Pasang AC').dalamToko === true && uraiKetLuar('Macet | LUAR [AREA TOKO]: Pasang AC').teks === 'Pasang AC' && uraiKetLuar('Macet | LUAR [AREA TOKO]: Pasang AC').ketBersih === 'Macet | LUAR: Pasang AC' && uraiKetLuar('LUAR: Pasang AC').dalamToko === false);
+  const itTandaToko = rakitItemKonfirmasi([buatAbs({ karyawan: 'K001', nama: 'Budi', jam_masuk: '07:44', cara_masuk: 'LUAR', acc_masuk: 'MENUNGGU', ket_masuk: 'LUAR [AREA TOKO]: Pasang AC rumah' })], {})[0];
+  ujiBebas('kartu Konfirmasi membawa penanda dalam_area_toko, keterangan bersih, dan tanda luar', itTandaToko.dalam_area_toko === true && itTandaToko.ket === 'LUAR: Pasang AC rumah' && itTandaToko.luar === true && itTandaToko.ket_edit === 'Pasang AC rumah');
+  // 4) aturan konfirmasi: owner hanya pengajuan admin, admin hanya pengajuan karyawan dan bukan miliknya sendiri
+  const ownerK = { role: 'OWNER', id: 'OWN01', cabang: '' }, adminK2 = { role: 'ADMIN', id: 'K010', cabang: 'Ngawi' };
+  ujiBebas('konfirmasi: OWNER menolak pengajuan KARYAWAN (server, bukan hanya disembunyikan) dan boleh pengajuan ADMIN semua cabang', !bolehMemutuskanKonfirmasi(ownerK, { karyawan: 'K001', cabang: 'Ngawi', role: 'KARYAWAN' }).boleh && !bolehMemutuskanKonfirmasi(ownerK, { karyawan: 'K001', cabang: 'Ngawi' }).boleh && bolehMemutuskanKonfirmasi(ownerK, { karyawan: 'K010', cabang: 'Ngawi', role: 'ADMIN' }).boleh && bolehMemutuskanKonfirmasi(ownerK, { karyawan: 'K020', cabang: 'Pusat', role: 'ADMIN' }).boleh);
+  ujiBebas('konfirmasi: ADMIN menolak pengajuannya sendiri (ACC, TOLAK, edit), pengajuan admin lain, dan cabang lain; boleh pengajuan karyawan cabangnya', !bolehMemutuskanKonfirmasi(adminK2, { karyawan: 'K010', cabang: 'Ngawi', role: 'ADMIN' }).boleh && !bolehMemutuskanKonfirmasi(adminK2, { karyawan: 'K011', cabang: 'Ngawi', role: 'ADMIN' }).boleh && !bolehMemutuskanKonfirmasi(adminK2, { karyawan: 'K001', cabang: 'Pusat', role: 'KARYAWAN' }).boleh && bolehMemutuskanKonfirmasi(adminK2, { karyawan: 'K001', cabang: 'Ngawi', role: 'KARYAWAN' }).boleh);
+  ujiBebas('konfirmasi: KARYAWAN, PERANGKAT, tanpa aktor ditolak semuanya', ['KARYAWAN', 'PERANGKAT'].every(function (r) { return !bolehMemutuskanKonfirmasi({ role: r, id: 'K001', cabang: 'Ngawi' }, { karyawan: 'K002', cabang: 'Ngawi', role: 'KARYAWAN' }).boleh; }) && !bolehMemutuskanKonfirmasi(null, { karyawan: 'K002', cabang: 'Ngawi' }).boleh);
+  const lihatOwner2 = saringItemKonfirmasi(itemKonf, ownerK, '');
+  ujiBebas('konfirmasi: owner hanya MELIHAT pengajuan level admin (K010 saja), filter cabang Pusat = 0; admin melihat karyawan cabangnya tanpa miliknya', lihatOwner2.length === 1 && lihatOwner2[0].karyawan === 'K010' && saringItemKonfirmasi(itemKonf, ownerK, 'Pusat').length === 0 && saringItemKonfirmasi(itemKonf, adminK2, '').every(function (x) { return x.role === 'KARYAWAN' && x.cabang === 'Ngawi'; }));
+  // 5) edit pengajuan absen luar
+  const sekarang10 = epoch('10:00:00');
+  const dasarEdit = { jenis: 'MASUK', tanggal: '2026-10-05', jamBaru: '07:44', keterangan: 'Pasang AC rumah Bu Sri', sekarangMs: sekarang10, jendelaMenit: 60, shift: s1, jamMasuk: '07:50', jamPulang: '', stMasuk: 'TELAT', stPulang: '', ketLama: 'TIDAK DIISI | LUAR: Pasang AC lama' };
+  const edit = function (o) { return rencanaEditAbsen(Object.assign({}, dasarEdit, o)); };
+  const e1 = edit({});
+  ujiBebas('edit masuk: 07:50 TELAT diedit ke 07:44 = HADIR, alasan telat dibuang, tetap MENUNGGU, keterangan baru', e1.ok && e1.perubahan.st_masuk === 'HADIR' && e1.perubahan.telat_mnt === 0 && e1.perubahan.masuk === '07:44' && e1.perubahan.ket_masuk === 'LUAR: Pasang AC rumah Bu Sri' && e1.perubahan.acc_masuk === 'MENUNGGU');
+  const e2 = edit({ jamBaru: '07:52', stMasuk: 'HADIR', ketLama: 'LUAR: lama sekali' });
+  ujiBebas('edit masuk: HADIR diedit ke 07:52 = TELAT 7 menit (aturan sama dengan absen biasa), keterangan "TIDAK DIISI | LUAR: ..."', e2.ok && e2.perubahan.st_masuk === 'TELAT' && e2.perubahan.telat_mnt === 7 && e2.perubahan.ket_masuk === 'TIDAK DIISI | LUAR: Pasang AC rumah Bu Sri');
+  ujiBebas('edit masuk: alasan telat yang sudah diisi dipertahankan selama masih telat', edit({ jamBaru: '08:00', ketLama: 'Macet | LUAR: lama' }).perubahan.ket_masuk === 'Macet | LUAR: Pasang AC rumah Bu Sri' && edit({ jamBaru: '07:45', ketLama: 'Macet | LUAR: lama' }).perubahan.st_masuk === 'HADIR');
+  ujiBebas('edit masuk: 07:45:xx batas tepat (HADIR) dan 07:46 TELAT 1 menit', edit({ jamBaru: '07:45' }).perubahan.st_masuk === 'HADIR' && edit({ jamBaru: '07:46' }).perubahan.telat_mnt === 1);
+  ujiBebas('edit masuk: sebelum jendela absen dibuka ditolak (06:00 sebelum 06:45)', edit({ jamBaru: '06:00' }).ok === false);
+  ujiBebas('edit: keterangan hasil edit tetap minimal 5 karakter; jam salah bentuk ditolak', !edit({ keterangan: 'abcd' }).ok && !edit({ keterangan: '    ' }).ok && !edit({ jamBaru: '7:5' }).ok && !edit({ jamBaru: '24:00' }).ok && !edit({ jamBaru: '07:60' }).ok && !edit({ jamBaru: '' }).ok);
+  ujiBebas('edit: jam tidak boleh melewati jam server sekarang (10:00): 10:00 boleh, 10:01 dan 23:59 ditolak; tanggal kemarin boleh jam berapa pun', edit({ jenis: 'PULANG', jamBaru: '10:00', jamMasuk: '07:00', stPulang: 'PULANG CEPAT', ketLama: 'Sakit | LUAR: a' }).ok === true && !edit({ jamBaru: '10:01' }).ok && !edit({ jamBaru: '23:59' }).ok && edit({ jamBaru: '07:44', tanggal: '2026-10-04' }).ok === true && jamTidakMelewati('2026-10-05', '10:00', sekarang10) === true && jamTidakMelewati('2026-10-05', '10:01', sekarang10) === false);
+  ujiBebas('edit masuk: jam masuk harus sebelum jam pulang yang sudah ada', !edit({ jamPulang: '07:40' }).ok && edit({ jamPulang: '16:30' }).ok);
+  const dasarPulang = { jenis: 'PULANG', jamMasuk: '07:44', jamPulang: '16:32', stPulang: 'PULANG NORMAL', ketLama: 'LUAR: a b c d' };
+  ujiBebas('edit pulang: PULANG NORMAL diedit ke 15:00 = PULANG CEPAT (alasan "TIDAK DIISI" karena belum ada), tetap MENUNGGU', (function () { const r = edit(Object.assign({}, dasarPulang, { jamBaru: '15:00', sekarangMs: epoch('18:00:00') })); return r.ok && r.perubahan.st_pulang === 'PULANG CEPAT' && r.perubahan.ket_pulang === 'TIDAK DIISI | LUAR: Pasang AC rumah Bu Sri' && r.perubahan.acc_pulang === 'MENUNGGU' && r.perubahan.lembur === ''; })());
+  const dasarLembur = Object.assign({}, dasarPulang, { stPulang: 'LEMBUR DI TOKO', ketLama: 'Stok opname | LUAR: lama', sekarangMs: epoch('21:00:00') });
+  const eL = edit(Object.assign({}, dasarLembur, { jamBaru: '17:31' }));
+  ujiBebas('edit lembur: tingkat dihitung ulang dari jam baru (17:31 = 61 menit = tingkat 2; 17:00 = 30 menit = tingkat 1; 19:00 = tingkat 3), alasan lama dipertahankan', eL.ok && eL.perubahan.lembur === '2|61' && eL.perubahan.st_pulang === 'LEMBUR DI TOKO' && eL.perubahan.ket_pulang === 'Stok opname | LUAR: Pasang AC rumah Bu Sri' && edit(Object.assign({}, dasarLembur, { jamBaru: '17:00' })).perubahan.lembur === '1|30' && edit(Object.assign({}, dasarLembur, { jamBaru: '19:00' })).perubahan.lembur.charAt(0) === '3');
+  ujiBebas('edit lembur: jenis tidak berubah, jam sebelum lembur dibuka (16:35, batas 16:36) ditolak; jam pulang harus setelah jam masuk', !edit(Object.assign({}, dasarLembur, { jamBaru: '16:35' })).ok && edit(Object.assign({}, dasarLembur, { jamBaru: '16:36' })).ok && !edit(Object.assign({}, dasarPulang, { jamBaru: '07:40' })).ok);
+  ujiBebas('edit: penanda "dalam area toko" ikut terjaga setelah edit', edit({ ketLama: 'LUAR [AREA TOKO]: lama' }).perubahan.ket_masuk === 'LUAR [AREA TOKO]: Pasang AC rumah Bu Sri');
+  ujiBebas('edit: tanpa jadwal shift ditolak; catatan sebelum/sesudah untuk log berisi jam lama dan baru', !edit({ shift: null }).ok && e1.sebelum.indexOf('masuk=07:50') === 0 && e1.sesudah.indexOf('masuk=07:44') === 0);
+  // 6) tombol LEMBUR HP pribadi mengikuti jam server dengan aturan yang sama dengan HP toko
+  ujiBebas('lembur_boleh: 16:35:59 belum, 16:36:00 boleh (jam pulang 16:30 + toleransi 5 + 1 menit), belum absen masuk tidak boleh', lemburBolehDariJam(detik('16:35:59'), s1, true, false, '') === false && lemburBolehDariJam(detik('16:36:00'), s1, true, false, '') === true && lemburBolehDariJam(detik('18:00:00'), s1, false, false, '') === false);
+  ujiBebas('lembur_boleh: setelah PULANG CEPAT tidak boleh; setelah PULANG NORMAL (ganti jadi lembur) dan LEMBUR (revisi) boleh', lemburBolehDariJam(detik('18:00:00'), s1, true, true, 'PULANG CEPAT') === false && lemburBolehDariJam(detik('18:00:00'), s1, true, true, 'PULANG NORMAL') === true && lemburBolehDariJam(detik('18:00:00'), s1, true, true, 'LEMBUR DI TOKO') === true);
+  ujiBebas('lembur_boleh: shift 2 memakai jam pulangnya sendiri (22:00 + 6 menit)', lemburBolehDariJam(detik('22:05:59'), siang, true, false, '') === false && lemburBolehDariJam(detik('22:06:00'), siang, true, false, '') === true);
+  ujiBebas('absen pulang luar tanpa absen masuk hari itu ditolak di server (tombol Absen Pulang hanya aktif setelah ada absen masuk)', tentukanStatusPulang(detik('17:00:00'), s1, 'PULANG', false, false, '').ok === false && tentukanStatusPulang(detik('17:00:00'), s1, 'PULANG', false, false, '').pesan === 'Belum absen masuk hari ini');
 
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
@@ -1506,13 +1542,15 @@ function tesServer() {
   baris.push('  - Admin baru (pw_hash kosong, ganti_pw TRUE diisi pemilik di sheet): login pertama dengan nama saja membuka layar Buat kata sandi dan PIN; sesudahnya pw_hash dan pin_hash terisi, ganti_pw FALSE, dan sheet sesi bertambah satu baris (kolom perangkat berawalan HPP, kolom kedaluwarsa kosong)');
   baris.push('  - Reset PIN / Nonaktifkan karyawan dari HP toko atau HP pribadi admin: karyawan yang sedang masuk di HP pribadi langsung ditolak pada permintaan berikutnya (sesi di sheet jadi aktif FALSE)');
   baris.push('  - Karyawan lama dengan PIN 4 angka tidak bisa absen lagi sampai admin menjalankan Reset PIN (PIN baru 5 angka)');
-  baris.push('  - Absen luar masuk di HP pribadi: isi tujuan + keperluan, lokasi terkunci, KIRIM: baris absensi dengan cara_masuk LUAR, acc_masuk MENUNGGU, ket_masuk "LUAR: tujuan / keperluan", gps_masuk "lat,lng,akurasi" (teks, bukan angka), id_masuk berakhiran -P, foto menyusul ke folder Drive');
+  baris.push('  - Absen luar masuk di HP pribadi: isi keterangan (minimal 5 karakter), lokasi terkunci, KIRIM: baris absensi dengan cara_masuk LUAR, acc_masuk MENUNGGU, ket_masuk "LUAR: keterangan" (ketik bebas, minimal 5 karakter), gps_masuk "lat,lng,akurasi" (teks, bukan angka), id_masuk berakhiran -P, foto menyusul ke folder Drive');
   baris.push('  - Izin lokasi ditolak: absen luar tidak bisa dilanjutkan (pesan jelas, tombol Coba lagi); akurasi 350 m tetap bisa dikirim');
   baris.push('  - Telat lewat absen luar: pop-up TELAT + alasan; ket_masuk menjadi "Macet | LUAR: ..." (bagian luar tetap)');
   baris.push('  - Pulang luar setelah masuk di HP toko: form tujuan/keperluan muncul; setelah masuk luar: tanpa form; PULANG + LEMBUR mengikuti aturan jam lembur; acc_pulang MENUNGGU, cara_pulang LUAR');
   baris.push('  - Riwayat absen di HP pribadi: hanya milik sendiri, 31 hari terakhir, paling banyak 50 baris, jam masuk/pulang benar (bukan terbalik AM/PM)');
   baris.push('  - Konfirmasi: menu admin (HP toko dan HP pribadi) dan menu owner menampilkan jumlah menunggu (99+ bila lebih); isi dikelompokkan Absen luar, Lembur, Pulang cepat; ACC mengubah acc_masuk/acc_pulang jadi DITERIMA, TOLAK (dengan konfirmasi) jadi DITOLAK, tombolnya hilang; sheet log ada ACC_ABSEN / TOLAK_ABSEN');
-  baris.push('  - Konfirmasi hak: admin Ngawi tidak melihat item Pusat dan tidak melihat absen luar miliknya sendiri; owner melihat semua cabang (filter cabang kalau lebih dari satu) termasuk milik admin dan bisa meng-ACC-nya');
+  baris.push('  - Konfirmasi hak: admin Ngawi hanya melihat pengajuan KARYAWAN Ngawi (bukan miliknya sendiri, bukan admin lain); owner hanya melihat pengajuan ADMIN (semua cabang). Coba ACC pengajuan karyawan memakai sesi owner (harus ditolak) dan ACC pengajuan sendiri memakai sesi admin (harus ditolak)');
+  baris.push('  - Edit pengajuan absen luar (Konfirmasi > Edit): ubah jam dan keterangan; status HADIR/TELAT dan tingkat lembur dihitung ulang, acc tetap MENUNGGU, log EDIT_ABSEN berisi sebelum/sesudah; pengajuan yang sudah DITERIMA/DITOLAK, milik sendiri, atau jam melewati sekarang harus ditolak');
+  baris.push('  - Penanda area toko: absen luar dalam radius_tanda_toko_m (bawaan 100 m) dari HP toko cabang itu: ket_masuk/ket_pulang berawalan "LUAR [AREA TOKO]:" dan kartu Konfirmasi menampilkan "Lokasi di dalam area toko"; absen tetap MENUNGGU');
   baris.push('  - Lihat foto: foto hanya dimuat saat tombol ditekan; TANPA FOTO tampil sebagai tulisan; tautan Buka di Google Maps membuka lokasi yang benar; akurasi di atas 100 m diberi tanda');
   baris.push('  - Muat lagi: layar menampilkan 20 kartu per muatan; setelah beberapa item diputuskan, Muat lagi tidak melewatkan item');
   baris.push('  - Aktifkan kembali karyawan nonaktif: saklar Tampilkan nonaktif -> tombol Aktifkan kembali; aktif jadi TRUE dengan ID sama, pin_hash/salah_login/terkunci tidak berubah, log AKTIFKAN_KARYAWAN; nama kembar dengan karyawan aktif ditolak');
@@ -2891,19 +2929,31 @@ function kunciCacheSesi(daftarSesi, akunId) {
 }
 
 /**
- * Fungsi murni: boleh memutuskan (ACC/TOLAK) sebuah item konfirmasi?
- *  aktor = { role, id, cabang }; item = { karyawan (id pemilik absen), cabang }.
- *  OWNER: semua cabang, termasuk item milik admin. ADMIN: hanya cabangnya dan BUKAN miliknya sendiri. Selain itu ditolak.
+ * Fungsi murni: boleh memutuskan (ACC/TOLAK) atau mengedit sebuah item konfirmasi?
+ *  aktor = { role, id, cabang }; item = { karyawan (id pemilik pengajuan), cabang, role (role pemilik: KARYAWAN/ADMIN; kosong = KARYAWAN) }.
+ *  Pembagian tugas: ADMIN hanya memutuskan pengajuan KARYAWAN di cabangnya sendiri (bukan miliknya sendiri);
+ *  OWNER hanya memutuskan pengajuan level ADMIN (semua cabang). Selain itu ditolak, apa pun yang dikirim klien.
  */
 function bolehMemutuskanKonfirmasi(aktor, item) {
   if (!aktor || !item) { return { boleh: false, pesan: 'Data tidak lengkap' }; }
-  if (aktor.role === 'OWNER') { return { boleh: true }; }
+  const rolePemilik = item.role || 'KARYAWAN';
+  if (aktor.role === 'OWNER') {
+    if (rolePemilik !== 'ADMIN') { return { boleh: false, pesan: 'Owner hanya memutuskan pengajuan admin. Pengajuan karyawan diputuskan oleh admin cabang.' }; }
+    return { boleh: true };
+  }
   if (aktor.role === 'ADMIN') {
-    if (item.cabang !== aktor.cabang) { return { boleh: false, pesan: 'Hanya boleh memutuskan absen di cabang sendiri' }; }
-    if (String(item.karyawan) === String(aktor.id)) { return { boleh: false, pesan: 'Admin tidak boleh memutuskan absennya sendiri (hanya owner)' }; }
+    if (String(item.karyawan) === String(aktor.id)) { return { boleh: false, pesan: 'Admin tidak boleh memutuskan atau mengedit pengajuannya sendiri. Itu tugas owner.' }; }
+    if (rolePemilik !== 'KARYAWAN') { return { boleh: false, pesan: 'Pengajuan admin diputuskan oleh owner' }; }
+    if (item.cabang !== aktor.cabang) { return { boleh: false, pesan: 'Hanya boleh memutuskan pengajuan di cabang sendiri' }; }
     return { boleh: true };
   }
   return { boleh: false, pesan: 'Tidak punya hak memutuskan' };
+}
+
+/** Role pemilik sebuah pengajuan (KARYAWAN atau ADMIN) dari sheet akun; tidak ketemu = KARYAWAN (paling ketat untuk owner). */
+function peranAkun(id) {
+  const a = bacaSheet('akun').data.find(function (r) { return String(r.id) === String(id); });
+  return a && a.role === 'ADMIN' ? 'ADMIN' : (a && a.role === 'OWNER' ? 'OWNER' : 'KARYAWAN');
 }
 
 /** Hapus cache validasi semua sesi aktif milik akun (tanpa mencabut sesi), mis. saat akun terkunci. */
@@ -3054,12 +3104,37 @@ function prosesPribadiKeluarkanSemua(d) {
  */
 var BATAS_AKURASI_TANDAI_M = 100;
 
-/** Fungsi murni: teks keterangan luar yang disimpan di kolom keterangan. */
-function susunKetLuar(tujuan, keperluan) {
+/**
+ * Fungsi murni: teks keterangan luar yang disimpan di kolom keterangan: "LUAR: keterangan".
+ * dalamToko = true -> "LUAR [AREA TOKO]: keterangan" (penanda lokasi di dalam area toko; tanpa kolom baru).
+ * Dua argumen pertama (tujuan, keperluan) tetap diterima supaya data lama "LUAR: tujuan / keperluan" bisa disusun ulang.
+ */
+function susunKetLuar(tujuan, keperluan, dalamToko) {
   const t = String(tujuan || '').trim(), k = String(keperluan || '').trim();
-  if (t && k) { return 'LUAR: ' + t + ' / ' + k; }
-  if (t || k) { return 'LUAR: ' + (t || k); }
-  return '';
+  const isi = t && k ? t + ' / ' + k : (t || k);
+  if (!isi) { return ''; }
+  return 'LUAR' + (dalamToko ? ' [AREA TOKO]' : '') + ': ' + isi;
+}
+
+/** Fungsi murni: uraikan potongan "LUAR..." dari kolom keterangan: { luar, dalamToko, teks (tanpa awalan), ketBersih }. */
+function uraiKetLuar(ket) {
+  const bagian = String(ket || '').split(' | ');
+  let luar = false, dalamToko = false, teks = '';
+  const sisa = [];
+  bagian.forEach(function (b) {
+    const m = /^LUAR( \[AREA TOKO\])?: ?([\s\S]*)$/.exec(b);
+    if (m && !luar) { luar = true; dalamToko = !!m[1]; teks = m[2]; sisa.push('LUAR: ' + m[2]); } else { sisa.push(b); }
+  });
+  return { luar: luar, dalamToko: dalamToko, teks: teks, ketBersih: sisa.filter(function (x) { return x !== ''; }).join(' | ') };
+}
+
+/** Fungsi murni: keterangan absen luar: wajib minimal 5 karakter (setelah spasi dipotong), maksimal 100, tanpa karakter kontrol. Tanda | diganti /. */
+function validasiKeteranganLuar(teks) {
+  const t = String(teks === undefined || teks === null ? '' : teks).trim();
+  if (t.length < 5) { return { ok: false, pesan: 'Keterangan wajib diisi, minimal 5 karakter' }; }
+  if (t.length > 100) { return { ok: false, pesan: 'Keterangan maksimal 100 karakter' }; }
+  if (/[\u0000-\u001f\u007f]/.test(t)) { return { ok: false, pesan: 'Keterangan mengandung karakter yang tidak boleh' }; }
+  return { ok: true, teks: t.replace(/\s*\|\s*/g, ' / ') };
 }
 
 /** Fungsi murni: gabungkan potongan keterangan yang tidak kosong dengan " | ". */
@@ -3075,9 +3150,6 @@ function ketSetelahAlasan(ketLama, alasanTeks) {
 
 /** Fungsi murni: nilai acc awal: absen luar selalu MENUNGGU. */
 function accAwalLuar(luar) { return luar ? 'MENUNGGU' : ''; }
-
-/** Fungsi murni: form tujuan dan keperluan wajib kecuali absen masuk hari itu juga absen luar. */
-function perluFormLuar(caraMasuk) { return String(caraMasuk || '') !== 'LUAR'; }
 
 /** Fungsi murni: "lat,lng,akurasi" (lat dan lng di awal supaya mudah dibuka di peta). */
 function teksGps(g) {
@@ -3098,29 +3170,19 @@ function akurasiBuruk(teks) {
 }
 
 /**
- * Fungsi murni: validasi absen luar. GPS WAJIB dan divalidasi tipe/rentangnya (akurasi buruk tidak menolak).
- * wajibForm = tujuan dan keperluan wajib (1..100 karakter); kalau tidak wajib, boleh kosong tapi tetap dicek bila ada.
- * daftarKeperluan (opsional) = isi `KEPERLUAN_LUAR` di sheet pengaturan; kalau terisi dan keperluan tidak kosong, keperluan WAJIB ada di daftar
- * (tanpa beda huruf besar-kecil). Daftar kosong/tidak diberikan = tidak diperiksa terhadap daftar.
+ * Fungsi murni: validasi absen luar (masuk, pulang, dan lembur). Keterangan WAJIB minimal 5 karakter
+ * (setelah spasi dipotong) dan GPS WAJIB (tipe dan rentang divalidasi; akurasi buruk tidak menolak).
  */
-function validasiAbsenLuar(d, wajibForm, daftarKeperluan) {
-  const bersih = function (t) { return String(t === undefined || t === null ? '' : t).trim(); };
-  const tujuan = bersih(d.tujuan), keperluan = bersih(d.keperluan);
-  const aman = function (t) { return !/[\u0000-\u001f\u007f]/.test(t); };
-  if (wajibForm && (!tujuan || !keperluan)) { return { ok: false, pesan: 'Tujuan dan keperluan wajib diisi' }; }
-  if (tujuan.length > 100 || keperluan.length > 100) { return { ok: false, pesan: 'Tujuan dan keperluan maksimal 100 karakter' }; }
-  if (!aman(tujuan) || !aman(keperluan)) { return { ok: false, pesan: 'Tujuan dan keperluan tidak valid' }; }
-  if (keperluan && daftarKeperluan && daftarKeperluan.length) {
-    const ada = daftarKeperluan.some(function (x) { return String(x).trim().toLowerCase() === keperluan.toLowerCase(); });
-    if (!ada) { return { ok: false, pesan: "Keperluan tidak ada di daftar pilihan" }; }
-  }
+function validasiAbsenLuar(d) {
+  const k = validasiKeteranganLuar(d.keterangan);
+  if (!k.ok) { return { ok: false, pesan: k.pesan }; }
   const g = d.gps;
   if (!g || typeof g.lat !== 'number' || typeof g.lng !== 'number' || typeof g.akurasi !== 'number' ||
       !isFinite(g.lat) || !isFinite(g.lng) || !isFinite(g.akurasi) ||
       Math.abs(g.lat) > 90 || Math.abs(g.lng) > 180 || g.akurasi < 0 || g.akurasi > 100000) {
     return { ok: false, pesan: 'Lokasi (GPS) wajib untuk absen luar' };
   }
-  return { ok: true, tujuan: tujuan, keperluan: keperluan, gps: { lat: g.lat, lng: g.lng, akurasi: g.akurasi } };
+  return { ok: true, keterangan: k.teks, gps: { lat: g.lat, lng: g.lng, akurasi: g.akurasi } };
 }
 
 /** Tulis teks ke satu sel sebagai TEKS biasa (supaya "lat,lng,akurasi" tidak dibaca Sheets sebagai angka/rumus). */
@@ -3143,7 +3205,7 @@ function prosesTiketPribadi(d) {
   return prosesTiketWaktu(d.jenis, { cabang: p.cabang }, p.id);
 }
 
-/** Aksi absen_luar_masuk { sesi, tiket, tujuan, keperluan, gps:{lat,lng,akurasi}, tanpa_foto }. */
+/** Aksi absen_luar_masuk { sesi, tiket, keterangan (min. 5 karakter), gps:{lat,lng,akurasi}, tanpa_foto }. */
 function prosesAbsenLuarMasuk(d) {
   const p = validasiSesiPribadi(d.sesi);
   if (!p) { return responSesiPribadiHabis(); }
@@ -3151,14 +3213,14 @@ function prosesAbsenLuarMasuk(d) {
   if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
   const tk = periksaTiket(d.tiket, 'MASUK', p.cabang, kunci, Date.now(), p.id);
   if (!tk.ok) { return respon({ status: 'gagal', pesan: tk.pesan }); }
-  const v = validasiAbsenLuar(d, true, ambilDaftarPengaturan("KEPERLUAN_LUAR"));
+  const v = validasiAbsenLuar(d);
   if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
   const akun = akunPribadiLengkap(p);
   if (!akun) { return responSesiPribadiHabis(); }
-  return catatAbsenMasuk({ akun: akun, tk: tk, idHp: 'PRIBADI', tanpaFoto: d.tanpa_foto === true, luar: { tujuan: v.tujuan, keperluan: v.keperluan, gps: v.gps } });
+  return catatAbsenMasuk({ akun: akun, tk: tk, idHp: 'PRIBADI', tanpaFoto: d.tanpa_foto === true, luar: { keterangan: v.keterangan, gps: v.gps, dalamToko: dalamAreaTokoCabang(v.gps, p.cabang) } });
 }
 
-/** Aksi absen_luar_pulang { sesi, tiket, jenis: PULANG | PULANG_LEMBUR, tujuan?, keperluan?, gps, tanpa_foto }. */
+/** Aksi absen_luar_pulang { sesi, tiket, jenis: PULANG | PULANG_LEMBUR, keterangan (min. 5 karakter), gps, tanpa_foto }. */
 function prosesAbsenLuarPulang(d) {
   const p = validasiSesiPribadi(d.sesi);
   if (!p) { return responSesiPribadiHabis(); }
@@ -3167,11 +3229,11 @@ function prosesAbsenLuarPulang(d) {
   if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
   const tk = periksaTiket(d.tiket, d.jenis === 'PULANG_LEMBUR' ? 'LEMBUR' : 'PULANG', p.cabang, kunci, Date.now(), p.id);
   if (!tk.ok) { return respon({ status: 'gagal', pesan: tk.pesan }); }
-  const v = validasiAbsenLuar(d, false, ambilDaftarPengaturan("KEPERLUAN_LUAR")); // wajib tidaknya form dicek di catatAbsenPulang (tergantung cara absen masuk)
+  const v = validasiAbsenLuar(d);
   if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
   const akun = akunPribadiLengkap(p);
   if (!akun) { return responSesiPribadiHabis(); }
-  return catatAbsenPulang({ akun: akun, tk: tk, jenis: d.jenis, idHp: 'PRIBADI', tanpaFoto: d.tanpa_foto === true, luar: { tujuan: v.tujuan, keperluan: v.keperluan, gps: v.gps } });
+  return catatAbsenPulang({ akun: akun, tk: tk, jenis: d.jenis, idHp: 'PRIBADI', tanpaFoto: d.tanpa_foto === true, luar: { keterangan: v.keterangan, gps: v.gps, dalamToko: dalamAreaTokoCabang(v.gps, p.cabang) } });
 }
 
 function prosesSimpanAlasanPribadi(d) {
@@ -3266,7 +3328,8 @@ function prosesPribadiHariIni(d) {
     status: 'ok', tanggal: hariIni,
     sudah_masuk: !!baris && baris.masuk !== '', sudah_pulang: !!baris && baris.pulang !== '',
     jam_masuk: baris ? baris.masuk : '', jam_pulang: baris ? baris.pulang : '',
-    cara_masuk: baris ? String(baris.cara_masuk) : '', st_pulang: baris ? String(baris.st_pulang) : ''
+    cara_masuk: baris ? String(baris.cara_masuk) : '', st_pulang: baris ? String(baris.st_pulang) : '',
+    lembur_boleh: lemburBolehPribadi(p, baris)
   });
 }
 
@@ -3275,6 +3338,25 @@ function prosesPribadiKeperluanLuar(d) {
   const p = validasiSesiPribadi(d.sesi);
   if (!p) { return responSesiPribadiHabis(); }
   return respon({ status: "ok", daftar: ambilDaftarPengaturan("KEPERLUAN_LUAR") });
+}
+
+/**
+ * Apakah tombol LEMBUR di HP pribadi boleh aktif sekarang? Jam server + aturan yang SAMA dengan lembur HP toko
+ * (tentukanStatusPulang): sudah absen masuk, sudah lewat jam pulang + toleransi + 1 menit, bukan setelah PULANG CEPAT, bukan ADMIN.
+ */
+function lemburBolehPribadi(p, baris) {
+  try {
+    if (!baris || p.role === 'ADMIN') { return false; }
+    const shift = bacaShiftCabang(p.cabang).find(function (sh) { return String(sh.no) === String(baris.shift); }) || null;
+    if (!shift) { return false; }
+    if (shift.toleransi === null) { shift.toleransi = ambilNilaiUmum('toleransi_pulang_menit', 5); }
+    return lemburBolehDariJam(waktuDariMs(Date.now()).detik, shift, String(baris.masuk) !== '', String(baris.pulang) !== '', String(baris.st_pulang));
+  } catch (e) { return false; }
+}
+
+/** Fungsi murni: lembur boleh dicatat pada jam itu? (aturan yang sama dengan absen lembur HP toko). */
+function lemburBolehDariJam(detik, shift, sudahMasuk, sudahPulang, stPulang) {
+  return tentukanStatusPulang(detik, shift, 'PULANG_LEMBUR', sudahMasuk, sudahPulang, stPulang).ok === true;
 }
 
 /** Aksi pribadi_riwayat { sesi }: milik sendiri, 31 hari terakhir, paling banyak 50 baris. */
@@ -3341,7 +3423,7 @@ function kelompokItem(jenis, baris) {
  * baris: tanggal 'yyyy-MM-dd', karyawan, nama, cabang, shift, jam_masuk, jam_pulang, cara_masuk, cara_pulang, acc_masuk, acc_pulang,
  * st_masuk, telat_mnt, st_pulang, lembur ("tingkat|menit"), ket_masuk, ket_pulang, foto_masuk, foto_pulang, gps_masuk, gps_pulang.
  */
-function rakitItemKonfirmasi(rows) {
+function rakitItemKonfirmasi(rows, petaRole) {
   const items = [];
   rows.forEach(function (b) {
     const buat = function (jenis) {
@@ -3351,12 +3433,14 @@ function rakitItemKonfirmasi(rows) {
       const kelompok = kelompokItem(jenis, b);
       if (!kelompok) { return; }
       const lem = /^(\d+)\|(\d+)$/.exec(String(b.lembur));
+      const ket = uraiKetLuar(String((masuk ? b.ket_masuk : b.ket_pulang) || ''));
       items.push({
         id: b.karyawan + '|' + b.tanggal + '|' + jenis, jenis: jenis, kelompok: kelompok,
         karyawan: b.karyawan, nama: b.nama, cabang: b.cabang, tanggal: b.tanggal, shift: b.shift,
         jam: masuk ? b.jam_masuk : b.jam_pulang,
         status: masuk ? b.st_masuk : b.st_pulang,
-        ket: String((masuk ? b.ket_masuk : b.ket_pulang) || ''),
+        ket: ket.ketBersih, ket_edit: ket.teks, dalam_area_toko: ket.dalamToko,
+        role: (petaRole && petaRole[b.karyawan]) || 'KARYAWAN', luar: String(masuk ? b.cara_masuk : b.cara_pulang) === 'LUAR',
         tingkat: !masuk && lem ? Number(lem[1]) : 0, durasi_menit: !masuk && lem ? Number(lem[2]) : 0,
         gps: gps, akurasi: akurasiDariGps(gps), akurasi_buruk: akurasiBuruk(gps), maps: urlMaps(gps),
         foto: foto === '' ? 'BELUM' : (foto === TEKS_TANPA_FOTO ? 'TANPA' : 'ADA')
@@ -3368,10 +3452,11 @@ function rakitItemKonfirmasi(rows) {
   return items;
 }
 
-/** Fungsi murni: item yang boleh dilihat aktor. OWNER: semua (boleh difilter cabang); ADMIN: cabangnya dan bukan miliknya sendiri. */
+/** Fungsi murni: item yang boleh dilihat aktor = item yang boleh diputuskannya. ADMIN: pengajuan KARYAWAN di cabangnya (bukan miliknya sendiri);
+ * OWNER: hanya pengajuan ADMIN (boleh difilter cabang). */
 function saringItemKonfirmasi(items, aktor, filterCabang) {
   return items.filter(function (it) {
-    if (!bolehMemutuskanKonfirmasi(aktor, { karyawan: it.karyawan, cabang: it.cabang }).boleh) { return false; }
+    if (!bolehMemutuskanKonfirmasi(aktor, { karyawan: it.karyawan, cabang: it.cabang, role: it.role }).boleh) { return false; }
     return !(aktor.role === 'OWNER' && filterCabang && it.cabang !== filterCabang);
   });
 }
@@ -3454,7 +3539,9 @@ function aktorKonfirmasi(d) {
 }
 
 function itemUntukAktor(aktor, filterCabang) {
-  return saringItemKonfirmasi(rakitItemKonfirmasi(bacaAbsensiMenunggu()), aktor, filterCabang);
+  const petaRole = {};
+  bacaSheet('akun').data.forEach(function (r) { petaRole[String(r.id)] = r.role === 'ADMIN' ? 'ADMIN' : (r.role === 'OWNER' ? 'OWNER' : 'KARYAWAN'); });
+  return saringItemKonfirmasi(rakitItemKonfirmasi(bacaAbsensiMenunggu(), petaRole), aktor, filterCabang);
 }
 
 /** Aksi konfirmasi_jumlah: jumlah item yang menunggu (untuk badge menu; maksimal 99+). */
@@ -3488,7 +3575,7 @@ function prosesKonfirmasiPutuskan(d) {
     const cari = cariBarisAbsensi(it.karyawan, it.tanggal);
     if (!cari) { return respon({ status: 'gagal', pesan: 'Absen tidak ditemukan' }); }
     const kolomAcc = it.jenis === 'MASUK' ? 'acc_masuk' : 'acc_pulang';
-    const izin = bolehMemutuskanKonfirmasi(k.aktor, { karyawan: cari.baris.karyawan, cabang: cari.baris.cabang });
+    const izin = bolehMemutuskanKonfirmasi(k.aktor, { karyawan: cari.baris.karyawan, cabang: cari.baris.cabang, role: peranAkun(cari.baris.karyawan) });
     if (!izin.boleh) { return respon({ status: 'gagal', pesan: izin.pesan }); }
     if (!bisaDiputuskan(cari.baris[kolomAcc])) { return respon({ status: 'gagal', pesan: 'Item ini sudah diputuskan' }); }
     const baru = d.keputusan === 'ACC' ? 'DITERIMA' : 'DITOLAK';
@@ -3504,6 +3591,153 @@ function prosesKonfirmasiPutuskan(d) {
   }
 }
 
+/**
+ * ---- Penanda "di dalam area toko" untuk absen luar ----
+ * Koordinat absen luar dibandingkan dengan koordinat toko cabang itu (gps_daftar semua HP toko AKTIF cabang itu saat didaftarkan,
+ * ditambah titik LOKASI di sheet pengaturan bila ada). Radius = pengaturan UMUM `radius_tanda_toko_m` (bawaan 100 m).
+ * Di dalam radius: absen TETAP diterima dan menunggu ACC, tetapi ditandai di kolom keterangan: "LUAR [AREA TOKO]: ...".
+ */
+function titikDariGps(teks) {
+  const p = String(teks || '').split(',');
+  if (p.length < 2 || p[0].trim() === '' || p[1].trim() === '') { return null; }
+  const lat = Number(p[0]), lng = Number(p[1]);
+  if (!isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) { return null; }
+  return { lat: lat, lng: lng };
+}
+
+/** Fungsi murni: apakah gps { lat, lng } berada dalam radius (meter) dari salah satu titik toko? */
+function dalamRadiusToko(gps, titik, radius) {
+  return (titik || []).some(function (t) { return jarakMeter(gps.lat, gps.lng, t.lat, t.lng) <= radius; });
+}
+
+function titikTokoCabang(cabang) {
+  const hasil = [];
+  const sama = function (x) { return String(x).trim().toLowerCase() === String(cabang).trim().toLowerCase(); };
+  bacaSheet('akun').data.forEach(function (r) {
+    if (r.role === 'PERANGKAT' && r.aktif === true && sama(r.cabang)) {
+      const t = titikDariGps(r.gps_daftar);
+      if (t) { hasil.push(t); }
+    }
+  });
+  const lok = ambilLokasiCabang(cabang);
+  if (lok) { hasil.push(lok); }
+  return hasil;
+}
+
+/** Gagal membaca sheet tidak boleh menggagalkan absen: dianggap tidak di area toko. */
+function dalamAreaTokoCabang(gps, cabang) {
+  try {
+    return dalamRadiusToko(gps, titikTokoCabang(cabang), ambilNilaiUmum('radius_tanda_toko_m', 100));
+  } catch (e) { return false; }
+}
+
+/**
+ * ---- Edit pengajuan absen luar di Konfirmasi ----
+ * Yang boleh diubah: jam dan keterangan. Jenis (masuk/pulang/lembur) tetap. Status dan tingkat lembur dihitung ulang
+ * dengan fungsi yang sama seperti absen biasa; pengajuan tetap MENUNGGU.
+ */
+/** Fungsi murni: jam "HH:mm" pada tanggal itu (waktu Jakarta) tidak melewati sekarangMs. */
+function jamTidakMelewati(tanggal, jam, sekarangMs) {
+  const ms = Date.parse(tanggal + 'T' + jam + ':00+07:00');
+  return isFinite(ms) && ms <= sekarangMs;
+}
+
+/** Fungsi murni: kolom keterangan setelah edit: alasan lama (kalau masih perlu) + bagian luar yang baru. */
+function ketSetelahEdit(ketLama, ketLuarBaru, perluAlasan) {
+  const alasan = String(ketLama || '').split(' | ').filter(function (x) { return x !== '' && x.indexOf('LUAR') !== 0; })[0] || '';
+  return gabungKet(perluAlasan ? (alasan || 'TIDAK DIISI') : '', ketLuarBaru);
+}
+
+/**
+ * Fungsi murni: rencana perubahan kolom untuk satu edit.
+ * p = { jenis 'MASUK'|'PULANG', tanggal, jamBaru 'HH:mm', keterangan, sekarangMs, jendelaMenit,
+ *       shift { masuk, tutup, pulang, toleransi }, jamMasuk, jamPulang (jam tampilan baris sekarang, kosong kalau belum ada),
+ *       stMasuk, stPulang (status sekarang), ketLama }
+ * Hasil: { ok:false, pesan } atau { ok:true, perubahan:{kolom:nilai}, sebelum, sesudah }.
+ */
+function rencanaEditAbsen(p) {
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(p.jamBaru || ''))) { return { ok: false, pesan: 'Jam harus berbentuk JJ:MM, contoh 07:45' }; }
+  const k = validasiKeteranganLuar(p.keterangan);
+  if (!k.ok) { return { ok: false, pesan: k.pesan }; }
+  if (!jamTidakMelewati(p.tanggal, p.jamBaru, p.sekarangMs)) { return { ok: false, pesan: 'Jam tidak boleh melewati jam sekarang' }; }
+  if (!p.shift) { return { ok: false, pesan: 'Jadwal shift karyawan tidak ditemukan, hubungi admin' }; }
+  const detik = jamKeDetik(p.jamBaru);
+  const lama = uraiKetLuar(p.ketLama);
+  const ketLuar = susunKetLuar(k.teks, '', lama.dalamToko);
+  if (p.jenis === 'MASUK') {
+    if (p.jamPulang && p.jamBaru >= p.jamPulang) { return { ok: false, pesan: 'Jam masuk harus sebelum jam pulang (' + p.jamPulang + ')' }; }
+    const st = tentukanStatusMasuk(detik, p.shift, p.jendelaMenit);
+    if (!st.ok) { return { ok: false, pesan: st.pesan }; }
+    const telat = st.st_masuk === 'TELAT';
+    return {
+      ok: true,
+      perubahan: { masuk: p.jamBaru, st_masuk: st.st_masuk, telat_mnt: st.telat_mnt, ket_masuk: ketSetelahEdit(p.ketLama, ketLuar, telat), acc_masuk: 'MENUNGGU' },
+      sebelum: 'masuk=' + p.jamMasuk + '; st=' + p.stMasuk + '; ket=' + p.ketLama,
+      sesudah: 'masuk=' + p.jamBaru + '; st=' + st.st_masuk + (telat ? ' ' + st.telat_mnt + ' mnt' : '') + '; ket=' + ketSetelahEdit(p.ketLama, ketLuar, telat)
+    };
+  }
+  if (p.jenis === 'PULANG') {
+    if (p.jamMasuk && p.jamBaru <= p.jamMasuk) { return { ok: false, pesan: 'Jam pulang harus setelah jam masuk (' + p.jamMasuk + ')' }; }
+    const jenis = p.stPulang === 'LEMBUR DI TOKO' ? 'PULANG_LEMBUR' : 'PULANG';
+    const h = tentukanStatusPulang(detik, p.shift, jenis, true, false, '');
+    if (!h.ok) { return { ok: false, pesan: h.pesan }; }
+    const lembur = h.st_pulang === 'LEMBUR DI TOKO' ? h.tingkat + '|' + h.durasi_menit : '';
+    const ketBaru = ketSetelahEdit(p.ketLama, ketLuar, !!h.keterangan);
+    return {
+      ok: true,
+      perubahan: { pulang: p.jamBaru, st_pulang: h.st_pulang, lembur: lembur, ket_pulang: ketBaru, acc_pulang: 'MENUNGGU' },
+      sebelum: 'pulang=' + p.jamPulang + '; st=' + p.stPulang + '; ket=' + p.ketLama,
+      sesudah: 'pulang=' + p.jamBaru + '; st=' + h.st_pulang + (lembur ? ' ' + lembur : '') + '; ket=' + ketBaru
+    };
+  }
+  return { ok: false, pesan: 'Jenis tidak dikenal' };
+}
+
+/** Aksi konfirmasi_edit { id, jam 'HH:mm', keterangan }: edit jam dan keterangan satu pengajuan absen luar yang masih MENUNGGU. */
+function prosesKonfirmasiEdit(d) {
+  const k = aktorKonfirmasi(d);
+  if (k.gagal) { return k.gagal; }
+  const it = parseIdItem(d.id);
+  if (!it) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
+  const kunciLock = LockService.getScriptLock();
+  kunciLock.waitLock(10000);
+  try {
+    const cari = cariBarisAbsensi(it.karyawan, it.tanggal);
+    if (!cari) { return respon({ status: 'gagal', pesan: 'Absen tidak ditemukan' }); }
+    const b = cari.baris;
+    const izin = bolehMemutuskanKonfirmasi(k.aktor, { karyawan: b.karyawan, cabang: b.cabang, role: peranAkun(b.karyawan) });
+    if (!izin.boleh) { return respon({ status: 'gagal', pesan: izin.pesan }); }
+    const masuk = it.jenis === 'MASUK';
+    if (!bisaDiputuskan(masuk ? b.acc_masuk : b.acc_pulang)) {
+      return respon({ status: 'gagal', pesan: 'Pengajuan yang sudah diputuskan (di-ACC atau ditolak) tidak bisa diedit' });
+    }
+    if (String(masuk ? b.cara_masuk : b.cara_pulang) !== 'LUAR') {
+      return respon({ status: 'gagal', pesan: 'Hanya pengajuan absen luar yang bisa diedit' });
+    }
+    const tampil = function (kolom) {
+      const idx = cari.bacaan.header.indexOf(kolom);
+      return idx === -1 ? '' : jamDariTampilan(cari.bacaan.sheet.getRange(b._baris, idx + 1).getDisplayValue());
+    };
+    const shift = bacaShiftCabang(b.cabang).find(function (sh) { return String(sh.no) === String(b.shift); }) || null;
+    if (shift && shift.toleransi === null) { shift.toleransi = ambilNilaiUmum('toleransi_pulang_menit', 5); }
+    const rencana = rencanaEditAbsen({
+      jenis: it.jenis, tanggal: it.tanggal, jamBaru: String(d.jam || '').trim(), keterangan: d.keterangan, sekarangMs: Date.now(),
+      jendelaMenit: ambilNilaiUmum('jendela_absen_menit', 60), shift: shift,
+      jamMasuk: String(b.masuk) === '' ? '' : tampil('masuk'), jamPulang: String(b.pulang) === '' ? '' : tampil('pulang'),
+      stMasuk: String(b.st_masuk), stPulang: String(b.st_pulang), ketLama: String(masuk ? b.ket_masuk : b.ket_pulang)
+    });
+    if (!rencana.ok) { return respon({ status: 'gagal', pesan: rencana.pesan }); }
+    perbaruiKolom(cari.bacaan, b, rencana.perubahan);
+    tambahLog({
+      jenis: 'KONFIRMASI', oleh: k.aktor.id, cabang: b.cabang, aksi: 'EDIT_ABSEN',
+      target: b.nama + ' ' + it.jenis + ' ' + it.tanggal, id: b.karyawan, sebelum: rencana.sebelum, sesudah: rencana.sesudah
+    });
+    return respon({ status: 'ok', pesan: 'Pengajuan diperbarui dan tetap menunggu ACC' });
+  } finally {
+    kunciLock.releaseLock();
+  }
+}
+
 /** Aksi ambil_foto { id }: baca satu foto dari Drive (tidak publik) dan kirim sebagai base64, hanya untuk yang berhak. */
 function prosesAmbilFoto(d) {
   const k = aktorKonfirmasi(d);
@@ -3512,7 +3746,7 @@ function prosesAmbilFoto(d) {
   if (!it) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
   const cari = cariBarisAbsensi(it.karyawan, it.tanggal);
   if (!cari) { return respon({ status: 'gagal', pesan: 'Absen tidak ditemukan' }); }
-  const izin = bolehMemutuskanKonfirmasi(k.aktor, { karyawan: cari.baris.karyawan, cabang: cari.baris.cabang }); // hak lihat = hak putuskan
+  const izin = bolehMemutuskanKonfirmasi(k.aktor, { karyawan: cari.baris.karyawan, cabang: cari.baris.cabang, role: peranAkun(cari.baris.karyawan) }); // hak lihat = hak putuskan
   if (!izin.boleh) { return respon({ status: 'gagal', pesan: izin.pesan }); }
   const tautan = String(it.jenis === 'MASUK' ? cari.baris.foto_masuk : cari.baris.foto_pulang);
   if (tautan === '') { return respon({ status: 'ok', foto: null, teks: 'Foto belum ada' }); }
