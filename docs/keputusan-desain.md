@@ -137,3 +137,22 @@ Daftar resmi selisih antara mockup (`docs/mockup/layar/`) dan aplikasi. Rincian 
 | 2026-10-06 | Layar admin dan owner lain (22, 24, 25, 53–55, 62–77, 81–82) | Belum ada | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
 
 Catatan koreksi audit (2026-10-06): dugaan awal bahwa layar login HP pribadi di mockup memakai keypad angka **tidak terbukti**; mockup 29 memakai kolom ketik biasa seperti app. Keypad ada di mockup untuk PIN HP toko (09), buat PIN karyawan (61), dan absen luar cadangan PIN (34); dua yang pertama sudah ada di app (5 digit), yang ketiga belum.
+
+### Penyelarasan Fase 1, bagian 2 (HP pribadi) — 2026-10-06
+Bukti visual berdampingan: `docs/audit/visual/<nomor>_mockup.png` dan `<nomor>_app.png` (29, 30, 33, 46). Hasil uji alur dengan server tiruan: `docs/audit/visual/uji_alur_pribadi_hasil.png`, `uji_alur_admin_hasil.png`, `uji_server_keperluan_hasil.png`.
+
+| Tanggal | Layar | Apa yang berubah | Alasan | Status |
+|---|---|---|---|---|
+| 2026-10-06 | Beranda HP pribadi (30–32) | Disalin dari mockup: logo + ikon akun, sapaan, ABSEN MASUK/PULANG 104 px (ikon 52), LEMBUR, satu baris tiga kotak Izin/Cuti, Tukar shift, Report (nonaktif "Segera"). Tombol "Riwayat absen" dihapus dari beranda (layar dan aksi server `pribadi_riwayat` masih ada, tetapi tidak terjangkau dari layar) | Sesuai mockup | sesuai mockup; Riwayat: belum disinkron ke mockup |
+| 2026-10-06 | Beranda HP pribadi (30–32) | Lencana label performa (EXCELLENT/GOOD/BAD) disiapkan tetapi DISEMBUNYIKAN | Belum ada data performa | belum ada data |
+| 2026-10-06 | Beranda HP pribadi (30–32) | Kartu "N pengajuan menunggu ACC" + "Lihat" tidak dibuat | Belum ada data izin | belum ada data |
+| 2026-10-06 | Beranda HP pribadi | Ikon akun membuka menu pojok (Log out, dst.), bukan layar "Akun saya" (44) | Layar Akun saya belum ada; Log out harus terjangkau | PENYIMPANGAN: harus diperbaiki (setelah Akun saya dibuat) |
+| 2026-10-06 | Beranda HP pribadi | Sapaan "Halo, {nama lengkap}" (mockup) bukan nama panggilan lagi; baris tanggal diganti baris status absen hari ini | Mengikuti mockup | sesuai mockup |
+| 2026-10-06 | Beranda HP pribadi | Tombol LEMBUR aktif begitu sudah absen masuk (kecuali sudah PULANG CEPAT); belum mengikuti jam server seperti HP toko. Server menolak bila belum waktunya | `pribadi_hari_ini` belum mengirim jam pulang shift; mengubahnya di luar izin langkah ini | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Absen luar (33) | Pilihan pulang di dalam layar absen luar (PULANG / PULANG + LEMBUR) dihapus: ABSEN PULANG dan LEMBUR di beranda masing-masing membuka layar absen luar sendiri; tombol kirim berlabel "KIRIM" | Sesuai mockup | sesuai mockup |
+| 2026-10-06 | Absen luar (33) | Kolom teks "Keperluan" diganti pilihan (chip) dari `KEPERLUAN_LUAR` + kolom ketik "Keterangan tujuan" (wajib). Aksi server baru `pribadi_keperluan_luar` dan validasi server bahwa keperluan ada di daftar (daftar kosong = tidak diperiksa) | Sesuai mockup | sesuai mockup |
+| 2026-10-06 | Absen luar (33) | Hanya kolom keperluan/tujuan yang disalin dari mockup; susunan atas layar lama dipertahankan. Teks "Wajah cocok dengan akun" tidak ada (belum ada pengenalan wajah); foto tetap otomatis saat KIRIM | Pengenalan wajah belum ada | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Login HP pribadi (29) | Karyawan memakai keypad angka 5 titik PIN (angka kelima langsung masuk); admin lewat tautan "Masuk sebagai admin (kata sandi)" dengan keyboard. Mockup 29: kolom Username + Password biasa | KEPUTUSAN PEMILIK 2026-10-06 (keypad seperti 09, 61, 34) | belum disinkron ke mockup |
+| 2026-10-06 | Login HP pribadi (29) | Gambar karyawan dan tagline "Selamat bekerja karyawan terbaik..." tidak ada | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Beranda admin HP pribadi (46) | Kartu "Menu admin" di bawah beranda (angka konfirmasi), tombol absen 86 px dan kotak 64 px seperti mockup 46; menu dari ikon akun memuat semua item mockup 50, yang belum ada fiturnya nonaktif "Segera" (Absen manual, Data absensi, Jadwal shift, Input izin, Kalender libur, Dashboard bulanan) | Sesuai mockup | sesuai mockup |
+| 2026-10-06 | Menu admin HP pribadi | Item "Keluarkan semua perangkat" dipertahankan (tidak ada di mockup 50) | Fitur yang sudah berfungsi | belum disinkron ke mockup |

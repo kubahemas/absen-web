@@ -120,6 +120,7 @@ function doPost(e) {
   if (data.aksi === 'absen_luar_pulang') { return prosesAbsenLuarPulang(data); }
   if (data.aksi === 'pribadi_hari_ini') { return prosesPribadiHariIni(data); }
   if (data.aksi === 'pribadi_riwayat') { return prosesPribadiRiwayat(data); }
+  if (data.aksi === "pribadi_keperluan_luar") { return prosesPribadiKeperluanLuar(data); }
 
   // Konfirmasi (ACC / TOLAK): owner (sesi owner), admin HP toko (token + sesi), atau admin HP pribadi (sesi).
   if (data.aksi === 'konfirmasi_jumlah') { return prosesKonfirmasiJumlah(data); }
@@ -1372,6 +1373,9 @@ function tesServer() {
   ujiBebas('GPS disimpan "lat,lng,akurasi" (lat dan lng di awal)', teksGps(gpsOk) === '-7.404412,111.446212,18' && akurasiDariGps(teksGps(gpsOk)) === 18);
   ujiBebas('tujuan dan keperluan masuk luar wajib (1..100 karakter), 101 karakter ditolak', !validasiAbsenLuar({ tujuan: '', keperluan: 'b', gps: gpsOk }, true).ok && !validasiAbsenLuar({ tujuan: 'a', keperluan: '  ', gps: gpsOk }, true).ok && !validasiAbsenLuar({ tujuan: 'x'.repeat(101), keperluan: 'b', gps: gpsOk }, true).ok && validasiAbsenLuar({ tujuan: 'x'.repeat(100), keperluan: 'b', gps: gpsOk }, true).ok);
   ujiBebas('pulang luar tanpa form diterima di sisi validasi (wajib tidaknya ditentukan cara absen masuk)', validasiAbsenLuar({ gps: gpsOk }, false).ok === true);
+  const dKep = ["Survey", "Pengiriman", "Lainnya"];
+  ujiBebas("keperluan harus ada di daftar KEPERLUAN_LUAR (tanpa beda huruf besar-kecil); di luar daftar ditolak", validasiAbsenLuar({ tujuan: "a", keperluan: "survey", gps: gpsOk }, true, dKep).ok === true && validasiAbsenLuar({ tujuan: "a", keperluan: "Santai", gps: gpsOk }, true, dKep).ok === false && validasiAbsenLuar({ tujuan: "a", keperluan: "Lainnya", gps: gpsOk }, true, dKep).ok === true);
+  ujiBebas("daftar KEPERLUAN_LUAR kosong atau tidak diberikan: tidak diperiksa terhadap daftar; pulang luar tanpa keperluan tetap diterima", validasiAbsenLuar({ tujuan: "a", keperluan: "apa saja", gps: gpsOk }, true, []).ok === true && validasiAbsenLuar({ gps: gpsOk }, false, dKep).ok === true);
   ujiBebas('pulang luar setelah masuk di HP toko (PIN) meminta tujuan dan keperluan; setelah masuk luar tidak perlu mengulang', perluFormLuar('PIN') === true && perluFormLuar('') === true && perluFormLuar('LUAR') === false);
   ujiBebas('absen luar berstatus MENUNGGU (masuk dan pulang); absen HP toko tidak berubah', accAwalLuar({ tujuan: 'a' }) === 'MENUNGGU' && accAwalLuar(null) === '');
   ujiBebas('keterangan luar: "LUAR: tujuan / keperluan", digabung dengan alasan memakai " | "', susunKetLuar('Toko Madiun', 'Antar barang') === 'LUAR: Toko Madiun / Antar barang' && gabungKet('Macet', 'LUAR: a / b') === 'Macet | LUAR: a / b' && gabungKet('', 'LUAR: a / b') === 'LUAR: a / b' && gabungKet('', '') === '');
@@ -3096,14 +3100,20 @@ function akurasiBuruk(teks) {
 /**
  * Fungsi murni: validasi absen luar. GPS WAJIB dan divalidasi tipe/rentangnya (akurasi buruk tidak menolak).
  * wajibForm = tujuan dan keperluan wajib (1..100 karakter); kalau tidak wajib, boleh kosong tapi tetap dicek bila ada.
+ * daftarKeperluan (opsional) = isi `KEPERLUAN_LUAR` di sheet pengaturan; kalau terisi dan keperluan tidak kosong, keperluan WAJIB ada di daftar
+ * (tanpa beda huruf besar-kecil). Daftar kosong/tidak diberikan = tidak diperiksa terhadap daftar.
  */
-function validasiAbsenLuar(d, wajibForm) {
+function validasiAbsenLuar(d, wajibForm, daftarKeperluan) {
   const bersih = function (t) { return String(t === undefined || t === null ? '' : t).trim(); };
   const tujuan = bersih(d.tujuan), keperluan = bersih(d.keperluan);
   const aman = function (t) { return !/[\u0000-\u001f\u007f]/.test(t); };
   if (wajibForm && (!tujuan || !keperluan)) { return { ok: false, pesan: 'Tujuan dan keperluan wajib diisi' }; }
   if (tujuan.length > 100 || keperluan.length > 100) { return { ok: false, pesan: 'Tujuan dan keperluan maksimal 100 karakter' }; }
   if (!aman(tujuan) || !aman(keperluan)) { return { ok: false, pesan: 'Tujuan dan keperluan tidak valid' }; }
+  if (keperluan && daftarKeperluan && daftarKeperluan.length) {
+    const ada = daftarKeperluan.some(function (x) { return String(x).trim().toLowerCase() === keperluan.toLowerCase(); });
+    if (!ada) { return { ok: false, pesan: "Keperluan tidak ada di daftar pilihan" }; }
+  }
   const g = d.gps;
   if (!g || typeof g.lat !== 'number' || typeof g.lng !== 'number' || typeof g.akurasi !== 'number' ||
       !isFinite(g.lat) || !isFinite(g.lng) || !isFinite(g.akurasi) ||
@@ -3141,7 +3151,7 @@ function prosesAbsenLuarMasuk(d) {
   if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
   const tk = periksaTiket(d.tiket, 'MASUK', p.cabang, kunci, Date.now(), p.id);
   if (!tk.ok) { return respon({ status: 'gagal', pesan: tk.pesan }); }
-  const v = validasiAbsenLuar(d, true);
+  const v = validasiAbsenLuar(d, true, ambilDaftarPengaturan("KEPERLUAN_LUAR"));
   if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
   const akun = akunPribadiLengkap(p);
   if (!akun) { return responSesiPribadiHabis(); }
@@ -3157,7 +3167,7 @@ function prosesAbsenLuarPulang(d) {
   if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
   const tk = periksaTiket(d.tiket, d.jenis === 'PULANG_LEMBUR' ? 'LEMBUR' : 'PULANG', p.cabang, kunci, Date.now(), p.id);
   if (!tk.ok) { return respon({ status: 'gagal', pesan: tk.pesan }); }
-  const v = validasiAbsenLuar(d, false); // wajib tidaknya form dicek di catatAbsenPulang (tergantung cara absen masuk)
+  const v = validasiAbsenLuar(d, false, ambilDaftarPengaturan("KEPERLUAN_LUAR")); // wajib tidaknya form dicek di catatAbsenPulang (tergantung cara absen masuk)
   if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
   const akun = akunPribadiLengkap(p);
   if (!akun) { return responSesiPribadiHabis(); }
@@ -3258,6 +3268,13 @@ function prosesPribadiHariIni(d) {
     jam_masuk: baris ? baris.masuk : '', jam_pulang: baris ? baris.pulang : '',
     cara_masuk: baris ? String(baris.cara_masuk) : '', st_pulang: baris ? String(baris.st_pulang) : ''
   });
+}
+
+/** Aksi pribadi_keperluan_luar { sesi }: daftar pilihan keperluan absen luar (`KEPERLUAN_LUAR` di sheet pengaturan, urutan baris = urutan tampil). */
+function prosesPribadiKeperluanLuar(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return responSesiPribadiHabis(); }
+  return respon({ status: "ok", daftar: ambilDaftarPengaturan("KEPERLUAN_LUAR") });
 }
 
 /** Aksi pribadi_riwayat { sesi }: milik sendiri, 31 hari terakhir, paling banyak 50 baris. */

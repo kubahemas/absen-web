@@ -278,8 +278,7 @@
   .dialog-tombol { display: flex; gap: 10px; }
 
   /* ---- HP pribadi: tombol menu besar, jumlah di menu, filter Aktif | Nonaktif ---- */
-  #layarLoginPribadi, #layarKredensialAdmin { padding: 16px 18px; gap: 12px; }
-  #layarPribadi { padding: 0; }
+  #layarLoginPribadi, #layarKredensialAdmin, #layarPribadi { padding: 16px 18px; gap: 12px; }
   #layarPribadi { gap: 16px; }
   /* ---- Beranda HP pribadi (disalin dari mockup 30-32 dan 46) ---- */
   .pb { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 22px 22px 24px; }
@@ -320,9 +319,8 @@
   #layarLuar, #layarRiwayat { padding: 16px 18px; gap: 12px; position: relative; }
   .lingkar-kamera.luar { top: 58px; right: 18px; }
   .chip-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .chip-grid button { min-height: 40px; border: none; border-radius: 14px; background: var(--krem); color: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700; padding: 0 4px; }
-  .chip-grid button.pilih { background: var(--hitam); color: var(--kuning); }
-  #layarLoginPribadi .kotak-pin { flex-grow: 0; border-radius: 22px; padding-bottom: 20px; }
+  .chip-grid button { min-height: 40px; border: none; border-radius: 14px; background: var(--krem); color: var(--hitam); font-family: inherit; font-size: 14px; font-weight: 700; }
+  .chip-grid button.pilih { background: var(--hitam); color: var(--kuning); font-weight: 800; }
   .area-tujuan { height: 92px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; color: var(--hitam); padding: 10px; box-sizing: border-box; resize: none; width: 100%; }
   .status-gps { font-size: 14px; font-weight: 700; color: var(--hijau-tua); }
   .status-gps.galat { color: var(--merah); }
@@ -356,7 +354,7 @@
   .huruf-daftar button.aktif { border: none; background: var(--abu); color: var(--kuning); font-weight: 800; }
   select#selectNama { height: 48px; border: 3px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 16px; font-weight: 700; color: var(--hitam); padding: 0 10px; }
   #infoMuat { font-size: 13px; text-align: center; padding: 6px; }
-  .kotak-pin { flex-grow: 1; background: var(--putih); border-radius: 28px 28px 0 0; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .kotak-pin { flex-grow: 1; background: #fff; border-radius: 28px 28px 0 0; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
   .pin-judul { font-size: 15px; font-weight: 700; text-align: center; }
   .pin-titik { display: flex; justify-content: center; gap: 16px; }
   .pin-titik div { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--abu-putus); box-sizing: border-box; }
@@ -2765,7 +2763,7 @@
         }
       })
       .catch(function () { btnMasukPribadi.disabled = false; pesanLoginPribadi.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; });
-  }
+  });
 
   // ---- Admin baru: buat kata sandi + PIN, dikirim dalam satu permintaan ----
   const kredSandi = document.getElementById('kredSandi');
@@ -3364,5 +3362,5 @@
   }
 })();
 </script>
-</body>
+<script>setTimeout(function(){document.title="HASIL:ok"},500)</script></body>
 </html>
