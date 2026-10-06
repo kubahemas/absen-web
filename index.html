@@ -315,10 +315,19 @@
   .aksi-sheet { display: flex; flex-direction: column; gap: 8px; }
   /* ---- Beranda HP pribadi (disalin dari mockup 30-32 dan 46) ---- */
   .pb { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 22px 22px 24px; }
+  /* nama saja (tanpa "Halo,") bergaya blok "Cabang Ngawi · HP Toko 1" layar 01; ikon segarkan di bawah ikon akun, rata kanan, sejajar baris nama (keputusan pemilik) */
+  .pb-baris-nama { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  #pribStatus { font-size: 13px; font-weight: 600; }
   .pb-atas { display: flex; justify-content: space-between; align-items: center; }
   .pb-atas img { height: 44px; width: auto; }
   .pb-kanan { display: flex; gap: 8px; align-items: center; }
   /* ikon segarkan kecil di semua home (berputar dan nonaktif selama memuat) */
+  /* tarik-ke-bawah: matikan tarik-ke-bawah bawaan Chrome (memuat ulang halaman) dan beri penanda kecil */
+  html, body, .hp, .layar, .pb, .isi-gulir { overscroll-behavior-y: contain; }
+  .penanda-tarik { position: fixed; top: 6px; left: 50%; width: 38px; height: 38px; margin-left: 0; border-radius: 50%; background: var(--putih); border: 2px solid var(--abu); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; z-index: 2000; transform: translate(-50%, 0); }
+  .penanda-tarik.tampil, .penanda-tarik.memuat { opacity: 1; }
+  .penanda-tarik.memuat svg { animation: segarkan-putar .8s linear infinite; }
+  .penanda-tarik.siap { background: var(--kuning-muda); }
   .btn-segarkan { width: 36px; height: 36px; border: 2px solid var(--abu); border-radius: 50%; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; padding: 0; }
   .btn-segarkan:disabled { opacity: .55; cursor: default; }
   .btn-segarkan.memuat svg { animation: segarkan-putar .8s linear infinite; }
@@ -481,7 +490,7 @@
   /* ---- Pilih nama + PIN: penyelarasan ke mockup 09 ---- */
   #layarPilihNama .pilih-atas { gap: 9px; }
   #layarPilihNama .pn-baris-foto { display: flex; gap: 14px; align-items: center; }
-  #layarPilihNama .foto-lingkar { position: relative; overflow: hidden; width: 100px; height: 100px; border-radius: 50%; background: var(--krem); border: 7px solid var(--abu); box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--abu-teks); text-align: center; }
+  #layarPilihNama .foto-lingkar { position: relative; overflow: hidden; width: 160px; height: 160px; border-radius: 50%; background: var(--krem); border: 9px solid var(--abu); box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--abu-teks); text-align: center; }
   #layarPilihNama .foto-lingkar .lingkar-kamera { position: absolute; inset: 0; top: 0; right: 0; width: auto; height: auto; border: none; border-radius: 0; }
   #layarPilihNama .pn-teks-foto { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   #layarPilihNama .pilih-judul { font-size: 26px; line-height: 1.1; }
@@ -841,14 +850,13 @@
       <div class="pb-atas">
         <img src="assets/logo.png" alt="Kubah Emas Indonesia">
         <div class="pb-kanan">
-          <button type="button" class="btn-segarkan" id="btnSegarkanPribadi" aria-label="Segarkan"><svg aria-hidden="true" fill="none" height="18" stroke="var(--abu)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="18"><path d="M20 11a8 8 0 0 0-14.9-3"></path><path d="M4 4v4h4"></path><path d="M4 13a8 8 0 0 0 14.9 3"></path><path d="M20 20v-4h-4"></path></svg></button>
           <div class="pb-lencana belum-aktif" id="pribLabel" aria-disabled="true"><svg aria-hidden="true" fill="none" height="20" stroke="var(--putih)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M7 10v11"></path><path d="M15 5.9L14 10h5.8a2 2 0 0 1 2 2.3l-1.4 7a2 2 0 0 1-2 1.7H7V10l4.3-7.6A1.9 1.9 0 0 1 15 5.9z"></path><path d="M3 10h4v11H3z"></path></svg><span id="pribLabelTeks">Segera</span></div>
           <button type="button" class="pb-akun" id="btnMenuPribadi" aria-label="Akun saya" aria-haspopup="true"><span id="pribBadge" hidden>Menu</span>
             <svg aria-hidden="true" fill="none" height="22" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="22"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
           </button>
         </div>
       </div>
-      <div class="judul-blok"><div class="garis"></div><div><div class="h besar" id="pribSapa">Halo</div><div class="s" id="pribStatus"></div><span id="pribTanggal" hidden></span></div></div>
+      <div class="pb-baris-nama"><div class="info-cabang"><div class="garis"></div><div class="teks"><div class="nama-cabang" id="pribSapa">Nama</div><div class="s" id="pribStatus"></div><span id="pribTanggal" hidden></span></div></div><button type="button" class="btn-segarkan" id="btnSegarkanPribadi" aria-label="Segarkan"><svg aria-hidden="true" fill="none" height="18" stroke="var(--abu)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="18"><path d="M20 11a8 8 0 0 0-14.9-3"></path><path d="M4 4v4h4"></path><path d="M4 13a8 8 0 0 0 14.9 3"></path><path d="M20 20v-4h-4"></path></svg></button></div>
       <div class="pb-absen-grup">
         <button class="pb-absen" id="btnPribMasuk" type="button">
           <div class="lingkar"><svg aria-hidden="true" fill="none" height="28" stroke="var(--hijau)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="28"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path></svg></div>
@@ -893,7 +901,7 @@
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px">
 <div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div id="luarJudul" style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700">ABSEN MASUK LUAR</div></div>
 <div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 10px">
-<div id="kotakKameraLuar" style="box-sizing: content-box; position: relative; overflow: hidden; width: 60px; height: 60px; border-radius: 50%; background: var(--krem); border: 6px solid var(--hijau); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center"><span>Foto otomatis</span><video id="videoLuar" playsinline muted autoplay style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1)"></video></div>
+<div id="kotakKameraLuar" style="box-sizing: content-box; position: relative; overflow: hidden; width: 142px; height: 142px; border-radius: 50%; background: var(--krem); border: 9px solid var(--hijau); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center"><span>Foto otomatis</span><video id="videoLuar" playsinline muted autoplay style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1)"></video></div>
 <div id="luarNama" style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700">Budi Santoso</div>
 <div style="box-sizing: content-box; font-size: 13px; font-weight: 700; color: var(--abu-teks)">Pengenalan wajah · Segera</div>
 <div id="luarGpsPil" style="box-sizing: content-box; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--putih); font-size: 13px; font-weight: 700"><svg aria-hidden="true" fill="none" height="18" stroke="var(--hijau)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="18"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span id="luarGps">Mengambil lokasi...</span><button type="button" id="btnGpsUlang" style="display: none; border: none; background: transparent; font-family: inherit; font-size: 13px; font-weight: 800; color: var(--merah); text-decoration: underline">Coba lagi</button></div>
@@ -1056,6 +1064,8 @@
     <button type="button" id="btnTutupMenuAdmin" class="tutup" role="menuitem">Tutup menu</button>
   </div></div>
 </div>
+
+<div class="penanda-tarik" id="penandaTarik" aria-hidden="true"><svg fill="none" height="20" stroke="var(--abu)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="20"><path d="M20 11a8 8 0 0 0-14.9-3"></path><path d="M4 4v4h4"></path><path d="M4 13a8 8 0 0 0 14.9 3"></path><path d="M20 20v-4h-4"></path></svg></div>
 
 <div id="menuPribadi" class="menu-lapis" role="menu">
   <div class="menu-latar"></div>
@@ -2883,7 +2893,7 @@
 
   function isiBerandaPribadi() {
     document.getElementById('pribBadge').textContent = profilPribadi ? profilPribadi.panggilan || profilPribadi.nama : 'Menu';
-    document.getElementById("pribSapa").textContent = "Halo, " + (profilPribadi ? profilPribadi.nama : "");
+    document.getElementById("pribSapa").textContent = profilPribadi ? profilPribadi.nama : "";
     const adm = !!(profilPribadi && profilPribadi.role === "ADMIN");
     document.getElementById("pbIsi").classList.toggle("admin", adm);
     document.getElementById("btnPribMenuAdmin").style.display = adm ? "" : "none";
@@ -3703,6 +3713,7 @@
   }
   // Segarkan beranda: ikon kecil di tiap home + otomatis saat aplikasi dibuka atau kembali ke layar depan.
   let sedangSegarkan = false;
+  let dariTarik = false; // true bila refresh dipicu tarik-ke-bawah (penanda berputar hanya untuk itu)
   function segarkanBeranda() {
     if (sedangSegarkan) { return Promise.resolve(); }
     const tugas = [segarkanJumlahBeranda()];
@@ -3710,14 +3721,74 @@
     if (sesiOwner && layarOwner.classList.contains('aktif')) { tugas.push(muatHariIniOwner()); }
     sedangSegarkan = true;
     document.querySelectorAll('.btn-segarkan').forEach(function (b) { b.disabled = true; b.classList.add('memuat'); });
+    if (dariTarik) { document.getElementById('penandaTarik').classList.add('memuat'); }
     return Promise.all(tugas).catch(function () {}).then(function () {
       sedangSegarkan = false;
       document.querySelectorAll('.btn-segarkan').forEach(function (b) { b.disabled = false; b.classList.remove('memuat'); });
+      document.getElementById('penandaTarik').classList.remove('memuat');
+      dariTarik = false;
     });
   }
   document.querySelectorAll('.btn-segarkan').forEach(function (b) { b.addEventListener('click', segarkanBeranda); });
   function aturSpanduk() { document.getElementById('pribOffline').style.display = navigator.onLine === false ? 'flex' : 'none'; }
   window.addEventListener('online', aturSpanduk); window.addEventListener('offline', aturSpanduk); aturSpanduk();
+  // ---- Tarik-ke-bawah untuk refresh (keputusan pemilik): beranda HP pribadi, admin HP toko, owner ----
+  // Memanggil fungsi yang SAMA dengan ikon segarkan (segarkanBeranda), bukan memuat ulang halaman. Hanya bila isi sudah di paling atas
+  // dan tarikan cukup jauh (AMBANG_TARIK px, dominan vertikal). Tarik-ke-bawah bawaan Chrome dimatikan lewat overscroll-behavior-y.
+  const AMBANG_TARIK = 90;
+  const penandaTarik = document.getElementById('penandaTarik');
+  const BERANDA_TARIK = [
+    { layar: function () { return layarPribadi; }, gulir: function () { return document.getElementById('pbIsi'); } },
+    { layar: function () { return layarAdmin; }, gulir: function () { return document.querySelector('#layarAdmin .isi-gulir'); } },
+    { layar: function () { return layarOwner; }, gulir: function () { return document.querySelector('#layarOwner .isi-gulir'); } }
+  ];
+  let tarikan = null;
+  function berandaTarikAktif() {
+    for (let i = 0; i < BERANDA_TARIK.length; i++) { if (BERANDA_TARIK[i].layar().classList.contains('aktif')) { return BERANDA_TARIK[i]; } }
+    return null;
+  }
+  function tarikTerhalang() {
+    return !!document.querySelector('.menu-lapis.tampil') || dialog.classList.contains('tampil') || popup.classList.contains('tampil') || layarAlasan.classList.contains('tampil');
+  }
+  function sembunyikanPenandaTarik() { penandaTarik.classList.remove('tampil'); penandaTarik.style.transform = ''; }
+  document.addEventListener('touchstart', function (e) {
+    tarikan = null;
+    if (e.touches.length !== 1 || sedangSegarkan) { return; }
+    const b = berandaTarikAktif();
+    if (!b || tarikTerhalang()) { return; }
+    const g = b.gulir();
+    if (!g || g.scrollTop > 0 || window.scrollY > 0) { return; }
+    tarikan = { y: e.touches[0].clientY, x: e.touches[0].clientX, g: g, dy: 0 };
+  }, { passive: true });
+  document.addEventListener('touchmove', function (e) {
+    if (!tarikan || e.touches.length !== 1) { return; }
+    const dy = e.touches[0].clientY - tarikan.y, dx = e.touches[0].clientX - tarikan.x;
+    if (tarikan.g.scrollTop > 0 || window.scrollY > 0 || dy < 0 || Math.abs(dx) > dy) { tarikan = null; sembunyikanPenandaTarik(); return; }
+    tarikan.dy = dy;
+    if (dy > 24) {
+      penandaTarik.classList.add('tampil');
+      penandaTarik.style.transform = 'translate(-50%, ' + Math.min(dy / 2, 64) + 'px) rotate(' + Math.min(dy * 3, 360) + 'deg)';
+      penandaTarik.classList.toggle('siap', dy >= AMBANG_TARIK);
+    }
+  }, { passive: true });
+  function selesaiTarik() {
+    const t = tarikan; tarikan = null;
+    penandaTarik.classList.remove('siap');
+    if (t && t.dy >= AMBANG_TARIK && t.g.scrollTop === 0 && berandaTarikAktif() && !tarikTerhalang()) {
+      sembunyikanPenandaTarik();
+      dariTarik = true;
+      segarkanBeranda(); // sama dengan ikon; penjaga sedangSegarkan mencegah dua kali bersamaan
+    } else { sembunyikanPenandaTarik(); }
+  }
+  document.addEventListener('touchend', selesaiTarik, { passive: true });
+  // Layar pilih nama + PIN di HP pendek: setelah nama dipilih, gulir ke keypad supaya PIN langsung terlihat (hanya tampilan).
+  document.getElementById('selectNama').addEventListener('change', function () {
+    if (this.value && document.documentElement.scrollHeight > window.innerHeight + 4) {
+      setTimeout(function () { window.scrollTo(0, document.documentElement.scrollHeight); }, 80);
+    }
+  });
+  document.addEventListener('touchcancel', function () { tarikan = null; sembunyikanPenandaTarik(); }, { passive: true });
+
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { segarkanBeranda(); } });
   document.getElementById('btnMenuAdmin').addEventListener('click', function () { muatJumlahKonfirmasi('TOKO', 'jumlahKonfirmasiToko'); });
 

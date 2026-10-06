@@ -135,6 +135,10 @@ Daftar resmi selisih antara mockup (`docs/mockup/layar/`) dan aplikasi. Rincian 
 | 2026-10-06 | Mockup 45, 63 (aturan lama) | Password awal 123456, PIN awal 1234, password 6 angka, ikatan HP/"Lepas HP" tidak berlaku lagi | Dibatalkan | belum disinkron ke mockup (mockup perlu dikoreksi, jangan ditiru) |
 | 2026-10-06 | Layar HP pribadi: Report, Izin/Cuti, Akun saya (36–45) | Belum ada | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
 | 2026-10-06 | Layar admin dan owner lain (22, 24, 25, 53–55, 62–77, 81–82) | Belum ada | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-09 | Beranda HP pribadi (30, 31, 32, 46) | Kata "Halo," dihapus; nama saja bergaya blok "Cabang ..." layar 01 (Poppins tebal kecil + garis hitam tegak). Subjudul "Belum absen hari ini" tetap | Keputusan pemilik | disetujui pemilik |
+| 2026-10-09 | Beranda HP pribadi (30, 31, 32, 46) | Ikon segarkan pindah ke bawah ikon akun, rata kanan, sejajar baris nama (posisi lama di baris atas dihapus). Beranda admin (49) dan owner (71) tidak berubah | Keputusan pemilik | disetujui pemilik |
+| 2026-10-09 | Beranda HP pribadi, admin HP toko, owner | Tarik-ke-bawah untuk refresh (fitur baru): hanya bila di paling atas dan tarikan >= 90 px, memanggil fungsi yang sama dengan ikon segarkan, tarik-ke-bawah bawaan Chrome dimatikan, penanda kecil berputar | Keputusan pemilik | disetujui pemilik |
+| 2026-10-09 | Layar 09 (HP toko) dan absen luar masuk/pulang/lembur (HP pribadi) | Lingkaran foto kamera dibesarkan menjadi 160 px, border 9 px (sebelumnya 100 px/7 px dan 72 px). Ukuran usulan Claude Code, belum final: pemilik menilai di gambar dampingan. Layar 09 di 360x640 perlu digulir (isi 806 px); setelah nama dipilih otomatis digulir ke keypad | Keputusan pemilik (ukuran = usulan) | menunggu penilaian ukuran |
 
 Catatan koreksi audit (2026-10-06): dugaan awal bahwa layar login HP pribadi di mockup memakai keypad angka **tidak terbukti**; mockup 29 memakai kolom ketik biasa seperti app. Keypad ada di mockup untuk PIN HP toko (09), buat PIN karyawan (61), dan absen luar cadangan PIN (34); dua yang pertama sudah ada di app (5 digit), yang ketiga belum.
 

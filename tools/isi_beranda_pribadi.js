@@ -5,7 +5,7 @@ window.fetch = function (url, opsi) {
   var b = {}; try { b = JSON.parse(opsi.body); } catch (e) {}
   var d = { status: 'gagal', pesan: 'tidak ditiru' };
   if (b.aksi === 'login_pribadi') { d = { status: 'ok', sesi: 'S'.repeat(40), id: 'K001', nama: 'Budi Santoso', panggilan: 'Budi', role: P, cabang: 'Ngawi' }; }
-  if (b.aksi === 'pribadi_hari_ini') { d = { status: 'ok', sudah_masuk: false, sudah_pulang: false, jam_masuk: '', jam_pulang: '', cara_masuk: '', st_pulang: '', lembur_boleh: false }; }
+  if (b.aksi === 'pribadi_hari_ini') { d = window.__HARI || { status: 'ok', sudah_masuk: false, sudah_pulang: false, jam_masuk: '', jam_pulang: '', cara_masuk: '', st_pulang: '', lembur_boleh: false }; }
   if (b.aksi === 'absen_luar_masuk') { d = { status: 'ok', st_masuk: 'HADIR', jam: '07:40', shift: 'Shift 1' }; }
   if (b.aksi === 'tiket_waktu') { d = { status: 'ok', tiket: 'T' }; }
   if (b.aksi === 'konfirmasi_jumlah') { d = { status: 'ok', jumlah: 5, jumlah_teks: '5' }; }

@@ -21,7 +21,7 @@ else
   FIX=""; [ -n "$ISI" ] && FIX="$(cat "$ISI")"
   ID="$ARG" FIX="$FIX" perl "$AKAR/tools/injeksi.pl" "$AKAR/index.html" > "$AKAR/__potret.html"
   SRC="__potret.html"
-  IW=390; IH=844; CX=0; CY=0
+  IW=${LEBAR:-390}; IH=${TINGGI:-844}; CX=0; CY=0
 fi
 echo "<!doctype html><body style='margin:0;background:#888'><iframe src='$SRC' style='border:0;width:${IW}px;height:${IH}px'></iframe></body>" > "$HAR"
 URL="file:///$(cygpath -m "$HAR")"; URL="${URL// /%20}"
@@ -31,5 +31,5 @@ sleep 1
 rm -f "$HAR" "$AKAR/__potret.html"
 if [ -f "$OUT" ]; then
   W=$([ "$MODE" = "mockup" ] && echo 390 || echo 390)
-  powershell -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$AKAR/tools/potong.ps1")" "$OUTW" $CX $CY $W 844 && echo "OK $OUT" || echo "GAGAL-POTONG $OUT"
+  powershell -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$AKAR/tools/potong.ps1")" "$OUTW" $CX $CY ${LEBAR:-390} ${TINGGI:-844} && echo "OK $OUT" || echo "GAGAL-POTONG $OUT"
 else echo "GAGAL $OUT"; fi

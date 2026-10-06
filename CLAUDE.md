@@ -206,3 +206,8 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - Konfirmasi (layar 28 owner dan 52 admin): semua pengajuan dimuat, diurut dari yang PALING LAMA, hanya MAKSIMAL 5 kartu tampil; kartu berikutnya naik setelah satu di-ACC/ditolak; angka total tetap seluruhnya. Hanya tampilan; hak di server tidak berubah.
 - Pop-up 15 (pulang awal) dan 17 (lembur) tampil lebih dulu sebelum layar alasan/pekerjaan lembur; penyimpanan tetap setelah alasan/pekerjaan dikirim. Judul layar pilih nama: "Absen Masuk PIN" / "Absen Pulang PIN" / "Lembur PIN". Tanggal layar utama HP toko: "NamaHari, d NamaBulan yyyy".
 - Uji baru: `tools/uji_alur_hp_toko.js`, `tools/uji_alur_konfirmasi_antrean.js` (admin; versi owner lewat `tools/pra_owner.js` dan `window.__MODE_OWNER = true`), `tools/uji_tombol_segera.js`.
+
+## Paket 2026-10-09
+- Beranda HP pribadi: nama saja (tanpa "Halo,"), ikon segarkan di bawah ikon akun. Tarik-ke-bawah untuk refresh di beranda HP pribadi, admin HP toko, owner (ambang 90 px, hanya di paling atas, memanggil `segarkanBeranda`, bukan memuat ulang halaman; `overscroll-behavior-y: contain`).
+- Lingkaran foto kamera 160 px / border 9 px di layar 09 dan absen luar (usulan, belum final). `tools/potret.sh` mendukung `LEBAR=360 TINGGI=640`.
+- Uji baru: `tools/uji_alur_tarik_refresh.js` (konteks pribadi/admin/owner lewat `window.__KONTEKS`), `tools/uji_alur_foto_lingkaran.js` (konteks toko/luar), `uji_alur_pribadi.js` memeriksa nama dan posisi ikon.

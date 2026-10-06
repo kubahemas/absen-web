@@ -165,3 +165,12 @@ Semua selisih di bawah **belum diputuskan pemilik**: tidak diubah, hanya dicatat
 | 28 | Kartu izin, tanpa kotak Foto, badge hitam, subjudul "Pengajuan milik admin" | Kartu izin belum ada; kotak Foto, badge abu, subjudul memuat jumlah | `28_dampingan.png` |
 | 52 | Chip "Izin 1", "Lupa absen 1", kartu izin/lupa absen/tukar shift | Chip "Segera" nonaktif; kartu itu belum ada | `52_dampingan.png` |
 | 03, 04, 05, 06, 07, 08, 13, 18, 19, 22–25 | Seluruh layar | Belum dibuat (butuh fitur wajah/jadwal/izin/server) | – |
+
+## Keputusan pemilik 2026-10-09 (sudah diterapkan, pemutus = pemilik)
+
+| No | Layar | Keputusan | Gambar |
+|---|---|---|---|
+| 1 | 30, 31, 32, 46 | "Halo," dihapus; nama saja dengan gaya blok "Cabang Ngawi · HP Toko 1" layar 01 (Poppins 15 px tebal, garis hitam tegak di kiri). Subjudul "Belum absen hari ini" tetap. Hanya HP pribadi. Selisih dari mockup: nama jauh lebih kecil dari judul besar mockup | `30_dampingan.png`, `31_dampingan.png`, `32_dampingan.png`, `46_dampingan.png` |
+| 2 | 30, 31, 32, 46 | Ikon segarkan pindah ke bawah ikon akun, rata kanan, sejajar baris nama. Beranda 49 dan 71 tidak berubah | sama |
+| 3 | 30–32, 46, 49, 71 | Tarik-ke-bawah untuk refresh (fitur baru, tidak ada di mockup): ambang 90 px, hanya di paling atas, memanggil fungsi ikon, penanda berputar kecil di atas layar | – (perilaku) |
+| 4 | 09, absen luar | Lingkaran foto 160 px / border 9 px (**ukuran usulan Claude Code**; mohon dinilai). Layar 09 tidak muat 360x640 tanpa gulir (isi 806 px); halaman otomatis menggulir ke keypad setelah nama dipilih. Absen luar muat 360x640 tanpa gulir | `09_dampingan.png`, `luar_masuk_app.png`, `luar_pulang_app.png`, `luar_lembur_app.png` (app saja, tidak punya mockup sendiri), `09_360x640.png`, `luar_masuk_360x640.png`, `luar_pulang_360x640.png`, `luar_lembur_360x640.png` |

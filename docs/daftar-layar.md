@@ -175,3 +175,9 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 - `tools/pra_toko.js` + `tools/isi_beranda_admin_toko.js`: HP toko tiruan + login admin (pakai `PRA="$(cat tools/pra_toko.js)"` di depan perintah potret; `injeksi.pl` kini mendukung variabel PRA yang dijalankan di `<head>` sebelum aplikasi). Uji: `tools/uji_alur_admin_toko.js`.
 - `tools/isi_beranda_pribadi.js`: pengisi potret (server tiruan + login HP pribadi → beranda).
 - `tools/mockup_ke_layar.pl`: sekarang menambah `box-sizing: content-box` pada elemen non-form supaya ukuran sama dengan mockup (aplikasi memakai `border-box` global; tanpa ini blok dengan padding + tinggi tetap bergeser).
+
+## Paket 2026-10-09 (keputusan pemilik)
+
+- 30, 31, 32, 46: nama tanpa "Halo,", ikon segarkan di bawah ikon akun (selisih dari mockup, keputusan pemilik; lihat `docs/daftar-selisih.md`).
+- Tarik-ke-bawah refresh di beranda HP pribadi, admin HP toko, owner.
+- 09 dan absen luar masuk/pulang/lembur: lingkaran foto 160 px (ukuran usulan, belum final).
