@@ -13,7 +13,7 @@ window.fetch = function (url, opsi) {
   var d = { status: 'gagal', pesan: 'tidak ditiru' };
   if (b.aksi === 'login_owner') { d = { status: 'ok', sesi: 'O'.repeat(40) }; }
   if (b.aksi === 'owner_beranda') { d = { status: 'ok', nama: 'Owner', id: 'OWN01', perangkat_aktif: [] }; }
-  if (b.aksi === 'owner_hari_ini') { d = { status: 'ok', angka: { sudah_masuk: 3, telat: 1, sudah_pulang: 2, menunggu_acc: sisa.length }, tampilkan_dropdown_cabang: false, daftar_cabang: ['Ngawi'], daftar_shift: [], tanggal: '2026-10-06' }; }
+  if (b.aksi === 'beranda_hari_ini') { d = { status: 'ok', tanggal: '2026-10-06', jam: '08:20', hari: 'Selasa', cabang: '', semua: { tepat: 2, telat: 1, belum: 0, izin: 0 }, shift: [{ no: 1, nama: 'Shift 1', masuk: '07:45', tepat: 2, telat: 1, belum: 0, izin: 0, belum_daftar: [] }], telat7: [], tertinggi: null, daftar_cabang: ['Ngawi'] }; }
   if (b.aksi === 'owner_perhatian') { d = { status: 'ok', jumlah: 0, jumlah_teks: '0', daftar: [] }; }
   if (b.aksi === 'konfirmasi_jumlah') { d = { status: 'ok', jumlah: sisa.length, jumlah_teks: String(sisa.length) }; }
   if (b.aksi === 'konfirmasi_daftar') { d = { status: 'ok', daftar: sisa.slice(), total: sisa.length, jumlah_teks: String(sisa.length), ada_lagi: false }; }
@@ -31,7 +31,7 @@ window.fetch = function (url, opsi) {
     var m = Array.prototype.map.call(document.querySelectorAll('#menuOwner .menu-kartu button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim() + (b.disabled ? '[x]' : ''); });
     H.push('       menu owner: ' + m.join(' | '));
     ok('menu owner sesuai mockup 72 (item belum ada fiturnya nonaktif); Perangkat (HP toko) aktif', /Log admin.*\[x\]/.test(m[0]) && m.some(function (x) { return x === 'Perangkat (HP toko)'; }) && m.some(function (x) { return /^Ganti password$/.test(x); }));
-    el('btnTutupMenuOwner').click();
+    el('menuLatar').click();
     el('btnOwnerKonf').click(); await tunggu(500);
     ok('layar Konfirmasi terbuka dari kotak beranda', aktif() === 'layarKonfirmasi');
     ok('judul "Konfirmasi data admin", badge Owner, catatan admin tidak bisa ACC datanya sendiri', el('konfJudul').textContent === 'Konfirmasi data admin' && el('konfBadge').textContent === 'Owner' && el('konfCatatan').style.display !== 'none');

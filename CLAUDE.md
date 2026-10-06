@@ -1,5 +1,12 @@
 # Proyek: Aplikasi Absensi Kubah Emas Indonesia
 
+## ATURAN TAMPILAN DARI PEMILIK (paling atas, berlaku untuk semua pekerjaan layar)
+1. Mockup di `docs/mockup/layar` dipatuhi PERSIS. Jangan merevisi desain atas inisiatif sendiri. Penyimpangan hanya dari keputusan pemilik yang tertulis.
+2. DILARANG menyembunyikan elemen mockup. Elemen yang fungsinya belum ada tampil persis seperti mockup tetapi NONAKTIF (pudar, tidak bisa ditekan, memakai pola `.segera`; tanpa angka atau data palsu).
+3. Jangan memilih sendiri solusi tampilan yang tidak ada di mockup. Kalau ketemu kasus seperti itu, catat di `docs/daftar-selisih.md` dan tanyakan ke pemilik.
+- Penyimpangan yang bukan keputusan pemilik TIDAK diubah dan TIDAK dikembalikan sendiri; hanya dicatat di `docs/daftar-selisih.md` (pemilik yang memilih kembalikan atau pertahankan).
+- Keputusan pemilik yang tetap berlaku: "Hadir" diganti "Tepat waktu" (hanya status HADIR; Telat terpisah); kartu angka SATU dengan dropdown Shift (owner: dropdown Cabang + Shift); daftar Belum absen 5 nama + "Lihat semua (N)"; "Perlu evaluasi (BAD)" nonaktif; absen luar ketik bebas minimal 5 karakter; label "Hanya untuk absen tugas di luar toko"; penanda "Lokasi di dalam area toko"; owner tidak ACC karyawan dan admin tidak ACC/edit miliknya sendiri; Edit di Konfirmasi dengan alasan minimal 5 karakter; home admin HP pribadi memakai kotak Konfirmasi karyawan dan menu admin lewat ikon akun; refresh otomatis + ikon refresh; "HP terikat" dihapus dari Akun saya; Log out di menu kecil dari ikon akun; iPhone/Safari ditunda.
+
 ## Tentang pemilik proyek
 - Pemilik proyek adalah pemula (belum bisa koding). Selalu jelaskan dengan bahasa Indonesia yang sederhana dan langsung.
 - Kerjakan SATU langkah kecil per permintaan. Setelah selesai, jelaskan cara mengetesnya, lalu tunggu konfirmasi sebelum lanjut.
@@ -184,3 +191,8 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - **`konfirmasi_edit` kini wajib `alasan`** (minimal 5 karakter, maksimal 100; `validasiAlasanEdit`), dicatat di kolom `alasan` sheet `log` (aksi `EDIT_ABSEN`).
 - Beranda admin HP toko memakai kartu shift yang bisa digeser; "Perlu evaluasi (BAD)" disembunyikan (menunggu data label). Daftar Karyawan = satu daftar (aktif lalu nonaktif), ketuk baris = sheet aksi. Tambah karyawan: langkah 1 (data), 2 (persetujuan wajah "Segera" + PIN 5 angka), 4 (Selesai); langkah 3 (daftar wajah) belum ada. Akun saya tidak punya "HP terikat" (tidak ada ikatan akun ke HP).
 - Uji: `PRA="$(cat tools/pra_toko.js)" ID="" tools/potret.sh app "" hasil.png tools/uji_alur_admin_toko.js`.
+
+## Paket kelompok 3 Owner (2026-10-06)
+- `beranda_hari_ini` kini mengembalikan `tepat` (status HADIR saja) dan `telat` terpisah, menggantikan `hadir`. Beranda admin HP toko dan owner memakai satu kartu + dropdown Shift; owner memanggil server saat Cabang diganti, Shift diganti cukup dari data yang sudah ada. Layar `layarBelumAbsen` = daftar penuh Belum absen.
+- Elemen mockup tanpa fungsi dibuat nonaktif (lencana performa, strip pengajuan, kotak "Bulan ini" di pop-up, spanduk offline, "Perlu evaluasi (BAD)"). Daftar selisih lengkap: `docs/daftar-selisih.md`.
+- Uji owner: `PRA="$(cat tools/pra_owner.js)" ID="" tools/potret.sh app "" hasil.png tools/uji_alur_owner_beranda.js`.

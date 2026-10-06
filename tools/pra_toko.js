@@ -3,10 +3,10 @@
 localStorage.setItem('absen_hp_toko', JSON.stringify({ token: 'T'.repeat(40), id: 'HPT-NGW-01', cabang: 'Ngawi', nama: 'HP toko 1' }));
 window.__BERANDA = window.__BERANDA || {
   status: 'ok', tanggal: '2026-09-28', jam: '08:20', hari: 'Senin', cabang: 'Ngawi',
-  semua: { hadir: 8, telat: 2, belum: 4, izin: 1 },
+  semua: { tepat: 8, telat: 2, belum: 4, izin: 1 },
   shift: [
-    { no: 1, nama: 'Shift 1', masuk: '07:45', hadir: 8, telat: 2, belum: 1, izin: 1, belum_daftar: [{ nama: 'Joko Susilo', panggilan: 'Joko', jadwal: '07:45' }] },
-    { no: 2, nama: 'Shift 2', masuk: '13:45', hadir: 0, telat: 0, belum: 3, izin: 0, belum_daftar: [{ nama: 'Rina Wati', panggilan: 'Rina', jadwal: '13:45' }, { nama: 'Ani Yulia', panggilan: 'Ani', jadwal: '13:45' }, { nama: 'Dedi Kurnia', panggilan: 'Dedi', jadwal: '13:45' }] }
+    { no: 1, nama: 'Shift 1', masuk: '07:45', tepat: 8, telat: 2, belum: 1, izin: 1, belum_daftar: [{ nama: 'Joko Susilo', panggilan: 'Joko', jadwal: '07:45' }] },
+    { no: 2, nama: 'Shift 2', masuk: '13:45', tepat: 0, telat: 0, belum: 3, izin: 0, belum_daftar: [{ nama: 'Rina Wati', panggilan: 'Rina', jadwal: '13:45' }, { nama: 'Ani Yulia', panggilan: 'Ani', jadwal: '13:45' }, { nama: 'Dedi Kurnia', panggilan: 'Dedi', jadwal: '13:45' }] }
   ],
   telat7: [], tertinggi: null
 };

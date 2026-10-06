@@ -1499,9 +1499,9 @@ function tesServer() {
   const masB = function (extra) { return Object.assign({ tanggal: '2026-10-05', jam: '08:20', cabang: 'Ngawi', akun: akunBeranda, shift: shiftBeranda, kalender: [], absensi: absB, izin: izinB, liburMingguCabang: { Ngawi: true, Pusat: false } }, extra || {}); };
   const bn = hitungBerandaHariIni(masB());
   const s1B = bn.shift.find(function (x) { return x.no === 1; }), s2B = bn.shift.find(function (x) { return x.no === 2; });
-  ujiBebas('beranda: shift 1 Ngawi = Hadir 3 (termasuk admin), Telat 1, Belum absen 1 (Joko; izin DITOLAK tidak dihitung), Izin/cuti 1 (Dewi)', s1B.hadir === 3 && s1B.telat === 1 && s1B.belum === 1 && s1B.izin === 1 && s1B.belum_daftar[0].nama === 'Joko' && s1B.belum_daftar[0].jadwal === '07:45');
-  ujiBebas('beranda: shift 2 belum dimulai (13:45 > 08:20): Rina dan Ani (pola bergilir pekan ke-2) TIDAK dihitung belum absen; tukar shift bukan izin', s2B.belum === 0 && s2B.izin === 0 && s2B.hadir === 0 && s2B.masuk === '13:45');
-  ujiBebas('beranda: "Semua shift" = jumlah semua shift; karyawan nonaktif, owner, dan HP toko tidak dihitung; cabang Pusat tidak ikut saat filter Ngawi', bn.semua.hadir === 3 && bn.semua.telat === 1 && bn.semua.belum === 1 && bn.semua.izin === 1);
+  ujiBebas('beranda: shift 1 Ngawi = Tepat waktu 2 (Budi dan admin; Siti yang telat TIDAK masuk Tepat waktu), Telat 1, Belum absen 1 (Joko; izin DITOLAK tidak dihitung), Izin/cuti 1 (Dewi)', s1B.tepat === 2 && s1B.telat === 1 && s1B.belum === 1 && s1B.izin === 1 && s1B.belum_daftar[0].nama === 'Joko' && s1B.belum_daftar[0].jadwal === '07:45');
+  ujiBebas('beranda: shift 2 belum dimulai (13:45 > 08:20): Rina dan Ani (pola bergilir pekan ke-2) TIDAK dihitung belum absen; tukar shift bukan izin', s2B.belum === 0 && s2B.izin === 0 && s2B.tepat === 0 && s2B.masuk === '13:45');
+  ujiBebas('beranda: "Semua shift" = jumlah semua shift; karyawan nonaktif, owner, dan HP toko tidak dihitung; cabang Pusat tidak ikut saat filter Ngawi', bn.semua.tepat === 2 && bn.semua.telat === 1 && bn.semua.belum === 1 && bn.semua.izin === 1);
   const bSemua = hitungBerandaHariIni(masB({ cabang: '' }));
   ujiBebas('beranda owner "Semua cabang": karyawan Pusat (Dodi, jam masuk 08:00 sudah lewat) ikut dihitung belum absen; shift digabung per nomor', bSemua.semua.belum === 2 && bSemua.shift.length === 2 && bSemua.shift[0].belum_daftar.length === 2);
   ujiBebas('beranda sebelum jam masuk (07:00): tidak ada yang dihitung belum absen', hitungBerandaHariIni(masB({ jam: '07:00' })).semua.belum === 0);
@@ -2308,7 +2308,7 @@ function jadwalKaryawanHari(akun, tanggal, kalender, liburMinggu) {
 
 /**
  * Inti angka beranda. m = { tanggal, jam 'HH:mm', cabang ('' = semua), akun[], shift[], kalender[], absensi[], izin[], liburMingguCabang { namaCabang: true/false } }.
- * Karyawan = akun aktif role KARYAWAN atau ADMIN. Hadir = sudah absen masuk (telat termasuk hadir). Belum absen = terjadwal hari ini,
+ * Karyawan = akun aktif role KARYAWAN atau ADMIN. Tepat waktu = absen masuk berstatus HADIR; Telat dihitung terpisah (tidak masuk Tepat waktu); yang sudah absen masuk (tepat atau telat) tidak dihitung Belum absen. Belum absen = terjadwal hari ini,
  * jam masuk shiftnya sudah lewat, belum absen, tidak sedang izin/cuti. Izin/cuti = izin berstatus bukan DITOLAK/BATAL yang mencakup hari ini (bukan tukar/pindah shift).
  */
 function hitungBerandaHariIni(m) {
@@ -2318,7 +2318,7 @@ function hitungBerandaHariIni(m) {
   const adaDiCabang = function (c) { return !cab || String(c) === cab; };
   const kolom = {};
   const kolomShift = function (no) {
-    if (!kolom[no]) { kolom[no] = { no: no, nama: 'Shift ' + no, masuk: '', hadir: 0, telat: 0, belum: 0, izin: 0, belum_daftar: [] }; }
+    if (!kolom[no]) { kolom[no] = { no: no, nama: 'Shift ' + no, masuk: '', tepat: 0, telat: 0, belum: 0, izin: 0, belum_daftar: [] }; }
     return kolom[no];
   };
   const barisShift = function (cabangAkun, no) {
@@ -2336,8 +2336,7 @@ function hitungBerandaHariIni(m) {
     const no = nomorShift(r.shift);
     if (no === null) { return; }
     const k = kolomShift(no);
-    k.hadir++;
-    if (r.st_masuk === 'TELAT') { k.telat++; }
+    if (r.st_masuk === 'TELAT') { k.telat++; } else if (r.st_masuk === 'HADIR') { k.tepat++; }
   });
   const izinId = {};
   m.izin.forEach(function (z) {
@@ -2363,8 +2362,8 @@ function hitungBerandaHariIni(m) {
     k.belum_daftar.sort(function (x, y) { return x.nama < y.nama ? -1 : 1; });
     return k;
   });
-  const semua = { hadir: 0, telat: 0, belum: 0, izin: 0 };
-  daftarShift.forEach(function (k) { semua.hadir += k.hadir; semua.telat += k.telat; semua.belum += k.belum; semua.izin += k.izin; });
+  const semua = { tepat: 0, telat: 0, belum: 0, izin: 0 };
+  daftarShift.forEach(function (k) { semua.tepat += k.tepat; semua.telat += k.telat; semua.belum += k.belum; semua.izin += k.izin; });
   const telat7 = [];
   for (let i = 6; i >= 0; i--) {
     const t = geserTanggal(m.tanggal, -i);

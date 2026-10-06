@@ -12,7 +12,7 @@ Urutan kerja: **1. HP Pribadi** → 2. Admin cabang → 3. Owner → 4. HP Toko.
 |---|---|
 | 1. HP Pribadi (29–48) | **selesai** (layar yang belum ada fiturnya = "Segera") |
 | 2. Admin cabang (49–70) | **selesai** (layar yang belum ada fiturnya = "Segera", lihat tabel) |
-| 3. Owner (71–77, 78–82) | belum |
+| 3. Owner (71–82) | **selesai** untuk layar yang fiturnya ada (71, 72, 78, 79, 80); sisanya "Segera" |
 | 4. HP Toko (01–28) | belum |
 
 Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dibuat dengan `tools/potret.sh` dan `tools/berdampingan.ps1`).
@@ -71,20 +71,22 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 
 ## 3. Owner
 
+Selisih per layar (siapa yang memutuskan, gambar berdampingan): lihat `docs/daftar-selisih.md`.
+
 | No | Layar mockup | Status | Catatan |
 |---|---|---|---|
-| 71 | 23. Owner - Beranda | tersambung* | *penyelarasan sebelumnya; dropdown Cabang selalu tampil + aksi data baru belum |
-| 72 | 23b. Owner - menu | tersambung* | sama |
-| 73 | 24. Owner - Log per kategori | belum | |
-| 74 | 25. Owner - Log detail | belum | |
-| 75 | 26. Owner - Pengaturan | belum | |
-| 76 | 27. Owner - Kunci periode | belum | |
-| 77 | 28. Owner - Role & admin | belum | |
-| 78 | 29. HP baru - pilih jenis HP | belum | ada layar buatan sebelumnya (`layarJenis`), perlu diperiksa |
-| 79 | 30. Daftarkan HP toko | belum | ada layar buatan sebelumnya (`layarDaftarHp`), perlu diperiksa |
-| 80 | 31. Owner - Daftar perangkat | belum | ada layar Kelola HP toko buatan sebelumnya |
-| 81 | Owner - Laporan bulanan - Ringkasan | belum | |
-| 82 | Owner - Laporan bulanan - Per karyawan | belum | |
+| 71 | 23. Owner - Beranda | tersambung | Dropdown Cabang selalu tampil; satu kartu + dropdown Shift; Belum absen; Perlu evaluasi nonaktif; Telat 7 hari dari data nyata |
+| 72 | 23b. Owner - menu | tersambung | Urutan dan isi menu = mockup; item tanpa fitur "Segera" |
+| 73 | 24. Owner - Log per kategori | belum | **Menunggu fitur** |
+| 74 | 25. Owner - Log detail | belum | **Menunggu fitur** |
+| 75 | 26. Owner - Pengaturan | belum | **Menunggu fitur** |
+| 76 | 27. Owner - Kunci periode | belum | **Menunggu fitur** |
+| 77 | 28. Owner - Role & admin | belum | **Menunggu fitur** |
+| 78 | 29. HP baru - pilih jenis HP | tersambung | Tombol "Masuk sebagai Owner" dipertahankan (TANYA) |
+| 79 | 30. Daftarkan HP toko | tersambung | Cabang/ID/Kode = "Segera" |
+| 80 | 31. Owner - Daftar perangkat | tersambung | Filter cabang, saklar nonaktif, Ubah nama dipertahankan (TANYA) |
+| 81 | Owner - Laporan bulanan - Ringkasan | belum | **Menunggu fitur** |
+| 82 | Owner - Laporan bulanan - Per karyawan | belum | **Menunggu fitur** |
 
 ## 4. HP Toko (urutan galeri 01–28; 22–28 tercampur di galeri)
 
