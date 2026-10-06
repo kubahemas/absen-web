@@ -161,3 +161,9 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - Keperluan absen luar = pilihan dari `KEPERLUAN_LUAR` (aksi `pribadi_keperluan_luar`, sesi HP pribadi) + kolom ketik tujuan (wajib). Server menolak keperluan yang tidak ada di daftar (daftar kosong = tidak diperiksa). Perubahan `api.gs` ini perlu disalin ke editor Apps Script dan di-deploy sebagai VERSI BARU.
 - Login HP pribadi: karyawan = keypad PIN 5 angka (angka kelima langsung masuk); admin = tautan "Masuk sebagai admin (kata sandi)" dengan keyboard.
 - Uji dengan server tiruan: `ID="" tools/potret.sh app "" hasil.png tools/uji_alur_pribadi.js` (juga `tools/uji_alur_admin.js`). Pita hijau di atas gambar = hasil, pita merah = galat JavaScript. Setiap potret otomatis menampilkan pita merah bila ada galat JS di halaman.
+
+## Penyelarasan ke mockup: Konfirmasi, beranda admin dan owner (Fase 1 bagian 3)
+- Layar Konfirmasi (`#layarKonfirmasi`) satu markup untuk admin HP toko, admin HP pribadi, dan owner (disalin dari mockup 52 dan 28): kartu dengan tombol ACC/Tolak, kotak "Foto", tautan Maps, chip pengelompokan (admin saja), tombol Home. Aksi server tidak berubah.
+- Owner membuka Konfirmasi dari kotak "Konfirmasi data admin" di beranda owner (tidak ada lagi item Konfirmasi di menu owner). Admin HP toko: kartu "Menunggu konfirmasi" di beranda dan item menu. Admin HP pribadi: kartu "Menu admin" dan menu ikon akun.
+- Menu owner dan admin memuat semua item mockup; yang belum ada fiturnya NONAKTIF dengan tulisan "Segera" (kelas `.segera`). Jangan membuat item menu yang belum punya fungsi selain pola ini.
+- Uji: `ID="" tools/potret.sh app "" hasil.png tools/uji_alur_konfirmasi_owner.js` (juga `..._admin.js`).

@@ -16,6 +16,7 @@
 :root {
   --abu: #333438;
   --abu-garis: #D9D6CC;
+  --abu-terang: #D8D8D8;
   --abu-latar: #E8E6E0;
   --abu-pucat: #F2F2F0;
   --abu-putus: #9A9A9A;
@@ -334,6 +335,31 @@
 
   /* ---- Konfirmasi ---- */
   #layarKonfirmasi { padding: 16px 18px; gap: 16px; }
+  /* ---- Konfirmasi (disalin dari mockup 52 dan 28) ---- */
+  .btn-konf-kartu { min-height: 64px; border: none; border-radius: 20px; background: var(--hitam); color: var(--putih); font-family: inherit; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; text-align: left; flex-shrink: 0; }
+  .btn-konf-kartu .t { font-size: 16px; font-weight: 800; }
+  .btn-konf-kartu .s { font-size: 12px; font-weight: 600; color: var(--abu-terang); }
+  .btn-konf-kartu .jml { padding: 4px 12px; border-radius: 999px; background: var(--kuning); color: var(--hitam); font-size: 15px; font-weight: 800; }
+  .btn-konf-kartu .jml:empty { display: none; }
+  .badge-abu { background: var(--abu); }
+  .btn-home { flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam); white-space: nowrap; }
+  .konf-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .konf-chips button { min-height: 38px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; color: var(--abu); font-family: inherit; font-size: 13px; font-weight: 700; padding: 0 14px; white-space: nowrap; }
+  .konf-chips button.pilih { background: var(--abu); color: var(--kuning); font-weight: 800; }
+  .konf-chips button:disabled { opacity: 0.45; }
+  .kartu-konf { background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .konf-baris { display: flex; gap: 12px; align-items: center; }
+  .konf-foto { width: 56px; height: 56px; border-radius: 14px; border: none; background: var(--krem); flex-shrink: 0; font-family: inherit; font-size: 10px; font-weight: 700; color: var(--abu-teks); }
+  .konf-isi { flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .konf-tipe { font-size: 12px; font-weight: 700; color: var(--abu-tua); }
+  .konf-nama { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+  .konf-detail { font-size: 13px; color: var(--abu-teks); overflow-wrap: anywhere; }
+  .kartu-konf .link-maps { font-size: 14px; display: flex; align-items: center; gap: 6px; min-height: 32px; }
+  .konf-aksi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .konf-aksi button { height: 46px; border-radius: 999px; font-family: inherit; font-size: 15px; font-weight: 800; white-space: nowrap; }
+  .konf-aksi .acc { border: none; background: var(--abu); color: var(--kuning); }
+  .konf-aksi .tolak { border: 2px solid var(--merah-tombol); background: var(--putih); color: #B8211A; }
+  .konf-aksi button:disabled { opacity: 0.5; }
   .judul-kelompok { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 20px; font-weight: 700; margin-top: 6px; }
   .konf-ket { font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
   .konf-gps { font-size: 12px; font-weight: 700; color: var(--abu-teks); }
@@ -561,6 +587,7 @@
           <button type="button" class="btn-kecil" id="btnLihatSemua">Lihat semua</button>
         </div>
       </div>
+      <button type="button" class="btn-konf-kartu" id="btnOwnerKonf"><div class="k"><div class="t">Konfirmasi data admin</div><div class="s">Absen luar, lembur, pulang cepat</div></div><div class="jml" id="ownerKonfJumlah"></div></button>
       <div class="catatan-kecil" id="ownerPesan" style="color:var(--merah)"></div>
     </div>
   </div>
@@ -605,20 +632,23 @@
 
   <!-- Beranda admin (minimal: hanya yang sudah punya fungsi) -->
   <div id="layarAdmin" class="layar">
+    <!-- Disalin dari mockup 49. Kartu Hari ini (Hadir/Telat/Izin) dan Perlu evaluasi belum dibuat: belum ada data/aksi server untuk admin. -->
     <div class="isi-gulir">
       <div class="baris-header">
         <img src="assets/logo.png" alt="Kubah Emas Indonesia">
-        <button type="button" class="badge-hitam badge-menu" id="btnMenuAdmin" aria-label="Buka menu" aria-haspopup="true"><span id="admBadge">Admin</span>
+        <button type="button" class="badge-hitam badge-menu badge-abu" id="btnMenuAdmin" aria-label="Buka menu" aria-haspopup="true"><span id="admBadge">Admin</span>
           <svg aria-hidden="true" fill="none" height="14" stroke="#FFD62E" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="14"><path d="M6 9l6 6 6-6"></path></svg>
         </button>
       </div>
-      <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Beranda admin</div><div class="s" id="admSub"></div></div></div>
+      <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Hari ini</div><div class="s" id="admTanggal"></div></div></div>
+      <span id="admSub" hidden></span>
+      <button type="button" class="btn-konf-kartu" id="btnAdminKonf"><div class="k"><div class="t">Menunggu konfirmasi</div></div><div class="jml" id="admKonfJumlah"></div></button>
       <div class="catatan-kecil" id="admPesan"></div>
     </div>
-    <div class="catatan-kecil">Di HP toko keluar otomatis 2 menit.</div>
+    <div class="catatan-kecil" style="text-align:center">Di HP toko keluar otomatis 2 menit.</div>
     <div class="bar-bawah">
-      <button type="button" class="btn-garis" id="btnAdminHome">Home</button>
-      <button type="button" class="btn-gelap" id="btnAdminLogout">Log out</button>
+      <button type="button" class="btn-home" id="btnAdminHome">Home</button>
+      <button type="button" id="btnAdminLogout" style="display:none" aria-hidden="true" tabindex="-1">Log out</button>
     </div>
   </div>
 
@@ -812,15 +842,18 @@
 
   <!-- Konfirmasi (ACC / TOLAK) untuk owner, admin HP toko, dan admin HP pribadi -->
   <div id="layarKonfirmasi" class="layar">
+    <!-- Disalin dari mockup 52 (admin) dan 28 (owner) -->
     <div class="isi-gulir">
-      <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam" id="konfBadge">Konfirmasi</div></div>
-      <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Konfirmasi</div><div class="s" id="konfSub">Memuat...</div></div></div>
+      <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam badge-abu" id="konfBadge">Konfirmasi</div></div>
+      <div class="judul-blok"><div class="garis"></div><div><div class="h besar" id="konfJudul">Konfirmasi</div><div class="s" id="konfSub"></div></div></div>
+      <div class="konf-chips" id="konfChips"></div>
       <div class="filter-owner" id="konfFilter" style="display:none"><div class="bidang-filter"><label for="konfCabang">Cabang</label><select id="konfCabang"></select></div></div>
-      <div id="daftarKonfirmasi" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div id="daftarKonfirmasi" style="display:flex;flex-direction:column;gap:12px"></div>
       <button type="button" class="btn-garis" id="btnMuatLagi" style="display:none;flex:none">Muat lagi</button>
       <div class="catatan-kecil" id="konfPesan" style="color:var(--merah)"></div>
+      <div class="catatan-kecil" id="konfCatatan" style="display:none">Admin tidak bisa meng-ACC datanya sendiri.</div>
     </div>
-    <div class="bar-bawah"><button type="button" class="btn-garis" id="btnKembaliKonf">Kembali</button></div>
+    <div class="bar-bawah"><button type="button" class="btn-home" id="btnKembaliKonf">Home</button></div>
   </div>
 
   <div id="layarUtama" class="layar">
@@ -901,8 +934,14 @@
 <div id="menuOwner" class="menu-lapis" role="menu">
   <div class="menu-latar" id="menuLatar"></div>
   <div class="menu-wadah"><div class="menu-kartu">
-    <button type="button" id="btnMenuKonfirmasiOwner" role="menuitem">Konfirmasi<span class="jumlah-menu" id="jumlahKonfirmasiOwner"></span></button>
-    <button type="button" id="btnMenuKelolaHp" role="menuitem">Kelola HP toko</button>
+    <button type="button" disabled role="menuitem">Log admin<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Kunci periode<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Role &amp; admin<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Pengaturan<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Cabang &amp; shift<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Laporan bulanan<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Data absensi<span class="segera">Segera</span></button>
+    <button type="button" id="btnMenuKelolaHp" role="menuitem">Perangkat (HP toko)</button>
     <button type="button" id="btnOwnerKeluarkan" role="menuitem">Keluarkan semua perangkat</button>
     <button type="button" id="btnOwnerGantiPw" role="menuitem">Ganti password</button>
     <button type="button" id="btnOwnerLogout" class="keluar" role="menuitem">
@@ -916,7 +955,13 @@
   <div class="menu-latar" id="menuLatarAdmin"></div>
   <div class="menu-wadah"><div class="menu-kartu">
     <button type="button" id="btnMenuKonfirmasiToko" role="menuitem">Konfirmasi<span class="jumlah-menu" id="jumlahKonfirmasiToko"></span></button>
+    <button type="button" disabled role="menuitem">Absen manual<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Data absensi<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Jadwal shift<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Input izin<span class="segera">Segera</span></button>
     <button type="button" id="btnMenuKaryawan" role="menuitem">Karyawan</button>
+    <button type="button" disabled role="menuitem">Kalender libur<span class="segera">Segera</span></button>
+    <button type="button" disabled role="menuitem">Dashboard bulanan<span class="segera">Segera</span></button>
     <button type="button" id="btnMenuUbahNama" role="menuitem">Ubah nama HP ini</button>
     <button type="button" id="btnMenuAdminLogout" class="keluar" role="menuitem">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg><span>Log out</span>
@@ -1991,6 +2036,7 @@
         if (ownerGagalSesi(d)) { return; }
         if (d.status !== 'ok') { document.getElementById('ownerSub').textContent = d.pesan || 'Gagal memuat.'; return; }
         dataOwner = d;
+        muatJumlahKonfirmasi('OWNER', 'ownerKonfJumlah');
         document.getElementById('ownerSub').textContent = d.nama + ' · ' + d.id;
       })
       .catch(function () { document.getElementById('ownerSub').textContent = 'Tidak bisa terhubung ke server.'; });
@@ -2371,7 +2417,9 @@
         pesanLoginAdmin.textContent = '';
         document.getElementById('admBadge').textContent = 'Admin ' + d.cabang;
         document.getElementById('admSub').textContent = d.nama;
+        document.getElementById('admTanggal').textContent = tanggalHariIniTeks();
         tampilLayar(layarAdmin);
+        muatJumlahKonfirmasi('TOKO', 'admKonfJumlah');
         mulaiDiamAdmin();
       })
       .catch(function () { btnMasukAdmin.disabled = false; pesanLoginAdmin.textContent = 'Tidak bisa terhubung ke server. Coba lagi.'; });
@@ -3153,6 +3201,11 @@
     document.getElementById('btnMuatLagi').style.display = 'none';
     document.getElementById('konfSub').textContent = 'Memuat...';
     pesanKonf('');
+    konfKelPilih = '';
+    document.getElementById('konfJudul').textContent = mode === 'OWNER' ? 'Konfirmasi data admin' : 'Konfirmasi';
+    document.getElementById('konfCatatan').style.display = mode === 'OWNER' ? '' : 'none';
+    document.getElementById('konfBadge').textContent = mode === 'OWNER' ? 'Owner' : 'Admin ' + (mode === 'PRIBADI' ? (profilPribadi ? profilPribadi.cabang : '') : (document.getElementById('namaCabang').textContent || ''));
+    gambarChipKonf();
     // Owner: filter cabang hanya kalau cabang lebih dari satu
     const adaFilter = mode === 'OWNER' && infoHari && infoHari.tampilkan_dropdown_cabang;
     document.getElementById('konfFilter').style.display = adaFilter ? '' : 'none';
@@ -3170,29 +3223,60 @@
     else if (modeKonf === 'PRIBADI') { tampilLayar(layarPribadi); }
     else { tampilLayar(layarAdmin); }
     modeKonf = '';
+    segarkanJumlahBeranda();
   }
 
   function teksKonfirmasiDurasi(menit) { return teksDurasi(menit); }
 
+  const NAMA_TIPE = { LUAR: 'Absen luar', LEMBUR: 'Lembur', PULANG_CEPAT: 'Pulang cepat' };
   function kartuKonfirmasi(it) {
-    const baris = [];
-    baris.push('<div class="hp-nama">' + escHtml(tglTampil(it.tanggal)) + ' · ' + escHtml(it.jam || '-') + ' · ' + (it.jenis === 'MASUK' ? 'Masuk' : 'Pulang') +
-      (it.status ? ' · ' + escHtml(it.status) : '') + '</div>');
-    if (it.cabang) { baris.push('<div class="hp-ket">' + escHtml(it.cabang) + ' · Shift ' + escHtml(it.shift) + '</div>'); }
-    if (it.ket) { baris.push('<div class="konf-ket">' + escHtml(it.ket) + '</div>'); }
-    if (it.tingkat) { baris.push('<div class="konf-ket">Lembur tingkat ' + it.tingkat + ' · ' + escHtml(teksKonfirmasiDurasi(it.durasi_menit)) + '</div>'); }
+    let tipe = NAMA_TIPE[it.kelompok] || it.kelompok;
+    if (it.kelompok === 'LUAR') { tipe += ', ' + (it.jenis === 'MASUK' ? 'masuk' : 'pulang'); }
+    if (it.kelompok === 'LEMBUR' && it.tingkat) { tipe += ' tingkat ' + it.tingkat + ' · ' + teksKonfirmasiDurasi(it.durasi_menit); }
+    const detail = [tglTampil(it.tanggal) + ' ' + (it.jam || '-')];
+    if (it.ket) { detail.push(it.ket); }
+    if (it.cabang && modeKonf === 'OWNER') { detail.push(it.cabang + ' · Shift ' + it.shift); }
+    let gps = '';
     if (it.gps) {
       const aman = typeof it.maps === 'string' && it.maps.indexOf('https://www.google.com/maps?q=') === 0;
-      baris.push('<div class="konf-gps">Akurasi ' + (it.akurasi === null ? '?' : Math.round(it.akurasi)) + ' m' +
-        (it.akurasi_buruk ? ' <span class="chip-merah">Akurasi buruk</span>' : '') +
-        (aman ? ' · <a class="link-maps" href="' + escHtml(it.maps) + '" target="_blank" rel="noopener noreferrer">Buka di Google Maps</a>' : '') + '</div>');
+      detail.push('akurasi ' + (it.akurasi === null ? '?' : Math.round(it.akurasi)) + ' m');
+      gps = (it.akurasi_buruk ? '<div><span class="chip-merah">Akurasi buruk</span></div>' : '') +
+        (aman ? '<a class="link-maps" href="' + escHtml(it.maps) + '" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg><span>Buka di Google Maps</span></a>' : '');
     }
-    return '<div class="kartu-hp kartu-konf" data-id="' + escHtml(it.id) + '">' +
-      '<div class="nama-hp-besar">' + escHtml(it.nama) + '</div>' + baris.join('') +
-      '<div class="foto-konf" data-slot="foto"></div>' +
-      '<div class="aksi-hp"><button type="button" class="btn-biasa-garis" data-konf="foto">Lihat foto</button></div>' +
-      '<div class="aksi-hp"><button type="button" class="btn-acc" data-konf="acc">ACC</button><button type="button" class="btn-merah-garis" data-konf="tolak">TOLAK</button></div></div>';
+    return '<div class="kartu-konf" data-id="' + escHtml(it.id) + '" data-kel="' + escHtml(it.kelompok) + '">' +
+      '<div class="konf-baris"><button type="button" class="konf-foto" data-konf="foto" aria-label="Lihat foto">Foto</button>' +
+      '<div class="konf-isi"><div class="konf-tipe">' + escHtml(tipe) + '</div><div class="konf-nama">' + escHtml(it.nama) + '</div>' +
+      '<div class="konf-detail">' + escHtml(detail.join(', ')) + '</div></div></div>' +
+      '<div class="foto-konf" data-slot="foto"></div>' + gps +
+      '<div class="konf-aksi"><button type="button" class="acc" data-konf="acc">ACC</button><button type="button" class="tolak" data-konf="tolak">Tolak</button></div></div>';
   }
+
+  // Chip pengelompokan (mockup 52): Semua / Lembur / Absen luar / Pulang cepat; Izin dan Lupa absen belum ada fiturnya.
+  let konfKelPilih = '';
+  function gambarChipKonf() {
+    const kotak = document.getElementById('konfChips');
+    const bisa = (modeKonf !== 'OWNER');
+    kotak.style.display = bisa ? '' : 'none';
+    if (!bisa) { return; }
+    const semuaMuat = document.getElementById('btnMuatLagi').style.display === 'none';
+    const jml = function (k) { return semuaMuat ? ' ' + daftarKonfirmasi.querySelectorAll('.kartu-konf[data-kel="' + k + '"]').length : ''; };
+    const def = [['', 'Semua ' + (konfTotal > 99 ? '99+' : konfTotal)], ['LEMBUR', 'Lembur' + jml('LEMBUR')], ['LUAR', 'Absen luar' + jml('LUAR')], ['PULANG_CEPAT', 'Pulang cepat' + jml('PULANG_CEPAT')]];
+    kotak.innerHTML = def.map(function (c) {
+      return '<button type="button" data-kel="' + c[0] + '"' + (konfKelPilih === c[0] ? ' class="pilih"' : '') + '>' + c[1] + '</button>';
+    }).join('') + '<button type="button" disabled>Izin · Segera</button><button type="button" disabled>Lupa absen · Segera</button>';
+  }
+  function terapkanFilterKonf() {
+    daftarKonfirmasi.querySelectorAll('.kartu-konf').forEach(function (k) {
+      k.style.display = (modeKonf === 'OWNER' || !konfKelPilih || k.getAttribute('data-kel') === konfKelPilih) ? '' : 'none';
+    });
+  }
+  document.getElementById('konfChips').addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-kel]');
+    if (!b) { return; }
+    konfKelPilih = b.getAttribute('data-kel');
+    gambarChipKonf();
+    terapkanFilterKonf();
+  });
 
   function muatKonfirmasi() {
     if (konfMemuat) { return; }
@@ -3206,18 +3290,14 @@
         if (d.status !== 'ok') { pesanKonf(d.pesan || 'Gagal memuat.'); return; }
         konfJumlahTeks = d.jumlah_teks;
         konfTotal = d.total;
-        document.getElementById('konfSub').textContent = d.total ? d.jumlah_teks + ' menunggu keputusan' : 'Tidak ada yang menunggu';
+        document.getElementById('konfSub').textContent = (modeKonf === 'OWNER') ? (d.total ? d.jumlah_teks + ' menunggu keputusan' : 'Tidak ada yang menunggu') : '';
         let html = '';
-        d.daftar.forEach(function (it) {
-          if (it.kelompok !== konfKelompokTerakhir) {
-            html += '<div class="judul-kelompok" data-kelompok="' + escHtml(it.kelompok) + '">' + escHtml(NAMA_KELOMPOK[it.kelompok] || it.kelompok) + '</div>';
-            konfKelompokTerakhir = it.kelompok;
-          }
-          html += kartuKonfirmasi(it);
-        });
+        d.daftar.forEach(function (it) { html += kartuKonfirmasi(it); });
         daftarKonfirmasi.insertAdjacentHTML('beforeend', html);
         konfOffset += d.daftar.length;
         document.getElementById('btnMuatLagi').style.display = d.ada_lagi ? '' : 'none';
+        gambarChipKonf();
+        terapkanFilterKonf();
         if (!d.total) { daftarKonfirmasi.innerHTML = '<div class="hp-ket">Tidak ada yang menunggu persetujuan.</div>'; }
       })
       .catch(function () { konfMemuat = false; pesanKonf('Tidak bisa terhubung ke server.'); });
@@ -3232,7 +3312,8 @@
     // yang diputuskan hilang dari daftar server: geser offset supaya "Muat lagi" tidak melewatkan item
     konfOffset = Math.max(0, konfOffset - 1);
     konfTotal = Math.max(0, konfTotal - 1);
-    document.getElementById('konfSub').textContent = konfTotal ? (konfTotal > 99 ? '99+' : konfTotal) + ' menunggu keputusan' : 'Tidak ada yang menunggu';
+    document.getElementById('konfSub').textContent = (modeKonf === 'OWNER') ? (konfTotal ? (konfTotal > 99 ? '99+' : konfTotal) + ' menunggu keputusan' : 'Tidak ada yang menunggu') : '';
+    gambarChipKonf();
     if (sebelum && sebelum.classList.contains('judul-kelompok') && (!sesudah || sesudah.classList.contains('judul-kelompok'))) { sebelum.remove(); }
     if (!daftarKonfirmasi.querySelector('.kartu-konf')) { konfOffset = 0; konfKelompokTerakhir = ''; daftarKonfirmasi.innerHTML = ''; muatKonfirmasi(); }
   }
@@ -3260,7 +3341,7 @@
     if (aksi === 'tolak') {
       // konfirmasi singkat sebelum TOLAK
       bukaDialog(
-        '<div class="dialog-judul">Tolak absen ini?</div><div class="dialog-sub">' + escHtml(kartu.querySelector('.nama-hp-besar').textContent) + '</div>' +
+        '<div class="dialog-judul">Tolak absen ini?</div><div class="dialog-sub">' + escHtml(kartu.querySelector('.konf-nama').textContent) + '</div>' +
         '<div class="dialog-catatan">Keputusan tidak bisa diubah lagi.</div>' +
         '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">TOLAK</button></div>');
       document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
@@ -3299,11 +3380,17 @@
   }
 
   // Titik masuk: menu owner, menu admin HP toko, menu admin HP pribadi
-  document.getElementById('btnMenuKonfirmasiOwner').addEventListener('click', function () { bukaKonfirmasi('OWNER'); });
+  document.getElementById('btnOwnerKonf').addEventListener('click', function () { bukaKonfirmasi('OWNER'); });
+  document.getElementById('btnAdminKonf').addEventListener('click', function () { bukaKonfirmasi('TOKO'); });
   document.getElementById('btnMenuKonfirmasiToko').addEventListener('click', function () { bukaKonfirmasi('TOKO'); });
   function bukaKonfirmasiPribadi() { bukaKonfirmasi('PRIBADI'); }
   function sesudahBukaMenuPribadi() { muatJumlahKonfirmasi('PRIBADI', 'jumlahKonfirmasiMenu'); }
-  document.getElementById('btnMenuOwner').addEventListener('click', function () { muatJumlahKonfirmasi('OWNER', 'jumlahKonfirmasiOwner'); });
+  // jumlah di kotak Konfirmasi beranda owner dan admin HP toko (diperbarui saat beranda dibuka dan saat kembali dari layar Konfirmasi)
+  function segarkanJumlahBeranda() {
+    if (sesiOwner && layarOwner.classList.contains('aktif')) { muatJumlahKonfirmasi('OWNER', 'ownerKonfJumlah'); }
+    if (sesiAdmin && layarAdmin.classList.contains('aktif')) { muatJumlahKonfirmasi('TOKO', 'admKonfJumlah'); }
+    if (sesiPribadi && layarPribadi.classList.contains('aktif') && profilPribadi && profilPribadi.role === 'ADMIN') { muatJumlahKonfirmasi('PRIBADI', 'pribMenuAdminJumlah'); }
+  }
   document.getElementById('btnMenuAdmin').addEventListener('click', function () { muatJumlahKonfirmasi('TOKO', 'jumlahKonfirmasiToko'); });
 
   // ---- Mulai: sesi owner = beranda owner; sesi HP pribadi = beranda pribadi; token HP toko = layar utama; kalau tidak = pilih jenis HP ----
