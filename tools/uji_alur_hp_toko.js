@@ -8,6 +8,27 @@ function el(id) { return document.getElementById(id); }
 function aktif() { var a = document.querySelector('.layar.aktif'); return a ? a.id : ''; }
 function hitung(aksi) { return window.__panggilan.filter(function (x) { return x.aksi === aksi; }).length; }
 function terakhir(aksi) { var a = window.__panggilan.filter(function (x) { return x.aksi === aksi; }); return a[a.length - 1]; }
+var kam = 0;
+try { Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: function () { kam++; return Promise.reject(new Error('uji')); } } }); } catch (e) { /* kamera tidak bisa ditiru: tes kamera dilewati */ }
+// Alur wajah (tampilan): tombol -> 03 -> 08 -> MANUAL -> 09. Tiket waktu tetap diminta saat tombol ditekan; kamera tidak dibuka di 03/08.
+async function tekan(id, rinci) {
+  var tiket0 = hitung('tiket_waktu'), kam0 = kam, b = el(id); b.disabled = false; b.click(); await tunggu(250);
+  if (rinci) {
+    ok('setelah ' + id + ' ditekan tampil layar pindai wajah (03) "Pengenalan wajah \u00b7 Segera"', aktif() === 'lb03' && /Pengenalan wajah \u00b7 Segera/.test(el('lb03').textContent));
+    ok('tiket waktu diminta SAAT TOMBOL DITEKAN (sebelum layar 08/09), jam resmi dari server', hitung('tiket_waktu') === tiket0 + 1);
+    ok('layar 03 TIDAK membuka kamera', kam === kam0);
+    await tunggu(1700);
+    ok('otomatis pindah ke "Wajah tidak terbaca" (08) setelah sekitar 1,5 detik', aktif() === 'lb08' && /Wajah tidak terbaca/.test(el('lb08').textContent));
+    var ulang = Array.prototype.filter.call(el('lb08').querySelectorAll('button'), function (x) { return /ULANGI/.test(x.textContent); })[0];
+    ok('tombol ULANGI di 08 NONAKTIF "Segera"; MANUAL aktif', !!ulang && ulang.disabled && /Segera/.test(ulang.textContent) && !!el('lb08').querySelector('[data-lb-aksi="pilihnama"]'));
+    ok('layar 08 TIDAK membuka kamera; tiket tidak diminta lagi', kam === kam0 && hitung('tiket_waktu') === tiket0 + 1);
+    el('lb08').querySelector('[data-lb-aksi="pilihnama"]').click(); await tunggu(200);
+    ok('MANUAL membuka layar pilih nama + PIN (09) TANPA meminta tiket baru (jam absen tetap saat tombol ditekan)', aktif() === 'layarPilihNama' && hitung('tiket_waktu') === tiket0 + 1);
+    return;
+  }
+  await tunggu(1700);
+  el('lb08').querySelector('[data-lb-aksi="pilihnama"]').click(); await tunggu(200);
+}
 async function isiPin(nama) {
   var s = el('selectNama'); s.value = nama; s.dispatchEvent(new Event('change')); await tunggu(150);
   ['1', '2', '3', '4', '5'].forEach(function (d) { document.querySelector('#keypad [data-digit="' + d + '"]').click(); });
@@ -21,8 +42,8 @@ async function isiPin(nama) {
     ok('kartu "Hari ini tidak masuk" tampil NONAKTIF: tombol mati, pudar, "Segera", tanpa angka', !!kt && kt.disabled && kt.classList.contains('belum-aktif') && /Segera/.test(kt.textContent) && !/\d/.test(kt.textContent));
 
     // ---- masuk tepat waktu ----
-    el('btnMasuk').click(); await tunggu(300);
-    ok('ABSEN MASUK membuka layar pilih nama dengan judul "Absen Masuk PIN"', aktif() === 'layarPilihNama' && document.querySelector('.pilih-judul').textContent === 'Absen Masuk PIN');
+    await tekan('btnMasuk', true);
+    ok('ABSEN MASUK berakhir di layar pilih nama dengan judul "Absen Masuk PIN"', aktif() === 'layarPilihNama' && document.querySelector('.pilih-judul').textContent === 'Absen Masuk PIN');
     ok('minta tiket waktu ke server (jam resmi dari server, bukan jam HP)', hitung('tiket_waktu') >= 1);
     ok('PIN 5 titik; "Foto ulang" dan tautan jadwal nonaktif "Segera"', el('pinTitik').children.length === 5 && document.querySelectorAll('#layarPilihNama .belum-aktif').length >= 2);
     await isiPin('K002');
@@ -34,13 +55,13 @@ async function isiPin(nama) {
 
     // ---- absen dobel ditolak (jawaban server) ----
     window.__absen = { status: 'gagal', pesan: 'Sudah absen masuk hari ini' };
-    el('btnMasuk').click(); await tunggu(300); await isiPin('K002');
+    await tekan('btnMasuk'); await isiPin('K002');
     ok('absen dobel: pop-up "Tidak tersimpan" dengan pesan server, tanpa "Selamat bekerja"', /Tidak tersimpan/.test(el('popup').textContent) && /Sudah absen masuk hari ini/.test(el('popup').textContent) && !/Selamat bekerja/.test(el('popup').textContent));
     el('popup').click(); await tunggu(200);
 
     // ---- pulang awal: pop-up 15 lebih dulu, absen BELUM tersimpan sampai alasan dikirim ----
     window.__absen = { status: 'ok', st_pulang: 'PULANG CEPAT', acc: 'MENUNGGU', jam: '15:00', shift: 'Shift 1', panggilan: 'Budi', perlu_keterangan: true, jenis_keterangan: 'ALASAN_PULANG_AWAL', kode_pending: 'KP', pilihan: ['Sakit', 'Urusan keluarga', 'Disuruh atasan', 'Lainnya'], nama: 'Budi Santoso' };
-    el('btnPulang').click(); await tunggu(300);
+    await tekan('btnPulang');
     ok('ABSEN PULANG: judul "Absen Pulang PIN"', document.querySelector('.pilih-judul').textContent === 'Absen Pulang PIN');
     await isiPin('K002');
     ok('pop-up 15 tampil lebih dulu: "Terima kasih", "Pulang awal 15:00 (Shift 1)", "Menunggu persetujuan admin", "ISI ALASAN PULANG AWAL"', /Terima kasih/.test(el('popup').textContent) && /Pulang awal 15:00 \(Shift 1\)/.test(el('popup').textContent) && /Menunggu persetujuan admin/.test(el('popup').textContent) && !!el('btnIsiAlasan') && /ISI ALASAN PULANG AWAL/.test(el('btnIsiAlasan').textContent));
@@ -55,7 +76,7 @@ async function isiPin(nama) {
 
     // ---- lembur: pop-up 17 (menutup sendiri 4 detik) lalu layar pekerjaan lembur (20) ----
     window.__absen = { status: 'ok', st_pulang: 'LEMBUR DI TOKO', acc: 'MENUNGGU', jam: '18:35', shift: 'Shift 1', panggilan: 'Budi', perlu_keterangan: true, jenis_keterangan: 'PEKERJAAN_LEMBUR', kode_pending: 'KL', pilihan: ['Stok opname', 'Bongkar muat', 'Lainnya'], nama: 'Budi Santoso', tingkat: 2, durasi_menit: 125 };
-    el('btnLembur').disabled = false; el('btnLembur').click(); await tunggu(300);
+    await tekan('btnLembur');
     ok('LEMBUR: judul "Lembur PIN"', document.querySelector('.pilih-judul').textContent === 'Lembur PIN');
     await isiPin('K002');
     ok('pop-up 17 tampil lebih dulu: "Lembur 18:35 (2 jam 5 menit)" (jam dan durasi dari server), "Menunggu persetujuan admin", "Menutup otomatis dalam 4 detik"', /Lembur 18:35 \(2 jam 5 menit\)/.test(el('popup').textContent) && /Menunggu persetujuan admin/.test(el('popup').textContent) && /Menutup otomatis dalam 4 detik/.test(el('popup').textContent));
@@ -70,7 +91,7 @@ async function isiPin(nama) {
     // ---- absen terlalu pagi ----
     el('popup').click(); await tunggu(200);
     window.__absen = { status: 'gagal', pesan: 'Absen masuk belum dibuka. Dibuka mulai 06:45.' };
-    el('btnMasuk').click(); await tunggu(300); await isiPin('K002');
+    await tekan('btnMasuk'); await isiPin('K002');
     ok('absen terlalu pagi: pop-up "Absen masuk belum dibuka" dengan "Dibuka mulai 06:45"; baris sisa waktu nonaktif "Segera"', /Absen masuk belum dibuka/.test(el('popup').textContent) && /Dibuka mulai 06:45/.test(el('popup').textContent) && /Segera/.test(el('popup').textContent));
   } catch (e) { H.push('GAGAL  galat uji: ' + e.message); }
 })();

@@ -30,7 +30,7 @@ window.fetch = function (url, opsi) {
     el('btnMenuOwner').click(); await tunggu(100);
     var m = Array.prototype.map.call(document.querySelectorAll('#menuOwner .menu-kartu button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim() + (b.disabled ? '[x]' : ''); });
     H.push('       menu owner: ' + m.join(' | '));
-    ok('menu owner sesuai mockup 72 (item belum ada fiturnya nonaktif); Perangkat (HP toko) aktif', /Log admin.*\[x\]/.test(m[0]) && m.some(function (x) { return x === 'Perangkat (HP toko)'; }) && m.some(function (x) { return /^Ganti password$/.test(x); }));
+    ok('menu owner sesuai mockup 72 (item dengan layar baru kini AKTIF); Perangkat (HP toko) aktif', /^Log admin$/.test(m[0]) && m.some(function (x) { return x === 'Perangkat (HP toko)'; }) && m.some(function (x) { return /^Ganti password$/.test(x); }));
     el('menuLatar').click();
     el('btnOwnerKonf').click(); await tunggu(500);
     ok('layar Konfirmasi terbuka dari kotak beranda', aktif() === 'layarKonfirmasi');

@@ -46,7 +46,7 @@ function hitung(aksi) { return window.__panggilan.filter(function (x) { return x
     ok('mengetuk baris Admin tidak membuka sheet aksi', !el('dialog').classList.contains('tampil'));
     ok('tidak ada pemilih Aktif/Nonaktif lagi', !el('segmenKaryawan'));
     baris[0].click(); await tunggu(100);
-    ok('mengetuk baris membuka sheet aksi: Reset PIN, Nonaktifkan, dan Ubah data/Pola shift/Daftar wajah "Segera" nonaktif', /Reset PIN/.test(el('dialog').textContent) && /Nonaktifkan/.test(el('dialog').textContent) && el('dialog').querySelectorAll('.btn-nonaktif-segera[disabled]').length === 3);
+    ok('mengetuk baris membuka sheet aksi: Reset PIN, Nonaktifkan, dan Ubah data/Daftar wajah "Segera" nonaktif, Pola shift AKTIF', /Reset PIN/.test(el('dialog').textContent) && /Nonaktifkan/.test(el('dialog').textContent) && el('dialog').querySelectorAll('.btn-nonaktif-segera[disabled]').length === 2 && !!el('dialog').querySelector('[data-lb-ke="lb59"]'));
     el('dialog').querySelector('[data-sh="tutup"]').click(); await tunggu(100);
     baris[6].click(); await tunggu(100);
     ok('baris nonaktif: sheet menawarkan "Aktifkan kembali", tanpa Reset PIN', /Aktifkan kembali/.test(el('dialog').textContent) && !/Reset PIN/.test(el('dialog').textContent));

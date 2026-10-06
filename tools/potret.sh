@@ -25,7 +25,7 @@ else
 fi
 echo "<!doctype html><body style='margin:0;background:#888'><iframe src='$SRC' style='border:0;width:${IW}px;height:${IH}px'></iframe></body>" > "$HAR"
 URL="file:///$(cygpath -m "$HAR")"; URL="${URL// /%20}"
-"$EDGE" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=700,1000 --user-data-dir="$(cygpath -w "${TEMP:-/tmp}")\potret-profil$$" --virtual-time-budget=12000 --screenshot="$OUTW" "$URL" >/dev/null 2>&1
+"$EDGE" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=700,1000 --user-data-dir="$(cygpath -w "${TEMP:-/tmp}")\potret-profil$$" --virtual-time-budget=${BUDGET:-12000} --screenshot="$OUTW" "$URL" >/dev/null 2>&1
 for i in $(seq 1 120); do [ -f "$OUT" ] && break; sleep 0.5; done
 sleep 1
 rm -f "$HAR" "$AKAR/__potret.html"

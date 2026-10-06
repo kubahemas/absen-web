@@ -32,6 +32,6 @@ window.fetch = function (url, opsi) {
     el('btnMenuPribadi').click(); await tunggu(200);
     var m = Array.prototype.map.call(document.querySelectorAll('#menuPribadiIsi button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim() + (b.disabled ? '[x]' : ''); });
     H.push('       menu: ' + m.join(' | '));
-    ok('menu ikon akun memuat Akun saya + item admin + Keluarkan semua + Log out', m.length >= 12 && /Akun saya/.test(m[0]) && /Konfirmasi/.test(m[1]) && /Absen manual.*\[x\]/.test(m[2]) && /Karyawan$/.test(m[6]) && /Dashboard bulanan.*\[x\]/.test(m[8]));
+    ok('menu ikon akun memuat Akun saya + item admin (Absen manual dan Dashboard bulanan kini AKTIF, menuju layar baru) + Keluarkan semua + Log out', m.length >= 12 && /Akun saya/.test(m[0]) && /Konfirmasi/.test(m[1]) && /^Absen manual$/.test(m[2]) && /Karyawan$/.test(m[6]) && /^Dashboard bulanan$/.test(m[8]));
   } catch (e) { H.push('GAGAL  galat uji: ' + e.message); }
 })();

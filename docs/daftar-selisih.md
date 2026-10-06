@@ -174,3 +174,20 @@ Semua selisih di bawah **belum diputuskan pemilik**: tidak diubah, hanya dicatat
 | 2 | 30, 31, 32, 46 | Ikon segarkan pindah ke bawah ikon akun, rata kanan, sejajar baris nama. Beranda 49 dan 71 tidak berubah | sama |
 | 3 | 30–32, 46, 49, 71 | Tarik-ke-bawah untuk refresh (fitur baru, tidak ada di mockup): ambang 90 px, hanya di paling atas, memanggil fungsi ikon, penanda berputar kecil di atas layar | – (perilaku) |
 | 4 | 09, absen luar | Lingkaran foto 160 px / border 9 px (**ukuran usulan Claude Code**; mohon dinilai). Layar 09 tidak muat 360x640 tanpa gulir (isi 806 px); halaman otomatis menggulir ke keypad setelah nama dipilih. Absen luar muat 360x640 tanpa gulir | `09_dampingan.png`, `luar_masuk_app.png`, `luar_pulang_app.png`, `luar_lembur_app.png` (app saja, tidak punya mockup sendiri), `09_360x640.png`, `luar_masuk_360x640.png`, `luar_pulang_360x640.png`, `luar_lembur_360x640.png` |
+
+## Selisih BARU putaran "semua layar belum" (2026-10-07) — butuh keputusan pemilik
+
+Semua layar baru = tampilan saja (aksi "Segera", tanpa angka/nama contoh). Gambar: `docs/audit/visual/NN_dampingan.png` (kiri app, kanan mockup).
+
+| No | Layar | Selisih dari mockup | Gambar |
+|---|---|---|---|
+| 1 | Semua layar baru | Angka, nama, tanggal, jam contoh diganti "–"; baris tabel/daftar contoh dibuang (hanya kepala kolom); dropdown/filter/input nonaktif tanpa isi | `NN_dampingan.png` tiap layar |
+| 2 | 36 (37, 38) | Satu layar Report dipakai untuk tiga kondisi (mockup 36/37/38 beda hanya label); lencana label (EXCELLENT/GOOD/BAD) nonaktif "Segera"; 38 tidak punya layar sendiri | `36_dampingan.png` |
+| 3 | 57 dan 59 | Mockup 57 (jalur lain ke Pola shift) belum punya jalur; Pola shift dibuka dari sheet karyawan → 59 | `57_dampingan.png`, `59_dampingan.png` |
+| 4 | 67 | Warna sampel pada kalender libur memakai warna mockup; hari libur nyata belum ada | `67_dampingan.png` |
+| 5 | 70 | Dibuat mirip 36 (detail karyawan); tanpa baris riwayat, tanda naik/turun, dan "Telat N kali"; tombol Detail membuka 40 / 39 | `70_dampingan.png` |
+| 6 | 68, 81 | Ringkasan: kalimat tren ("naik/turun/sama dengan…", "Paling banyak hari…", "Minggu ke-N") dihapus karena berisi angka contoh | `68_dampingan.png`, `81_dampingan.png` |
+| 7 | 02 | Latar di balik layar jadwal berbeda sedikit dari mockup (layar utama nyata, bukan gambar) | `02_dampingan.png` |
+| 8 | 04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 43, 53, 56, 62, 65, 70 | Layar KEJADIAN: dibuat lengkap tetapi SENGAJA belum bisa dibuka dari navigasi apa pun dan belum disambung ke logika absen; 57 juga belum punya jalur | dampingan tiap layar |
+| 9 | 03, 08 | Alur wajah hanya tampilan: 03 tampil 1–2 detik lalu 08; ULANGI nonaktif; kamera tidak dibuka; MANUAL → 09 | `03_dampingan.png`, `08_dampingan.png` |
+| 10 | 30, 31, 32, 46 | Nama besar kembali seperti mockup (Oswald 30 px tebal), tetap TANPA "Halo,". Menggantikan gaya blok "Cabang…" 15 px dari keputusan 2026-10-09 butir 1 (selisih dari mockup tinggal: tanpa "Halo,") | `30_dampingan.png` |

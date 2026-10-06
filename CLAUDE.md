@@ -211,3 +211,10 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - Beranda HP pribadi: nama saja (tanpa "Halo,"), ikon segarkan di bawah ikon akun. Tarik-ke-bawah untuk refresh di beranda HP pribadi, admin HP toko, owner (ambang 90 px, hanya di paling atas, memanggil `segarkanBeranda`, bukan memuat ulang halaman; `overscroll-behavior-y: contain`).
 - Lingkaran foto kamera 160 px / border 9 px di layar 09 dan absen luar (usulan, belum final). `tools/potret.sh` mendukung `LEBAR=360 TINGGI=640`.
 - Uji baru: `tools/uji_alur_tarik_refresh.js` (konteks pribadi/admin/owner lewat `window.__KONTEKS`), `tools/uji_alur_foto_lingkaran.js` (konteks toko/luar), `uji_alur_pribadi.js` memeriksa nama dan posisi ikon.
+
+## Paket "semua layar belum" (2026-10-07) — tampilan saja
+- 43 layar baru (`lbNN` di `index.html`, sumber hasil bersih di `tools/layar_baru/NN.html`) dibangun dengan `tools/bangun_layar_baru.sh` + `tools/sisip_layar_baru.pl` (konfigurasi di `tools/layar_baru_cfg.js`, pembersih `tools/layar_baru_bersih.js`). Aturan: tanpa angka/nama contoh ("–"), semua aksi nonaktif "Segera", tanpa panggilan server baru (`api.gs` tidak berubah). Navigasi lewat atribut `data-lb-ke` / `data-lb-ganti` / `data-lb-kembali` / `data-lb-aksi` dan tumpukan `tumpukanLb`.
+- Alur wajah HP toko (tampilan): tombol absen → 03 → 08 → MANUAL → 09 (`mulaiAlurWajah`; tiket waktu diminta saat tombol ditekan; kamera tidak dibuka).
+- Layar KEJADIAN sengaja belum bisa dicapai dari navigasi (daftar di `docs/daftar-layar.md`). Daftar selisih baru: `docs/daftar-selisih.md`.
+- Nama di beranda HP pribadi: Oswald 30 px tebal (seperti mockup), tanpa "Halo,".
+- Tes: `uji_tombol_segera.js`, `uji_layar_baru_tanpa_contoh.js` (butuh `token_contoh.js` dari `buat_token_contoh.pl`), `uji_alur_layar_baru.js` (KONTEKS toko/pribadi/pribadiadmin/admin/owner), alur wajah di `uji_alur_hp_toko.js`.

@@ -1,0 +1,38 @@
+// Konfigurasi per layar baru (nomor mockup). Lihat tools/layar_baru_bersih.js untuk arti tiap kunci.
+// SUMBER: nomor layar app -> berkas mockup (36 memakai mockup 37 GOOD sebagai satu layar Report).
+var SUMBER = { '36': '37' };
+var CFG = {
+  '02': { home: 'toko', hapusBaris: ['Ahmad', 'Ari'] },
+  '03': { home: 'toko', judulMode: true, ganti: [[/Memindai.*/, 'Pengenalan wajah · Segera']] },
+  '04': { home: 'toko' }, '05': { home: 'toko' }, '06': { home: 'toko' }, '07': { home: 'toko' },
+  '08': { home: 'toko', judulMode: true, nav: { 'Manual: pilih nama + PIN': { aksi: 'pilihnama' } } },
+  '13': { home: 'toko' }, '18': { home: 'toko' }, '19': { home: 'toko' },
+  '22': { home: 'adm' }, '23': { home: 'prib' },
+  '24': { home: 'own', hapusSatu: ['Shift 2 · Siang'] },
+  '25': { home: 'own', hapusBaris: ['Ahmad Fauzi'], pudar: [/^Semua cabang$/, /^Pekan ini$/, /^Semua$/] },
+  '34': { home: 'prib', tombolAngka: true },
+  '36': { home: 'prib', hapusTeks: [/^[▲▼] /, /^Telat \d+ kali/], hapusBaris: [/^Menunggu$/], ganti: [[/^GOOD$/, 'Segera']], pudar: [/^Segera$/], nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } },
+  '39': { home: 'prib', hapusBaris: ['24 Sep'] },
+  '40': { home: 'prib', hapusBaris: ['28 Sep'] },
+  '41': { home: 'prib', hapusTeks: [/izin khusus menikah/, /hari cuti/, /^Sisa cuti jadi/] },
+  '42': { home: 'prib', hapusSatu: [/Anda →/] },
+  '43': { home: 'prib' }, '45': { home: 'prib' },
+  '53': { home: 'adm' }, '54': { home: 'adm' },
+  '55': { home: 'adm', hapusSatu: ['Andi Pratama', 'Budi Santoso', 'Dewi Lestari', 'Joko Susilo', 'Rina Wati', 'Sari Utami'] },
+  '56': { home: 'adm' },
+  '57': { home: 'adm', hapusBaris: ['05–10 Okt'] },
+  '59': { home: 'adm', hapusBaris: ['5–10 Okt'] },
+  '62': { home: 'adm' },
+  '64': { home: 'adm', hapusBaris: ['Ahmad Fauzi'], pudar: [/^Pekan ini$/, /^Semua$/] },
+  '65': { home: 'adm' }, '66': { home: 'adm' },
+  '67': { home: 'adm', hapusBaris: [/^17 Sep/] },
+  '68': { home: 'adm', hapusTeks: [/^Minggu ke-\d/, /^Paling banyak hari/, /^(naik|turun|sama dengan)\b/], hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb69', ganti: true } } },
+  '69': { home: 'adm', hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb68', ganti: true } } },
+  '70': { home: 'adm', hapusTeks: [/^[▲▼] /, /^Telat \d+ kali/], hapusBaris: [/^Menunggu$/], ganti: [[/^GOOD$/, 'Segera']], pudar: [/^Segera$/], nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } },
+  '73': { home: 'own', nav: { 'Detail#5': { ke: 'lb74' } } },
+  '74': { home: 'own' }, '75': { home: 'own' },
+  '76': { home: 'own', hapusBaris: ['Semua absen lengkap', 'Agustus 2026'] },
+  '77': { home: 'own', hapusBaris: ['Dewi Lestari', 'Budi Santoso'] },
+  '81': { home: 'own', hapusTeks: [/^Minggu ke-\d/, /^Paling banyak hari/, /^(naik|turun|sama dengan)\b/], hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb82', ganti: true } } },
+  '82': { home: 'own', hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb81', ganti: true } } }
+};

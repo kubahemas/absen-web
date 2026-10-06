@@ -22,7 +22,7 @@ if (K === 'luar') {
   try {
     var lingkar, lebar = window.innerWidth;
     if (K === 'toko') {
-      el('btnMasuk').click(); await tunggu(300);
+      el('btnMasuk').click(); await tunggu(2400); el('lb08').querySelector('[data-lb-aksi="pilihnama"]').click(); await tunggu(300);
       lingkar = document.querySelector('#layarPilihNama .foto-lingkar');
       ok('layar 09 terbuka', aktif() === 'layarPilihNama');
     } else {
