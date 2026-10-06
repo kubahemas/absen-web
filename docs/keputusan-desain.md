@@ -129,7 +129,7 @@ Daftar resmi selisih antara mockup (`docs/mockup/layar/`) dan aplikasi. Rincian 
 | 2026-10-06 | Konfirmasi (28, 49, 71) | Hanya item menu; admin tanpa kartu "Menunggu konfirmasi" di beranda; owner tanpa kotak "Konfirmasi data admin" dan layar khusus data admin; owner dilaporkan tidak bisa ACC (penyebab belum dipastikan) | Dikerjakan bertahap | PENYIMPANGAN: harus diperbaiki |
 | 2026-10-06 | Tukar shift (42, 43, 56) dan terkait (55, 57, 59) | Belum ada sama sekali | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
 | 2026-10-06 | Pop-up HP toko (10, 11, 14, 15, 17, 35) | Kotak "Bulan ini" (Masuk, Telat, Izin/cuti, Sisa cuti) tidak ada | Statistik bulanan belum dibuat di server | PENYIMPANGAN: harus diperbaiki |
-| 2026-10-06 | Layar utama HP toko (01, 02) | Tidak ada kartu "Hari ini tidak masuk" dan layar jadwal shift hari ini; tombol absen 112 px (mockup 104) | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
+| 2026-10-06 | Layar utama HP toko (01, 02) | Tidak ada kartu "Hari ini tidak masuk", teks kecil di tombol (mis. "Shift 1 mulai 07:45") dan layar jadwal shift hari ini. KOREKSI: ukuran tombol ABSEN MASUK/PULANG HP toko (112 px, ikon 56) SUDAH sama dengan mockup 01; angka 104 px milik beranda HP pribadi (30) | Belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
 | 2026-10-06 | Beranda dan menu admin (49, 50) | Beranda hanya judul + Home/Log out; menu 4 item (mockup 10 item) | Dikerjakan bertahap | PENYIMPANGAN: harus diperbaiki |
 | 2026-10-06 | Pengenalan wajah dan peringatan (03–08, 13, 18, 19, 21, 34) | Belum ada (absen lewat nama + PIN) | Tahap 1 nomor 6–7 belum dikerjakan | PENYIMPANGAN: harus diperbaiki |
 | 2026-10-06 | Mockup 45, 63 (aturan lama) | Password awal 123456, PIN awal 1234, password 6 angka, ikatan HP/"Lepas HP" tidak berlaku lagi | Dibatalkan | belum disinkron ke mockup (mockup perlu dikoreksi, jangan ditiru) |
@@ -171,3 +171,12 @@ Bukti visual: `docs/audit/visual/52_*`, `28_*`, `49_*`, `50_*`, `71_*`, `72_*` (
 | 2026-10-06 | Beranda admin HP toko (49) | Judul "Hari ini" + tanggal, kartu "Menunggu konfirmasi" dengan jumlah, tombol Home; tombol Log out di bawah dihapus (Log out ada di menu seperti mockup 50) | Sesuai mockup | sesuai mockup |
 | 2026-10-06 | Beranda admin HP toko (49) | Tidak dibuat: kartu Hari ini (Hadir, Telat, Izin/cuti, per shift), daftar Belum absen, Perlu evaluasi (BAD) | Admin belum punya aksi server untuk angka Hari ini (aksi `owner_hari_ini` khusus owner) dan belum ada jadwal | belum ada data |
 | 2026-10-06 | Menu admin HP toko (50) | Item sesuai mockup 50; yang belum ada fiturnya nonaktif "Segera"; "Ubah nama HP ini" dipertahankan | Sesuai mockup | sesuai mockup; Ubah nama HP: belum disinkron ke mockup |
+
+### Penyelarasan Fase 1, bagian 4 (HP toko) — 2026-10-06
+Tidak ada perubahan kode di bagian ini, dengan alasan terbukti secara visual (`docs/audit/visual/01_mockup.png` dan `01_app.png`): ukuran dan posisi ABSEN MASUK, ABSEN PULANG, dan LEMBUR di HP toko sudah sama dengan mockup 01 (kotak tombol sama persis pada y 272–380 dan 397–506); angka "104 px" dalam perintah berasal dari mockup beranda HP pribadi (30), bukan HP toko. Tombol IZIN di HP toko tidak ada di aplikasi maupun di mockup 01 (tombol mockup: Shift 1 aktif, ABSEN MASUK, ABSEN PULANG, Hari ini tidak masuk, LEMBUR, Masuk sebagai Admin), jadi tidak ada yang diubah.
+
+| Tanggal | Layar | Apa yang berubah | Alasan | Status |
+|---|---|---|---|---|
+| 2026-10-06 | Layar utama HP toko (01) | Tidak ada perubahan | Ukuran tombol sudah sama dengan mockup | sesuai mockup (ukuran dan posisi tombol) |
+| 2026-10-06 | Layar utama HP toko (01) | Tidak dibuat: kartu "Hari ini tidak masuk", teks kecil di tombol ("Shift 1 mulai 07:45", "Pulang normal 16:30" — di app ada tempatnya tetapi terisi hanya bila server mengirim jadwal), jadwal shift (02) | Butuh data jadwal/izin | belum ada data |
+| 2026-10-06 | Pop-up HP toko (10, 11, 14, 15, 17, 35) | Kotak "Bulan ini" tidak dibuat | Butuh data Report | belum ada data |
