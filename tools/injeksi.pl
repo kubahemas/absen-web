@@ -7,6 +7,7 @@ use strict; use utf8;
 binmode(STDOUT, ':utf8');
 my $id  = $ENV{ID}  // '';
 my $fix = $ENV{FIX} // '';
+my $pra = $ENV{PRA} // ''; # skrip yang dijalankan di <head> SEBELUM aplikasi mulai (mis. isi localStorage, tiruan fetch)
 local $/;
 open my $h, '<:utf8', $ARGV[0] or die "tidak bisa membuka $ARGV[0]";
 my $t = <$h>; close $h;
@@ -21,6 +22,7 @@ my $badan = '<script type="text/plain" id="__fix">' . $fix . '</script><script>(
     'if(window.__g.length){var d=document.createElement("div");d.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:red;color:#fff;font:11px monospace;padding:4px";d.textContent="GALAT JS: "+window.__g.join(" | ");document.body.appendChild(d);}' .
   '},300);' .
   '})();</script>';
+$kepala .= '<script>' . $pra . '</script>' if $pra ne '';
 $t =~ s/<head>/<head>$kepala/;
 $t =~ s/<\/body>/$badan<\/body>/;
 print $t;

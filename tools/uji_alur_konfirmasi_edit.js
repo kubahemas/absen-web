@@ -32,13 +32,16 @@ window.fetch = function (url, opsi) {
     kartu[0].querySelector('.konf-edit').click(); await tunggu(100);
     var form = kartu[0].querySelector('.konf-form');
     ok('form edit: jam dan keterangan terisi dari pengajuan; ACC/Tolak disembunyikan selama edit', !!form && form.querySelector('.konf-jam').value === '08:05' && form.querySelector('.konf-ket-edit').value === 'Pasang AC lama' && kartu[0].querySelector('.konf-aksi').style.display === 'none');
-    ok('hanya jam dan keterangan yang bisa diubah (tidak ada pilihan jenis)', form.querySelectorAll('input, textarea, select').length === 2);
+    ok('hanya jam dan keterangan yang bisa diubah (tidak ada pilihan jenis)', form.querySelectorAll('input, textarea, select').length === 3);
     form.querySelector('.konf-ket-edit').value = 'abc'; form.querySelector('[data-konf="simpan-edit"]').click(); await tunggu(100);
     ok('keterangan 3 huruf ditolak di HP tanpa memanggil server', /minimal 5 karakter/.test(form.querySelector('.konf-form-pesan').textContent) && !panggilan.some(function (x) { return x.aksi === 'konfirmasi_edit'; }));
     form.querySelector('.konf-ket-edit').value = 'Pasang AC rumah Bu Sri'; form.querySelector('.konf-jam').value = '07:44';
+    form.querySelector('[data-konf="simpan-edit"]').click(); await tunggu(100);
+    ok('alasan kosong ditolak di HP tanpa memanggil server', /Alasan mengubah wajib/.test(form.querySelector('.konf-form-pesan').textContent) && !panggilan.some(function (x) { return x.aksi === 'konfirmasi_edit'; }));
+    form.querySelector('.konf-alasan-edit').value = 'Salah ketik jam';
     form.querySelector('[data-konf="simpan-edit"]').click(); await tunggu(400);
     var pe = panggilan.filter(function (x) { return x.aksi === 'konfirmasi_edit'; })[0];
-    ok('simpan mengirim id, jam, keterangan dengan sesi admin HP pribadi', !!pe && pe.id === 'K001|2026-10-06|MASUK' && pe.jam === '07:44' && pe.keterangan === 'Pasang AC rumah Bu Sri' && pe.sesi === 'S'.repeat(40) && !pe.token);
+    ok('simpan mengirim id, jam, keterangan dengan sesi admin HP pribadi', !!pe && pe.id === 'K001|2026-10-06|MASUK' && pe.jam === '07:44' && pe.keterangan === 'Pasang AC rumah Bu Sri' && pe.alasan === 'Salah ketik jam' && pe.sesi === 'S'.repeat(40) && !pe.token);
     ok('balasan teknis server tidak tampil mentah; diganti pesan Indonesia', /Perubahan belum bisa disimpan/.test(form.querySelector('.konf-form-pesan').textContent) && !/Exception|konfirmasi_edit/.test(form.querySelector('.konf-form-pesan').textContent));
     balasanEdit = { status: 'gagal', pesan: 'Pengajuan yang sudah diputuskan (di-ACC atau ditolak) tidak bisa diedit' };
     form.querySelector('[data-konf="simpan-edit"]').click(); await tunggu(400);
@@ -47,6 +50,7 @@ window.fetch = function (url, opsi) {
     ok('Batal menutup form dan mengembalikan ACC/Tolak', !kartu[0].querySelector('.konf-form') && kartu[0].querySelector('.konf-aksi').style.display !== 'none');
     kartu[0].querySelector('.konf-edit').click(); await tunggu(50);
     balasanEdit = { status: 'ok', pesan: 'Pengajuan diperbarui dan tetap menunggu ACC' };
+    kartu[0].querySelector('.konf-alasan-edit').value = 'Salah ketik jam';
     kartu[0].querySelector('.konf-ket-edit').value = 'Pasang AC rumah Bu Sri'; kartu[0].querySelector('[data-konf="simpan-edit"]').click(); await tunggu(700);
     ok('berhasil: daftar dimuat ulang dan pengajuan tetap tampil (menunggu ACC)', panggilan.filter(function (x) { return x.aksi === 'konfirmasi_daftar'; }).length >= 2 && el('daftarKonfirmasi').querySelectorAll('.kartu-konf').length === 2 && /Masih menunggu ACC/.test(el('konfPesan').textContent));
   } catch (e) { H.push('GAGAL  galat uji: ' + e.message); }

@@ -240,15 +240,17 @@
   /* lapisan latar menutupi SELURUH layar; wadah tidak menangkap ketukan, hanya kotak menu */
   .menu-wadah { pointer-events: none; }
   .menu-kartu { pointer-events: auto; }
-  #layarKaryawan, #layarTambahKaryawan { padding: 16px 18px; gap: 12px; }
-  #layarPinBaru { gap: 12px; padding-top: 0; }
+  #layarKaryawan { padding: 16px 18px; gap: 12px; }
+  #layarTambahKaryawan, #layarSelesaiKaryawan { padding: 0; }
+  #layarPinBaru { padding: 0; }
+  .keypad.keypad-kecil { gap: 6px; }
+  .keypad.keypad-kecil button { height: 36px; }
   .btn-tambah-besar { height: 66px; flex-shrink: 0; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 18px; font-weight: 800; white-space: nowrap; }
   .btn-lanjut-pin { height: 72px; font-size: 15px; }
   .btn-tambah-besar:disabled { opacity: 0.5; }
   .btn-aktifkan { flex: 1; min-height: 40px; border: 2px solid var(--hijau); border-radius: 999px; background: var(--hijau-muda); color: var(--hijau-tua); font-family: inherit; font-size: 12px; font-weight: 800; padding: 0 12px; white-space: nowrap; }
   .btn-nonaktif-segera { flex: 1; min-height: 40px; border: 2px dashed var(--abu-putus); border-radius: 999px; background: var(--krem); color: var(--abu-sedang); font-family: inherit; font-size: 12px; font-weight: 800; padding: 0 12px; white-space: nowrap; cursor: not-allowed; }
-  #layarPinBaru .kotak-pin { gap: 10px; }
-  #layarPinBaru .pesan-form { min-height: 18px; }
+  #layarPinBaru .pesan-form:empty { display: none; }
   .menu-kartu button.tutup { min-height: 44px; border-bottom: none; border-top: 1px solid var(--krem-gelap); font-weight: 600; color: var(--abu-teks); justify-content: center; }
   .btn-centang { width: 40px; height: 40px; flex-shrink: 0; border: 2px solid var(--hitam); border-radius: 50%; background: var(--putih); display: flex; align-items: center; justify-content: center; padding: 0; }
   .btn-centang:disabled { opacity: 0.4; }
@@ -269,6 +271,8 @@
   #dialog { position: fixed; inset: 0; height: 100dvh; display: none; box-sizing: border-box; padding: calc(22px + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom)); background: rgba(20,17,17,.55); flex-direction: column; justify-content: center; z-index: 30; }
   #dialog.tampil { display: flex; }
   .dialog-kartu { background: var(--putih); border-radius: 26px; padding: 22px 20px 20px; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 390px; margin: 0 auto; }
+  #konfJudul { font-size: 30px; }
+  .dialog-ikon { width: 64px; height: 64px; border-radius: 50%; background: var(--hitam); display: flex; align-items: center; justify-content: center; align-self: center; }
   .dialog-judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; text-align: center; }
   .dialog-sub { font-size: 13px; font-weight: 600; color: var(--abu-tua); text-align: center; }
   .dialog-daftar { display: flex; flex-direction: column; max-height: 40vh; overflow-y: auto; }
@@ -284,6 +288,18 @@
   #pesanLoginPribadi:empty { display: none; }
   #layarPribadi { padding: 0; }
   #layarPribadi { gap: 16px; }
+  /* ---- Daftar karyawan (mockup 58) ---- */
+  .kartu-daftar-kry { background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 0; }
+  .baris-kry { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap); cursor: pointer; }
+  .baris-kry:last-child { border-bottom: none; }
+  .avatar-kry { width: 40px; height: 40px; border-radius: 50%; background: var(--krem); flex-shrink: 0; }
+  .isi-kry { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
+  .nm-kry { font-size: 15px; font-weight: 700; color: var(--hitam); }
+  .nm-kry.mati { color: var(--abu-teks); }
+  .sh-kry { font-size: 12px; color: var(--abu-teks); }
+  .pil-kry { padding: 4px 10px; border-radius: 999px; background: var(--krem); color: var(--hitam); font-size: 12px; font-weight: 800; }
+  .pil-kry.mati { color: var(--abu-teks); }
+  .aksi-sheet { display: flex; flex-direction: column; gap: 8px; }
   /* ---- Beranda HP pribadi (disalin dari mockup 30-32 dan 46) ---- */
   .pb { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 22px 22px 24px; }
   .pb-atas { display: flex; justify-content: space-between; align-items: center; }
@@ -320,7 +336,7 @@
   .pb.admin .pb-kotak { height: 64px; gap: 1px; }
   .pb.admin .pb-kotak svg { width: 22px; height: 22px; }
   .btn-menu-besar { min-height: 64px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 22px; background: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam); white-space: nowrap; }
-  .jumlah-menu { margin-left: auto; padding: 2px 9px; border-radius: 999px; background: var(--kuning); font-size: 12px; font-weight: 800; }
+  .jumlah-menu { margin-left: auto; font-size: 15px; font-weight: 800; }
   .segmen { display: flex; gap: 4px; background: var(--putih); border-radius: 999px; padding: 4px; flex-shrink: 0; }
   .segmen-btn { flex: 1; min-height: 40px; border: none; border-radius: 999px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 800; color: var(--hitam); white-space: nowrap; }
   .segmen-btn.aktif { background: var(--hitam); color: var(--kuning); }
@@ -345,6 +361,24 @@
   .btn-konf-kartu .s { font-size: 12px; font-weight: 600; color: var(--abu-terang); }
   .btn-konf-kartu .jml { padding: 4px 12px; border-radius: 999px; background: var(--kuning); color: var(--hitam); font-size: 15px; font-weight: 800; }
   .btn-konf-kartu .jml:empty { display: none; }
+  /* ---- Kartu shift yang bisa digeser + daftar Belum absen (mockup 49 dan 71) ---- */
+  .geser-kartu { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin-right: -18px; scrollbar-width: none; }
+  .geser-kartu::-webkit-scrollbar { display: none; }
+  .kartu-shift { width: 300px; flex-shrink: 0; scroll-snap-align: start; background: var(--putih); border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; }
+  .kartu-shift .jd { font-size: 15px; font-weight: 800; }
+  .kartu-shift .angka4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+  .kartu-shift .angka4 > div { display: flex; flex-direction: column; align-items: center; }
+  .kartu-shift .n { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; }
+  .kartu-shift .l { font-size: 11px; font-weight: 700; color: var(--abu-tua); }
+  .titik-geser { display: flex; gap: 6px; justify-content: center; }
+  .titik-geser div { width: 8px; height: 8px; border-radius: 999px; background: rgba(20, 17, 17, .3); }
+  .titik-geser div.sekarang { width: 18px; background: var(--hitam); }
+  .kartu-belum { background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .kartu-belum .jd { font-size: 14px; font-weight: 800; }
+  .kartu-belum .b { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .kartu-belum .nm { font-size: 15px; font-weight: 600; }
+  .kartu-belum .jw { font-size: 13px; color: var(--abu-teks); white-space: nowrap; }
+  .kartu-belum .kosong { font-size: 13px; color: var(--abu-teks); }
   .badge-abu { background: var(--abu); }
   .btn-home { flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam); white-space: nowrap; }
   .konf-chips { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -363,7 +397,7 @@
   .konf-edit { align-self: flex-start; min-height: 32px; padding: 0 12px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--abu); flex-shrink: 0; }
   .konf-form { display: flex; flex-direction: column; gap: 8px; }
   .konf-form label { font-size: 13px; font-weight: 700; }
-  .konf-form input[type="time"] { height: 46px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 16px; font-weight: 700; color: var(--hitam); padding: 0 12px; }
+  .konf-form input[type="time"], .konf-form input[type="text"] { height: 46px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 16px; font-weight: 700; color: var(--hitam); padding: 0 12px; }
   .konf-form-pesan { min-height: 18px; font-size: 13px; font-weight: 700; color: var(--merah); }
   .konf-aksi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .konf-aksi button { height: 46px; border-radius: 999px; font-family: inherit; font-size: 15px; font-weight: 800; white-space: nowrap; }
@@ -373,7 +407,7 @@
   .judul-kelompok { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 20px; font-weight: 700; margin-top: 6px; }
   .konf-ket { font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
   .konf-gps { font-size: 12px; font-weight: 700; color: var(--abu-teks); }
-  .link-maps { color: var(--biru-tautan); font-weight: 800; }
+  .link-maps { color: var(--hitam); font-weight: 800; }
   .foto-konf img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 12px; background: var(--hitam-murni); }
   .foto-konf { font-size: 12px; font-weight: 700; color: var(--abu-teks); }
   .btn-acc { flex: 1; min-height: 44px; border: none; border-radius: 999px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; white-space: nowrap; }
@@ -642,16 +676,24 @@
 
   <!-- Beranda admin (minimal: hanya yang sudah punya fungsi) -->
   <div id="layarAdmin" class="layar">
-    <!-- Disalin dari mockup 49. Kartu Hari ini (Hadir/Telat/Izin) dan Perlu evaluasi belum dibuat: belum ada data/aksi server untuk admin. -->
+    <!-- Disalin dari mockup 49. Kartu shift bisa digeser (scroll-snap), daftar "Belum absen" mengikuti kartu yang tampil. "Perlu evaluasi (BAD)" disembunyikan: menunggu data label performa. -->
     <div class="isi-gulir">
       <div class="baris-header">
         <img src="assets/logo.png" alt="Kubah Emas Indonesia">
-        <button type="button" class="badge-hitam badge-menu badge-abu" id="btnMenuAdmin" aria-label="Buka menu" aria-haspopup="true"><span id="admBadge">Admin</span>
-          <svg aria-hidden="true" fill="none" height="14" stroke="#FFD62E" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="14"><path d="M6 9l6 6 6-6"></path></svg>
-        </button>
+        <div class="pb-kanan">
+          <button type="button" class="btn-segarkan" id="btnSegarkanAdmin" aria-label="Segarkan"><svg aria-hidden="true" fill="none" height="18" stroke="var(--abu)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="18"><path d="M20 11a8 8 0 0 0-14.9-3"></path><path d="M4 4v4h4"></path><path d="M4 13a8 8 0 0 0 14.9 3"></path><path d="M20 20v-4h-4"></path></svg></button>
+          <button type="button" class="badge-hitam badge-menu badge-abu" id="btnMenuAdmin" aria-label="Buka menu" aria-haspopup="true"><span id="admBadge">Admin</span>
+            <svg aria-hidden="true" fill="none" height="14" stroke="#FFD62E" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="14"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
       </div>
       <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Hari ini</div><div class="s" id="admTanggal"></div></div></div>
       <span id="admSub" hidden></span>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div class="geser-kartu" id="admKartu"></div>
+        <div class="titik-geser" id="admTitik"></div>
+      </div>
+      <div class="kartu-belum" id="admBelum"></div>
       <button type="button" class="btn-konf-kartu" id="btnAdminKonf"><div class="k"><div class="t">Menunggu konfirmasi</div></div><div class="jml" id="admKonfJumlah"></div></button>
       <div class="catatan-kecil" id="admPesan"></div>
     </div>
@@ -664,52 +706,33 @@
 
   <!-- Karyawan (admin di HP toko; disalin dari mockup 18 Admin - Daftar karyawan) -->
   <div id="layarKaryawan" class="layar">
+    <!-- Disalin dari mockup 58. Baris karyawan aktif lalu nonaktif dalam satu daftar; ketuk baris = sheet aksi (Reset PIN, Nonaktifkan/Aktifkan kembali; lainnya "Segera"). Baris role Admin tidak dikirim server (admin hanya mengelola karyawan). -->
     <div class="isi-gulir">
-      <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam" id="kryBadge">Admin</div></div>
+      <div class="baris-header"><img src="assets/logo.png" alt="Kubah Emas Indonesia"><div class="badge-hitam badge-abu" id="kryBadge">Admin</div></div>
       <div class="judul-blok"><div class="garis"></div><div><div class="h besar">Karyawan</div><div class="s" id="kryNama">Memuat...</div></div></div>
       <button type="button" class="btn-tambah-besar" id="btnTambahKaryawan" disabled>+ Tambah karyawan baru</button>
-      <div class="segmen" id="segmenKaryawan" role="tablist"><button type="button" class="segmen-btn aktif" data-kel="AKTIF">Aktif</button><button type="button" class="segmen-btn" data-kel="NONAKTIF">Nonaktif</button></div>
-      <div id="daftarKaryawanAdmin" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div class="kartu-daftar-kry" id="daftarKaryawanAdmin"></div>
       <div class="catatan-kecil" id="kryPesan" style="color:var(--merah)"></div>
+      <div class="catatan-kecil" style="text-align:center">Ketuk nama untuk reset PIN atau menonaktifkan.</div>
     </div>
-    <div class="bar-bawah"><button type="button" class="btn-garis" id="btnKembaliKaryawan">Kembali</button></div>
+    <div class="bar-bawah"><button type="button" class="btn-home" id="btnKembaliKaryawan">Home</button></div>
   </div>
 
-  <!-- Tambah karyawan (disalin dari mockup 19 Karyawan baru - data) -->
+  <!-- Tambah karyawan: disalin dari mockup 60 (langkah 1 dari 4). "Nama tersedia" dan "Jatah cuti" tidak ditampilkan (tidak ada datanya di sisi HP). -->
   <div id="layarTambahKaryawan" class="layar">
-    <div class="judul-blok"><div class="garis"></div><div><div class="h">Karyawan baru</div><div class="s">Isi oleh admin</div></div></div>
-    <form class="kartu-putih" autocomplete="off" onsubmit="return false">
-      <div class="bidang"><label for="kNama">Nama lengkap (sekaligus username)</label><input id="kNama" maxlength="60" autocomplete="off" autocapitalize="words"></div>
-      <div class="bidang"><label for="kPanggilan">Nama panggilan (tampil di pop-up)</label><input id="kPanggilan" maxlength="30" autocomplete="off" autocapitalize="words"></div>
-      <div class="bidang" id="bidangShift"><label for="kShift">Shift (pola diatur setelah tersimpan)</label><select id="kShift"></select></div>
-      <div class="catatan-abu" id="catatShift" style="display:none"></div>
-      <div class="bidang"><label for="kMulai">Tanggal mulai kerja</label><input id="kMulai" type="date"></div>
-      <div class="catatan-abu">ID otomatis · Cabang mengikuti admin · Role: Karyawan<div style="font-size:12px;font-weight:600;color:var(--abu-teks);margin-top:4px">Role Admin hanya bisa diberikan owner.</div></div>
-    </form>
-    <div class="pesan-form" id="pesanTambahKaryawan"></div>
-    <div style="flex-grow:1"></div>
-    <div class="bar-bawah">
-      <button type="button" class="btn-kembali" id="btnKembaliTambah" aria-label="Kembali">‹</button>
-      <button type="button" class="btn-utama btn-lanjut-pin" id="btnLanjutPin">Lanjut: serahkan HP ke karyawan</button>
-    </div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 30px; width: auto"><div class="kry-badge-langkah" style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin</div></div>
+<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Karyawan baru</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Isi oleh admin</div></div></div><div style="box-sizing: content-box; display: flex; gap: 6px"><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700">Langkah 1 dari 4</div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 14px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kNama" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Nama lengkap (sekaligus username)</label><input id="kNama" maxlength="60" autocomplete="off" autocapitalize="words" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kPanggilan" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Nama panggilan (tampil di pop-up)</label><input id="kPanggilan" maxlength="30" autocomplete="off" autocapitalize="words" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></div><div id="bidangShift" style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kShift" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Shift (pola diatur setelah tersimpan)</label><select id="kShift" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></select></div><div class="catatan-abu" id="catatShift" style="display:none"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kMulai" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal mulai kerja</label><input id="kMulai" type="date" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></div><div style="box-sizing: content-box; background: var(--krem); border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 700">ID otomatis · Cabang mengikuti admin · Role: Karyawan<div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-teks); margin-top: 4px">Role Admin hanya bisa diberikan owner.</div></div></div><div class="pesan-form" id="pesanTambahKaryawan"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" id="btnKembaliTambah" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)">‹</button><button type="button" id="btnLanjutPin" style="flex-grow: 1; height: 72px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 18px; font-weight: 800">Lanjut: serahkan HP ke karyawan</button></div><button type="button" id="btnBatalTambah" style="min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--merah); text-decoration: underline">Batal pendaftaran (data belum disimpan)</button></div>
   </div>
 
-  <!-- Karyawan mengetik PIN dua kali (admin tidak melihat PIN) -->
+  <!-- Karyawan mengetik PIN dua kali: disalin dari mockup 61 (langkah 2 dari 4). Persetujuan data wajah = "Segera" (belum ada fitur wajah). PIN 5 angka (aturan server), bukan 4. Dipakai juga untuk Reset PIN (tanpa bilah langkah dan persetujuan). -->
   <div id="layarPinBaru" class="layar">
-    <div class="judul-blok" style="padding:16px 18px 0"><div class="garis"></div><div><div class="h" id="pinBaruJudul">Halo</div><div class="s" id="pinBaruSub"></div></div></div>
-    <div class="kotak-pin">
-      <div class="pin-judul" id="pinBaruLangkah">Buat PIN 5 angka</div>
-      <div class="pin-ket" id="pinBaruKet">Admin tidak melihat PIN ini. Ketik dua kali.</div>
-      <div class="pin-titik" id="pinBaruTitik"><div></div><div></div><div></div><div></div><div></div></div>
-      <div class="pesan-form" id="pinBaruPesan"></div>
-      <div class="keypad" id="pinBaruKeypad">
-        <button type="button" data-d="1">1</button><button type="button" data-d="2">2</button><button type="button" data-d="3">3</button>
-        <button type="button" data-d="4">4</button><button type="button" data-d="5">5</button><button type="button" data-d="6">6</button>
-        <button type="button" data-d="7">7</button><button type="button" data-d="8">8</button><button type="button" data-d="9">9</button>
-        <button type="button" class="kosong" id="pinBaruBatal">Batal</button><button type="button" data-d="0">0</button><button type="button" id="pinBaruHapus" aria-label="Hapus angka">⌫</button>
-      </div>
-      <div class="pin-ket" id="pinBaruFoto">Foto wajah diambil saat absen sebagai bukti kehadiran dan disimpan 2 bulan.</div>
-    </div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div class="kry-badge-langkah" style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div id="pinBaruJudul" style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Halo</div><div id="pinBaruSub" style="box-sizing: content-box; font-size: 13px; font-weight: 600"></div></div></div><div id="pinBaruBilah"><div style="box-sizing: content-box; display: flex; gap: 6px"><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; margin-top: 6px">Langkah 2 dari 4</div></div><div id="pinBaruSetuju" style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Persetujuan data wajah</div><div style="box-sizing: content-box; font-size: 13px; line-height: 1.5">Foto wajah saya hanya untuk absensi dan dihapus saat saya keluar.</div><button disabled aria-disabled="true" style="min-height: 40px; border: none; border-radius: 14px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: .55" type="button">Saya setuju · Segera</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px"><div id="pinBaruLangkah" style="box-sizing: content-box; font-size: 15px; font-weight: 800; text-align: center">Buat PIN 5 angka</div><div id="pinBaruKet" style="box-sizing: content-box; font-size: 12px; text-align: center; color: var(--abu-teks)">Admin tidak melihat PIN ini. Ketik dua kali.</div><div class="pin-titik" id="pinBaruTitik" style="gap: 18px"><div></div><div></div><div></div><div></div><div></div></div><div class="pesan-form" id="pinBaruPesan" style="text-align: center"></div><div class="keypad keypad-kecil" id="pinBaruKeypad"><button type="button" data-d="1">1</button><button type="button" data-d="2">2</button><button type="button" data-d="3">3</button><button type="button" data-d="4">4</button><button type="button" data-d="5">5</button><button type="button" data-d="6">6</button><button type="button" data-d="7">7</button><button type="button" data-d="8">8</button><button type="button" data-d="9">9</button><div></div><button type="button" data-d="0">0</button><button type="button" id="pinBaruHapus" aria-label="Hapus angka">⌫</button></div><div class="pin-ket" id="pinBaruFoto" style="display:none"></div></div></div><button type="button" id="pinBaruBatal" style="min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--merah); text-decoration: underline">Batal pendaftaran (data belum disimpan)</button><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button id="btnBackPinBaru" aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button">‹ Back</button></div></div>
+  </div>
+
+  <!-- Karyawan baru selesai: disalin dari mockup 63 (langkah 4 dari 4). Uji coba wajah dan "Kirim akun via WA" = "Segera". Akun HP pribadi: karyawan masuk dengan PIN yang baru dibuat (tidak ada password awal 123456 / PIN awal 1234). -->
+  <div id="layarSelesaiKaryawan" class="layar">
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 40px; width: auto"><div class="kry-badge-langkah" style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin</div></div>
+<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Selesai</div><div id="selesaiSub" style="box-sizing: content-box; font-size: 13px; font-weight: 600"></div></div></div><div style="box-sizing: content-box; display: flex; gap: 6px"><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700">Langkah 4 dari 4</div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: center"><div style="box-sizing: content-box; width: 48px; height: 48px; border-radius: 50%; background: var(--krem); flex-shrink: 0"></div><div style="box-sizing: content-box; display: flex; flex-direction: column"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Uji coba wajah · Segera</div><div style="box-sizing: content-box; font-size: 13px; color: var(--abu-teks)">Pengenalan wajah belum tersedia.</div></div></div><button disabled aria-disabled="true" style="min-height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); opacity: .55" type="button">Uji coba lagi · Segera</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Akun HP pribadi</div><div style="box-sizing: content-box; display: grid; grid-template-columns: 90px 1fr; gap: 6px; font-size: 14px"><div style="box-sizing: content-box; color: var(--abu-teks); font-weight: 600">Username</div><div id="selesaiUser" style="box-sizing: content-box; font-weight: 800"></div><div style="box-sizing: content-box; color: var(--abu-teks); font-weight: 600">Login</div><div style="box-sizing: content-box; font-weight: 800">PIN 5 angka</div></div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks)">PIN dibuat sendiri oleh karyawan dan tidak diketahui admin.</div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" id="btnSelesaiKaryawan" style="width: 110px; flex-shrink: 0; height: 56px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)">Selesai</button><button type="button" disabled aria-disabled="true" style="flex-grow: 1; height: 56px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 16px; font-weight: 800; opacity: .55; white-space: nowrap">Kirim akun via WA · Segera</button></div></div>
   </div>
 
   <!-- Login HP pribadi: disalin dari mockup 29 (satu kolom Password: PIN karyawan atau kata sandi admin; server yang membedakan) -->
@@ -831,9 +854,9 @@
 </div>
   </div>
 
-  <!-- Akun saya (HP pribadi): disalin dari mockup 44; Shift bawaan, HP terikat, Ganti password dan Ganti PIN belum ada fiturnya ("Segera") -->
+  <!-- Akun saya (HP pribadi): disalin dari mockup 44; Shift bawaan, Ganti password dan Ganti PIN belum ada fiturnya ("Segera") -->
 <div id="layarAkun" class="layar">
-<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 16px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 40px; width: auto"/></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Akun saya</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Data diatur admin cabang</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 6px 16px; display: flex; flex-direction: column; gap: 0px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Nama lengkap / username</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunNama">Budi Santoso</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">ID karyawan</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunId">EMP012</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Cabang</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunCabang">Ngawi</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Shift bawaan</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span style="color: var(--abu-teks)">Segera</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; "><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">HP terikat</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span style="color: var(--abu-teks)">Segera</span></div></div></div><button disabled style="opacity: .55; min-height: 64px; border: none; border-radius: 20px; background: var(--abu); color: var(--putih); font-family: inherit; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; text-align: left" type="button"><div style="box-sizing: content-box; display: flex; flex-direction: column"><div style="box-sizing: content-box; font-size: 16px; font-weight: 800; color: var(--kuning)">Ganti password</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Untuk login di HP ini · Segera</div></div><div style="box-sizing: content-box; font-size: 20px; font-weight: 800; color: var(--kuning)">›</div></button><button disabled style="opacity: .55; min-height: 64px; border: none; border-radius: 20px; background: var(--abu); color: var(--putih); font-family: inherit; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; text-align: left" type="button"><div style="box-sizing: content-box; display: flex; flex-direction: column"><div style="box-sizing: content-box; font-size: 16px; font-weight: 800; color: var(--kuning)">Ganti PIN</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Untuk absen di HP toko · Segera</div></div><div style="box-sizing: content-box; font-size: 20px; font-weight: 800; color: var(--kuning)">›</div></button></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600; line-height: 1.45; text-align: center">Ganti HP? Minta admin reset ikatan HP.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button id="btnAkunHome" aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button">Home</button></div></div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 16px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 40px; width: auto"/></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Akun saya</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Data diatur admin cabang</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 6px 16px; display: flex; flex-direction: column; gap: 0px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Nama lengkap / username</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunNama">Budi Santoso</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">ID karyawan</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunId">EMP012</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Cabang</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span id="akunCabang">Ngawi</span></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--krem-gelap);"><div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-teks)">Shift bawaan</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; text-align: right"><span style="color: var(--abu-teks)">Segera</span></div></div></div><button disabled style="opacity: .55; min-height: 64px; border: none; border-radius: 20px; background: var(--abu); color: var(--putih); font-family: inherit; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; text-align: left" type="button"><div style="box-sizing: content-box; display: flex; flex-direction: column"><div style="box-sizing: content-box; font-size: 16px; font-weight: 800; color: var(--kuning)">Ganti password</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Untuk login di HP ini · Segera</div></div><div style="box-sizing: content-box; font-size: 20px; font-weight: 800; color: var(--kuning)">›</div></button><button disabled style="opacity: .55; min-height: 64px; border: none; border-radius: 20px; background: var(--abu); color: var(--putih); font-family: inherit; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; text-align: left" type="button"><div style="box-sizing: content-box; display: flex; flex-direction: column"><div style="box-sizing: content-box; font-size: 16px; font-weight: 800; color: var(--kuning)">Ganti PIN</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Untuk absen di HP toko · Segera</div></div><div style="box-sizing: content-box; font-size: 20px; font-weight: 800; color: var(--kuning)">›</div></button></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button id="btnAkunHome" aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button">Home</button></div></div>
 </div>
 
   <!-- Riwayat absen milik sendiri -->
@@ -1039,6 +1062,7 @@
   const semuaLayar = document.querySelectorAll('.layar');
   function tampilLayar(el) {
     semuaLayar.forEach(function (l) { l.classList.toggle('aktif', l === el); });
+    if (el === layarAdmin && typeof muatBerandaAdmin === 'function') { setTimeout(muatBerandaAdmin, 0); }
     if (el !== layarPilihNama && el !== layarLuar) { matikanKamera(); }
     window.scrollTo(0, 0);
   }
@@ -2347,7 +2371,7 @@
 
   document.getElementById('btnOwnerLogout').addEventListener('click', function () {
     bukaDialog(
-      '<div class="dialog-judul">Log out?</div><div class="dialog-sub">Owner</div>' +
+      '<div class="dialog-ikon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--kuning)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div><div class="dialog-judul">Log out?</div><div class="dialog-sub">Owner</div>' +
       '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Log out</button></div>');
     document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
     document.getElementById('dlgYa').addEventListener('click', function () {
@@ -2369,7 +2393,7 @@
   function adminAktifDiLayar() {
     if (modePribadiAdmin) { return false; } // HP pribadi: tidak ada batas 2 menit
     if (modeKonf === 'TOKO' && layarKonfirmasi.classList.contains('aktif')) { return true; }
-    return [layarLoginAdmin, layarAdmin, layarKaryawan, layarTambahKaryawan, layarPinBaru].some(function (l) { return l.classList.contains('aktif'); });
+    return [layarLoginAdmin, layarAdmin, layarKaryawan, layarTambahKaryawan, layarPinBaru, document.getElementById('layarSelesaiKaryawan')].some(function (l) { return l.classList.contains('aktif'); });
   }
   function mulaiDiamAdmin() {
     clearTimeout(timerDiamAdmin);
@@ -2433,8 +2457,6 @@
   const layarKaryawan = document.getElementById('layarKaryawan');
   const layarTambahKaryawan = document.getElementById('layarTambahKaryawan');
   const layarPinBaru = document.getElementById('layarPinBaru');
-  const segmenKaryawan = document.getElementById('segmenKaryawan');
-  let kelompokKaryawan = 'AKTIF'; // hanya SATU kelompok tampil sekaligus
   let karyawanData = null;   // balasan karyawan_daftar
   let pinBaruMode = '';      // 'TAMBAH' | 'RESET'
   let pinBaruData = null;    // data karyawan baru (TAMBAH) atau { id, nama } (RESET); hanya di memori
@@ -2465,55 +2487,41 @@
 
   function muatKaryawan() {
     document.getElementById('btnTambahKaryawan').disabled = true; // data shift harus termuat dulu (panggilan server butuh beberapa detik)
-    kirimPost({ aksi: 'karyawan_daftar', token: kredAdmin().token, sesi: kredAdmin().sesi, kelompok: kelompokKaryawan })
-      .then(function (d) {
-        if (adminGagalUmum(d)) { return; }
-        if (d.status !== 'ok') { pesanKaryawan(d.pesan || 'Gagal memuat.'); return; }
-        karyawanData = d;
+    const ambil = function (kel) { return kirimPost({ aksi: 'karyawan_daftar', token: kredAdmin().token, sesi: kredAdmin().sesi, kelompok: kel }); };
+    Promise.all([ambil('AKTIF'), ambil('NONAKTIF')])
+      .then(function (r) {
+        const a = r[0], n = r[1];
+        if (adminGagalUmum(a)) { return; }
+        if (a.status !== 'ok') { pesanKaryawan(a.pesan || 'Gagal memuat.'); return; }
+        karyawanData = a;
+        karyawanData.daftar = a.daftar.concat(n && n.status === 'ok' ? n.daftar : []); // aktif dulu, nonaktif di bawah (mockup 58)
         document.getElementById('btnTambahKaryawan').disabled = false;
-        document.getElementById('kryBadge').textContent = 'Admin ' + d.cabang;
-        document.getElementById('kryNama').textContent = 'Cabang ' + d.cabang + ' · ' + d.jumlah_aktif + ' aktif';
-        document.getElementById('daftarKaryawanAdmin').innerHTML = d.daftar.length ? d.daftar.map(function (k, i) {
-          return '<div class="kartu-hp"><div class="hp-baris"><div style="min-width:0"><div class="nama-hp-besar">' + escHtml(k.nama) + '</div>' +
-            '<div class="hp-nama">' + escHtml(k.panggilan) + ' · Shift ' + escHtml(k.shift) + ' · ' + escHtml(k.id) + '</div></div>' +
-            (k.aktif ? '' : '<div class="badge-nonaktif">Nonaktif</div>') + '</div>' +
-            (k.aktif ? '<div class="aksi-hp"><button type="button" class="btn-biasa-garis" data-kry="reset" data-i="' + i + '">Reset PIN</button>' +
-              '<button type="button" class="btn-merah-garis" data-kry="nonaktif" data-i="' + i + '">Nonaktifkan</button></div>'
-              : '<div class="aksi-hp"><button type="button" class="btn-aktifkan" data-kry="aktifkan" data-i="' + i + '">Aktifkan kembali</button></div>') +
-            '<div class="aksi-hp"><button type="button" class="btn-nonaktif-segera" disabled aria-disabled="true">Daftar wajah · Segera</button></div></div>';
+        document.getElementById('kryBadge').textContent = 'Admin ' + a.cabang;
+        document.getElementById('kryNama').textContent = 'Cabang ' + a.cabang + ' · ' + a.jumlah_aktif + ' aktif';
+        document.getElementById('daftarKaryawanAdmin').innerHTML = karyawanData.daftar.length ? karyawanData.daftar.map(function (k, i) {
+          return '<div class="baris-kry" role="button" tabindex="0" data-kry="buka" data-i="' + i + '"><div class="avatar-kry"></div>' +
+            '<div class="isi-kry"><div class="nm-kry' + (k.aktif ? '' : ' mati') + '">' + escHtml(k.nama) + '</div><div class="sh-kry">Shift ' + escHtml(k.shift) + '</div></div>' +
+            '<div class="pil-kry' + (k.aktif ? '' : ' mati') + '">' + (k.aktif ? 'Karyawan' : 'Nonaktif') + '</div></div>';
         }).join('') : '<div class="hp-ket">Belum ada karyawan untuk ditampilkan.</div>';
       })
       .catch(function () { pesanKaryawan('Tidak bisa terhubung ke server.'); });
   }
 
   document.getElementById('btnMenuKaryawan').addEventListener('click', function () { modePribadiAdmin = false; bukaKaryawan(); });
-  segmenKaryawan.addEventListener('click', function (e) {
-    const b = e.target.closest('button[data-kel]');
-    if (!b) { return; }
-    kelompokKaryawan = b.getAttribute('data-kel');
-    segmenKaryawan.querySelectorAll('button').forEach(function (x) { x.classList.toggle('aktif', x === b); });
-    muatKaryawan();
-  });
   document.getElementById('btnKembaliKaryawan').addEventListener('click', function () { tampilLayar(modePribadiAdmin ? layarPribadi : layarAdmin); });
 
-  document.getElementById('daftarKaryawanAdmin').addEventListener('click', function (e) {
-    const tombol = e.target.closest('button[data-kry]');
-    if (!tombol || !karyawanData) { return; }
-    const k = karyawanData.daftar[Number(tombol.getAttribute('data-i'))];
-    if (!k) { return; }
-    if (tombol.getAttribute('data-kry') === 'reset') {
-      bukaPinBaru('RESET', { id: k.id, nama: k.nama });
-      return;
-    }
-    if (tombol.getAttribute('data-kry') === 'aktifkan') {
-      tombol.disabled = true;
+  // Aksi pada satu karyawan (dari sheet aksi yang dibuka dengan mengetuk baris)
+  function aksiKaryawan(aksi, k) {
+    if (aksi === 'reset') { tutupDialog(); bukaPinBaru('RESET', { id: k.id, nama: k.nama }); return; }
+    if (aksi === 'aktifkan') {
+      tutupDialog();
       kirimPost({ aksi: 'karyawan_aktifkan', token: kredAdmin().token, sesi: kredAdmin().sesi, id: k.id })
         .then(function (d) {
           if (adminGagalUmum(d)) { return; }
           pesanKaryawan(d.status === 'ok' ? k.nama + ' diaktifkan kembali.' : (d.pesan || 'Gagal.'));
-          muatKaryawan(); // baris pindah ke daftar aktif
+          muatKaryawan();
         })
-        .catch(function () { tombol.disabled = false; pesanKaryawan('Tidak bisa terhubung ke server.'); });
+        .catch(function () { pesanKaryawan('Tidak bisa terhubung ke server.'); });
       return;
     }
     bukaDialog(
@@ -2533,6 +2541,36 @@
         })
         .catch(function () { tutupDialog(); pesanKaryawan('Tidak bisa terhubung ke server.'); });
     });
+  }
+  function bukaSheetKaryawan(k) {
+    bukaDialog(
+      '<div class="dialog-judul">' + escHtml(k.nama) + '</div>' +
+      '<div class="dialog-sub">' + escHtml(k.panggilan) + ' · Shift ' + escHtml(k.shift) + ' · ' + escHtml(k.id) + '</div>' +
+      '<div class="aksi-sheet">' +
+        (k.aktif ? '<button type="button" class="btn-biasa-garis" data-sh="reset">Reset PIN</button><button type="button" class="btn-merah-garis" data-sh="nonaktif">Nonaktifkan</button>'
+                 : '<button type="button" class="btn-aktifkan" data-sh="aktifkan">Aktifkan kembali</button>') +
+        '<button type="button" class="btn-nonaktif-segera" disabled aria-disabled="true">Ubah data · Segera</button>' +
+        '<button type="button" class="btn-nonaktif-segera" disabled aria-disabled="true">Pola shift · Segera</button>' +
+        '<button type="button" class="btn-nonaktif-segera" disabled aria-disabled="true">Daftar wajah · Segera</button>' +
+        '<button type="button" class="btn-garis" data-sh="tutup">Tutup</button></div>');
+    dialog.querySelectorAll('button[data-sh]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        const a = b.getAttribute('data-sh');
+        if (a === 'tutup') { tutupDialog(); } else { aksiKaryawan(a, k); }
+      });
+    });
+  }
+  function bukaBarisKaryawan(el) {
+    const k = karyawanData && karyawanData.daftar[Number(el.getAttribute('data-i'))];
+    if (k) { bukaSheetKaryawan(k); }
+  }
+  document.getElementById('daftarKaryawanAdmin').addEventListener('click', function (e) {
+    const baris = e.target.closest('[data-kry="buka"]');
+    if (baris) { bukaBarisKaryawan(baris); }
+  });
+  document.getElementById('daftarKaryawanAdmin').addEventListener('keydown', function (e) {
+    const baris = e.target.closest('[data-kry="buka"]');
+    if (baris && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); bukaBarisKaryawan(baris); }
   });
 
   // ---- Tambah karyawan: admin mengisi data, lalu HP diserahkan ke karyawan untuk mengetik PIN dua kali ----
@@ -2557,13 +2595,17 @@
     }).join('');
     // Shift tidak wajib: satu shift = otomatis (tanpa dropdown); lebih dari satu = dropdown, shift pertama bawaan.
     const catat = document.getElementById('catatShift');
-    document.getElementById('bidangShift').style.display = shifts.length > 1 ? '' : 'none';
-    catat.style.display = shifts.length > 1 ? 'none' : '';
-    catat.textContent = shifts.length === 1 ? 'Shift otomatis: ' + teksShift(shifts[0]) : 'Belum ada shift untuk cabang ini di sheet shift.';
+    document.getElementById('bidangShift').style.display = shifts.length > 0 ? '' : 'none';
+    catat.style.display = shifts.length > 0 ? 'none' : '';
+    catat.textContent = 'Belum ada shift untuk cabang ini di sheet shift.';
     document.getElementById('btnLanjutPin').disabled = shifts.length === 0;
+    document.querySelectorAll('.kry-badge-langkah').forEach(function (b) { b.textContent = 'Admin ' + karyawanData.cabang; });
     tampilLayar(layarTambahKaryawan);
   });
   document.getElementById('btnKembaliTambah').addEventListener('click', function () { tampilLayar(layarKaryawan); });
+  document.getElementById('btnBatalTambah').addEventListener('click', function () { tampilLayar(layarKaryawan); });
+  document.getElementById('btnBackPinBaru').addEventListener('click', function () { batalPinBaru(); });
+  document.getElementById('btnSelesaiKaryawan').addEventListener('click', function () { tampilLayar(layarKaryawan); });
 
   document.getElementById('btnLanjutPin').addEventListener('click', function () {
     const data = { nama: kNama.value.trim(), panggilan: kPanggilan.value.trim(), shift: kShift.value, mulai_kerja: kMulai.value };
@@ -2590,7 +2632,11 @@
     pinBaruData = data;
     document.getElementById('pinBaruJudul').textContent = mode === 'TAMBAH' ? 'Halo, ' + data.panggilan : 'PIN baru untuk ' + data.nama;
     document.getElementById('pinBaruSub').textContent = mode === 'TAMBAH' ? 'Diisi sendiri oleh karyawan' : 'Diketik oleh karyawan, tanpa PIN awal';
-    document.getElementById('pinBaruFoto').style.display = mode === 'TAMBAH' ? '' : 'none';
+    const tambah = mode === 'TAMBAH';
+    document.getElementById('pinBaruBilah').style.display = tambah ? '' : 'none';
+    document.getElementById('pinBaruSetuju').style.display = tambah ? 'flex' : 'none';
+    document.getElementById('pinBaruBatal').textContent = tambah ? 'Batal pendaftaran (data belum disimpan)' : 'Batal';
+    document.querySelectorAll('.kry-badge-langkah').forEach(function (b) { b.textContent = 'Admin ' + (karyawanData ? karyawanData.cabang : ''); });
     gambarPinBaru();
     tampilLayar(layarPinBaru);
   }
@@ -2645,9 +2691,15 @@
           return;
         }
         resetPinBaru();
-        pesanKaryawan(mode === 'TAMBAH' ? nama + ' ditambahkan (ID ' + d.id + ').' : 'PIN ' + nama + ' sudah diganti.');
-        tampilLayar(layarKaryawan);
         muatKaryawan();
+        if (mode === 'TAMBAH') {
+          document.getElementById('selesaiSub').textContent = nama + ' · ' + d.id;
+          document.getElementById('selesaiUser').textContent = nama;
+          tampilLayar(document.getElementById('layarSelesaiKaryawan'));
+        } else {
+          pesanKaryawan('PIN ' + nama + ' sudah diganti.');
+          tampilLayar(layarKaryawan);
+        }
       })
       .catch(function () {
         pinBaruMengirim = false;
@@ -2676,7 +2728,7 @@
 
   document.getElementById('btnAdminLogout').addEventListener('click', function () {
     bukaDialog(
-      '<div class="dialog-judul">Log out?</div><div class="dialog-sub">' + escHtml(document.getElementById('admSub').textContent) + ' · ' + escHtml(document.getElementById('admBadge').textContent) + '</div>' +
+      '<div class="dialog-ikon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--kuning)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div><div class="dialog-judul">Log out?</div><div class="dialog-sub">' + escHtml(document.getElementById('admSub').textContent) + ' · ' + escHtml(document.getElementById('admBadge').textContent) + '</div>' +
       '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Log out</button></div>');
     document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
     document.getElementById('dlgYa').addEventListener('click', keluarAdmin);
@@ -2882,7 +2934,7 @@
 
   function dialogLogoutPribadi() {
     bukaDialog(
-      '<div class="dialog-judul">Log out?</div><div class="dialog-sub">' + escHtml(profilPribadi ? profilPribadi.nama : '') + '</div>' +
+      '<div class="dialog-ikon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--kuning)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div><div class="dialog-judul">Log out?</div><div class="dialog-sub">' + escHtml(profilPribadi ? profilPribadi.nama : '') + '</div>' +
       '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Log out</button></div>');
     document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
     document.getElementById('dlgYa').addEventListener('click', function () {
@@ -3176,11 +3228,12 @@
     daftarKonfirmasi.innerHTML = '';
     document.getElementById('btnMuatLagi').style.display = 'none';
     document.getElementById('konfSub').textContent = 'Memuat...';
+    document.getElementById('konfSub').style.display = mode === 'OWNER' ? '' : 'none';
     pesanKonf('');
     konfKelPilih = '';
     document.getElementById('konfJudul').textContent = mode === 'OWNER' ? 'Konfirmasi data admin' : 'Konfirmasi';
     document.getElementById('konfCatatan').style.display = mode === 'OWNER' ? '' : 'none';
-    document.getElementById('konfBadge').textContent = mode === 'OWNER' ? 'Owner' : 'Admin ' + (mode === 'PRIBADI' ? (profilPribadi ? profilPribadi.cabang : '') : (document.getElementById('namaCabang').textContent || ''));
+    document.getElementById('konfBadge').textContent = mode === 'OWNER' ? 'Owner' : 'Admin ' + (mode === 'PRIBADI' ? (profilPribadi ? profilPribadi.cabang : '') : (document.getElementById('admBadge').textContent || '').replace(/^Admin\s+/, ''));
     gambarChipKonf();
     // Owner: filter cabang hanya kalau cabang lebih dari satu
     const adaFilter = mode === 'OWNER' && infoHari && infoHari.tampilkan_dropdown_cabang;
@@ -3204,12 +3257,24 @@
 
   function teksKonfirmasiDurasi(menit) { return teksDurasi(menit); }
 
+  // Tanggal ala mockup 52: "Hari ini", "Kemarin", atau "Sabtu 26 Sep"
+  function tglKonf(tanggal) {
+    const p = String(tanggal || '').split('-');
+    if (p.length !== 3) { return String(tanggal || ''); }
+    const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+    const sk = new Date(); sk.setHours(0, 0, 0, 0);
+    const selisih = Math.round((sk - d) / 86400000);
+    if (selisih === 0) { return 'Hari ini'; }
+    if (selisih === 1) { return 'Kemarin'; }
+    return ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][d.getDay()] + ' ' + d.getDate() + ' ' + NAMA_BULAN[d.getMonth()].slice(0, 3);
+  }
   const NAMA_TIPE = { LUAR: 'Absen luar', LEMBUR: 'Lembur', PULANG_CEPAT: 'Pulang cepat' };
   function kartuKonfirmasi(it) {
     let tipe = NAMA_TIPE[it.kelompok] || it.kelompok;
     if (it.kelompok === 'LUAR') { tipe += ', ' + (it.jenis === 'MASUK' ? 'masuk' : 'pulang'); }
-    if (it.kelompok === 'LEMBUR' && it.tingkat) { tipe += ' tingkat ' + it.tingkat + ' · ' + teksKonfirmasiDurasi(it.durasi_menit); }
-    const detail = [tglTampil(it.tanggal) + ' ' + (it.jam || '-')];
+    if (it.kelompok === 'LEMBUR' && it.tingkat) { tipe += ' ' + (['', '<1 jam', '1–2 jam', '>2 jam'][it.tingkat] || ''); }
+    const detail = [tglKonf(it.tanggal) + ' ' + (it.jam || '-')];
+    if (it.kelompok === 'LEMBUR' && it.durasi_menit) { detail.push(teksKonfirmasiDurasi(it.durasi_menit)); }
     if (it.ket) { detail.push(it.ket); }
     if (it.cabang && modeKonf === 'OWNER') { detail.push(it.cabang + ' · Shift ' + it.shift); }
     let gps = '';
@@ -3311,7 +3376,7 @@
   }
 
   // Edit pengajuan absen luar (jam dan keterangan saja). Pesan dari server hanya ditampilkan bila pesan Indonesia yang dikenal.
-  const POLA_PESAN_EDIT = /^(Jam|Keterangan|Pengajuan|Hanya|Admin|Owner|Absen|Lembur|Jadwal|Item|Pulang)/;
+  const POLA_PESAN_EDIT = /^(Jam|Alasan|Keterangan|Pengajuan|Hanya|Admin|Owner|Absen|Lembur|Jadwal|Item|Pulang)/;
   function pesanEditRamah(d) {
     const p = String((d && d.pesan) || '');
     return POLA_PESAN_EDIT.test(p) && p.length <= 160 ? p : 'Perubahan belum bisa disimpan. Coba lagi, atau pastikan aplikasi sudah versi terbaru.';
@@ -3321,11 +3386,13 @@
     const pesan = form.querySelector('.konf-form-pesan');
     const jam = form.querySelector('.konf-jam').value;
     const ket = form.querySelector('.konf-ket-edit').value.trim();
+    const alasan = form.querySelector('.konf-alasan-edit').value.trim();
     if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(jam)) { pesan.textContent = 'Isi jam dengan benar.'; return; }
     if (ket.length < 5) { pesan.textContent = 'Keterangan wajib diisi, minimal 5 karakter.'; return; }
+    if (alasan.length < 5) { pesan.textContent = 'Alasan mengubah wajib diisi, minimal 5 karakter.'; return; }
     form.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
     pesan.textContent = 'Menyimpan...';
-    kirimPost(Object.assign({ aksi: 'konfirmasi_edit', id: kartu.getAttribute('data-id'), jam: jam, keterangan: ket }, kredKonf()))
+    kirimPost(Object.assign({ aksi: 'konfirmasi_edit', id: kartu.getAttribute('data-id'), jam: jam, keterangan: ket, alasan: alasan }, kredKonf()))
       .then(function (d) {
         if (konfGagalSesi(d)) { return; }
         if (d.status === 'ok') {
@@ -3351,6 +3418,7 @@
       form.className = 'konf-form';
       form.innerHTML = '<label>Jam (JJ:MM)</label><input type="time" class="konf-jam" value="' + escHtml(kartu.getAttribute('data-jam') || '') + '">' +
         '<label>Keterangan (wajib, minimal 5 karakter)</label><textarea class="area-tujuan konf-ket-edit" maxlength="100">' + escHtml(kartu.getAttribute('data-ket') || '') + '</textarea>' +
+        '<label>Alasan mengubah (wajib, minimal 5 karakter, dicatat di log)</label><input type="text" class="konf-alasan-edit" maxlength="100" autocomplete="off">' +
         '<div class="konf-form-pesan"></div>' +
         '<div class="konf-aksi"><button type="button" class="acc" data-konf="simpan-edit">Simpan</button><button type="button" class="tolak" data-konf="batal-edit">Batal</button></div>';
       kartu.appendChild(form);
@@ -3416,8 +3484,49 @@
     const tugas = [];
     if (sesiOwner && layarOwner.classList.contains('aktif')) { tugas.push(muatJumlahKonfirmasi('OWNER', 'ownerKonfJumlah')); }
     if (sesiAdmin && layarAdmin.classList.contains('aktif')) { tugas.push(muatJumlahKonfirmasi('TOKO', 'admKonfJumlah')); }
+    if (sesiAdmin && layarAdmin.classList.contains('aktif')) { tugas.push(muatBerandaAdmin()); }
     if (sesiPribadi && layarPribadi.classList.contains('aktif') && profilPribadi && profilPribadi.role === 'ADMIN') { tugas.push(muatJumlahKonfirmasi('PRIBADI', 'pribMenuAdminJumlah')); }
     return Promise.all(tugas);
+  }
+  // ---- Kartu Hari ini (angka per shift, bisa digeser) + daftar Belum absen: dipakai beranda admin dan owner ----
+  const NAMA_BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  function tglPanjang(d) {
+    const p = String(d.tanggal || '').split('-');
+    if (p.length !== 3) { return ''; }
+    return d.hari + ', ' + Number(p[2]) + ' ' + NAMA_BULAN[Number(p[1]) - 1] + ' ' + p[0] + ' · ' + d.jam;
+  }
+  function htmlKartuShift(judul, a) {
+    function k(n, label, warna) { return '<div><div class="n" style="color:' + warna + '">' + Number(n) + '</div><div class="l">' + label + '</div></div>'; }
+    return '<div class="kartu-shift"><div class="jd">' + escHtml(judul) + '</div><div class="angka4">' +
+      k(a.hadir, 'Hadir', 'var(--hijau)') + k(a.telat, 'Telat', 'var(--merah)') + k(a.belum, 'Belum absen', 'var(--hitam)') + k(a.izin, 'Izin/cuti', 'var(--hitam)') + '</div></div>';
+  }
+  function gambarBerandaShift(d, idKartu, idTitik, idBelum) {
+    const kartu = document.getElementById(idKartu), titik = document.getElementById(idTitik), belum = document.getElementById(idBelum);
+    const judul = ['Semua shift'].concat(d.shift.map(function (s) { return s.nama + (s.masuk ? ' · ' + s.masuk : ''); }));
+    kartu.innerHTML = htmlKartuShift('Semua shift', d.semua) + d.shift.map(function (s, i) { return htmlKartuShift(judul[i + 1], s); }).join('');
+    titik.innerHTML = judul.map(function (x, i) { return '<div' + (i === 0 ? ' class="sekarang"' : '') + '></div>'; }).join('');
+    function isiBelum(i) {
+      const daftar = i === 0 ? [].concat.apply([], d.shift.map(function (s) { return s.belum_daftar; })).sort(function (x, y) { return x.jadwal < y.jadwal ? -1 : (x.jadwal > y.jadwal ? 1 : (x.nama < y.nama ? -1 : 1)); }) : d.shift[i - 1].belum_daftar;
+      belum.innerHTML = '<div class="jd">Belum absen (' + (i === 0 ? 'semua shift' : 'shift ' + d.shift[i - 1].no) + ')</div>' +
+        (daftar.length ? daftar.map(function (x) { return '<div class="b"><div class="nm">' + escHtml(x.nama) + '</div><div class="jw">jadwal ' + escHtml(x.jadwal) + '</div></div>'; }).join('') : '<div class="kosong">Tidak ada yang belum absen.</div>');
+    }
+    isiBelum(0);
+    kartu.scrollLeft = 0;
+    kartu.onscroll = function () {
+      const i = Math.max(0, Math.min(judul.length - 1, Math.round(kartu.scrollLeft / 310)));
+      Array.prototype.forEach.call(titik.children, function (t, j) { t.classList.toggle('sekarang', j === i); });
+      isiBelum(i);
+    };
+  }
+  function muatBerandaAdmin() {
+    if (!sesiAdmin || !hpAktif) { return Promise.resolve(); }
+    return kirimPost({ aksi: 'beranda_hari_ini', token: hpAktif.token, sesi: sesiAdmin })
+      .then(function (d) {
+        if (d.status !== 'ok') { return; }
+        document.getElementById('admTanggal').textContent = tglPanjang(d);
+        gambarBerandaShift(d, 'admKartu', 'admTitik', 'admBelum');
+      })
+      .catch(function () { /* angka lama tetap tampil */ });
   }
   // Segarkan beranda: ikon kecil di tiap home + otomatis saat aplikasi dibuka atau kembali ke layar depan.
   let sedangSegarkan = false;
@@ -3472,7 +3581,7 @@
     if (menuAdmin.classList.contains('tampil')) { tutupMenuAdmin(); return; }
     if (layarPerhatian.classList.contains('aktif') || layarKelolaHp.classList.contains('aktif')) { tampilLayar(layarOwner); return; }
     if (layarPinBaru.classList.contains('aktif')) { batalPinBaru(); return; }
-    if (layarTambahKaryawan.classList.contains('aktif')) { tampilLayar(layarKaryawan); return; }
+    if (layarTambahKaryawan.classList.contains('aktif') || document.getElementById('layarSelesaiKaryawan').classList.contains('aktif')) { tampilLayar(layarKaryawan); return; }
     if (layarKaryawan.classList.contains('aktif')) { tampilLayar(modePribadiAdmin ? layarPribadi : layarAdmin); return; }
     if (menuPribadi.classList.contains('tampil')) { tutupMenuPribadi(); return; }
     if (layarLuar.classList.contains('aktif')) { keluarLuar(); return; }
