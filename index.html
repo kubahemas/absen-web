@@ -310,6 +310,8 @@
   .sh-kry { font-size: 12px; color: var(--abu-teks); }
   .pil-kry { padding: 4px 10px; border-radius: 999px; background: var(--krem); color: var(--hitam); font-size: 12px; font-weight: 800; }
   .pil-kry.mati { color: var(--abu-teks); }
+  .pil-kry.admin { background: var(--hitam); color: var(--kuning); }
+  .baris-kry.baca { cursor: default; }
   .aksi-sheet { display: flex; flex-direction: column; gap: 8px; }
   /* ---- Beranda HP pribadi (disalin dari mockup 30-32 dan 46) ---- */
   .pb { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 22px 22px 24px; }
@@ -338,6 +340,9 @@
   .pb-offline .kiri { display: flex; align-items: center; gap: 8px; }
   .pb-offline .titik { width: 8px; height: 8px; border-radius: 50%; background: var(--kuning); }
   .pb-offline .kanan { color: var(--kuning); }
+  .kartu-tidak-masuk { background: transparent; border: 2px dashed var(--abu); border-radius: 20px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; font-family: inherit; text-align: left; }
+  .kartu-tidak-masuk .atas { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+  .kartu-tidak-masuk .j { font-size: 13px; font-weight: 800; color: var(--hitam); }
   .pb-catatan-luar { font-size: 12px; font-weight: 700; text-align: center; margin-top: -4px; }
   .pb-lembur { height: 62px; border: none; border-radius: 20px; background: var(--hitam); color: var(--putih); font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 28px; }
   .pb-lembur .judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; }
@@ -473,6 +478,25 @@
   #btnBatalNama { background: transparent; border: none; text-align: center; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 4px; text-decoration: underline; }
 
 
+  /* ---- Pilih nama + PIN: penyelarasan ke mockup 09 ---- */
+  #layarPilihNama .pilih-atas { gap: 9px; }
+  #layarPilihNama .pn-baris-foto { display: flex; gap: 14px; align-items: center; }
+  #layarPilihNama .foto-lingkar { position: relative; overflow: hidden; width: 76px; height: 76px; border-radius: 50%; background: var(--krem); border: 5px solid var(--abu); box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--abu-teks); text-align: center; }
+  #layarPilihNama .foto-lingkar .lingkar-kamera { position: absolute; inset: 0; top: 0; right: 0; width: auto; height: auto; border: none; border-radius: 0; }
+  #layarPilihNama .pn-teks-foto { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  #layarPilihNama .pilih-judul { font-size: 26px; line-height: 1.1; }
+  #layarPilihNama .pn-sub { font-size: 13px; font-weight: 600; }
+  .btn-foto-ulang { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 2px solid var(--hitam); border-radius: 999px; background: var(--putih); font-family: inherit; font-size: 13px; font-weight: 800; color: var(--hitam); white-space: nowrap; }
+  #layarPilihNama .huruf-daftar button { min-width: 36px; min-height: 36px; border-radius: 12px; font-size: 15px; }
+  #layarPilihNama .pn-label-nama { font-size: 13px; font-weight: 700; }
+  #layarPilihNama select#selectNama { font-size: 17px; font-weight: 800; padding: 0 12px; }
+  #layarPilihNama .pn-tautan { font-size: 13px; font-weight: 700; color: var(--hitam); text-align: center; padding: 4px; }
+  #layarPilihNama .kotak-pin { border-radius: 30px 30px 0 0; padding: 14px 18px 16px; gap: 10px; }
+  #layarPilihNama .pin-titik { gap: 18px; }
+  #layarPilihNama .pin-titik div { width: 18px; height: 18px; }
+  #layarPilihNama .keypad button { height: 44px; font-size: 24px; }
+  #layarPilihNama .keypad button.kosong { font-size: 14px; }
+  #layarPilihNama .keypad button.hapus { background: transparent; display: flex; align-items: center; justify-content: center; }
   /* ---- Pop-up hasil absen (disalin dari mockup 6a tepat waktu, 6b telat, 6b2 alasan) ---- */
   @keyframes jatuh { 0% { transform: translateY(-40px) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(110vh) rotate(540deg); opacity: 1; } }
   @keyframes sinar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -500,6 +524,8 @@
   .popup .bulan-kotak { background: var(--hijau-muda); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; }
   .popup .bulan-kotak .n { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.4; color: var(--abu-teks); }
   .popup .bulan-kotak .l { font-size: 13px; font-weight: 600; color: var(--abu-tua); }
+  .popup.merah .bulan-kotak { background: var(--merah-muda); }
+  .popup.hitam .bulan-kotak { background: var(--abu-pucat); }
   .popup .petunjuk { font-size: 13px; color: var(--abu-teks); }
   .popup .petunjuk-merah { font-size: 13px; font-weight: 700; color: var(--merah); }
   .popup .tombol-alasan { width: 100%; min-height: 64px; border: none; border-radius: 22px; background: var(--hitam); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700; }
@@ -549,6 +575,10 @@
   #layarAlasan.lembur .alasan-foot { order: 3; }
 
   /* ---- Pop-up PULANG (disalin dari mockup 6c / 6d / 6e): latar hitam ---- */
+  .popup.abu { background: var(--abu); }
+  .popup.abu .bulat { background: var(--hitam); }
+  .popup.abu .judul-popup { color: var(--hitam); font-size: 32px; line-height: 1.15; }
+  .popup.abu .pil { border: 2px solid var(--hitam); background: var(--putih); color: var(--hitam); }
   .popup.hitam { background: var(--hitam); }
   .popup.hitam .bulat { background: var(--hitam); }
   .popup.hitam .judul-popup { color: var(--hitam); }
@@ -740,7 +770,7 @@
   <!-- Tambah karyawan: disalin dari mockup 60 (langkah 1 dari 4). "Nama tersedia" dan "Jatah cuti" tidak ditampilkan (tidak ada datanya di sisi HP). -->
   <div id="layarTambahKaryawan" class="layar">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 30px; width: auto"><div class="kry-badge-langkah" style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin</div></div>
-<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Karyawan baru</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Isi oleh admin</div></div></div><div style="box-sizing: content-box; display: flex; gap: 6px"><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700">Langkah 1 dari 4</div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 14px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kNama" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Nama lengkap (sekaligus username)</label><input id="kNama" maxlength="60" autocomplete="off" autocapitalize="words" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kPanggilan" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Nama panggilan (tampil di pop-up)</label><input id="kPanggilan" maxlength="30" autocomplete="off" autocapitalize="words" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"><div class="segera" style="box-sizing: content-box">Nama tersedia · Segera</div></div><div id="bidangShift" style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kShift" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Shift (pola diatur setelah tersimpan)</label><select id="kShift" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></select></div><div class="catatan-abu" id="catatShift" style="display:none"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kMulai" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal mulai kerja</label><input id="kMulai" type="date" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></div><div style="box-sizing: content-box; background: var(--krem); border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 700">ID otomatis · Cabang mengikuti admin · Role: Karyawan<div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-teks); margin-top: 4px">Role Admin hanya bisa diberikan owner.</div></div></div><div class="pesan-form" id="pesanTambahKaryawan"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" id="btnKembaliTambah" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)">‹</button><button type="button" id="btnLanjutPin" style="flex-grow: 1; height: 72px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 18px; font-weight: 800">Lanjut: serahkan HP ke karyawan</button></div><button type="button" id="btnBatalTambah" style="min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--merah); text-decoration: underline">Batal pendaftaran (data belum disimpan)</button></div>
+<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Karyawan baru</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Isi oleh admin</div></div></div><div style="box-sizing: content-box; display: flex; gap: 6px"><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700">Langkah 1 dari 4</div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 14px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kNama" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Nama lengkap (sekaligus username)</label><input id="kNama" maxlength="60" autocomplete="off" autocapitalize="words" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kPanggilan" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Nama panggilan (tampil di pop-up)</label><input id="kPanggilan" maxlength="30" autocomplete="off" autocapitalize="words" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"><div class="segera" style="box-sizing: content-box">Nama tersedia · Segera</div></div><div id="bidangShift" style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kShift" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Shift (pola diatur setelah tersimpan)</label><select id="kShift" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></select></div><div class="catatan-abu" id="catatShift" style="display:none"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="kMulai" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal mulai kerja</label><input id="kMulai" type="date" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%"></div><div style="box-sizing: content-box; background: var(--krem); border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 700"><span id="infoTambahKry">ID otomatis · Cabang mengikuti admin · Role: Karyawan</span><div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-teks); margin-top: 4px">Role Admin hanya bisa diberikan owner.</div></div></div><div class="pesan-form" id="pesanTambahKaryawan"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" id="btnKembaliTambah" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)">‹</button><button type="button" id="btnLanjutPin" style="flex-grow: 1; height: 72px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 18px; font-weight: 800">Lanjut: serahkan HP ke karyawan</button></div><button type="button" id="btnBatalTambah" style="min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--merah); text-decoration: underline">Batal pendaftaran (data belum disimpan)</button></div>
   </div>
 
   <!-- Karyawan mengetik PIN dua kali: disalin dari mockup 61 (langkah 2 dari 4). Persetujuan data wajah = "Segera" (belum ada fitur wajah). PIN 5 angka (aturan server), bukan 4. Dipakai juga untuk Reset PIN (tanpa bilah langkah dan persetujuan). -->
@@ -929,6 +959,7 @@
         <div class="lingkar"><svg aria-hidden="true" fill="none" height="30" stroke="#D92A22" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="30"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div>
         <div class="teks-tombol"><div class="judul">ABSEN PULANG</div><div class="sub" id="subPulang">&nbsp;</div></div>
       </button>
+      <button class="kartu-tidak-masuk belum-aktif" type="button" disabled aria-disabled="true" aria-label="Hari ini tidak masuk (belum ada fungsi)"><div class="atas"><div class="j">Hari ini tidak masuk</div><div class="segera">Segera</div></div></button>
       <div style="flex-grow:1"></div>
       <button class="belum-aktif" id="btnLembur" type="button" disabled>
         <svg aria-hidden="true" fill="none" height="24" stroke="#FFD62E" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
@@ -941,16 +972,24 @@
   </div>
 
 
+  <!-- Pilih nama + PIN: disalin dari mockup 09. Beda: PIN 5 angka (aturan server; mockup usang 4 digit); "Foto ulang" dan "Tidak ada di jadwal..." belum ada fungsinya = nonaktif "Segera"; label dan daftar nama tanpa "(Shift N)" / "terjadwal hari ini" (belum ada data jadwal di HP toko) -->
   <div id="layarPilihNama" class="layar">
     <div class="pilih-atas">
-      <div class="lingkar-kamera" id="kotakKamera" style="display:none"><video id="pratinjauKamera" playsinline muted autoplay></video></div>
-      <div class="pilih-judul">Pilih nama</div>
+      <div class="pn-baris-foto">
+        <div class="foto-lingkar"><span>Foto kamera</span><div class="lingkar-kamera" id="kotakKamera" style="display:none"><video id="pratinjauKamera" playsinline muted autoplay></video></div></div>
+        <div class="pn-teks-foto">
+          <div class="pilih-judul">Pilih nama + PIN</div>
+          <div class="pn-sub">Foto ini tersimpan sebagai bukti absen</div>
+          <button type="button" class="btn-foto-ulang belum-aktif" disabled aria-disabled="true"><svg aria-hidden="true" fill="none" height="14" stroke="var(--hitam)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="14"><path d="M1 4v6h6"></path><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"></path></svg>Foto ulang<span class="segera">Segera</span></button>
+        </div>
+      </div>
       <div class="huruf-label">Huruf depan nama</div>
       <div class="huruf-daftar" id="hurufDaftar"></div>
-      <label for="selectNama" style="font-size:13px; font-weight:700">Nama (urut abjad)</label>
+      <label for="selectNama" class="pn-label-nama">Nama (urut abjad)</label>
       <select id="selectNama">
         <option value="">-- pilih nama --</option>
       </select>
+      <div class="pn-tautan belum-aktif" aria-disabled="true">Tidak ada di jadwal atau karyawan cabang lain <span class="segera">Segera</span></div>
       <div id="infoMuat"></div>
     </div>
     <div class="kotak-pin">
@@ -970,7 +1009,7 @@
         <button type="button" data-digit="9">9</button>
         <button type="button" class="kosong" id="btnBatalPin">Batal</button>
         <button type="button" data-digit="0">0</button>
-        <button type="button" id="btnHapusDigit" aria-label="Hapus angka">⌫</button>
+        <button type="button" class="hapus" id="btnHapusDigit" aria-label="Hapus angka"><svg aria-hidden="true" fill="none" height="26" stroke="var(--hitam)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="26"><path d="M21 5H8l-6 7 6 7h13z"></path><path d="M17 9l-6 6"></path><path d="M11 9l6 6"></path></svg></button>
       </div>
       <div class="pin-ket">Angka kelima langsung mengirim absen</div>
       <button id="btnBatalNama" type="button">‹ Kembali ke layar utama</button>
@@ -1054,7 +1093,7 @@
   const popup = document.getElementById('popup');
   const layarAlasan = document.getElementById('layarAlasan');
   const metaTema = document.querySelector('meta[name="theme-color"]');
-  const TEMA = { kuning: '#FFD62E', hijau: '#1F8A4C', merah: '#B91C1C', hitam: '#141111' };
+  const TEMA = { kuning: '#FFD62E', hijau: '#1F8A4C', merah: '#B91C1C', hitam: '#141111', abu: '#333438' };
   let modeAbsen = 'MASUK'; // MASUK | PULANG | PULANG_LEMBUR (jenis yang sedang dikerjakan di layar pilih nama)
 
   // ---- Data HP toko (token dll.) di localStorage. Password admin TIDAK pernah disimpan. ----
@@ -1384,7 +1423,22 @@
       '</div>', 4);
   }
 
+  // Mockup 21: "Absen masuk belum dibuka". Jam buka diambil dari pesan server; baris "Sekarang ... menit lagi" belum ada datanya (tidak ada jam server di layar) = nonaktif.
+  const SVG_JAM = '<svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#FFD62E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>';
+  function tampilBelumDibuka(pesan) {
+    const m = /(\d{1,2}:\d{2})/.exec(String(pesan || ''));
+    bukaPopupOtomatis('abu', TEMA.abu,
+      '<div class="kartu">' +
+        '<div class="ikon-besar"><div class="bulat">' + SVG_JAM + '</div></div>' +
+        '<div class="judul-popup">Absen masuk belum dibuka</div>' +
+        (m ? '<div class="pil">Dibuka mulai ' + escHtml(m[1]) + (shiftUtama ? ' (' + escHtml(shiftUtama.nama) + ')' : '') + '</div>' : '') +
+        '<div class="segera">Sekarang dan sisa waktu · Segera</div>' +
+        '<div class="petunjuk">Ketuk di mana saja atau tunggu 4 detik</div>' +
+      '</div>', 4);
+  }
+
   function tampilGagal(pesan) {
+    if (/belum dibuka/i.test(String(pesan || ''))) { tampilBelumDibuka(pesan); return; }
     bukaPopupOtomatis('merah', TEMA.merah,
       '<div class="kartu">' +
         '<div class="ikon-besar"><div class="bulat">' + SVG_PERINGATAN + '</div></div>' +
@@ -2488,11 +2542,18 @@
         karyawanData.daftar = a.daftar.concat(n && n.status === 'ok' ? n.daftar : []); // aktif dulu, nonaktif di bawah (mockup 58)
         document.getElementById('btnTambahKaryawan').disabled = false;
         document.getElementById('kryBadge').textContent = 'Admin ' + a.cabang;
-        document.getElementById('kryNama').textContent = 'Cabang ' + a.cabang + ' · ' + a.jumlah_aktif + ' aktif';
-        document.getElementById('daftarKaryawanAdmin').innerHTML = karyawanData.daftar.length ? karyawanData.daftar.map(function (k, i) {
-          return '<div class="baris-kry" role="button" tabindex="0" data-kry="buka" data-i="' + i + '"><div class="avatar-kry"></div>' +
-            '<div class="isi-kry"><div class="nm-kry' + (k.aktif ? '' : ' mati') + '">' + escHtml(k.nama) + '</div><div class="sh-kry">Shift ' + escHtml(k.shift) + '</div></div>' +
-            '<div class="pil-kry' + (k.aktif ? '' : ' mati') + '">' + (k.aktif ? 'Karyawan' : 'Nonaktif') + '</div></div>';
+        // Baris Admin (HANYA BACA: tanpa ketuk, tanpa aksi). Aktif (karyawan + admin) urut abjad, lalu yang nonaktif.
+        const admin = (a.admin_daftar || []).concat(n && n.status === 'ok' ? (n.admin_daftar || []) : []).filter(function (x, i, arr) { return arr.findIndex(function (y) { return y.id === x.id; }) === i; });
+        const semuaBaris = karyawanData.daftar.map(function (k, i) { return { k: k, i: i, adm: false }; }).concat(admin.map(function (k) { return { k: k, i: -1, adm: true }; }));
+        const urut = function (x, y) { return String(x.k.nama).toLowerCase() < String(y.k.nama).toLowerCase() ? -1 : 1; };
+        const barisAktif = semuaBaris.filter(function (b) { return b.k.aktif; }).sort(urut);
+        const barisMati = semuaBaris.filter(function (b) { return !b.k.aktif; }).sort(urut);
+        document.getElementById('kryNama').textContent = 'Cabang ' + a.cabang + ' · ' + barisAktif.length + ' aktif';
+        document.getElementById('daftarKaryawanAdmin').innerHTML = semuaBaris.length ? barisAktif.concat(barisMati).map(function (b) {
+          const k = b.k;
+          const pil = !k.aktif ? '<div class="pil-kry mati">Nonaktif</div>' : (b.adm ? '<div class="pil-kry admin">Admin</div>' : '<div class="pil-kry">Karyawan</div>');
+          const isi = '<div class="avatar-kry"></div><div class="isi-kry"><div class="nm-kry' + (k.aktif ? '' : ' mati') + '">' + escHtml(k.nama) + '</div><div class="sh-kry">Shift ' + escHtml(k.shift) + '</div></div>' + pil;
+          return b.adm ? '<div class="baris-kry baca">' + isi + '</div>' : '<div class="baris-kry" role="button" tabindex="0" data-kry="buka" data-i="' + b.i + '">' + isi + '</div>';
         }).join('') : '<div class="hp-ket">Belum ada karyawan untuk ditampilkan.</div>';
       })
       .catch(function () { pesanKaryawan('Tidak bisa terhubung ke server.'); });
@@ -2591,6 +2652,10 @@
     catat.textContent = 'Belum ada shift untuk cabang ini di sheet shift.';
     document.getElementById('btnLanjutPin').disabled = shifts.length === 0;
     document.querySelectorAll('.kry-badge-langkah').forEach(function (b) { b.textContent = 'Admin ' + karyawanData.cabang; });
+    // Baris info persis mockup 60; semua nilai dari server (ID berikutnya, cabang admin, jatah_cuti di pengaturan). Server lama tanpa nilai: teks umum, tanpa angka karangan.
+    document.getElementById('infoTambahKry').textContent = (karyawanData.id_berikutnya && karyawanData.jatah_cuti !== undefined)
+      ? 'ID otomatis: ' + karyawanData.id_berikutnya + ' · Cabang: ' + karyawanData.cabang + ' · Jatah cuti: ' + karyawanData.jatah_cuti + ' hari · Role: Karyawan'
+      : 'ID otomatis · Cabang mengikuti admin · Role: Karyawan';
     tampilLayar(layarTambahKaryawan);
   });
   document.getElementById('btnKembaliTambah').addEventListener('click', function () { tampilLayar(layarKaryawan); });
@@ -3010,7 +3075,7 @@
     if (!d) { return; }
     document.getElementById('subPribMasuk').textContent = d.sudah_masuk ? 'Sudah masuk ' + d.jam_masuk : 'Absen luar';
     document.getElementById('subPribPulang').textContent = d.sudah_pulang ? 'Sudah pulang ' + d.jam_pulang + ' · ketuk untuk lembur' : (d.sudah_masuk ? 'Absen luar' : 'Belum absen masuk');
-    document.getElementById('pribStatus').textContent = !d.sudah_masuk ? 'Belum absen hari ini.' : ('Masuk ' + d.jam_masuk + (d.sudah_pulang ? ' · Pulang ' + d.jam_pulang : ' · belum pulang'));
+    document.getElementById('pribStatus').textContent = !d.sudah_masuk ? 'Belum absen hari ini' : ('Masuk ' + d.jam_masuk + (d.sudah_pulang ? ' · Pulang ' + d.jam_pulang : ' · belum pulang'));
     aturTombolPribadi('btnPribMasuk', !d.sudah_masuk);
     aturTombolPribadi("btnPribPulang", d.sudah_masuk);
     aturTombolPribadi("btnPribLembur", d.lembur_boleh === true); // jam server + aturan sama dengan lembur HP toko (dihitung server)
@@ -3153,6 +3218,7 @@
 
   // Catatan di pop-up setelah absen luar
   function sisipkanCatatanLuar() {
+    return; // keputusan pemilik: pil tambahan ini tidak ada di mockup 35 (pil "Menunggu persetujuan admin" sudah ada di pop-up)
     if (!modeLuar) { return; }
     const judul = popup.querySelector('.judul-popup');
     if (!judul || /Tidak tersimpan|Alasan tersimpan/.test(judul.textContent)) { return; }
@@ -3266,7 +3332,6 @@
     if (it.kelompok === 'LUAR') { tipe += ', ' + (it.jenis === 'MASUK' ? 'masuk' : 'pulang'); }
     if (it.kelompok === 'LEMBUR' && it.tingkat) { tipe += ' ' + (['', '<1 jam', '1–2 jam', '>2 jam'][it.tingkat] || ''); }
     const detail = [tglKonf(it.tanggal) + ' ' + (it.jam || '-')];
-    if (it.kelompok === 'LEMBUR' && it.durasi_menit) { detail.push(teksKonfirmasiDurasi(it.durasi_menit)); }
     if (it.ket) { detail.push(it.ket); }
     if (it.cabang && modeKonf === 'OWNER') { detail.push(it.cabang + ' · Shift ' + it.shift); }
     let gps = '';
@@ -3295,7 +3360,7 @@
     if (!bisa) { return; }
     const semuaMuat = document.getElementById('btnMuatLagi').style.display === 'none';
     const jml = function (k) { return semuaMuat ? ' ' + daftarKonfirmasi.querySelectorAll('.kartu-konf[data-kel="' + k + '"]').length : ''; };
-    const def = [['', 'Semua ' + (konfTotal > 99 ? '99+' : konfTotal)], ['LEMBUR', 'Lembur' + jml('LEMBUR')], ['LUAR', 'Absen luar' + jml('LUAR')], ['PULANG_CEPAT', 'Pulang cepat' + jml('PULANG_CEPAT')]];
+    const def = [['', 'Semua ' + (konfTotal > 99 ? '99+' : konfTotal)], ['LEMBUR', 'Lembur' + jml('LEMBUR')], ['LUAR', 'Absen luar' + jml('LUAR')]];
     kotak.innerHTML = def.map(function (c) {
       return '<button type="button" data-kel="' + c[0] + '"' + (konfKelPilih === c[0] ? ' class="pilih"' : '') + '>' + c[1] + '</button>';
     }).join('') + '<button type="button" disabled>Izin · Segera</button><button type="button" disabled>Lupa absen · Segera</button>';

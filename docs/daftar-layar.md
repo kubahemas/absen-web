@@ -13,7 +13,7 @@ Urutan kerja: **1. HP Pribadi** → 2. Admin cabang → 3. Owner → 4. HP Toko.
 | 1. HP Pribadi (29–48) | **selesai** (layar yang belum ada fiturnya = "Segera") |
 | 2. Admin cabang (49–70) | **selesai** (layar yang belum ada fiturnya = "Segera", lihat tabel) |
 | 3. Owner (71–82) | **selesai** untuk layar yang fiturnya ada (71, 72, 78, 79, 80); sisanya "Segera" |
-| 4. HP Toko (01–28) | belum |
+| 4. HP Toko (01–28) | **dikerjakan** (tampilan; semua yang tersambung masih punya selisih, tidak ada yang "sesuai" penuh) |
 
 Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dibuat dengan `tools/potret.sh` dan `tools/berdampingan.ps1`).
 
@@ -90,36 +90,54 @@ Selisih per layar (siapa yang memutuskan, gambar berdampingan): lihat `docs/daft
 
 ## 4. HP Toko (urutan galeri 01–28; 22–28 tercampur di galeri)
 
+Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung masih punya selisih (lihat `docs/daftar-selisih.md`, bagian Kelompok 4). Hanya TAMPILAN yang diselaraskan; logika absen HP toko tidak diubah.
+
 | No | Layar mockup | Status | Catatan |
 |---|---|---|---|
-| 01 | 1. HP Toko - Layar utama | tersambung* | *penyelarasan sebelumnya |
-| 02 | 1c. Shift 1 aktif - jadwal hari ini | belum | |
-| 03 | 2. Pindai wajah | belum | menunggu fitur wajah |
-| 04 | 3. Wajah dikenali | belum | menunggu fitur wajah |
-| 05 | 3b. Peringatan sudah absen (dobel) | belum | |
-| 06 | 3d. Shift tidak sesuai jadwal | belum | |
-| 07 | 3c. Sudah absen lembur - revisi | belum | |
-| 08 | 4. Wajah tidak terbaca | belum | menunggu fitur wajah |
-| 09 | 5. Pilih nama + PIN | belum | ada layar buatan sebelumnya |
-| 10 | 6a. Pop-up TEPAT WAKTU | belum | |
-| 11 | 6b. Pop-up TELAT | belum | |
-| 12 | 6b2. Alasan telat | belum | |
-| 13 | 6b3. Peringatan lanjutan | belum | |
-| 14 | 6c. Pop-up PULANG | belum | |
-| 15 | 6d. Pop-up PULANG AWAL | belum | |
-| 16 | 6d2. Alasan pulang awal | belum | |
-| 17 | 6e. Pop-up LEMBUR | belum | |
-| 18 | 6f. Masuk + belum absen pulang kemarin | belum | |
-| 19 | 6g. Pulang + belum absen masuk | belum | |
-| 20 | 7. Lembur | belum | |
-| 21 | 6h. Absen terlalu pagi | belum | |
-| 22 | Admin - Cek Surat Dokter | belum | menunggu fitur izin |
-| 23 | HP Pribadi - Izin Sakit dengan Surat Dokter | belum | menunggu fitur izin |
-| 24 | Owner - Cabang dan Shift | belum | |
-| 25 | Owner - Data Absensi | belum | |
-| 26 | Owner - Ganti Password | belum | |
-| 27 | Owner - Keluarkan Semua Perangkat | belum | |
-| 28 | Owner - Konfirmasi Data Admin | tersambung* | *penyelarasan sebelumnya |
+| 01 | 1. HP Toko - Layar utama | tersambung (ada selisih) | Kartu "Hari ini tidak masuk" nonaktif "Segera"; format tanggal dd/MM/yy |
+| 02 | 1c. Shift 1 aktif - jadwal hari ini | belum | **Menunggu fitur** jadwal (label tidak membuka apa pun) |
+| 03 | 2. Pindai wajah | belum | **Menunggu fitur** wajah |
+| 04 | 3. Wajah dikenali | belum | **Menunggu fitur** wajah |
+| 05 | 3b. Peringatan sudah absen (dobel) | belum | **Menunggu fitur** |
+| 06 | 3d. Shift tidak sesuai jadwal | belum | **Menunggu fitur** |
+| 07 | 3c. Sudah absen lembur - revisi | belum | **Menunggu fitur** |
+| 08 | 4. Wajah tidak terbaca | belum | **Menunggu fitur** wajah |
+| 09 | 5. Pilih nama + PIN | tersambung (ada selisih) | "Foto ulang" dan tautan jadwal nonaktif; PIN 5 angka |
+| 10 | 6a. Pop-up TEPAT WAKTU | tersambung (ada selisih) | "Bulan ini" nonaktif |
+| 11 | 6b. Pop-up TELAT | tersambung (ada selisih) | "Bulan ini" nonaktif |
+| 12 | 6b2. Alasan telat | tersambung | Tidak ada selisih tampilan yang terlihat |
+| 13 | 6b3. Peringatan lanjutan | belum | **Menunggu fitur** |
+| 14 | 6c. Pop-up PULANG | tersambung (ada selisih) | "Bulan ini" nonaktif |
+| 15 | 6d. Pop-up PULANG AWAL | belum | App langsung membuka layar alasan (16); pop-up 15 tidak ada |
+| 16 | 6d2. Alasan pulang awal | tersambung (ada selisih) | Judul dua baris, teks bawah lebih panjang |
+| 17 | 6e. Pop-up LEMBUR | belum | App langsung membuka layar lembur (20); pop-up 17 tidak ada |
+| 18 | 6f. Masuk + belum absen pulang kemarin | belum | **Menunggu fitur** |
+| 19 | 6g. Pulang + belum absen masuk | belum | **Menunggu fitur** |
+| 20 | 7. Lembur | tersambung (ada selisih) | Selisih jarak kecil |
+| 21 | 6h. Absen terlalu pagi | tersambung (ada selisih) | Pop-up seperti mockup; "Sekarang… menit lagi" nonaktif |
+| 22 | Admin - Cek Surat Dokter | belum | **Menunggu fitur** izin |
+| 23 | HP Pribadi - Izin Sakit dengan Surat Dokter | belum | **Menunggu fitur** izin |
+| 24 | Owner - Cabang dan Shift | belum | **Menunggu fitur** |
+| 25 | Owner - Data Absensi | belum | **Menunggu fitur** |
+| 26 | Owner - Ganti Password | tersambung (ada selisih) | Syarat abu sampai terpenuhi |
+| 27 | Owner - Keluarkan Semua Perangkat | tersambung (ada selisih) | Daftar perangkat dari server |
+| 28 | Owner - Konfirmasi Data Admin | tersambung (ada selisih) | Badge, subjudul, kotak Foto beda |
+
+## Perubahan dari mockup: keputusan pemilik 2026-10-07 (tambahan)
+
+| Layar | Perubahan | Alasan |
+|---|---|---|
+| 50 Menu admin | "Ubah nama HP ini" dan "Tutup menu" dipertahankan | keputusan pemilik (fungsi) |
+| 51 Log out | Beranda samar di belakang dialog dipertahankan | keputusan pemilik |
+| 58 Karyawan | Ketuk nama membuka sheet aksi; baris Admin hanya baca | keputusan pemilik |
+| 60 Karyawan baru | Tombol hijau di posisi app, ikon kalender di tanggal; baris info dengan nilai server | keputusan pemilik |
+| 61 PIN | Tombol ⌫ ; PIN 5 angka (mockup 4 digit usang, pemilik yang merevisi mockup) | keputusan pemilik |
+| 63 Selesai | Tanpa password/PIN awal (mockup usang, pemilik yang merevisi) | keputusan pemilik |
+| 78 | Tombol "Masuk sebagai Owner" | keputusan pemilik |
+| 80 | Filter cabang, saklar nonaktif, Ubah nama | keputusan pemilik |
+| 52 Konfirmasi | Chip "Pulang cepat" dan durasi tepat dihapus (kembali ke mockup) | keputusan pemilik |
+| 35 Pop-up | Pil tambahan dihapus | keputusan pemilik |
+| 30–32, 46 | Titik di subjudul dihapus (kembali ke mockup) | keputusan pemilik |
 
 ## Perubahan dari mockup (penyimpangan sengaja)
 
@@ -142,12 +160,12 @@ Selisih per layar (siapa yang memutuskan, gambar berdampingan): lihat `docs/daft
 | Ikon akun (karyawan) | Membuka menu kecil: Akun saya, Log out, Tutup menu (mockup 44 tidak punya tombol Log out) | Log out tetap perlu ada |
 | iPhone/Safari | Ditunda | belum diuji |
 
-## Menunggu data / fitur (disembunyikan atau nonaktif di app)
+## Menunggu data / fitur (tampil NONAKTIF "Segera" di app)
 
-- Lencana performa EXCELLENT/GOOD/BAD dan kotak "Perlu evaluasi (BAD)": disembunyikan, menunggu perhitungan label.
-- Strip "N pengajuan menunggu ACC" (beranda karyawan/admin): disembunyikan, menunggu fitur izin.
+- Lencana performa EXCELLENT/GOOD/BAD dan kotak "Perlu evaluasi (BAD)": tampil nonaktif, menunggu perhitungan label.
+- Strip "N pengajuan menunggu ACC" (beranda karyawan/admin): tampil nonaktif, menunggu fitur izin.
 - Kotak "Bulan ini" di pop-up: menunggu hitungan rekap bulan.
-- Kotak "Perlu evaluasi (BAD)" di beranda admin: disembunyikan, menunggu data label performa.
+- Kotak "Perlu evaluasi (BAD)" di beranda admin: tampil nonaktif, menunggu data label performa.
 - Angka Izin/cuti di beranda admin: 0 sampai fitur izin ada (rumus sudah siap: izin yang bukan DITOLAK/BATAL dan mencakup hari ini).
 - "Belum absen" hanya menghitung karyawan yang jam masuk shiftnya SUDAH lewat (supaya shift siang tidak terhitung belum absen di pagi hari).
 

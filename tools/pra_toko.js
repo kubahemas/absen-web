@@ -1,6 +1,7 @@
 // Dijalankan di <head> sebelum aplikasi (lewat PRA=...): HP toko terdaftar di localStorage + server TIRUAN untuk admin HP toko.
 // Pakai: PRA="$(cat tools/pra_toko.js)" ID="" bash tools/potret.sh app "" hasil.png tools/isi_beranda_admin_toko.js
-localStorage.setItem('absen_hp_toko', JSON.stringify({ token: 'T'.repeat(40), id: 'HPT-NGW-01', cabang: 'Ngawi', nama: 'HP toko 1' }));
+try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}
+localStorage.setItem("absen_hp_toko", JSON.stringify({ token: 'T'.repeat(40), id: 'HPT-NGW-01', cabang: 'Ngawi', nama: 'HP toko 1' }));
 window.__BERANDA = window.__BERANDA || {
   status: 'ok', tanggal: '2026-09-28', jam: '08:20', hari: 'Senin', cabang: 'Ngawi',
   semua: { tepat: 8, telat: 2, belum: 4, izin: 1 },
@@ -41,8 +42,23 @@ window.fetch = function (url, opsi) {
   window.fetch = function (url, opsi) {
     var b = {}; try { b = JSON.parse(opsi.body); } catch (e) {}
     var d = null;
-    if (b.aksi === 'karyawan_daftar') { d = { status: 'ok', cabang: 'Ngawi', daftar: b.kelompok === 'NONAKTIF' ? mati : aktif, daftar_shift: [{ no: '1', nama: 'Shift 1', masuk: '07:45', pulang: '16:30' }], kelompok: b.kelompok, jumlah_aktif: aktif.length }; }
+    if (b.aksi === 'karyawan_daftar') { d = { status: 'ok', cabang: 'Ngawi', daftar: b.kelompok === 'NONAKTIF' ? mati : aktif, daftar_shift: [{ no: '1', nama: 'Shift 1', masuk: '07:45', pulang: '16:30' }], kelompok: b.kelompok, jumlah_aktif: aktif.length, admin_daftar: [{ id: 'A01', nama: 'Dewi Lestari', panggilan: 'Dewi', shift: '1', aktif: true }, { id: 'A02', nama: 'Sari Utami', panggilan: 'Sari', shift: '2', aktif: true }], id_berikutnya: 'K005', jatah_cuti: 6 }; }
     if (b.aksi === 'karyawan_tambah') { d = { status: 'ok', id: 'K005' }; }
+    if (d) { window.__panggilan.push(b); return Promise.resolve({ json: function () { return Promise.resolve(d); } }); }
+    return f0(url, opsi);
+  };
+})();
+// HP toko (layar absen 01-21): daftar nama, tiket waktu, hasil absen tiruan. window.__absen = respons absen_masuk/absen_pulang yang mau dipakai.
+(function () {
+  var f0 = window.fetch;
+  window.__absen = window.__absen || { status: 'ok', st_masuk: 'HADIR', jam: '07:40', shift: 'Shift 1', id_absen: 'M-K001-261006-074000-T1' };
+  window.fetch = function (url, opsi) {
+    var b = {}; try { b = JSON.parse(opsi.body); } catch (e) {}
+    var d = null;
+    if (b.aksi === 'daftar_karyawan') { d = { status: 'ok', data: [{ id: 'K001', nama: 'Andi Pratama', panggilan: 'Andi' }, { id: 'K002', nama: 'Budi Santoso', panggilan: 'Budi' }, { id: 'K003', nama: 'Joko Susilo', panggilan: 'Joko' }, { id: 'K004', nama: 'Rina Wati', panggilan: 'Rina' }], shift: { nama: 'Shift 1', masuk: '07:45', pulang: '16:30', toleransi_pulang: 5 }, hp: { id: 'HPT-NGW-01', nama: 'HP toko 1', cabang: 'Ngawi' } }; }
+    if (b.aksi === 'tiket_waktu') { d = { status: 'ok', tiket: 'TIKET', jam: '07:40' }; }
+    if (b.aksi === 'absen_masuk' || b.aksi === 'absen_pulang') { d = window.__absen; }
+    if (b.aksi === 'unggah_foto') { d = { status: 'ok' }; }
     if (d) { window.__panggilan.push(b); return Promise.resolve({ json: function () { return Promise.resolve(d); } }); }
     return f0(url, opsi);
   };

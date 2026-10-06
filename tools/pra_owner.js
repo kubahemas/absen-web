@@ -1,4 +1,5 @@
 // Dijalankan di <head> sebelum aplikasi (lewat PRA=...): server TIRUAN untuk owner (beranda mockup 71 dan layar lain kelompok 3).
+try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}
 // Pakai: PRA="$(cat tools/pra_owner.js)" ID="" bash tools/potret.sh app "" hasil.png tools/isi_beranda_owner.js
 window.__panggilan = [];
 window.__BELUM_SEMUA = [['Joko Susilo', '07:45'], ['Dedi Kurnia', '07:45'], ['Rina Wati', '13:45'], ['Ani Yulia', '13:45'], ['Tono Wibowo', '13:45'], ['Sari Utami', '08:00'], ['Dodi Hartono', '08:00']];
@@ -34,6 +35,7 @@ window.fetch = function (url, opsi) {
     ] };
   }
   if (b.aksi === 'konfirmasi_jumlah') { d = { status: 'ok', jumlah: 2, jumlah_teks: '2' }; }
+  if (b.aksi === 'konfirmasi_daftar') { var it = function (id, kel, jenis, nama) { return { id: id, jenis: jenis, kelompok: kel, karyawan: id.split('|')[0], nama: nama, cabang: 'Ngawi', tanggal: '2026-09-28', shift: '1', jam: '08:05', status: '', ket: 'Survey', tingkat: kel === 'LEMBUR' ? 2 : 0, durasi_menit: 75, gps: kel === 'LUAR' ? '-7.4,111.4,12' : '', akurasi: 12, akurasi_buruk: false, maps: 'https://www.google.com/maps?q=-7.4,111.4', foto: 'ADA' }; }; var l = [it('A01|2026-09-28|MASUK', 'LUAR', 'MASUK', 'Dewi Lestari'), it('A02|2026-09-27|PULANG', 'LEMBUR', 'PULANG', 'Sari Utami')]; d = { status: 'ok', daftar: l, total: 2, jumlah_teks: '2', ada_lagi: false }; }
   if (b.aksi === 'owner_daftar_hp') { d = { status: 'ok', hp_toko: [{ id: 'HPT-NGW-01', nama: 'HP toko 1', cabang: 'Ngawi', aktif: true }, { id: 'HPT-NGW-02', nama: 'HP toko 2', cabang: 'Ngawi', aktif: true }, { id: 'HPT-PST-01', nama: 'HP toko pusat', cabang: 'Pusat', aktif: false }] }; }
   return Promise.resolve({ json: function () { return Promise.resolve(d); } });
 };

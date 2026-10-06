@@ -1520,6 +1520,22 @@ function tesServer() {
 
   ujiBebas('alasan edit pengajuan: wajib minimal 5 karakter setelah spasi dipotong (kosong, 4 huruf, spasi saja ditolak; 5 huruf diterima); maksimal 100; tanda | diganti spasi', ['', '   ', 'abcd', '  ab  ', undefined, null].every(function (x) { return validasiAlasanEdit(x).ok === false; }) && validasiAlasanEdit('  salah ketik jam  ').ok === true && validasiAlasanEdit('  salah ketik jam  ').alasan === 'salah ketik jam' && validasiAlasanEdit('x'.repeat(101)).ok === false && validasiAlasanEdit('x'.repeat(100)).ok === true && validasiAlasanEdit('salah|jam').alasan === 'salah jam');
 
+  // ---- Paket kelompok 4: baris Admin hanya-baca dan info "ID otomatis" di karyawan_daftar ----
+  const akunAdm = [
+    { id: 'K001', nama: 'Budi', panggilan: 'Budi', cabang: 'Ngawi', role: 'KARYAWAN', shift: 1, aktif: true, pw_hash: 'x', pin_hash: 'y' },
+    { id: 'K003', nama: 'Tono', panggilan: 'Tono', cabang: 'Ngawi', role: 'KARYAWAN', shift: 1, aktif: false },
+    { id: 'A01', nama: 'Dewi', panggilan: 'Dewi', cabang: 'Ngawi', role: 'ADMIN', shift: 1, aktif: true, pw_hash: 'rahasia', pin_hash: 'rahasia2', data_wajah: 'w' },
+    { id: 'A02', nama: 'Sari', panggilan: 'Sari', cabang: 'Pusat', role: 'ADMIN', shift: 2, aktif: true },
+    { id: 'A03', nama: 'Amir', panggilan: 'Amir', cabang: 'Ngawi', role: 'ADMIN', shift: 2, aktif: false },
+    { id: 'OWN01', nama: 'owner', panggilan: '', cabang: '', role: 'OWNER', shift: '', aktif: true },
+    { id: 'HPT-NGW-01', nama: 'HP toko', panggilan: '', cabang: 'Ngawi', role: 'PERANGKAT', shift: '', aktif: true }
+  ];
+  const admNgw = daftarAdminCabang(akunAdm, 'Ngawi');
+  ujiBebas('karyawan_daftar: baris Admin hanya akun role ADMIN di cabang itu (Dewi dan Amir nonaktif; bukan Sari cabang lain, bukan karyawan, owner, atau HP toko), urut abjad', admNgw.length === 2 && admNgw[0].nama === 'Amir' && admNgw[1].nama === 'Dewi' && admNgw[0].aktif === false && admNgw[1].aktif === true);
+  ujiBebas('baris Admin hanya membawa id, nama, panggilan, shift, aktif (tanpa hash PIN/kata sandi atau data wajah)', Object.keys(admNgw[1]).sort().join(',') === 'aktif,id,nama,panggilan,shift' && JSON.stringify(admNgw).indexOf('rahasia') === -1);
+  ujiBebas('daftar karyawan (yang bisa diubah) TETAP tidak memuat ADMIN: saringDaftarKaryawan aktif = hanya Budi, nonaktif = hanya Tono', saringDaftarKaryawan(akunAdm, 'Ngawi', 'AKTIF').map(function (x) { return x.id; }).join() === 'K001' && saringDaftarKaryawan(akunAdm, 'Ngawi', 'NONAKTIF').map(function (x) { return x.id; }).join() === 'K003');
+  ujiBebas('ID berikutnya = nomor K terbesar di SEMUA akun (nonaktif ikut) + 1, ID admin/owner/HP toko tidak mengganggu; belum ada karyawan = K001', buatIdKaryawan(akunAdm.map(function (x) { return x.id; })) === 'K004' && buatIdKaryawan([]) === 'K001');
+
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -2658,6 +2674,14 @@ function saringDaftarKaryawan(rows, cabang, kelompok) {
     .sort(function (a, b) { return String(a.nama).toLowerCase() < String(b.nama).toLowerCase() ? -1 : 1; });
 }
 
+/** Fungsi murni: akun role ADMIN di cabang itu untuk baris hanya-baca di daftar Karyawan. Hanya id, nama, panggilan, shift, aktif (tanpa hash atau data lain). Tidak dipakai oleh aksi ubah/hapus apa pun. */
+function daftarAdminCabang(rows, cabang) {
+  return rows
+    .filter(function (r) { return r.role === 'ADMIN' && r.cabang === cabang; })
+    .map(function (r) { return { id: r.id, nama: r.nama, panggilan: r.panggilan, shift: r.shift, aktif: r.aktif === true }; })
+    .sort(function (a, b) { return String(a.nama).toLowerCase() < String(b.nama).toLowerCase() ? -1 : 1; });
+}
+
 /** Fungsi murni: daftar nama di layar "pilih nama" HP toko = karyawan dan admin AKTIF di cabang itu (nonaktif tidak muncul). */
 function daftarUntukPilihNama(rows, cabang) {
   return rows
@@ -2736,7 +2760,12 @@ function prosesKaryawanDaftar(d) {
   const kelompok = d.kelompok === 'NONAKTIF' ? 'NONAKTIF' : 'AKTIF';
   const daftar = saringDaftarKaryawan(semuaAkun, cabang, kelompok);
   const shifts = bacaShiftCabang(cabang).map(function (sh) { return { no: sh.no, nama: sh.nama, masuk: sh.masuk, pulang: sh.pulang }; });
-  return respon({ status: 'ok', cabang: cabang, daftar: daftar, daftar_shift: shifts, kelompok: kelompok, jumlah_aktif: saringDaftarKaryawan(semuaAkun, cabang, 'AKTIF').length });
+  return respon({
+    status: 'ok', cabang: cabang, daftar: daftar, daftar_shift: shifts, kelompok: kelompok, jumlah_aktif: saringDaftarKaryawan(semuaAkun, cabang, 'AKTIF').length,
+    admin_daftar: daftarAdminCabang(semuaAkun, cabang), // HANYA BACA (tampil di daftar, tanpa aksi apa pun)
+    id_berikutnya: buatIdKaryawan(semuaAkun.map(function (r) { return r.id; })), // ID yang akan dipakai karyawan baru berikutnya (info layar tambah karyawan)
+    jatah_cuti: ambilNilaiUmum('jatah_cuti', 6)
+  });
 }
 
 /**

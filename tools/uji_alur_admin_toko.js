@@ -38,18 +38,22 @@ function hitung(aksi) { return window.__panggilan.filter(function (x) { return x
     // Karyawan
     el('btnMenuAdmin').click(); await tunggu(150);
     el('btnMenuKaryawan').click(); await tunggu(700);
-    ok('layar Karyawan terbuka, subjudul "Cabang Ngawi \u00b7 4 aktif"', aktif() === 'layarKaryawan' && el('kryNama').textContent === 'Cabang Ngawi \u00b7 4 aktif');
+    ok('layar Karyawan terbuka, subjudul "Cabang Ngawi \u00b7 6 aktif" (4 karyawan + 2 admin)', aktif() === 'layarKaryawan' && el('kryNama').textContent === 'Cabang Ngawi \u00b7 6 aktif');
     var baris = el('daftarKaryawanAdmin').querySelectorAll('.baris-kry');
-    ok('aktif dan nonaktif dalam satu daftar (4 aktif lalu 1 nonaktif berlabel "Nonaktif")', baris.length === 5 && /Nonaktif/.test(baris[4].textContent) && /Karyawan/.test(baris[0].textContent));
+    ok('satu daftar urut abjad: 6 aktif (karyawan dan admin bercampur) lalu 1 nonaktif berlabel "Nonaktif"', baris.length === 7 && /Nonaktif/.test(baris[6].textContent) && /Karyawan/.test(baris[0].textContent) && /Admin/.test(baris[2].textContent) && /Dewi Lestari/.test(baris[2].textContent));
+    ok('baris Admin HANYA BACA: tanpa ketuk (tidak ada data-kry), tanpa tombol; mengetuknya tidak membuka apa pun', baris[2].classList.contains('baca') && !baris[2].hasAttribute('data-kry') && baris[5].classList.contains('baca') && baris[2].querySelectorAll('button').length === 0);
+    baris[2].click(); await tunggu(100);
+    ok('mengetuk baris Admin tidak membuka sheet aksi', !el('dialog').classList.contains('tampil'));
     ok('tidak ada pemilih Aktif/Nonaktif lagi', !el('segmenKaryawan'));
     baris[0].click(); await tunggu(100);
     ok('mengetuk baris membuka sheet aksi: Reset PIN, Nonaktifkan, dan Ubah data/Pola shift/Daftar wajah "Segera" nonaktif', /Reset PIN/.test(el('dialog').textContent) && /Nonaktifkan/.test(el('dialog').textContent) && el('dialog').querySelectorAll('.btn-nonaktif-segera[disabled]').length === 3);
     el('dialog').querySelector('[data-sh="tutup"]').click(); await tunggu(100);
-    baris[4].click(); await tunggu(100);
+    baris[6].click(); await tunggu(100);
     ok('baris nonaktif: sheet menawarkan "Aktifkan kembali", tanpa Reset PIN', /Aktifkan kembali/.test(el('dialog').textContent) && !/Reset PIN/.test(el('dialog').textContent));
     el('dialog').querySelector('[data-sh="tutup"]').click(); await tunggu(100);
     // Tambah karyawan
     el('btnTambahKaryawan').click(); await tunggu(150);
+    ok('baris info langkah 1 persis mockup 60 dengan nilai dari server', el('infoTambahKry').textContent === 'ID otomatis: K005 \u00b7 Cabang: Ngawi \u00b7 Jatah cuti: 6 hari \u00b7 Role: Karyawan');
     ok('langkah 1 dari 4 tampil dengan dropdown shift (satu shift pun tampil)', aktif() === 'layarTambahKaryawan' && /Langkah 1 dari 4/.test(el('layarTambahKaryawan').textContent) && el('bidangShift').style.display !== 'none');
     el('kNama').value = 'Wulan Sari'; el('kPanggilan').value = 'Wulan'; el('kMulai').value = '2026-10-01';
     el('btnLanjutPin').click(); await tunggu(150);

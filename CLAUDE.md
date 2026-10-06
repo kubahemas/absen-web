@@ -196,3 +196,8 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - `beranda_hari_ini` kini mengembalikan `tepat` (status HADIR saja) dan `telat` terpisah, menggantikan `hadir`. Beranda admin HP toko dan owner memakai satu kartu + dropdown Shift; owner memanggil server saat Cabang diganti, Shift diganti cukup dari data yang sudah ada. Layar `layarBelumAbsen` = daftar penuh Belum absen.
 - Elemen mockup tanpa fungsi dibuat nonaktif (lencana performa, strip pengajuan, kotak "Bulan ini" di pop-up, spanduk offline, "Perlu evaluasi (BAD)"). Daftar selisih lengkap: `docs/daftar-selisih.md`.
 - Uji owner: `PRA="$(cat tools/pra_owner.js)" ID="" tools/potret.sh app "" hasil.png tools/uji_alur_owner_beranda.js`.
+
+## Paket 2026-10-07: keputusan pemilik + kelompok 4 HP toko
+- `karyawan_daftar` kini juga mengirim `admin_daftar` (akun ADMIN cabang itu: id, nama, panggilan, shift, aktif; HANYA BACA di layar Karyawan, tanpa aksi apa pun; fungsi murni `daftarAdminCabang`), `id_berikutnya` (ID karyawan baru berikutnya, `buatIdKaryawan`) dan `jatah_cuti` (UMUM `jatah_cuti`, bawaan 6) untuk baris info layar tambah karyawan. Aksi ubah/hapus karyawan tidak berubah (tetap hanya role KARYAWAN).
+- Kelompok 4 (HP toko): tampilan diselaraskan (layar utama, pilih nama + PIN, pop-up, absen terlalu pagi); logika absen tidak diubah. Selisih yang belum diputuskan pemilik: `docs/daftar-selisih.md`. Mockup 61 ("PIN 4 digit") dan 63 ("password awal") usang; pemilik yang merevisi mockup (jangan diedit).
+- Pengisi uji HP toko: `PRA="$(cat tools/pra_toko.js)"` + `tools/isi_alur_toko.js` (alur absen dengan server tiruan; atur `window.__MODE`, `window.__absen`, `window.__TAHAN`).

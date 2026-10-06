@@ -29,7 +29,7 @@ window.fetch = function (url, opsi) {
     ok('judul Konfirmasi, badge "Admin Ngawi", catatan owner tersembunyi', el('konfJudul').textContent === 'Konfirmasi' && el('konfBadge').textContent === 'Admin Ngawi' && el('konfCatatan').style.display === 'none');
     var chips = Array.prototype.map.call(el('konfChips').querySelectorAll('button'), function (b) { return b.textContent + (b.disabled ? '[x]' : ''); });
     H.push('       chip: ' + chips.join(' | '));
-    ok('chip: Semua 4, Lembur 2, Absen luar 1, Pulang cepat 1; Izin dan Lupa absen "Segera" nonaktif', chips[0] === 'Semua 4' && chips[1] === 'Lembur 2' && chips[2] === 'Absen luar 1' && chips[3] === 'Pulang cepat 1' && /Izin.*Segera\[x\]/.test(chips[4]) && /Lupa absen.*Segera\[x\]/.test(chips[5]));
+    ok('chip: Semua 4, Lembur 2, Absen luar 1 (tanpa chip Pulang cepat, keputusan pemilik); Izin dan Lupa absen "Segera" nonaktif', chips[0] === 'Semua 4' && chips[1] === 'Lembur 2' && chips[2] === 'Absen luar 1' && chips.length === 5 && /Izin.*Segera\[x\]/.test(chips[3]) && /Lupa absen.*Segera\[x\]/.test(chips[4]));
     el('konfChips').querySelector('button[data-kel="LEMBUR"]').click();
     var tampil = Array.prototype.filter.call(el('daftarKonfirmasi').querySelectorAll('.kartu-konf'), function (k) { return k.style.display !== 'none'; });
     ok('chip Lembur menyaring: hanya 2 kartu lembur tampil', tampil.length === 2 && tampil.every(function (k) { return k.getAttribute('data-kel') === 'LEMBUR'; }));
