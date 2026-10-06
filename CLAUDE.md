@@ -201,3 +201,8 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - `karyawan_daftar` kini juga mengirim `admin_daftar` (akun ADMIN cabang itu: id, nama, panggilan, shift, aktif; HANYA BACA di layar Karyawan, tanpa aksi apa pun; fungsi murni `daftarAdminCabang`), `id_berikutnya` (ID karyawan baru berikutnya, `buatIdKaryawan`) dan `jatah_cuti` (UMUM `jatah_cuti`, bawaan 6) untuk baris info layar tambah karyawan. Aksi ubah/hapus karyawan tidak berubah (tetap hanya role KARYAWAN).
 - Kelompok 4 (HP toko): tampilan diselaraskan (layar utama, pilih nama + PIN, pop-up, absen terlalu pagi); logika absen tidak diubah. Selisih yang belum diputuskan pemilik: `docs/daftar-selisih.md`. Mockup 61 ("PIN 4 digit") dan 63 ("password awal") usang; pemilik yang merevisi mockup (jangan diedit).
 - Pengisi uji HP toko: `PRA="$(cat tools/pra_toko.js)"` + `tools/isi_alur_toko.js` (alur absen dengan server tiruan; atur `window.__MODE`, `window.__absen`, `window.__TAHAN`).
+
+## Paket 2026-10-08
+- Konfirmasi (layar 28 owner dan 52 admin): semua pengajuan dimuat, diurut dari yang PALING LAMA, hanya MAKSIMAL 5 kartu tampil; kartu berikutnya naik setelah satu di-ACC/ditolak; angka total tetap seluruhnya. Hanya tampilan; hak di server tidak berubah.
+- Pop-up 15 (pulang awal) dan 17 (lembur) tampil lebih dulu sebelum layar alasan/pekerjaan lembur; penyimpanan tetap setelah alasan/pekerjaan dikirim. Judul layar pilih nama: "Absen Masuk PIN" / "Absen Pulang PIN" / "Lembur PIN". Tanggal layar utama HP toko: "NamaHari, d NamaBulan yyyy".
+- Uji baru: `tools/uji_alur_hp_toko.js`, `tools/uji_alur_konfirmasi_antrean.js` (admin; versi owner lewat `tools/pra_owner.js` dan `window.__MODE_OWNER = true`), `tools/uji_tombol_segera.js`.

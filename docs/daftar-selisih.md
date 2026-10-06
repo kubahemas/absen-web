@@ -123,29 +123,45 @@ Semua selisih di bawah **belum diputuskan pemilik**: tidak diubah, hanya dicatat
 
 | No | Elemen / selisih | Kondisi di app | Siapa | Gambar |
 |---|---|---|---|---|
-| 01 Layar utama | Tanggal "Senin, 28 September 2026" | Format "Rabu, 07/10/26" (dd/MM/yy) | Claude Code | `01_dampingan.png` |
 | 〃 | Kartu "Hari ini tidak masuk (8)" + nama-nama | Kartu putus-putus pudar "Hari ini tidak masuk · Segera" tanpa angka dan nama (belum ada data izin/libur di HP toko) | Belum ada fungsi | `01_dampingan.png` |
-| 〃 | Tombol LEMBUR hitam menyala | Pudar sampai jam lembur (aturan jam) | Claude Code | `01_dampingan.png` |
+| 〃 | Tombol LEMBUR hitam menyala | Pudar sampai jam lembur (aturan jam). **Belum diputuskan pemilik, tidak diubah** | Belum diputuskan | `01_dampingan.png` |
 | 02 Jadwal shift hari ini | Seluruh layar (muncul saat label "Shift 1 aktif ▾" diketuk) | Belum dibuat; label tetap tampil tetapi tidak membuka apa pun (butuh aksi jadwal di server) | Belum ada fungsi | `02_dampingan.png` |
 | 03, 04, 08 Pindai wajah, wajah dikenali, wajah tidak terbaca | Seluruh layar | Belum dibuat (pengenalan wajah belum ada) | Belum ada fungsi | – |
 | 05 Sudah absen (dobel), 06 Shift tidak sesuai jadwal, 07 Sudah absen lembur · revisi, 13 Peringatan lanjutan, 18 dan 19 (absen kemarin belum lengkap) | Seluruh layar | Belum dibuat; absen dobel ditolak server dengan pop-up "Tidak tersimpan" | Belum ada fungsi | – |
-| 09 Pilih nama + PIN | Judul "Pilih nama + PIN" | Judul berubah menurut mode: "Absen masuk/pulang: pilih nama", "Lembur: pilih nama" | Claude Code | `09_dampingan.png` |
-| 〃 | Tombol "Foto ulang" | "Foto ulang · Segera" nonaktif (foto diambil otomatis saat PIN dikirim) | Belum ada fungsi | `09_dampingan.png` |
 | 〃 | "Nama (terjadwal hari ini, urut abjad)" dan "(Shift 1)" di tiap nama | "Nama (urut abjad)" tanpa "(Shift N)": HP toko belum punya data jadwal, label mockup akan menyesatkan | Claude Code | `09_dampingan.png` |
 | 〃 | Tautan "Tidak ada di jadwal atau karyawan cabang lain" | Pudar "Segera" | Belum ada fungsi | `09_dampingan.png` |
 | 〃 | "Masukkan PIN 4 digit", 4 titik, "Digit keempat langsung menyimpan absen" | 5 angka, 5 titik, "Angka kelima…" (aturan server; mockup usang) | Pemilik (PIN 5 angka); mockup perlu direvisi | `09_dampingan.png` |
-| 〃 | Keypad aktif sejak awal | Keypad pudar sebelum nama dipilih; ada tautan tambahan "‹ Kembali ke layar utama" di bawah | Claude Code | `09_dampingan.png` |
 | 10 Pop-up tepat waktu | Kotak "Bulan ini" 18/1/0/5 dari 6 | Empat kotak pudar "Segera" tanpa angka (sisa cuti belum dihitung) | Belum ada fungsi | `10_dampingan.png` |
 | 11 Pop-up telat | Kotak "Bulan ini" berisi angka | Empat kotak pudar "Segera" (warna merah muda seperti mockup) | Belum ada fungsi | `11_dampingan.png` |
 | 12 Alasan telat | (tidak ada selisih tampilan) | Sama | sesuai | `12_dampingan.png` |
 | 14 Pop-up pulang | Kotak "Bulan ini" | Empat kotak pudar "Segera" | Belum ada fungsi | `14_dampingan.png` |
-| 15 Pop-up pulang awal | Pop-up "Terima kasih…" lebih dulu, baru layar alasan | App langsung membuka layar alasan (16); absen baru tersimpan setelah alasan diisi (logika server yang sudah lulus tes) | Claude Code (urutan layar) | `15_dampingan.png` |
-| 16 Alasan pulang awal | Judul satu baris, teks bawah singkat | "Kenapa pulang awal, Budi? (wajib)" dua baris; teks bawah lebih panjang | Claude Code | `16_dampingan.png` |
-| 17 Pop-up lembur | Pop-up "Terima kasih… Lembur 18:35 (2 jam 5 menit)" lebih dulu | App langsung membuka layar pekerjaan lembur (20) | Claude Code (urutan layar) | `20_dampingan.png` |
-| 20 Lembur | Isi keterangan contoh, "Pulang 17:48" | Sama strukturnya; jarak vertikal beberapa piksel berbeda | Claude Code | `20_dampingan.png` |
 | 21 Absen terlalu pagi | "Sekarang 06:21. Silakan kembali absen 23 menit lagi." | Pop-up dibuat seperti mockup (latar abu, ikon jam, "Dibuka mulai HH:mm (Shift N)"); baris sisa waktu = "Sekarang dan sisa waktu · Segera" (tidak ada jam server di layar); jam buka diambil dari teks pesan server | Belum ada fungsi | `21_dampingan.png` |
 | 22 Cek surat dokter, 23 Izin sakit dengan surat dokter | Seluruh layar | Belum dibuat (fitur izin belum ada) | Belum ada fungsi | – |
 | 24 Owner · Cabang dan shift, 25 Owner · Data absensi | Seluruh layar | Belum dibuat; item menu "Segera" | Belum ada fungsi | – |
-| 26 Owner · Ganti password | Tanda centang hijau pada syarat | Syarat abu sampai terpenuhi; teks "Tidak sama dengan password lama (huruf besar/kecil dianggap sama)" lebih panjang | Claude Code | `26_dampingan.png` |
 | 27 Owner · Keluarkan semua perangkat | Daftar perangkat yang sedang login | Daftar tampil bila server mengirim; dialog tanpa latar gelap penuh (beranda samar di belakang) | Claude Code | `27_dampingan.png` |
-| 28 Owner · Konfirmasi data admin | Badge "Owner" hitam; subjudul "Pengajuan milik admin"; kartu tanpa kotak Foto | Badge abu, subjudul memuat "· N menunggu", kartu memakai kotak Foto dan tanggal "Senin 28 Sep"; kartu izin belum ada | Claude Code / Belum ada fungsi | `28_dampingan.png` |
+
+## Keputusan pemilik 2026-10-08 (sudah diterapkan, pemutus = pemilik)
+
+| No | Layar | Keputusan | Gambar |
+|---|---|---|---|
+| 1 | 01 | Tanggal mengikuti mockup: format "NamaHari, d NamaBulan yyyy" dengan tanggal hari ini (contoh "Rabu, 7 Oktober 2026") | `01_dampingan.png` |
+| 2 | 09 | Versi app dipertahankan, dengan: (a) tautan "‹ Kembali ke layar utama" diturunkan (jarak 18 px dari keypad); (b) bingkai foto diperbesar dari 76 px/border 5 px menjadi 100 px/border 7 px (**ukuran pilihan Claude Code, mohon dinilai pemilik di gambar dampingan**); (c) judul mengikuti mode: "Absen Masuk PIN", "Absen Pulang PIN", "Lembur PIN" | `09_dampingan.png` |
+| 3 | 15, 17 | Pop-up 15 (pulang awal) dan 17 (lembur) dibuat persis mockup, tampil LEBIH DULU sebelum layar alasan (16) / pekerjaan lembur (20). Urutan penyimpanan dan logika server tidak berubah: absen baru tersimpan setelah alasan/pekerjaan dikirim. Pop-up 15 memakai hitung mundur 10 detik; kalau tidak ditekan tidak ada yang tersimpan (sama dengan aturan lama). Pop-up 17 menutup sendiri 4 detik lalu membuka layar 20. Jam = jam tiket dari server (bukan jam HP). "Durasi lembur" memakai `durasi_menit` dari balasan server (data nyata, bukan karangan); bila server tidak mengirimnya, tidak ditampilkan. **Risiko yang sudah disadari pemilik:** teks "Terima kasih" muncul sebelum absen tersimpan | `15_dampingan.png`, `17_dampingan.png` |
+| 4 | 16, 20, 21, 26 | Versi app sekarang dipertahankan | `16_dampingan.png`, `20_dampingan.png`, `21_dampingan.png`, `26_dampingan.png` |
+| 5 | 28, 52 | Versi app dipertahankan; kartu tampil MAKSIMAL 5, urut dari yang paling lama (tanggal lalu jam); sisanya mengantre dan naik setelah satu di-ACC/ditolak; angka total tetap seluruhnya. Semua halaman server dimuat sekali, diurutkan di HP. Hak, ACC, tolak, edit, foto tidak berubah | `28_dampingan.png`, `52_dampingan.png` |
+| 6 | 35, 60 | Disetujui pemilik, tidak diubah | `35_dampingan.png`, `60_dampingan.png` |
+
+## Selisih kelompok 4 yang MASIH belum diputuskan pemilik (tidak diubah)
+
+| No | Elemen / selisih | Kondisi di app | Gambar |
+|---|---|---|---|
+| 01 | Tombol LEMBUR hitam menyala | Pudar sampai jam lembur | `01_dampingan.png` |
+| 01 | Kartu "Hari ini tidak masuk (8)" + nama | Nonaktif "Segera" tanpa angka dan nama | `01_dampingan.png` |
+| 02 | Layar jadwal hari ini (muncul dari label "Shift 1 aktif ▾") | Belum dibuat; label tidak membuka apa pun tetapi masih tampak bisa diketuk | `02_dampingan.png` |
+| 09 | "Nama (terjadwal hari ini, urut abjad)", "(Shift N)", tautan "Tidak ada di jadwal…" | Label "Nama (urut abjad)"; tautan dan "Foto ulang" nonaktif "Segera"; keypad pudar sebelum nama dipilih; "PIN 5 angka" (mockup usang 4 digit) | `09_dampingan.png` |
+| 10, 11, 14 | Kotak "Bulan ini" berisi angka | Empat kotak nonaktif "Segera" (sisa cuti belum dihitung) | `10_dampingan.png`, `11_dampingan.png`, `14_dampingan.png` |
+| 15, 17 | Kotak "Bulan ini" | Nonaktif "Segera" | `15_dampingan.png`, `17_dampingan.png` |
+| 27 | Dialog tanpa beranda; daftar perangkat | Beranda samar di belakang; daftar tampil bila server mengirim | `27_dampingan.png` |
+| 28 | Kartu izin, tanpa kotak Foto, badge hitam, subjudul "Pengajuan milik admin" | Kartu izin belum ada; kotak Foto, badge abu, subjudul memuat jumlah | `28_dampingan.png` |
+| 52 | Chip "Izin 1", "Lupa absen 1", kartu izin/lupa absen/tukar shift | Chip "Segera" nonaktif; kartu itu belum ada | `52_dampingan.png` |
+| 03, 04, 05, 06, 07, 08, 13, 18, 19, 22–25 | Seluruh layar | Belum dibuat (butuh fitur wajah/jadwal/izin/server) | – |

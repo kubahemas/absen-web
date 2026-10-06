@@ -481,7 +481,7 @@
   /* ---- Pilih nama + PIN: penyelarasan ke mockup 09 ---- */
   #layarPilihNama .pilih-atas { gap: 9px; }
   #layarPilihNama .pn-baris-foto { display: flex; gap: 14px; align-items: center; }
-  #layarPilihNama .foto-lingkar { position: relative; overflow: hidden; width: 76px; height: 76px; border-radius: 50%; background: var(--krem); border: 5px solid var(--abu); box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--abu-teks); text-align: center; }
+  #layarPilihNama .foto-lingkar { position: relative; overflow: hidden; width: 100px; height: 100px; border-radius: 50%; background: var(--krem); border: 7px solid var(--abu); box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--abu-teks); text-align: center; }
   #layarPilihNama .foto-lingkar .lingkar-kamera { position: absolute; inset: 0; top: 0; right: 0; width: auto; height: auto; border: none; border-radius: 0; }
   #layarPilihNama .pn-teks-foto { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   #layarPilihNama .pilih-judul { font-size: 26px; line-height: 1.1; }
@@ -496,6 +496,7 @@
   #layarPilihNama .pin-titik div { width: 18px; height: 18px; }
   #layarPilihNama .keypad button { height: 44px; font-size: 24px; }
   #layarPilihNama .keypad button.kosong { font-size: 14px; }
+  #layarPilihNama #btnBatalNama { margin-top: 18px; padding: 10px 4px; }
   #layarPilihNama .keypad button.hapus { background: transparent; display: flex; align-items: center; justify-content: center; }
   /* ---- Pop-up hasil absen (disalin dari mockup 6a tepat waktu, 6b telat, 6b2 alasan) ---- */
   @keyframes jatuh { 0% { transform: translateY(-40px) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(110vh) rotate(540deg); opacity: 1; } }
@@ -978,7 +979,7 @@
       <div class="pn-baris-foto">
         <div class="foto-lingkar"><span>Foto kamera</span><div class="lingkar-kamera" id="kotakKamera" style="display:none"><video id="pratinjauKamera" playsinline muted autoplay></video></div></div>
         <div class="pn-teks-foto">
-          <div class="pilih-judul">Pilih nama + PIN</div>
+          <div class="pilih-judul">Absen Masuk PIN</div>
           <div class="pn-sub">Foto ini tersimpan sebagai bukti absen</div>
           <button type="button" class="btn-foto-ulang belum-aktif" disabled aria-disabled="true"><svg aria-hidden="true" fill="none" height="14" stroke="var(--hitam)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="14"><path d="M1 4v6h6"></path><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"></path></svg>Foto ulang<span class="segera">Segera</span></button>
         </div>
@@ -1147,9 +1148,10 @@
   (function () {
     const sekarang = new Date();
     const dua = function (n) { return String(n).padStart(2, '0'); };
+    // Keputusan pemilik: "NamaHari, d NamaBulan yyyy" (mockup 01), contoh "Senin, 28 September 2026"
+    const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     document.getElementById('tanggalHariIni').textContent =
-      new Intl.DateTimeFormat('id-ID', { weekday: 'long' }).format(sekarang) + ', ' +
-      dua(sekarang.getDate()) + '/' + dua(sekarang.getMonth() + 1) + '/' + String(sekarang.getFullYear()).slice(2);
+      new Intl.DateTimeFormat('id-ID', { weekday: 'long' }).format(sekarang) + ', ' + sekarang.getDate() + ' ' + bulan[sekarang.getMonth()] + ' ' + sekarang.getFullYear();
   })();
 
   // ---- Status online/offline ----
@@ -1647,6 +1649,43 @@
       '</div>', 4);
   }
 
+  // Pop-up 15 (pulang awal) dan 17 (lembur): tampil LEBIH DULU, sebelum layar alasan (16) / pekerjaan lembur (20).
+  // Absen BELUM tersimpan di server pada tahap ini (tersimpan setelah alasan/keterangan dikirim); jam = jam tiket dari server, bukan jam HP.
+  function tampilPopupSebelumAlasan(data, panggilan) {
+    const lembur = alasan.mode === 'LEMBUR';
+    tutupPopup();
+    wajib = true;
+    popup.className = 'popup tampil hitam';
+    setTema(TEMA.hitam);
+    const durasi = lembur && data.durasi_menit ? ' (' + teksDurasi(data.durasi_menit) + ')' : '';
+    popup.innerHTML =
+      '<div class="kartu">' +
+        '<div class="ikon-besar"><div class="bulat">' + SVG_KELUAR + '</div></div>' +
+        '<div class="judul-popup">Terima kasih, ' + escHtml(panggilan) + '!</div>' +
+        (lembur
+          ? '<div class="pil">Lembur ' + escHtml(data.jam) + durasi + '</div>'
+          : '<div class="pil merah-pil">Pulang awal ' + escHtml(data.jam) + ' (' + escHtml(data.shift) + ')</div>') +
+        (data.acc === 'MENUNGGU' ? '<div class="pil-menunggu">Menunggu persetujuan admin</div>' : '') +
+        htmlBulanIni() +
+        (lembur ? '<div class="petunjuk">Menutup otomatis dalam 4 detik</div>'
+                : '<button type="button" class="tombol-alasan" id="btnIsiAlasan">ISI ALASAN PULANG AWAL</button><div class="petunjuk-merah">Isi dalam <b id="sisaDetik">10</b> detik.</div>') +
+      '</div>';
+    const lanjut = function () { tutupPopup(); bukaLayarAlasan(); };
+    if (lembur) {
+      popup.onclick = lanjut;
+      timerPopup = setTimeout(lanjut, 4000);
+      return;
+    }
+    document.getElementById('btnIsiAlasan').addEventListener('click', lanjut);
+    const selesai = Date.now() + 10000;
+    timerHitung = setInterval(function () {
+      const sisa = Math.ceil((selesai - Date.now()) / 1000);
+      if (sisa <= 0) { alasan = null; fotoMenunggu = null; tutupPopupDanReset(); return; } // tidak ditekan: tidak ada yang tersimpan
+      const el = document.getElementById('sisaDetik');
+      if (el) { el.textContent = sisa; }
+    }, 250);
+  }
+
   // Tiket waktu: begitu tombol ditekan, minta jam server (ditandatangani) di latar belakang.
   // Jam absen yang dicatat = jam di tiket (saat tombol ditekan), bukan saat PIN dimasukkan.
   let tiketPromise = null;
@@ -1785,7 +1824,7 @@
           panggilan: panggilan, nama: data.nama, jam: data.jam, shift: data.shift,
           tingkat: data.tingkat, durasi: data.durasi_menit, acc: data.acc === 'MENUNGGU'
         };
-        bukaLayarAlasan();
+        tampilPopupSebelumAlasan(data, panggilan);
       } else {
         tampilPulang(data, panggilan);
         mulaiUnggah(data.id_absen, 'PULANG'); // foto menyusul di latar belakang, tidak menunda pop-up
@@ -1814,7 +1853,7 @@
   function bukaPilihNama(mode) {
     modeAbsen = mode;
     document.querySelector('.pilih-judul').textContent =
-      mode === 'MASUK' ? 'Absen masuk: pilih nama' : (mode === 'PULANG' ? 'Absen pulang: pilih nama' : 'Lembur: pilih nama');
+      mode === 'MASUK' ? 'Absen Masuk PIN' : (mode === 'PULANG' ? 'Absen Pulang PIN' : 'Lembur PIN');
     tampilLayar(layarPilihNama);
     mintaTiket(mode);
     if (!daftarKaryawan.length && !mutaDaftarKaryawan) { muatDaftarKaryawan(); }
@@ -3281,7 +3320,7 @@
 
   function bukaKonfirmasi(mode) {
     modeKonf = mode;
-    konfOffset = 0;
+    konfOffset = 0; konfAntrean = [];
     konfKelompokTerakhir = '';
     daftarKonfirmasi.innerHTML = '';
     document.getElementById('btnMuatLagi').style.display = 'none';
@@ -3358,17 +3397,32 @@
     const bisa = (modeKonf !== 'OWNER');
     kotak.style.display = bisa ? '' : 'none';
     if (!bisa) { return; }
-    const semuaMuat = document.getElementById('btnMuatLagi').style.display === 'none';
-    const jml = function (k) { return semuaMuat ? ' ' + daftarKonfirmasi.querySelectorAll('.kartu-konf[data-kel="' + k + '"]').length : ''; };
+    const jml = function (k) { return ' ' + konfAntrean.filter(function (it) { return it.kelompok === k; }).length; };
     const def = [['', 'Semua ' + (konfTotal > 99 ? '99+' : konfTotal)], ['LEMBUR', 'Lembur' + jml('LEMBUR')], ['LUAR', 'Absen luar' + jml('LUAR')]];
     kotak.innerHTML = def.map(function (c) {
       return '<button type="button" data-kel="' + c[0] + '"' + (konfKelPilih === c[0] ? ' class="pilih"' : '') + '>' + c[1] + '</button>';
     }).join('') + '<button type="button" disabled>Izin · Segera</button><button type="button" disabled>Lupa absen · Segera</button>';
   }
-  function terapkanFilterKonf() {
-    daftarKonfirmasi.querySelectorAll('.kartu-konf').forEach(function (k) {
-      k.style.display = (modeKonf === 'OWNER' || !konfKelPilih || k.getAttribute('data-kel') === konfKelPilih) ? '' : 'none';
+  // Antrean tampilan: semua pengajuan dimuat, diurut dari yang PALING LAMA; hanya MAKSIMAL 5 kartu tampil sekaligus.
+  // Kartu berikutnya naik setelah satu di-ACC/ditolak. Hanya pengaturan tampilan: hak, ACC, tolak, edit, foto tetap di server.
+  const MAKS_KARTU_KONF = 5;
+  let konfAntrean = [];
+  function cocokFilterKonf(it) { return modeKonf === 'OWNER' || !konfKelPilih || it.kelompok === konfKelPilih; }
+  function isiKartuKonf() {
+    const tampil = {};
+    daftarKonfirmasi.querySelectorAll('.kartu-konf').forEach(function (k) { tampil[k.getAttribute('data-id')] = true; });
+    let n = Object.keys(tampil).length;
+    let html = '';
+    konfAntrean.forEach(function (it) {
+      if (n >= MAKS_KARTU_KONF || tampil[it.id] || !cocokFilterKonf(it)) { return; }
+      html += kartuKonfirmasi(it); n++;
     });
+    if (html) { daftarKonfirmasi.insertAdjacentHTML('beforeend', html); }
+  }
+  function terapkanFilterKonf() {
+    daftarKonfirmasi.innerHTML = '';
+    isiKartuKonf();
+    if (!daftarKonfirmasi.querySelector('.kartu-konf') && !konfAntrean.length) { daftarKonfirmasi.innerHTML = '<div class="hp-ket">Tidak ada yang menunggu persetujuan.</div>'; }
   }
   document.getElementById('konfChips').addEventListener('click', function (e) {
     const b = e.target.closest('button[data-kel]');
@@ -3378,44 +3432,52 @@
     terapkanFilterKonf();
   });
 
+  function teksSubKonf() {
+    if (modeKonf !== 'OWNER') { return ''; }
+    return konfTotal ? 'Pengajuan milik admin · ' + (konfTotal > 99 ? '99+' : konfTotal) + ' menunggu' : 'Tidak ada pengajuan admin yang menunggu';
+  }
   function muatKonfirmasi() {
     if (konfMemuat) { return; }
     konfMemuat = true;
-    const dasar = Object.assign({ aksi: 'konfirmasi_daftar', offset: konfOffset }, kredKonf());
-    if (modeKonf === 'OWNER' && document.getElementById('konfCabang').value) { dasar.cabang = document.getElementById('konfCabang').value; }
-    kirimPost(dasar)
+    const kumpul = [];
+    const ambil = function (offset, halaman) {
+      const dasar = Object.assign({ aksi: 'konfirmasi_daftar', offset: offset }, kredKonf());
+      if (modeKonf === 'OWNER' && document.getElementById('konfCabang').value) { dasar.cabang = document.getElementById('konfCabang').value; }
+      return kirimPost(dasar).then(function (d) {
+        if (konfGagalSesi(d)) { return null; }
+        if (d.status !== 'ok') { throw new Error(d.pesan || 'Gagal memuat.'); }
+        d.daftar.forEach(function (it) { kumpul.push(it); });
+        if (d.ada_lagi && d.daftar.length && halaman < 120) { return ambil(offset + d.daftar.length, halaman + 1).then(function () { return d; }); }
+        return d;
+      });
+    };
+    ambil(0, 0)
       .then(function (d) {
         konfMemuat = false;
-        if (konfGagalSesi(d)) { return; }
-        if (d.status !== 'ok') { pesanKonf(d.pesan || 'Gagal memuat.'); return; }
-        konfJumlahTeks = d.jumlah_teks;
-        konfTotal = d.total;
-        document.getElementById('konfSub').textContent = (modeKonf === 'OWNER') ? (d.total ? 'Pengajuan milik admin · ' + d.jumlah_teks + ' menunggu' : 'Tidak ada pengajuan admin yang menunggu') : '';
-        let html = '';
-        d.daftar.forEach(function (it) { html += kartuKonfirmasi(it); });
-        daftarKonfirmasi.insertAdjacentHTML('beforeend', html);
-        konfOffset += d.daftar.length;
-        document.getElementById('btnMuatLagi').style.display = d.ada_lagi ? '' : 'none';
+        if (!d) { return; }
+        // paling lama di atas: tanggal lalu jam (pengajuan terlama dulu)
+        konfAntrean = kumpul.sort(function (x, y) { const a = String(x.tanggal) + ' ' + String(x.jam || ''), b = String(y.tanggal) + ' ' + String(y.jam || ''); return a < b ? -1 : (a > b ? 1 : 0); });
+        konfTotal = konfAntrean.length;
+        document.getElementById('btnMuatLagi').style.display = 'none';
+        document.getElementById('konfSub').textContent = teksSubKonf();
         gambarChipKonf();
         terapkanFilterKonf();
-        if (!d.total) { daftarKonfirmasi.innerHTML = '<div class="hp-ket">Tidak ada yang menunggu persetujuan.</div>'; }
       })
-      .catch(function () { konfMemuat = false; pesanKonf('Tidak bisa terhubung ke server.'); });
+      .catch(function (e) { konfMemuat = false; pesanKonf(e && e.message && /^[A-Z]/.test(e.message) && e.message.length < 120 ? e.message : 'Tidak bisa terhubung ke server.'); });
   }
   document.getElementById('btnMuatLagi').addEventListener('click', muatKonfirmasi);
   document.getElementById('konfCabang').addEventListener('change', function () { bukaKonfirmasi('OWNER'); });
   document.getElementById('btnKembaliKonf').addEventListener('click', keluarKonfirmasi);
 
   function hapusKartuKonfirmasi(kartu) {
-    const sebelum = kartu.previousElementSibling, sesudah = kartu.nextElementSibling;
+    const id = kartu.getAttribute('data-id');
     kartu.remove();
-    // yang diputuskan hilang dari daftar server: geser offset supaya "Muat lagi" tidak melewatkan item
-    konfOffset = Math.max(0, konfOffset - 1);
-    konfTotal = Math.max(0, konfTotal - 1);
-    document.getElementById('konfSub').textContent = (modeKonf === 'OWNER') ? (konfTotal ? 'Pengajuan milik admin · ' + (konfTotal > 99 ? '99+' : konfTotal) + ' menunggu' : 'Tidak ada pengajuan admin yang menunggu') : '';
+    konfAntrean = konfAntrean.filter(function (it) { return it.id !== id; });
+    konfTotal = konfAntrean.length;
+    document.getElementById('konfSub').textContent = teksSubKonf();
     gambarChipKonf();
-    if (sebelum && sebelum.classList.contains('judul-kelompok') && (!sesudah || sesudah.classList.contains('judul-kelompok'))) { sebelum.remove(); }
-    if (!daftarKonfirmasi.querySelector('.kartu-konf')) { konfOffset = 0; konfKelompokTerakhir = ''; daftarKonfirmasi.innerHTML = ''; muatKonfirmasi(); }
+    isiKartuKonf(); // kartu berikutnya dalam antrean naik mengisi tempat
+    if (!daftarKonfirmasi.querySelector('.kartu-konf') && !konfAntrean.length) { daftarKonfirmasi.innerHTML = '<div class="hp-ket">Tidak ada yang menunggu persetujuan.</div>'; }
   }
 
   function putuskanKonfirmasi(kartu, keputusan) {
@@ -3454,7 +3516,7 @@
         if (konfGagalSesi(d)) { return; }
         if (d.status === 'ok') {
           pesanKonf('Pengajuan diperbarui. Masih menunggu ACC.');
-          konfOffset = 0; daftarKonfirmasi.innerHTML = ''; muatKonfirmasi();
+          konfAntrean = []; daftarKonfirmasi.innerHTML = ''; muatKonfirmasi();
           return;
         }
         pesan.textContent = pesanEditRamah(d);

@@ -94,7 +94,7 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 
 | No | Layar mockup | Status | Catatan |
 |---|---|---|---|
-| 01 | 1. HP Toko - Layar utama | tersambung (ada selisih) | Kartu "Hari ini tidak masuk" nonaktif "Segera"; format tanggal dd/MM/yy |
+| 01 | 1. HP Toko - Layar utama | tersambung (ada selisih) | Tanggal ikut mockup (keputusan pemilik); LEMBUR pudar dan kartu "Hari ini tidak masuk" nonaktif (belum diputuskan) |
 | 02 | 1c. Shift 1 aktif - jadwal hari ini | belum | **Menunggu fitur** jadwal (label tidak membuka apa pun) |
 | 03 | 2. Pindai wajah | belum | **Menunggu fitur** wajah |
 | 04 | 3. Wajah dikenali | belum | **Menunggu fitur** wajah |
@@ -102,26 +102,26 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 | 06 | 3d. Shift tidak sesuai jadwal | belum | **Menunggu fitur** |
 | 07 | 3c. Sudah absen lembur - revisi | belum | **Menunggu fitur** |
 | 08 | 4. Wajah tidak terbaca | belum | **Menunggu fitur** wajah |
-| 09 | 5. Pilih nama + PIN | tersambung (ada selisih) | "Foto ulang" dan tautan jadwal nonaktif; PIN 5 angka |
+| 09 | 5. Pilih nama + PIN | tersambung (ada selisih) | Versi app dipertahankan (keputusan pemilik): judul "Absen Masuk/Pulang/Lembur PIN", bingkai foto 100 px |
 | 10 | 6a. Pop-up TEPAT WAKTU | tersambung (ada selisih) | "Bulan ini" nonaktif |
 | 11 | 6b. Pop-up TELAT | tersambung (ada selisih) | "Bulan ini" nonaktif |
 | 12 | 6b2. Alasan telat | tersambung | Tidak ada selisih tampilan yang terlihat |
 | 13 | 6b3. Peringatan lanjutan | belum | **Menunggu fitur** |
 | 14 | 6c. Pop-up PULANG | tersambung (ada selisih) | "Bulan ini" nonaktif |
-| 15 | 6d. Pop-up PULANG AWAL | belum | App langsung membuka layar alasan (16); pop-up 15 tidak ada |
-| 16 | 6d2. Alasan pulang awal | tersambung (ada selisih) | Judul dua baris, teks bawah lebih panjang |
-| 17 | 6e. Pop-up LEMBUR | belum | App langsung membuka layar lembur (20); pop-up 17 tidak ada |
+| 15 | 6d. Pop-up PULANG AWAL | tersambung (ada selisih) | Pop-up persis mockup tampil lebih dulu; "Bulan ini" nonaktif |
+| 16 | 6d2. Alasan pulang awal | tersambung | Versi app dipertahankan (keputusan pemilik) |
+| 17 | 6e. Pop-up LEMBUR | tersambung (ada selisih) | Pop-up persis mockup tampil lebih dulu, lalu layar 20; "Bulan ini" nonaktif |
 | 18 | 6f. Masuk + belum absen pulang kemarin | belum | **Menunggu fitur** |
 | 19 | 6g. Pulang + belum absen masuk | belum | **Menunggu fitur** |
-| 20 | 7. Lembur | tersambung (ada selisih) | Selisih jarak kecil |
-| 21 | 6h. Absen terlalu pagi | tersambung (ada selisih) | Pop-up seperti mockup; "Sekarang… menit lagi" nonaktif |
+| 20 | 7. Lembur | tersambung | Versi app dipertahankan (keputusan pemilik) |
+| 21 | 6h. Absen terlalu pagi | tersambung | Versi app dipertahankan (keputusan pemilik); baris sisa waktu nonaktif |
 | 22 | Admin - Cek Surat Dokter | belum | **Menunggu fitur** izin |
 | 23 | HP Pribadi - Izin Sakit dengan Surat Dokter | belum | **Menunggu fitur** izin |
 | 24 | Owner - Cabang dan Shift | belum | **Menunggu fitur** |
 | 25 | Owner - Data Absensi | belum | **Menunggu fitur** |
-| 26 | Owner - Ganti Password | tersambung (ada selisih) | Syarat abu sampai terpenuhi |
+| 26 | Owner - Ganti Password | tersambung | Versi app dipertahankan (keputusan pemilik) |
 | 27 | Owner - Keluarkan Semua Perangkat | tersambung (ada selisih) | Daftar perangkat dari server |
-| 28 | Owner - Konfirmasi Data Admin | tersambung (ada selisih) | Badge, subjudul, kotak Foto beda |
+| 28 | Owner - Konfirmasi Data Admin | tersambung | Versi app dipertahankan; maksimal 5 kartu terlama (keputusan pemilik) |
 
 ## Perubahan dari mockup: keputusan pemilik 2026-10-07 (tambahan)
 

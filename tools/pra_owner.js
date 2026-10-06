@@ -39,3 +39,18 @@ window.fetch = function (url, opsi) {
   if (b.aksi === 'owner_daftar_hp') { d = { status: 'ok', hp_toko: [{ id: 'HPT-NGW-01', nama: 'HP toko 1', cabang: 'Ngawi', aktif: true }, { id: 'HPT-NGW-02', nama: 'HP toko 2', cabang: 'Ngawi', aktif: true }, { id: 'HPT-PST-01', nama: 'HP toko pusat', cabang: 'Pusat', aktif: false }] }; }
   return Promise.resolve({ json: function () { return Promise.resolve(d); } });
 };
+// Antrean Konfirmasi (28) yang bisa diisi ulang oleh uji: window.__KONF (urutan server = terbaru dulu)
+(function () {
+  var f0 = window.fetch;
+  var mk = function (id, kel, jenis, nama) { return { id: id, jenis: jenis, kelompok: kel, karyawan: id.split('|')[0], nama: nama, cabang: 'Ngawi', tanggal: '2026-09-28', shift: '1', jam: '08:05', status: '', ket: 'Survey', tingkat: kel === 'LEMBUR' ? 2 : 0, durasi_menit: 75, gps: kel === 'LUAR' ? '-7.4,111.4,12' : '', akurasi: 12, akurasi_buruk: false, maps: 'https://www.google.com/maps?q=-7.4,111.4', foto: 'ADA' }; };
+  window.__KONF = window.__KONF || [mk('A01|2026-09-28|MASUK', 'LUAR', 'MASUK', 'Dewi Lestari'), mk('A02|2026-09-27|PULANG', 'LEMBUR', 'PULANG', 'Sari Utami')];
+  window.fetch = function (url, opsi) {
+    var b = {}; try { b = JSON.parse(opsi.body); } catch (e) {}
+    var d = null;
+    if (window.__KONF && b.aksi === 'konfirmasi_daftar') { d = { status: 'ok', daftar: window.__KONF.slice(0, 20), total: window.__KONF.length, jumlah_teks: String(window.__KONF.length), ada_lagi: false }; }
+    if (window.__KONF && b.aksi === 'konfirmasi_jumlah') { d = { status: 'ok', jumlah: window.__KONF.length, jumlah_teks: String(window.__KONF.length) }; }
+    if (window.__KONF && b.aksi === 'konfirmasi_putuskan') { for (var q = 0; q < window.__KONF.length; q++) { if (window.__KONF[q].id === b.id) { window.__KONF.splice(q, 1); break; } } d = { status: 'ok', keputusan: b.keputusan === 'ACC' ? 'DITERIMA' : 'DITOLAK' }; }
+    if (d) { window.__panggilan.push(b); return Promise.resolve({ json: function () { return Promise.resolve(d); } }); }
+    return f0(url, opsi);
+  };
+})();
