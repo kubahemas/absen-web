@@ -224,3 +224,8 @@ Bukti: `docs/audit/visual/paket_*_app.png` (layar), `uji_alur_*_hasil.png` (alur
 
 - **Foto absen dan foto wajah HANYA dari kamera dalam aplikasi (2026-10-07, Tahap 4).** Layar 09, absen luar, absen manual (54) dan Update foto (65) memakai kamera depan (getUserMedia); galeri atau pemilih berkas tidak boleh. Hanya dokumen (surat izin di layar 41, 23, 66) boleh dari galeri. Jam foto pada absen manual/edit absen = waktu server saat tombol AMBIL FOTO ditekan (tiket `foto_tiket`, dicatat di log `UBAH_FOTO_ABSEN`); jam yang diketik hanya jam koreksi absen.
 - **Layar 74 = Log Edit absen owner** (hanya owner, 20 tindakan terbaru, tanpa foto, tanpa kolom sheet baru). G5: "Ganti PIN" layar 44 tetap "Segera"; karyawan memakai satu menu "Ganti password".
+
+### Keputusan pemilik 2026-10-07: SG1, SG2, SG3 (dipertahankan)
+- **SG1 (layar 54, 65):** mengetuk kotak foto (54) atau "Update foto" (65) membuka layar penuh kuning "Foto karyawan" dengan lingkaran kamera depan, AMBIL FOTO, lalu PAKAI FOTO / ULANGI dan Batal. Foto 640 px JPEG 0,6. Kamera ditolak/tidak ada: pesan "Izinkan akses kamera untuk mengambil foto", SIMPAN nonaktif, tidak ada jalan ke galeri.
+- **SG2 (layar 74):** log hanya 20 tindakan terbaru, kalimat di bawah judul "N tindakan · terbaru di atas", kolom Alasan kosong tampil "—", tanpa foto.
+- **SG3 (layar 74):** popup pilihan Admin tertutup di awal, dibuka dengan mengetuk judul kolom Admin; isinya daftar admin nyata + "Semua admin". Penyaring Waktu, Cabang, Karyawan dan tombol Ekspor tetap nonaktif.
