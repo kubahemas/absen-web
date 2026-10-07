@@ -17,6 +17,7 @@ if (K === 'pribadi' || K === 'pribadiadmin') {
     if (b.aksi === 'login_pribadi') { d = { status: 'ok', sesi: 'S'.repeat(40), id: 'K001', nama: 'Budi Santoso', panggilan: 'Budi', role: K === 'pribadiadmin' ? 'ADMIN' : 'KARYAWAN', cabang: 'Ngawi' }; }
     if (b.aksi === 'pribadi_hari_ini') { d = { status: 'ok', sudah_masuk: false, sudah_pulang: false, jam_masuk: '', jam_pulang: '', cara_masuk: '', st_pulang: '', lembur_boleh: false }; }
     if (b.aksi === 'konfirmasi_jumlah') { d = { status: 'ok', jumlah: 0, jumlah_teks: '0' }; }
+    if (b.aksi === 'laporan_saya') { d = { status: 'ok', nama: 'Budi Santoso', jam_masuk: '07:45', laporan: { bulan: '2026-10', bulan_teks: 'Oktober 2026', periode_teks: '1â9 Oktober', hari_kerja: 0, masuk: 0, telat_hari: 0, telat_mnt: 0, plg_awal: 0, alpha: 0, izin_biasa: 0, izin_khusus: 0, cuti_bulan: 0, jatah_cuti: 6, sisa_cuti: 6, lembur_hari: 0, lembur_1: 0, lembur_2: 0, lembur_3: 0, label: null, ada_data: false, catatan: '', menunggu: [], ditolak: [], telat_detail: [], lembur_detail: [], tren: { label: { arah: '', dari: '' }, telat: { arah: '', dari: '' } } } }; }
     return Promise.resolve({ json: function () { return Promise.resolve(d); } });
   };
 }
@@ -74,7 +75,7 @@ async function ke(tombol, id, asal, nama) {
       ok('tab "Ringkasan" kembali ke 81', aktif() === 'lb81');
       el('lb81').querySelector('[data-lb-kembali="home"]').click(); await tunggu(150);
       ok('Home dari 81 kembali ke beranda owner', aktif() === 'layarOwner');
-      var asing = panggil.slice(n0).filter(function (x) { return !/^(beranda_hari_ini|owner_perhatian|konfirmasi_jumlah|owner_beranda|konfirmasi_daftar|absensi_daftar)$/.test(x.aksi); }).map(function (x) { return x.aksi; });
+      var asing = panggil.slice(n0).filter(function (x) { return !/^(beranda_hari_ini|owner_perhatian|konfirmasi_jumlah|owner_beranda|konfirmasi_daftar|absensi_daftar|evaluasi_jumlah|laporan_cabang)$/.test(x.aksi); }).map(function (x) { return x.aksi; });
       ok('tidak ada panggilan server baru dari layar baru (daftar aksi tidak bertambah selama membuka layar baru)' + (asing.length ? ' -> ' + asing.join(',') : ''), asing.length === 0);
     }
     if (K === 'admin') {
@@ -135,7 +136,7 @@ async function ke(tombol, id, asal, nama) {
       ok('45 (KARYAWAN): aturan = PIN tepat 5 angka; tanpa "6 angka" dan "123456"; tombol Simpan nonaktif "Segera"', ar.length === 3 && /PIN tepat 5 angka/.test(ar[0]) && !/6 angka|123456|8 karakter/.test(el('lb45').textContent) && /Simpan/.test(el('lb45').textContent) && Array.prototype.every.call(el('lb45').querySelectorAll('button'), function (b) { return b.disabled || b.hasAttribute('data-lb-kembali'); }));
       tombolKembali().click(); await tunggu(150);
       ok('Back dari 45 kembali ke Akun saya', aktif() === 'layarAkun');
-      ok('tidak ada panggilan server baru dari layar baru', panggil.slice(n0).every(function (x) { return /^(pribadi_hari_ini|konfirmasi_jumlah|izin_info|izin_pratinjau|tukar_rekan)$/.test(x.aksi); }));
+      ok('tidak ada panggilan server baru dari layar baru', panggil.slice(n0).every(function (x) { return /^(pribadi_hari_ini|konfirmasi_jumlah|izin_info|izin_pratinjau|tukar_rekan|laporan_saya)$/.test(x.aksi); }));
     }
     if (K === 'pribadiadmin') {
       el('btnJenisPribadi').click(); el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12'; el('btnMasukPribadi').click(); await tunggu(900);

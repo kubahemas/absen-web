@@ -347,3 +347,30 @@ Selisih berikut DIPERTAHANKAN apa adanya (bukan lagi selisih terbuka). SB1 dan S
 |---|---|---|---|
 | SF3 | 25, 65, 74 | Pensil di layar 25 membuka layar 65 (lihat D1); layar 74 (log) tidak dihubungkan | `25_dampingan.png` (kiri mockup, kanan app) |
 | SF4 | 30-32, 46 | Tombol baru "Batalkan pengajuan" di bawah kartu "N pengajuan menunggu ACC" (hanya tampil bila N > 0) dan dialog daftar pengajuan dengan tombol "Batalkan" + konfirmasi. Tidak ada di mockup; "Lihat" tetap pudar sesuai keputusan SA1 | `SF4_dampingan.png`, `SF4_dialog.png` |
+
+## TAHAP 2 (laporan dan label) — asumsi yang diambil (butuh setuju atau koreksi pemilik)
+
+| No | Aturan yang tidak ada di dokumen | Pilihan yang dipakai (paling aman dan sederhana) |
+|---|---|---|
+| E1 | Aturan label | Tertulis di `docs/keputusan-desain.md` baris 88: EXCELLENT = tanpa alpha, telat, izin biasa, pulang awal; BAD = alpha >= 1, telat > 5, pulang awal > 5, atau izin biasa > 3 hari; selainnya GOOD. Batas dibaca dari pengaturan UMUM (`batas_telat_bad`, `batas_pulang_awal_bad`, `batas_izin_biasa_bad`; bawaan 5, 5, 3). Izin khusus dan cuti tidak mempengaruhi label. |
+| E2 | Hari kerja dan alpha | Hari kerja = hari terjadwal (kalender > pola > shift, libur Minggu/tanggal merah dikecualikan) dari awal bulan (atau tanggal mulai kerja) sampai hari ini, TANPA hari yang izin/cuti-nya DITERIMA. Alpha = hari kerja SEBELUM hari ini tanpa absen dan tanpa izin diterima; izin yang masih MENUNGGU tidak dihitung alpha. Hari ini belum absen = belum dinilai. Absen luar yang DITOLAK dianggap tidak hadir. |
+| E3 | Label sebelum ada data | Bila belum ada hari yang bisa dinilai (mis. tanggal 1 sebelum jam masuk) label KOSONG: lencana tetap "Segera" nonaktif dan Report netral (36). Label tidak ditebak. |
+| E4 | Telat, pulang awal, lembur | Telat = hari ber-status TELAT (menit dijumlahkan); pulang awal = PULANG CEPAT yang tidak ditolak; lembur disetujui = LEMBUR DI TOKO berstatus DITERIMA (tingkat dari kolom lembur). Absen dengan tanda "lupa masuk" (hanya ada jam pulang) dihitung hadir. |
+| E5 | Menunggu ACC dan Ditolak bulan ini | Menunggu = absen (luar, lembur, pulang awal, shift beda) bulan itu yang acc-nya MENUNGGU. Ditolak = absen dengan acc DITOLAK dan pengajuan izin berstatus DITOLAK yang mulai di bulan itu (badge "Ditolak"). Izin yang menunggu tidak ditampilkan di kotak ini (sudah ada di kartu "N pengajuan menunggu ACC"). |
+| E6 | Tren | Hanya bila bulan pembanding (bulan sebelumnya) punya data (label tidak kosong) DAN ada selisih nyata: label naik/turun, telat membaik/memburuk, kartu dashboard naik/turun. Tanpa itu tampil "–" abu tanpa panah. Sama dengan bulan lalu = "–". Warna: membaik hijau, memburuk merah; lembur netral. |
+| E7 | Kalimat di bawah label | Diisi data nyata: EXCELLENT "Tanpa pelanggaran. Pertahankan!"; GOOD "Telat 2 kali. Tanpa pelanggaran untuk EXCELLENT."; BAD "Telat 7 kali (batas 5) dan 1 alpha. Masuk daftar evaluasi." (lihat SD1). |
+| E8 | Report dibuka dari tombol Report | Layar dipilih menurut label bulan ini: EXCELLENT = 36e, GOOD = 37, BAD = 38, belum ada data = 36 (lihat SD3). Bulan yang tampil = bulan ini. Tombol bulan di pojok kanan atas hanya menampilkan nama bulan (tidak bisa dipilih). |
+| E9 | Dashboard | Admin: hanya KARYAWAN cabangnya. Owner: KARYAWAN dan ADMIN, semua cabang atau satu cabang. Kehadiran % = jumlah hari masuk / jumlah hari kerja semua karyawan. Telat per minggu: minggu 1 = tanggal 1–7, 2 = 8–14, 3 = 15–21, 4 = 22 ke atas; kalimat membandingkan minggu terakhir yang sudah berjalan dengan minggu yang sama bulan lalu. "Telat per hari" Senin–Sabtu. "Paling sering telat" 3 teratas (hari lalu menit). |
+| E10 | Kotak "Perlu evaluasi (BAD)" | Jumlah karyawan berlabel BAD bulan ini (admin: cabangnya; owner: semua cabang). Ketuk = layar Per karyawan (69 atau 82) dengan filter "Perlu evaluasi" aktif. |
+| E11 | Pilihan Bulan dan Cabang di dashboard | 12 bulan mundur dari bulan ini; mengganti pilihan memuat ulang dari server. Cabang (owner): Semua cabang atau satu cabang. |
+
+## TAHAP 2 — selisih tampilan baru (butuh keputusan pemilik)
+
+| No | Layar | Selisih | Gambar (kiri mockup, kanan app) |
+|---|---|---|---|
+| SD1 | 36e, 37, 38, 70 | Kalimat di bawah label ("Telat 2 kali. Tanpa pelanggaran untuk EXCELLENT.") yang pada putaran 11–17 diputuskan "–" pudar, kini diisi data nyata karena label sudah dihitung. Mohon konfirmasi mau tetap diisi atau dikembalikan "–" | `37_dampingan.png`, `38_dampingan.png` |
+| SD2 | 70 | Mockup 70 hanya menggambarkan GOOD (latar hijau); untuk EXCELLENT latar kuning, untuk BAD latar merah, lencana dan warna label mengikuti | `70_dampingan.png` |
+| SD3 | 36e, 37, 38 | Aturan lama: layar ini "tidak bisa dipicu dari navigasi". Kini tombol Report membuka layar sesuai label (satu-satunya cara menampilkan Report berwarna label); 37 dan 38 tidak dihapus/digabung. Mohon konfirmasi | `37_dampingan.png`, `38_dampingan.png`, `36e_dampingan.png` |
+| SD4 | 49, 71 | Kotak "Perlu evaluasi (BAD)" kini bisa diketuk (membuka daftar Per karyawan terfilter) dan menampilkan "N orang" | — |
+| SD5 | 36e, 37, 38, 70 | Daftar "Menunggu ACC" kosong = tidak ada tulisan apa pun (mockup tidak punya teks kosong); Detail untuk Masuk, Pulang awal, Alpha, Izin biasa, Izin khusus, Sisa cuti tetap nonaktif (mockup tidak punya layar detailnya) | `38_dampingan.png` |
+| SD6 | 68, 69, 81, 82 | Tab yang sedang terbuka tampil gelap (bukan pudar) | `68_dampingan.png`, `69_dampingan.png` |

@@ -5,7 +5,7 @@ var SUMBER = { '36': '36', '36e': '36' };
 // Elemen ke-3 = 'tren' (warna abu netral, keputusan pemilik 16), ke-4 = 'pudar' (kalimat "Telat N kali ..." nonaktif, keputusan pemilik 12).
 var TREN = [[/^\s*[▲▼][^]*$/, '–', 'tren'], [/^\s*sama dengan[^]*$/, '–', 'tren'], [/^\s*Minggu ke-[^]*$/, '–', 'tren'], [/^\s*Paling banyak hari[^]*$/, '–', 'tren'], [/^\s*Telat \S+ kali[^]*$/, '–', 'tren', 'pudar']];
 // Layar Report: tiga kondisi label. 36 = versi yang bisa dibuka (lencana netral/nonaktif); 36e (EXCELLENT), 37 (GOOD), 38 (BAD) = berwarna penuh, TIDAK bisa dibuka dari navigasi.
-var REPORT = { home: 'prib', hapusTeks: [], hapusBaris: [/^Menunggu$/], ganti: TREN, nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } };
+var REPORT = { home: 'prib', fn: FN['report'], hapusTeks: [], hapusBaris: [/^Menunggu$/], ganti: TREN, nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } };
 var CFG = {
   '02': { home: 'toko', hapusBaris: ['Ahmad', 'Ari'], fn: FN['02'] },
   '03': { home: 'toko', judulMode: true, ganti: [[/Memindai.*/, 'Pengenalan wajah · Segera']] },
@@ -27,14 +27,15 @@ var CFG = {
   '35': { home: 'prib', fn: function (root) { Array.prototype.forEach.call(root.querySelectorAll('div'), function (d) { if (teksLangsung(d) === 'Bulan ini') { d.classList.add('belum-aktif'); if (d.nextElementSibling) { d.nextElementSibling.classList.add('belum-aktif'); } } }); } },
   // 36 = Report yang BISA dibuka: sumber mockup 36 (latar kuning netral); lencana label diganti "Segera" nonaktif berwarna netral (tanpa EXCELLENT/GOOD/BAD).
   '36': { home: 'prib', hapusTeks: [], hapusBaris: REPORT.hapusBaris, ganti: TREN.concat([[/^EXCELLENT$/, 'Segera']]), pudar: [/^Segera$/, /^Tanpa pelanggaran/], nav: REPORT.nav, fn: function (root) {
+    FN['report'](root);
     var lencana = Array.prototype.filter.call(root.querySelectorAll('div'), function (d) { return teksLangsung(d) === 'Segera'; })[0];
     if (lencana) { lencana.style.color = 'var(--abu-teks)'; var ikon = lencana.parentElement.previousElementSibling; if (ikon) { ikon.style.background = 'var(--abu)'; } }
     Array.prototype.forEach.call(root.querySelectorAll('div'), function (d) { if (teksLangsung(d) === String.fromCharCode(8211) && /border-radius: 999px/.test(d.getAttribute('style') || '')) { d.style.borderColor = 'var(--abu-teks)'; d.style.background = 'var(--krem)'; d.style.color = 'var(--abu-teks)'; } });
   } },
   '36e': Object.assign({}, REPORT, { hapusTeks: [] }), '37': REPORT, '38': REPORT,
   '48': { home: 'prib', ganti: [[/^GOOD$/, 'Segera'], [/^Halo, –$/, '–']], pudar: [/^Segera$/], tanpaSegera: /^Tukar shift$/ },
-  '39': { home: 'prib', hapusBaris: ['24 Sep'] },
-  '40': { home: 'prib', hapusBaris: ['28 Sep'] },
+  '39': { home: 'prib', fn: FN['39'], hapusBaris: ['24 Sep'] },
+  '40': { home: 'prib', fn: FN['40'], hapusBaris: ['28 Sep'] },
   '41': { home: 'prib', fn: FN['41'], hapusTeks: [/izin khusus menikah/, /hari cuti/, /^Sisa cuti jadi/] },
   '42': { home: 'prib', hapusSatu: [/Anda →/], fn: FN['42'] },
   '43': { home: 'prib', fn: FN['43'] }, '45': { home: 'prib', ganti: [[/Password lama \(awal: –\)/, 'Password lama']], fn: function (root) {
@@ -53,13 +54,13 @@ var CFG = {
   '64': { home: 'adm', fn: FN['64'], hapusBaris: ['Ahmad Fauzi'], pudar: [/^Pekan ini$/, /^Semua$/] },
   '65': { home: 'adm', fn: FN['65'] }, '66': { home: 'adm', fn: FN['66'] },
   '67': { home: 'adm', fn: FN['67'], hapusBaris: [/^17 Sep/] },
-  '68': { home: 'adm', ganti: TREN, hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb69', ganti: true } } },
-  '69': { home: 'adm', hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb68', ganti: true } } },
-  '70': { home: 'adm', hapusTeks: REPORT.hapusTeks, hapusBaris: REPORT.hapusBaris, ganti: TREN.concat([[/^GOOD$/, 'Segera']]), pudar: [/^Segera$/], nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } },
+  '68': { home: 'adm', fn: FN['dash'], ganti: TREN, hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb69', ganti: true } } },
+  '69': { home: 'adm', fn: FN['perk'], hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb68', ganti: true } } },
+  '70': { home: 'adm', fn: FN['70'], hapusTeks: REPORT.hapusTeks, hapusBaris: REPORT.hapusBaris, ganti: TREN.concat([[/^GOOD$/, 'Segera']]), pudar: [/^Segera$/], nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } },
   '73': { home: 'own', nav: { 'Detail#5': { ke: 'lb74' } } },
   '74': { home: 'own' }, '75': { home: 'own' },
   '76': { home: 'own', hapusBaris: ['Semua absen lengkap', 'Agustus 2026'] },
   '77': { home: 'own', hapusBaris: ['Dewi Lestari', 'Budi Santoso'] },
-  '81': { home: 'own', ganti: TREN, hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb82', ganti: true } } },
-  '82': { home: 'own', hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb81', ganti: true } } }
+  '81': { home: 'own', fn: FN['dash'], ganti: TREN, hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb82', ganti: true } } },
+  '82': { home: 'own', fn: FN['perk'], hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb81', ganti: true } } }
 };

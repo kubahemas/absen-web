@@ -32,7 +32,7 @@ function hitung(aksi) { return window.__panggilan.filter(function (x) { return x
     el('filterCabang').value = 'Pusat'; el('filterCabang').dispatchEvent(new Event('change')); await tunggu(400);
     var pc = window.__panggilan.filter(function (x) { return x.aksi === 'beranda_hari_ini' && x.cabang === 'Pusat'; });
     ok('pilih Cabang Pusat memanggil server dengan cabang "Pusat"; pilihan cabang tetap, pilihan Shift 2 dipertahankan dan isi beranda mengikuti (Pusat tidak punya orang di shift 2)', pc.length === 1 && el('filterCabang').value === 'Pusat' && el("ownAngka").querySelectorAll(".n")[2].textContent === "0");
-    ok('"Perlu evaluasi (BAD)" tampil NONAKTIF: tombol mati, tulisan Segera, tanpa angka', !!document.querySelector('#layarOwner .btn-evaluasi[disabled]') && /Segera/.test(document.querySelector('#layarOwner .btn-evaluasi').textContent) && !/orang/.test(document.querySelector('#layarOwner .btn-evaluasi').textContent));
+    await tunggu(500); ok('"Perlu evaluasi (BAD)" AKTIF (Tahap 2): jumlah dari server "N orang", tanpa Segera', !document.querySelector('#layarOwner .btn-evaluasi').disabled && /\d+ orang/.test(document.querySelector('#layarOwner .btn-evaluasi').textContent) && !/Segera/.test(document.querySelector('#layarOwner .btn-evaluasi').textContent));
     ok('Telat 7 hari terakhir: 7 batang dari server, "Tertinggi: Senin (6 orang)"', el('ownTelat7').querySelectorAll('.kol').length === 7 && el('ownTertinggi').textContent === 'Tertinggi: Senin (6 orang)');
     ok('kotak Konfirmasi data admin memakai subjudul mockup', /Izin, absen luar, lupa absen milik admin/.test(el('btnOwnerKonf').textContent));
     el('btnSegarkanOwner').click();

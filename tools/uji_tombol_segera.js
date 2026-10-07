@@ -4,7 +4,7 @@
 window.__hasil = [];
 var H = window.__hasil;
 function ok(n, c) { H.push((c ? 'OK     ' : 'GAGAL  ') + n); }
-var BELUM = /(Izin\s*\/\s*Cuti|Izin\/Cuti|Tukar shift|Report|Absen manual|Data absensi|Jadwal shift|Input izin|Kalender libur|Dashboard bulanan|Log admin|Kunci periode|Role\s*&\s*admin|Pengaturan|Cabang\s*&\s*shift|Laporan bulanan|Ganti PIN|Lupa absen|Daftar wajah|Pola shift|Ubah data|Kirim akun via WA|Uji coba|Saya setuju|Foto ulang|Perlu evaluasi|Hari ini tidak masuk)/i;
+var BELUM = /(Izin\s*\/\s*Cuti|Izin\/Cuti|Tukar shift|Absen manual|Data absensi|Jadwal shift|Input izin|Kalender libur|Dashboard bulanan|Log admin|Kunci periode|Role\s*&\s*admin|Pengaturan|Cabang\s*&\s*shift|Laporan bulanan|Ganti PIN|Lupa absen|Daftar wajah|Pola shift|Ubah data|Kirim akun via WA|Uji coba|Saya setuju|Foto ulang|Perlu evaluasi|Hari ini tidak masuk)/i;
 var KELOMPOK = {
   'HP Toko': ['layarUtama', 'layarPilihNama', 'layarAlasan'],
   'HP Pribadi': ['layarPribadi', 'layarLuar', 'layarAkun', 'layarRiwayat', 'menuPribadi'],
@@ -88,7 +88,7 @@ var tren = ['lb68', 'lb81', 'lb36', 'lb36e', 'lb37', 'lb38', 'lb70'].map(functio
 ok('kalimat tren (68, 81, Report 36/36e/37/38, 70) tampil sebagai "-" tanpa panah segitiga, tanpa kata naik/turun dan tanpa angka' + (tren.length ? ' -> ' + tren.join(' | ') : ''), tren.length === 0);
 var l36 = document.getElementById('lb36'), s36 = tk('lb36');
 ok('Report yang bisa dibuka (36): lencana netral nonaktif "Segera", TANPA tulisan/warna EXCELLENT, GOOD, BAD', !/EXCELLENT|GOOD|BAD/.test(s36) && /Segera/.test(s36) && Array.prototype.some.call(l36.querySelectorAll('*'), function (e) { return e.classList.contains('belum-aktif') && e.textContent.trim() === 'Segera'; }));
-ok('Report berwarna penuh ada tetapi tidak bisa dibuka: 36e EXCELLENT, 37 GOOD, 38 BAD', /EXCELLENT/.test(tk('lb36e')) && /GOOD/.test(tk('lb37')) && /BAD/.test(tk('lb38')) && ['lb36e', 'lb37', 'lb38', 'lb48'].every(function (id) { return !!document.getElementById(id) && !terjangkau[id]; }));
+ok('Report berwarna penuh ada (36e EXCELLENT, 37 GOOD, 38 BAD) dan hanya dibuka lewat tombol Report menurut label, bukan tautan statis', /EXCELLENT/.test(tk('lb36e')) && /GOOD/.test(tk('lb37')) && /BAD/.test(tk('lb38')) && ['lb36e', 'lb37', 'lb38', 'lb48'].every(function (id) { return !!document.getElementById(id) && !terjangkau[id]; }));
 
 // ---- Keputusan pemilik 2026-10-07 (selisih 11-17) ----
 var STRIP = String.fromCharCode(8211);

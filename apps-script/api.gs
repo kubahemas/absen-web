@@ -135,6 +135,11 @@ function doPost(e) {
   if (data.aksi === 'izin_ajukan') { return prosesIzinAjukan(data); }
   if (data.aksi === 'izin_batal') { return prosesIzinBatal(data); }
   if (data.aksi === 'pengajuan_saya') { return prosesPengajuanSaya(data); }
+  // Laporan bulanan dan label performa (Tahap 2)
+  if (data.aksi === 'laporan_saya') { return prosesLaporanSaya(data); }
+  if (data.aksi === 'laporan_karyawan') { return prosesLaporanKaryawan(data); }
+  if (data.aksi === 'laporan_cabang') { return prosesLaporanCabang(data); }
+  if (data.aksi === 'evaluasi_jumlah') { return prosesEvaluasiJumlah(data); }
   if (data.aksi === 'izin_unggah_surat') { return prosesIzinUnggahSurat(data); }
   if (data.aksi === 'izin_input') { return prosesIzinInput(data); }
   if (data.aksi === 'izin_input_pratinjau') { return prosesIzinInputPratinjau(data); }
@@ -1840,6 +1845,46 @@ function tesServer() {
     const saya = rakitPengajuanSaya(izinRows, 'K003');
     ujiBebas('pengajuan saya: hanya milik sendiri yang MENUNGGU, satu item per grup (izin dua bagian jadi satu), tukar shift ikut dan bertanda tukar', saya.length === 2 && saya[0].grup === 'IZN-2026-0007' && saya[0].rincian === '12–14 Okt' && saya[1].judul === 'Tukar shift' && saya[1].tukar === true && saya[0].tukar === false);
     ujiBebas('pengajuan saya: yang sudah diputuskan atau milik orang lain tidak muncul', saya.every(function (x) { return x.grup !== 'IZN-2026-0009' && x.grup !== 'IZN-2026-0010'; }) && rakitPengajuanSaya(izinRows, 'K999').length === 0);
+  })();
+  // ---- Tahap 2: laporan bulanan dan label performa ----
+  (function () {
+    const batas = { telat: 5, plgAwal: 5, izinBiasa: 3 };
+    const nol = { alpha: 0, telat_hari: 0, plg_awal: 0, izin_biasa: 0 };
+    ujiBebas('label: semua nol = EXCELLENT; telat/pulang awal/izin biasa di batas (5, 5, 3) masih GOOD; sekali melewati batas atau alpha 1 = BAD', labelPerforma(nol, batas) === 'EXCELLENT' && labelPerforma({ alpha: 0, telat_hari: 5, plg_awal: 0, izin_biasa: 0 }, batas) === 'GOOD' && labelPerforma({ alpha: 0, telat_hari: 6, plg_awal: 0, izin_biasa: 0 }, batas) === 'BAD' && labelPerforma({ alpha: 0, telat_hari: 0, plg_awal: 6, izin_biasa: 0 }, batas) === 'BAD' && labelPerforma({ alpha: 0, telat_hari: 0, plg_awal: 0, izin_biasa: 3 }, batas) === 'GOOD' && labelPerforma({ alpha: 0, telat_hari: 0, plg_awal: 0, izin_biasa: 4 }, batas) === 'BAD' && labelPerforma({ alpha: 1, telat_hari: 0, plg_awal: 0, izin_biasa: 0 }, batas) === 'BAD');
+    ujiBebas('label: satu telat atau satu izin biasa sudah bukan EXCELLENT (GOOD); izin khusus dan cuti tidak mengurangi', labelPerforma({ alpha: 0, telat_hari: 1, plg_awal: 0, izin_biasa: 0 }, batas) === 'GOOD' && labelPerforma({ alpha: 0, telat_hari: 0, plg_awal: 0, izin_biasa: 1 }, batas) === 'GOOD');
+    ujiBebas('kalimat catatan: EXCELLENT "Tanpa pelanggaran. Pertahankan!"; GOOD "Telat 2 kali. Tanpa pelanggaran untuk EXCELLENT."; BAD "Telat 7 kali (batas 5) dan 1 alpha. Masuk daftar evaluasi."', teksCatatanLabel('EXCELLENT', nol, batas) === 'Tanpa pelanggaran. Pertahankan!' && teksCatatanLabel('GOOD', { alpha: 0, telat_hari: 2, plg_awal: 0, izin_biasa: 0 }, batas) === 'Telat 2 kali. Tanpa pelanggaran untuk EXCELLENT.' && teksCatatanLabel('BAD', { alpha: 1, telat_hari: 7, plg_awal: 0, izin_biasa: 0 }, batas) === 'Telat 7 kali (batas 5) dan 1 alpha. Masuk daftar evaluasi.');
+    ujiBebas('kalender bulan: akhir bulan, geser bulan lintas tahun, nama bulan, periode', akhirBulan('2026-02') === '2026-02-28' && akhirBulan('2026-10') === '2026-10-31' && geserBulan('2026-01', -1) === '2025-12' && geserBulan('2026-12', 1) === '2027-01' && namaBulanTeks('2026-09') === 'September 2026' && periodeTeks('2026-09-01', '2026-09-28') === '1–28 September' && bulanSah('2026-10') && !bulanSah('2026-13') && !bulanSah('x'));
+    const akunL = { id: 'K003', shift: 1, pola_shift: 'TETAP', urutan_shift: '', ganti_setiap: '', mulai_pola: '' };
+    const r = function (tgl, o) { return Object.assign({ tanggal: tgl, masuk: '', pulang: '', st_masuk: '', telat_mnt: 0, ket_masuk: '', st_pulang: '', lembur: '', ket_pulang: '', acc_masuk: '', acc_pulang: '', cara_masuk: 'PIN', cara_pulang: 'PIN', tanda: '' }, o); };
+    const absL = [
+      r('2026-10-01', { masuk: '07:40', st_masuk: 'HADIR', pulang: '16:31', st_pulang: 'PULANG NORMAL' }),
+      r('2026-10-02', { masuk: '07:52', st_masuk: 'TELAT', telat_mnt: 7, ket_masuk: 'Macet', pulang: '16:31', st_pulang: 'PULANG NORMAL' }),
+      r('2026-10-03', { masuk: '07:40', st_masuk: 'HADIR', pulang: '18:00', st_pulang: 'LEMBUR DI TOKO', lembur: '2|90', ket_pulang: 'Stok opname', acc_pulang: 'DITERIMA' }),
+      r('2026-10-06', { masuk: '07:40', st_masuk: 'HADIR', pulang: '15:00', st_pulang: 'PULANG CEPAT', ket_pulang: 'Sakit' }),
+      r('2026-10-08', { masuk: '07:40', st_masuk: 'HADIR', cara_masuk: 'LUAR', acc_masuk: 'MENUNGGU', ket_masuk: 'LUAR: pasang AC' }),
+      r('2026-10-09', { masuk: '07:40', st_masuk: 'HADIR' })
+    ];
+    const izinL = [{ id: 'IZN-2026-0001-A', grup: 'IZN-2026-0001', karyawan: 'K003', jenis: 'Cuti', kelompok: 'cuti', mulai: '2026-10-05', selesai: '2026-10-05', hari: 1, status: 'DITERIMA' }];
+    const lap = hitungLaporanKaryawan({ akun: akunL, bulan: '2026-10', hariIni: '2026-10-09', mulaiKerja: '', absensi: absL, izin: izinL, kalender: [], liburMinggu: true, batas: batas, jatahCuti: 6 });
+    ujiBebas('laporan: masuk 6 dari 7 hari kerja (izin cuti 5 Okt tidak dihitung hari kerja, Minggu libur); alpha 1 (7 Okt); telat 1 hari 7 menit; pulang awal 1; cuti 1; sisa cuti 5 dari 6', lap.masuk === 6 && lap.hari_kerja === 7 && lap.alpha === 1 && lap.telat_hari === 1 && lap.telat_mnt === 7 && lap.plg_awal === 1 && lap.cuti_bulan === 1 && lap.sisa_cuti === 5 && lap.jatah_cuti === 6);
+    ujiBebas('laporan: lembur disetujui 1 hari (tingkat 2); label BAD karena alpha; catatan memuat "1 alpha"; hari ini belum absen tidak dihitung alpha', lap.lembur_hari === 1 && lap.lembur_2 === 1 && lap.lembur_1 === 0 && lap.label === 'BAD' && /1 alpha/.test(lap.catatan) && hitungLaporanKaryawan({ akun: akunL, bulan: '2026-10', hariIni: '2026-10-09', mulaiKerja: '', absensi: absL.slice(0, 5), izin: izinL, kalender: [], liburMinggu: true, batas: batas, jatahCuti: 6 }).alpha === 1);
+    ujiBebas('laporan: menunggu ACC memuat absen luar 8 Okt; detail telat (7 menit, alasan Macet) dan detail lembur (Stok opname, tingkat 2)', lap.menunggu.length === 1 && lap.menunggu[0].judul === 'Absen luar' && /8 Okt/.test(lap.menunggu[0].rincian) && lap.telat_detail.length === 1 && lap.telat_detail[0].alasan === 'Macet' && lap.telat_detail[0].telat_mnt === 7 && lap.lembur_detail[0].pekerjaan === 'Stok opname' && lap.lembur_detail[0].tingkat === 2);
+    ujiBebas('laporan: pengajuan ditolak muncul di "Ditolak bulan ini"; absen luar yang ditolak tidak dihitung hadir', (function () { const x = hitungLaporanKaryawan({ akun: akunL, bulan: '2026-10', hariIni: '2026-10-09', mulaiKerja: '', absensi: [r('2026-10-08', { masuk: '07:40', st_masuk: 'HADIR', cara_masuk: 'LUAR', acc_masuk: 'DITOLAK' })], izin: [{ id: 'IZN-2026-0002-A', grup: 'IZN-2026-0002', karyawan: 'K003', jenis: 'Keperluan pribadi', kelompok: 'biasa', mulai: '2026-10-06', selesai: '2026-10-06', hari: 1, status: 'DITOLAK' }], kalender: [], liburMinggu: true, batas: batas, jatahCuti: 6 }); return x.ditolak.length === 2 && x.masuk === 0; })());
+    ujiBebas('laporan: sebelum ada hari yang bisa dinilai (hari pertama bulan, atau mulai kerja di masa depan) label = kosong (tidak ditebak)', hitungLaporanKaryawan({ akun: akunL, bulan: '2026-10', hariIni: '2026-10-01', mulaiKerja: '', absensi: [], izin: [], kalender: [], liburMinggu: true, batas: batas, jatahCuti: 6 }).label === null && hitungLaporanKaryawan({ akun: akunL, bulan: '2026-10', hariIni: '2026-10-09', mulaiKerja: '2026-11-01', absensi: [], izin: [], kalender: [], liburMinggu: true, batas: batas, jatahCuti: 6 }).label === null);
+    ujiBebas('laporan: hari libur dan Minggu tidak membuat alpha; mulai kerja hari ini = belum ada yang dinilai', hitungLaporanKaryawan({ akun: akunL, bulan: '2026-10', hariIni: '2026-10-09', mulaiKerja: '2026-10-09', absensi: [], izin: [], kalender: [], liburMinggu: true, batas: batas, jatahCuti: 6 }).alpha === 0 && hitungLaporanKaryawan({ akun: akunL, bulan: '2026-10', hariIni: '2026-10-09', mulaiKerja: '', absensi: [], izin: [], kalender: [{ tanggal: '2026-10-01', cabang: '', karyawan: '', isi: 'LIBUR TANGGAL MERAH' }], liburMinggu: true, batas: batas, jatahCuti: 6 }).alpha === 6);
+    const prevL = Object.assign({}, lap, { bulan: '2026-09', label: 'GOOD', telat_hari: 0 });
+    const tren = hitungTrenLaporan(lap, prevL);
+    ujiBebas('tren: label BAD dari GOOD = turun; telat 1 dari 0 = memburuk', tren.label.arah === 'turun' && tren.label.dari === 'GOOD' && tren.telat.arah === 'memburuk' && tren.telat.dari === 0);
+    ujiBebas('tren: tanpa data bulan pembanding (label kosong) atau tanpa selisih = kosong ("–", tanpa panah)', hitungTrenLaporan(lap, Object.assign({}, prevL, { label: null })).label.arah === '' && hitungTrenLaporan(lap, null).telat.arah === '' && hitungTrenLaporan(lap, Object.assign({}, lap)).label.arah === '' && hitungTrenLaporan(lap, Object.assign({}, lap)).telat.arah === '');
+    ujiBebas('ringkasan laporan: membawa tren, nama bulan, periode, penanda ada data; daftar tanggal mentah tidak ikut', (function () { const s = ringkasanLaporan(lap, prevL); return s.bulan_teks === 'Oktober 2026' && s.periode_teks === '1–9 Oktober' && s.ada_data === true && s.tren.label.arah === 'turun' && s.telat_tanggal === undefined; })());
+    const A = { id: 'K003', nama: 'Budi', cabang: 'Ngawi', cur: { masuk: 10, hari_kerja: 10, telat_hari: 0, telat_mnt: 0, alpha: 0, lembur_hari: 1, label: 'EXCELLENT', telat_tanggal: [], sampai: '2026-10-09' }, prev: { masuk: 9, hari_kerja: 10, telat_hari: 2, telat_mnt: 9, alpha: 0, lembur_hari: 1, label: 'GOOD', telat_tanggal: ['2026-09-07', '2026-09-08'] } };
+    const B = { id: 'K004', nama: 'Andi', cabang: 'Ngawi', cur: { masuk: 8, hari_kerja: 10, telat_hari: 6, telat_mnt: 40, alpha: 2, lembur_hari: 0, label: 'BAD', telat_tanggal: ['2026-10-05', '2026-10-06', '2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09'], sampai: '2026-10-09' }, prev: null };
+    const dash = rakitDashboard([A, B], '2026-10');
+    ujiBebas('dashboard: kehadiran 90% (18 dari 20); telat 6 hari; tidak hadir 2; komposisi EXCELLENT 1, BAD 1; perlu evaluasi 1; karyawan urut nama (Andi dulu)', dash.kehadiran.persen === 90 && dash.telat.hari === 6 && dash.tidak_hadir.hari === 2 && dash.komposisi.EXCELLENT === 1 && dash.komposisi.BAD === 1 && dash.komposisi.GOOD === 0 && dash.perlu_evaluasi === 1 && dash.karyawan[0].nama === 'Andi' && dash.bulan_teks === 'Oktober 2026');
+    ujiBebas('dashboard: paling sering telat urut hari lalu menit (Andi 6 hari); hari terbanyak Selasa (Sen 1... hari dengan telat terbanyak)', dash.paling_sering.length === 1 && dash.paling_sering[0].nama === 'Andi' && dash.paling_sering[0].hari === 6 && dash.hari_terbanyak === 'Selasa' && dash.telat_hari.length === 6);
+    ujiBebas('dashboard: pembanding ada (Budi punya data bulan lalu): telat naik dari 2, tidak hadir naik dari 0; tanpa pembanding sama sekali semua tren kosong', dash.ada_pembanding === true && dash.telat.tren.arah === 'naik' && dash.telat.tren.dari === 2 && dash.tidak_hadir.tren.arah === 'naik' && rakitDashboard([Object.assign({}, B)], '2026-10').telat.tren.arah === '' && rakitDashboard([Object.assign({}, B)], '2026-10').kehadiran.tren.arah === '');
+    ujiBebas('hak laporan: owner semua karyawan dan admin; admin hanya KARYAWAN cabangnya; karyawan biasa tidak', bolehLihatLaporan({ role: 'OWNER' }, { role: 'ADMIN', cabang: 'Pusat' }) === true && bolehLihatLaporan({ role: 'ADMIN', cabang: 'Ngawi' }, { role: 'KARYAWAN', cabang: 'Ngawi' }) === true && bolehLihatLaporan({ role: 'ADMIN', cabang: 'Ngawi' }, { role: 'KARYAWAN', cabang: 'Pusat' }) === false && bolehLihatLaporan({ role: 'ADMIN', cabang: 'Ngawi' }, { role: 'ADMIN', cabang: 'Ngawi' }) === false && bolehLihatLaporan({ role: 'KARYAWAN', cabang: 'Ngawi' }, { role: 'KARYAWAN', cabang: 'Ngawi' }) === false);
+    ujiBebas('keterangan utama: alasan telat/pekerjaan lembur tanpa bagian LUAR, SHIFT BEDA, MANUAL; TIDAK DIISI = kosong', ketUtamaAbsen('Macet | LUAR: pasang AC') === 'Macet' && ketUtamaAbsen('TIDAK DIISI | SHIFT BEDA: jadwal Shift 1') === '' && ketUtamaAbsen('LUAR: servis') === '' && ketUtamaAbsen('Lainnya: kendaraan mogok') === 'Lainnya: kendaraan mogok' && ketUtamaAbsen(null) === '');
   })();
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
@@ -6834,4 +6879,396 @@ function prosesAbsensiFoto(d) {
   const cari = cariBarisAbsensiTampil(String(t.akun.id), String(d.tanggal));
   if (!cari) { return respon({ status: 'gagal', pesan: 'Absen tidak ditemukan' }); }
   return fotoDariTautan(String(d.jenis === 'MASUK' ? cari.baris.foto_masuk : cari.baris.foto_pulang));
+}
+
+
+/**
+ * ======================= FITUR D: LAPORAN BULANAN DAN LABEL PERFORMA =======================
+ * Semua angka dihitung dari sheet absensi, izin, kalender, akun (tanpa tabel rekap); aplikasi tidak menyimpan angka gaji. Fungsi murni diuji di tesServer().
+ * Label (docs/keputusan-desain.md): EXCELLENT = tanpa alpha, telat, izin biasa, pulang awal; BAD = alpha >= 1, telat > batas, pulang awal > batas, atau izin biasa > batas
+ * (batas dari pengaturan UMUM: batas_telat_bad, batas_pulang_awal_bad, batas_izin_biasa_bad; bawaan 5, 5, 3); selainnya GOOD.
+ * Tren hanya dihitung bila bulan pembanding benar-benar punya data (label tidak kosong).
+ */
+var NAMA_BULAN_PANJANG = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+var PERINGKAT_LABEL = { BAD: 1, GOOD: 2, EXCELLENT: 3 };
+
+function akhirBulan(bulan) {
+  const y = Number(bulan.slice(0, 4)), m = Number(bulan.slice(5, 7));
+  return bulan + '-' + ('0' + new Date(Date.UTC(y, m, 0)).getUTCDate()).slice(-2);
+}
+function geserBulan(bulan, n) {
+  const y = Number(bulan.slice(0, 4)), m = Number(bulan.slice(5, 7)) - 1 + n;
+  const d = new Date(Date.UTC(y, m, 1));
+  return d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2);
+}
+function bulanSah(b) { return /^\d{4}-(0[1-9]|1[0-2])$/.test(String(b || '')); }
+function namaBulanTeks(bulan) { return NAMA_BULAN_PANJANG[Number(bulan.slice(5, 7)) - 1] + ' ' + bulan.slice(0, 4); }
+function periodeTeks(dari, sampai) {
+  const a = bagianTanggal(dari), b = bagianTanggal(sampai);
+  return a.d + '–' + b.d + ' ' + NAMA_BULAN_PANJANG[b.m - 1];
+}
+
+/** Fungsi murni: label dari angka bulan. batas = { telat, plgAwal, izinBiasa }. */
+function labelPerforma(m, batas) {
+  if (m.alpha >= 1 || m.telat_hari > batas.telat || m.plg_awal > batas.plgAwal || m.izin_biasa > batas.izinBiasa) { return 'BAD'; }
+  if (m.alpha === 0 && m.telat_hari === 0 && m.izin_biasa === 0 && m.plg_awal === 0) { return 'EXCELLENT'; }
+  return 'GOOD';
+}
+
+/** Fungsi murni: kalimat di bawah label (mockup 36e/37/38). */
+function teksCatatanLabel(label, m, batas) {
+  if (label === 'EXCELLENT') { return 'Tanpa pelanggaran. Pertahankan!'; }
+  if (label === 'GOOD') {
+    const bagian = [];
+    if (m.telat_hari > 0) { bagian.push('Telat ' + m.telat_hari + ' kali'); }
+    if (m.plg_awal > 0) { bagian.push('Pulang awal ' + m.plg_awal + ' kali'); }
+    if (m.izin_biasa > 0) { bagian.push('Izin biasa ' + m.izin_biasa + ' hari'); }
+    return (bagian.length ? bagian.join(', ') + '. ' : '') + 'Tanpa pelanggaran untuk EXCELLENT.';
+  }
+  if (label === 'BAD') {
+    const b = [];
+    if (m.telat_hari > batas.telat) { b.push('Telat ' + m.telat_hari + ' kali (batas ' + batas.telat + ')'); }
+    if (m.plg_awal > batas.plgAwal) { b.push('Pulang awal ' + m.plg_awal + ' kali (batas ' + batas.plgAwal + ')'); }
+    if (m.izin_biasa > batas.izinBiasa) { b.push('Izin biasa ' + m.izin_biasa + ' hari (batas ' + batas.izinBiasa + ')'); }
+    if (m.alpha >= 1) { b.push(m.alpha + ' alpha'); }
+    return b.join(' dan ') + '. Masuk daftar evaluasi.';
+  }
+  return '';
+}
+
+/** Fungsi murni: alasan telat/pekerjaan lembur dari kolom keterangan (buang bagian LUAR, SHIFT BEDA, MANUAL). Kosong/TIDAK DIISI = ''. */
+function ketUtamaAbsen(ket) {
+  const bagian = String(ket === undefined || ket === null ? '' : ket).split(' | ');
+  for (let i = 0; i < bagian.length; i++) {
+    const b = bagian[i].trim();
+    if (b && b !== 'TIDAK DIISI' && !/^(LUAR|SHIFT BEDA|MANUAL|KONFLIK)/.test(b)) { return b; }
+  }
+  return '';
+}
+
+function judulPengajuanAbsen(r, jenis) {
+  if (jenis === 'MASUK') { return String(r.cara_masuk) === 'LUAR' ? 'Absen luar' : (String(r.tanda).indexOf('SHIFT_BEDA') >= 0 ? 'Shift tidak sesuai jadwal' : 'Absen masuk'); }
+  if (String(r.cara_pulang) === 'LUAR') { return 'Absen luar'; }
+  if (String(r.st_pulang) === 'LEMBUR DI TOKO') { const m = /^(\d+)\|/.exec(String(r.lembur)); return 'Lembur ' + (['', '< 1 jam', '1–2 jam', '> 2 jam'][m ? Number(m[1]) : 0] || '').trim(); }
+  if (String(r.st_pulang) === 'PULANG CEPAT') { return 'Pulang awal'; }
+  return 'Absen pulang';
+}
+
+/**
+ * Fungsi murni: laporan satu karyawan satu bulan.
+ * p = { akun {id, shift...}, bulan 'yyyy-MM', hariIni, mulaiKerja ('' atau yyyy-MM-dd), absensi: baris karyawan itu (tanggal teks, masuk, pulang, st_masuk, telat_mnt, ket_masuk, st_pulang, lembur, ket_pulang, acc_masuk, acc_pulang, cara_masuk, cara_pulang, tanda),
+ *       izin: baris izin karyawan itu (mulai, selesai teks, jenis, kelompok, status, hari), kalender, liburMinggu, batas { telat, plgAwal, izinBiasa }, jatahCuti }.
+ * Hari dihitung dari awal bulan (atau mulai kerja) sampai hari ini; alpha hanya hari SEBELUM hari ini. label = null bila belum ada hari yang bisa dinilai.
+ */
+function hitungLaporanKaryawan(p) {
+  const awal = p.bulan + '-01', akhir = akhirBulan(p.bulan);
+  let dari = awal;
+  if (p.mulaiKerja && p.mulaiKerja > dari) { dari = p.mulaiKerja; }
+  const sampai = p.hariIni < akhir ? p.hariIni : akhir;
+  const hasil = {
+    bulan: p.bulan, dari: dari, sampai: sampai, hari_kerja: 0, masuk: 0, telat_hari: 0, telat_mnt: 0, plg_awal: 0, alpha: 0,
+    izin_biasa: 0, izin_khusus: 0, cuti_bulan: 0, jatah_cuti: Number(p.jatahCuti) || 0, sisa_cuti: 0, lembur_hari: 0, lembur_1: 0, lembur_2: 0, lembur_3: 0,
+    label: null, catatan: '', menunggu: [], ditolak: [], telat_detail: [], lembur_detail: [], telat_tanggal: []
+  };
+  hasil.sisa_cuti = hitungSisaCuti(p.jatahCuti, p.izin, p.akun.id, p.bulan.slice(0, 4));
+  const baris = {};
+  p.absensi.forEach(function (r) { if (String(r.tanggal) >= awal && String(r.tanggal) <= akhir) { baris[String(r.tanggal)] = r; } });
+  const izinD = {}, izinT = {};
+  p.izin.forEach(function (r) {
+    const st = String(r.status).toUpperCase(), jenis = String(r.jenis).toUpperCase();
+    if (jenis === 'TUKAR_SHIFT' || jenis === 'PINDAH_SHIFT') { return; }
+    if (st === 'DITOLAK' && String(r.mulai) >= awal && String(r.mulai) <= akhir) {
+      hasil.ditolak.push({ tanggal: String(r.mulai), judul: String(r.jenis), rincian: rentangPendek(String(r.mulai), String(r.selesai)) });
+    }
+    if (st !== 'DITERIMA' && st !== 'MENUNGGU') { return; }
+    const peta = st === 'DITERIMA' ? izinD : izinT;
+    const n = selisihHari(String(r.mulai), String(r.selesai));
+    for (let i = 0; i <= n && i < 400; i++) { peta[geserTanggal(String(r.mulai), i)] = String(r.kelompok).toLowerCase(); }
+  });
+  if (!(sampai < dari)) {
+    const n = selisihHari(dari, sampai);
+    for (let i = 0; i <= n && i < 40; i++) {
+      const t = geserTanggal(dari, i);
+      const j = jadwalKaryawanHari(p.akun, t, p.kalender, p.liburMinggu === true);
+      const terjadwal = !j.libur && j.shift !== null;
+      const r = baris[t];
+      const hadir = !!r && ((String(r.masuk) !== '' && String(r.acc_masuk) !== 'DITOLAK') || (String(r.masuk) === '' && String(r.pulang) !== '' && String(r.acc_pulang) !== 'DITOLAK'));
+      if (hadir) {
+        hasil.masuk++; hasil.hari_kerja++;
+        if (String(r.st_masuk) === 'TELAT') {
+          hasil.telat_hari++; hasil.telat_mnt += Number(r.telat_mnt) || 0; hasil.telat_tanggal.push(t);
+          hasil.telat_detail.push({ tanggal: t, masuk: String(r.masuk), telat_mnt: Number(r.telat_mnt) || 0, alasan: ketUtamaAbsen(r.ket_masuk) });
+        }
+        if (String(r.st_pulang) === 'PULANG CEPAT' && String(r.acc_pulang) !== 'DITOLAK') { hasil.plg_awal++; }
+        if (String(r.st_pulang) === 'LEMBUR DI TOKO' && String(r.acc_pulang) === 'DITERIMA') {
+          const lm = /^(\d+)\|(\d+)$/.exec(String(r.lembur));
+          const tk = lm ? Number(lm[1]) : 1;
+          hasil.lembur_hari++; hasil['lembur_' + (tk >= 1 && tk <= 3 ? tk : 1)]++;
+          hasil.lembur_detail.push({ tanggal: t, pulang: String(r.pulang), tingkat: tk, pekerjaan: ketUtamaAbsen(r.ket_pulang) });
+        }
+      } else if (terjadwal && t < p.hariIni && !izinD[t]) {
+        // hari kerja yang lewat tanpa absen dan tanpa izin diterima: dihitung hari kerja; alpha kecuali ada izin yang masih menunggu
+        hasil.hari_kerja++;
+        if (!izinT[t]) { hasil.alpha++; }
+      }
+      // hari dengan izin/cuti DITERIMA tidak dihitung hari kerja yang dinilai (tidak masuk penyebut Masuk x / y hari)
+      if (terjadwal && izinD[t] && !hadir) {
+        if (izinD[t] === 'khusus') { hasil.izin_khusus++; } else if (izinD[t] === 'cuti') { hasil.cuti_bulan++; } else { hasil.izin_biasa++; }
+      }
+    }
+  }
+  // hari izin/cuti yang diterima tidak masuk hari kerja yang dinilai alpha, tetapi tetap hari terjadwal
+  Object.keys(baris).forEach(function (t) {
+    const r = baris[t];
+    ['MASUK', 'PULANG'].forEach(function (jenis) {
+      const acc = String(jenis === 'MASUK' ? r.acc_masuk : r.acc_pulang);
+      if (jenis === 'MASUK' && String(r.masuk) === '') { return; }
+      if (jenis === 'PULANG' && String(r.pulang) === '') { return; }
+      const kartu = { tanggal: t, judul: judulPengajuanAbsen(r, jenis), rincian: tglPendekLaporan(t) + (ketUtamaAbsen(jenis === 'MASUK' ? r.ket_masuk : r.ket_pulang) ? ', ' + ketUtamaAbsen(jenis === 'MASUK' ? r.ket_masuk : r.ket_pulang).toLowerCase() : '') };
+      if (acc === 'MENUNGGU') { hasil.menunggu.push(kartu); }
+      if (acc === 'DITOLAK') { hasil.ditolak.push(kartu); }
+    });
+  });
+  hasil.menunggu.sort(function (a, b) { return a.tanggal < b.tanggal ? -1 : 1; });
+  hasil.ditolak.sort(function (a, b) { return a.tanggal < b.tanggal ? -1 : 1; });
+  hasil.telat_detail.sort(function (a, b) { return a.tanggal < b.tanggal ? 1 : -1; });
+  hasil.lembur_detail.sort(function (a, b) { return a.tanggal < b.tanggal ? 1 : -1; });
+  if (hasil.hari_kerja > 0) {
+    hasil.label = labelPerforma(hasil, p.batas);
+    hasil.catatan = teksCatatanLabel(hasil.label, hasil, p.batas);
+  }
+  return hasil;
+}
+
+function tglPendekLaporan(t) { const b = bagianTanggal(t); return b.d + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][b.m - 1]; }
+
+/**
+ * Fungsi murni: tren hanya bila bulan pembanding punya data (label tidak kosong) DAN ada selisih nyata; selain itu kosong ('' = tampil "–").
+ * Kembalian { label: { arah: 'naik'|'turun'|'', dari }, telat: { arah: 'membaik'|'memburuk'|'', dari } }.
+ */
+function hitungTrenLaporan(cur, prev) {
+  const t = { label: { arah: '', dari: '' }, telat: { arah: '', dari: '' } };
+  if (!cur || !prev || !prev.label || !cur.label) { return t; }
+  if (PERINGKAT_LABEL[cur.label] !== PERINGKAT_LABEL[prev.label]) {
+    t.label = { arah: PERINGKAT_LABEL[cur.label] > PERINGKAT_LABEL[prev.label] ? 'naik' : 'turun', dari: prev.label };
+  }
+  if (cur.telat_hari !== prev.telat_hari) { t.telat = { arah: cur.telat_hari < prev.telat_hari ? 'membaik' : 'memburuk', dari: prev.telat_hari }; }
+  return t;
+}
+
+/** Fungsi murni: bagian laporan yang dikirim ke HP (tanpa daftar tanggal mentah). */
+function ringkasanLaporan(cur, prev) {
+  const out = Object.assign({}, cur);
+  delete out.telat_tanggal;
+  out.tren = hitungTrenLaporan(cur, prev);
+  out.bulan_teks = namaBulanTeks(cur.bulan);
+  out.periode_teks = periodeTeks(cur.dari, cur.sampai);
+  out.ada_data = cur.label !== null;
+  return out;
+}
+
+/** Fungsi murni: urut minggu dalam bulan untuk satu tanggal (1..4: hari 1-7, 8-14, 15-21, 22 ke atas). */
+function mingguDalamBulan(t) { const d = bagianTanggal(t).d; return d <= 7 ? 1 : (d <= 14 ? 2 : (d <= 21 ? 3 : 4)); }
+
+function persenKehadiran(daftar) {
+  let masuk = 0, hari = 0;
+  daftar.forEach(function (x) { masuk += x.masuk; hari += x.hari_kerja; });
+  return hari > 0 ? Math.round(masuk * 100 / hari) : null;
+}
+
+/**
+ * Fungsi murni: dashboard satu cabang (atau semua cabang). daftar = [{ id, nama, cabang, cur, prev }] (cur/prev = hitungLaporanKaryawan).
+ * Perbandingan dengan bulan lalu hanya dibuat bila ada data pembanding (angka prev ada) dan selisihnya nyata.
+ */
+function rakitDashboard(daftar, bulan) {
+  const cur = daftar.map(function (x) { return x.cur; });
+  const prev = daftar.map(function (x) { return x.prev; }).filter(function (x) { return x && x.label !== null; });
+  const adaPrev = prev.length > 0;
+  const jumlah = function (arr, k) { return arr.reduce(function (s, x) { return s + (Number(x[k]) || 0); }, 0); };
+  const banding = function (nilai, lama, lebihBaikRendah) {
+    if (!adaPrev || nilai === lama || lama === null || nilai === null) { return { arah: '', dari: '' }; }
+    return { arah: nilai > lama ? 'naik' : 'turun', dari: lama, baik: lebihBaikRendah === null ? null : (lebihBaikRendah ? nilai < lama : nilai > lama) };
+  };
+  const pCur = persenKehadiran(cur), pPrev = adaPrev ? persenKehadiran(prev) : null;
+  const kad = banding(pCur, pPrev, false);
+  if (kad.arah) { kad.selisih = Math.abs(pCur - pPrev); }
+  const komposisi = { EXCELLENT: 0, GOOD: 0, BAD: 0 };
+  cur.forEach(function (x) { if (x.label) { komposisi[x.label]++; } });
+  const minggu = [0, 0, 0, 0], mingguLalu = [0, 0, 0, 0], hari = [0, 0, 0, 0, 0, 0, 0];
+  cur.forEach(function (x) { x.telat_tanggal.forEach(function (t) { minggu[mingguDalamBulan(t) - 1]++; hari[hariKeIndeks(t)]++; }); });
+  daftar.forEach(function (x) { if (x.prev) { x.prev.telat_tanggal.forEach(function (t) { mingguLalu[mingguDalamBulan(t) - 1]++; }); } });
+  let mingguTerakhir = 0;
+  const hariIniMinggu = cur.length ? mingguDalamBulan(cur[0].sampai) : 0;
+  for (let i = 0; i < 4; i++) { if (i + 1 <= hariIniMinggu) { mingguTerakhir = i; } }
+  let kalimatMinggu = '';
+  if (adaPrev && cur.length && mingguLalu[mingguTerakhir] !== minggu[mingguTerakhir]) {
+    kalimatMinggu = 'Minggu ke-' + (mingguTerakhir + 1) + (minggu[mingguTerakhir] < mingguLalu[mingguTerakhir] ? ' turun' : ' naik') + ' dari ' + mingguLalu[mingguTerakhir] + ' jadi ' + minggu[mingguTerakhir];
+  }
+  let maksHari = -1;
+  hari.forEach(function (n, i) { if (n > 0 && (maksHari < 0 || n > hari[maksHari])) { maksHari = i; } });
+  const sering = daftar.filter(function (x) { return x.cur.telat_hari > 0; }).sort(function (a, b) {
+    return b.cur.telat_hari - a.cur.telat_hari || b.cur.telat_mnt - a.cur.telat_mnt || (a.nama < b.nama ? -1 : 1);
+  }).slice(0, 3).map(function (x) { return { id: x.id, nama: x.nama, hari: x.cur.telat_hari, menit: x.cur.telat_mnt }; });
+  const karyawan = daftar.map(function (x) { return { id: x.id, nama: x.nama, cabang: x.cabang, label: x.cur.label, alpha: x.cur.alpha }; })
+    .sort(function (a, b) { return a.nama.toLowerCase() < b.nama.toLowerCase() ? -1 : 1; });
+  return {
+    bulan: bulan, bulan_teks: namaBulanTeks(bulan), bulan_lalu_teks: NAMA_BULAN_PANJANG[Number(geserBulan(bulan, -1).slice(5, 7)) - 1], ada_pembanding: adaPrev,
+    kehadiran: { persen: pCur, tren: kad },
+    telat: { hari: jumlah(cur, 'telat_hari'), tren: banding(jumlah(cur, 'telat_hari'), adaPrev ? jumlah(prev, 'telat_hari') : null, true) },
+    tidak_hadir: { hari: jumlah(cur, 'alpha'), tren: banding(jumlah(cur, 'alpha'), adaPrev ? jumlah(prev, 'alpha') : null, true) },
+    lembur: { hari: jumlah(cur, 'lembur_hari'), tren: banding(jumlah(cur, 'lembur_hari'), adaPrev ? jumlah(prev, 'lembur_hari') : null, null) },
+    komposisi: komposisi, jumlah_karyawan: daftar.length,
+    telat_minggu: minggu.map(function (n, i) { return { label: 'Mg ' + (i + 1), jumlah: n }; }), kalimat_minggu: kalimatMinggu,
+    telat_hari: [1, 2, 3, 4, 5, 6].map(function (i) { return { label: HARI_PENDEK[i], jumlah: hari[i] }; }), hari_terbanyak: maksHari >= 0 ? HARI_PANJANG[maksHari] : '',
+    paling_sering: sering, karyawan: karyawan, perlu_evaluasi: karyawan.filter(function (x) { return x.label === 'BAD'; }).length
+  };
+}
+
+// ---------- akses sheet laporan ----------
+
+/** Baris absensi sejak tanggal mulai (semua karyawan), dibaca dari bawah per blok sampai melewati tanggal itu; jam sebagai teks. */
+function bacaAbsensiSejak(mulai) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('absensi');
+  const terakhir = sheet.getLastRow();
+  if (terakhir < 2) { return []; }
+  const lebar = sheet.getLastColumn();
+  const header = sheet.getRange(1, 1, 1, lebar).getValues()[0];
+  const iM = header.indexOf('masuk'), iP = header.indexOf('pulang');
+  const hasil = [];
+  let akhir = terakhir, dibaca = 0;
+  while (akhir >= 2 && dibaca < 8000) {
+    const awal = Math.max(2, akhir - 299);
+    const rentang = sheet.getRange(awal, 1, akhir - awal + 1, lebar);
+    const v = rentang.getValues(), tampil = rentang.getDisplayValues();
+    let terbaru = '0000-00-00';
+    for (let i = v.length - 1; i >= 0; i--) {
+      const r = {}; header.forEach(function (nama, idx) { r[nama] = v[i][idx]; });
+      const tgl = String(sebagaiTanggalTeks(r.tanggal, ZONA_ABSEN));
+      if (tgl > terbaru) { terbaru = tgl; }
+      if (tgl < mulai) { continue; }
+      r.tanggal = tgl;
+      r.masuk = String(r.masuk) === '' ? '' : jamDariTampilan(tampil[i][iM]);
+      r.pulang = String(r.pulang) === '' ? '' : jamDariTampilan(tampil[i][iP]);
+      hasil.push(r);
+    }
+    dibaca += v.length;
+    if (terbaru < mulai) { break; }
+    akhir = awal - 1;
+  }
+  return hasil;
+}
+
+function bacaBatasLabel() {
+  return { telat: ambilNilaiUmum('batas_telat_bad', 5), plgAwal: ambilNilaiUmum('batas_pulang_awal_bad', 5), izinBiasa: ambilNilaiUmum('batas_izin_biasa_bad', 3) };
+}
+
+/** Data bersama untuk laporan: absensi sejak awal bulan pembanding, izin, kalender, libur Minggu per cabang, batas label. */
+function siapkanDataLaporan(bulan) {
+  const mulai = geserBulan(bulan, -1) + '-01';
+  const pengaturan = bacaSheet('pengaturan').data;
+  const kode = {}, libur = {};
+  pengaturan.forEach(function (r) { if (r.kategori === 'CABANG') { kode[String(r.nama)] = String(r.nilai).trim().toUpperCase(); } });
+  Object.keys(kode).forEach(function (n) {
+    const p = pengaturan.find(function (r) { return r.kategori === 'UMUM' && String(r.nama) === 'libur_minggu_' + kode[n]; });
+    libur[n] = !!p && String(p.nilai).toUpperCase() === 'TRUE';
+  });
+  return { absensi: bacaAbsensiSejak(mulai), izin: bacaIzinTernormalisasi().data, kalender: bacaKalenderTernormalisasi().data, libur: libur, batas: bacaBatasLabel(), hariIni: hariIniServer() };
+}
+
+/** Laporan satu akun untuk bulan dan bulan sebelumnya dari data bersama. { cur, prev } (hitungLaporanKaryawan). */
+function laporanAkun(akun, bulan, data) {
+  const a = Object.assign({}, akun, { mulai_pola: akun.mulai_pola === '' || akun.mulai_pola === undefined ? '' : normTanggalIzin(akun.mulai_pola) });
+  const mk = akun.mulai_kerja === '' || akun.mulai_kerja === undefined ? '' : normTanggalIzin(akun.mulai_kerja);
+  const abs = data.absensi.filter(function (r) { return String(r.karyawan) === String(akun.id); });
+  const izin = data.izin.filter(function (r) { return String(r.karyawan) === String(akun.id); });
+  const hitung = function (b) {
+    return hitungLaporanKaryawan({ akun: a, bulan: b, hariIni: data.hariIni, mulaiKerja: mk, absensi: abs, izin: izin, kalender: data.kalender, liburMinggu: data.libur[String(akun.cabang)] === true, batas: data.batas, jatahCuti: jatahCutiAkun(akun) });
+  };
+  return { cur: hitung(bulan), prev: hitung(geserBulan(bulan, -1)) };
+}
+
+function bulanDariData(d) { return bulanSah(d.bulan) ? String(d.bulan) : hariIniServer().slice(0, 7); }
+
+function infoShiftAkun(akun) {
+  const sh = bacaShiftCabang(akun.cabang).find(function (s) { return nomorShift(s.no) === nomorShift(akun.shift); });
+  return { shift: sh ? sh.nama : '', jam_masuk: sh ? sh.masuk : '' };
+}
+
+/** Aksi laporan_saya { sesi, bulan? }: Report milik sendiri (HP pribadi: karyawan atau admin). */
+function prosesLaporanSaya(d) {
+  const a = aktorIzinPribadi(d);
+  if (a.gagal) { return a.gagal; }
+  const bulan = bulanDariData(d);
+  const data = siapkanDataLaporan(bulan);
+  const l = laporanAkun(a.akun, bulan, data);
+  const info = infoShiftAkun(a.akun);
+  return respon({ status: 'ok', nama: String(a.akun.nama), laporan: ringkasanLaporan(l.cur, l.prev), jam_masuk: info.jam_masuk });
+}
+
+/** Siapa boleh melihat laporan siapa: OWNER semua KARYAWAN dan ADMIN; ADMIN hanya KARYAWAN cabangnya. */
+function bolehLihatLaporan(aktor, t) {
+  if (!t || (t.role !== 'KARYAWAN' && t.role !== 'ADMIN')) { return false; }
+  if (aktor.role === 'OWNER') { return true; }
+  return aktor.role === 'ADMIN' && t.role === 'KARYAWAN' && String(t.cabang) === String(aktor.cabang);
+}
+
+/** Aksi laporan_karyawan { id, bulan?, kredensial owner/admin }: detail satu karyawan (layar 70). */
+function prosesLaporanKaryawan(d) {
+  const a = autentikasiKoreksi(d);
+  if (a.gagal) { return a.gagal; }
+  const t = akunLengkapAktif(d.id);
+  if (!t || !bolehLihatLaporan(a.s.akun, t)) { return respon({ status: 'gagal', pesan: 'Pilih karyawan yang valid' }); }
+  const bulan = bulanDariData(d);
+  const l = laporanAkun(t, bulan, siapkanDataLaporan(bulan));
+  const info = infoShiftAkun(t);
+  return respon({ status: 'ok', id: String(t.id), nama: String(t.nama), cabang: String(t.cabang), shift: info.shift, jam_masuk: info.jam_masuk, laporan: ringkasanLaporan(l.cur, l.prev) });
+}
+
+function daftarAkunLaporan(aktor, cabangPilih) {
+  const cabang = aktor.role === 'OWNER' ? String(cabangPilih || '').slice(0, 60) : aktor.cabang;
+  return bacaSheet('akun').data.filter(function (r) {
+    if (r.aktif !== true || (cabang && String(r.cabang) !== cabang)) { return false; }
+    return aktor.role === 'OWNER' ? (r.role === 'KARYAWAN' || r.role === 'ADMIN') : r.role === 'KARYAWAN';
+  });
+}
+
+/** Aksi laporan_cabang { bulan?, cabang? (owner), kredensial owner/admin }: dashboard (admin 68/69) atau laporan bulanan (owner 81/82). */
+function prosesLaporanCabang(d) {
+  const a = autentikasiKoreksi(d);
+  if (a.gagal) { return a.gagal; }
+  const bulan = bulanDariData(d);
+  const data = siapkanDataLaporan(bulan);
+  const owner = a.s.akun.role === 'OWNER';
+  const daftar = daftarAkunLaporan(a.s.akun, d.cabang).map(function (akun) {
+    const l = laporanAkun(akun, bulan, data);
+    return { id: String(akun.id), nama: String(akun.nama), cabang: String(akun.cabang), cur: l.cur, prev: l.prev };
+  });
+  const out = rakitDashboard(daftar, bulan);
+  out.bulan_ini = hariIniServer().slice(0, 7);
+  out.status = 'ok';
+  out.cabang = owner ? String(d.cabang || '').slice(0, 60) : a.s.akun.cabang;
+  if (owner) {
+    const dc = [];
+    bacaSemuaShift().forEach(function (x) { if (dc.indexOf(x.cabang) === -1) { dc.push(x.cabang); } });
+    bacaSheet('pengaturan').data.forEach(function (r) { if (r.kategori === 'CABANG' && dc.indexOf(String(r.nama)) === -1) { dc.push(String(r.nama)); } });
+    out.daftar_cabang = dc;
+  }
+  return respon(out);
+}
+
+/** Aksi evaluasi_jumlah { cabang? (owner), kredensial owner/admin }: jumlah karyawan berlabel BAD bulan ini (kotak "Perlu evaluasi (BAD)" di beranda). */
+function prosesEvaluasiJumlah(d) {
+  const a = autentikasiKoreksi(d);
+  if (a.gagal) { return a.gagal; }
+  const bulan = hariIniServer().slice(0, 7);
+  const data = siapkanDataLaporan(bulan);
+  let n = 0;
+  daftarAkunLaporan(a.s.akun, d.cabang).forEach(function (akun) {
+    const mk = akun.mulai_kerja === '' || akun.mulai_kerja === undefined ? '' : normTanggalIzin(akun.mulai_kerja);
+    const abs = data.absensi.filter(function (r) { return String(r.karyawan) === String(akun.id); });
+    const izin = data.izin.filter(function (r) { return String(r.karyawan) === String(akun.id); });
+    const lap = hitungLaporanKaryawan({ akun: Object.assign({}, akun, { mulai_pola: akun.mulai_pola === '' ? '' : normTanggalIzin(akun.mulai_pola) }), bulan: bulan, hariIni: data.hariIni, mulaiKerja: mk, absensi: abs, izin: izin, kalender: data.kalender, liburMinggu: data.libur[String(akun.cabang)] === true, batas: data.batas, jatahCuti: jatahCutiAkun(akun) });
+    if (lap.label === 'BAD') { n++; }
+  });
+  return respon({ status: 'ok', jumlah: n });
 }

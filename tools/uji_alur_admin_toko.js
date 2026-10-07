@@ -22,7 +22,7 @@ function hitung(aksi) { return window.__panggilan.filter(function (x) { return x
     var nSebelum = hitung("beranda_hari_ini");
     el("admShiftPilih").value = "1"; el("admShiftPilih").dispatchEvent(new Event("change")); await tunggu(100);
     ok("pilih Shift 1: empat angka dan daftar mengikuti pilihan (tanpa memanggil server lagi)", /Belum absen \(shift 1\)/.test(el("admBelum").textContent) && /Joko Susilo/.test(el("admBelum").textContent) && el("admAngka").querySelectorAll(".n")[2].textContent === "1" && hitung("beranda_hari_ini") === nSebelum);
-    ok("\"Perlu evaluasi (BAD)\" tampil NONAKTIF persis mockup: tombol mati, tulisan Segera, tanpa angka", !!document.querySelector("#layarAdmin .btn-evaluasi[disabled]") && /Perlu evaluasi \(BAD\)/.test(el("layarAdmin").textContent) && !/orang/.test(document.querySelector("#layarAdmin .btn-evaluasi").textContent));
+    await tunggu(500); ok("\"Perlu evaluasi (BAD)\" AKTIF (Tahap 2): jumlah dari server \"N orang\", tanpa Segera", !document.querySelector("#layarAdmin .btn-evaluasi").disabled && /Perlu evaluasi \(BAD\)/.test(el("layarAdmin").textContent) && /\d+ orang/.test(document.querySelector("#layarAdmin .btn-evaluasi").textContent) && !/Segera/.test(document.querySelector("#layarAdmin .btn-evaluasi").textContent));
     ok('kotak Menunggu konfirmasi tampil dengan angka', /Menunggu konfirmasi/.test(el('btnAdminKonf').textContent) && el('admKonfJumlah').textContent === '3');
     ok('ikon segarkan ada di beranda admin', !!el('btnSegarkanAdmin'));
     var n0 = hitung('beranda_hari_ini');

@@ -63,3 +63,16 @@ window.fetch = function (url, opsi) {
     return f0(url, opsi);
   };
 })();
+// Tahap 2: balasan kosong supaya layar laporan/dashboard tidak memunculkan dialog galat di tes lama.
+(function () {
+  var f0 = window.fetch;
+  window.fetch = function (url, opsi) {
+    var b = {}; try { b = JSON.parse(opsi.body); } catch (e) {}
+    var kosong = { arah: '', dari: '' };
+    var d = null;
+    if (b.aksi === 'laporan_cabang') { d = { status: 'ok', bulan: '2026-10', bulan_ini: '2026-10', bulan_teks: 'Oktober 2026', bulan_lalu_teks: 'September', ada_pembanding: false, cabang: 'Ngawi', daftar_cabang: ['Ngawi', 'Pusat'], kehadiran: { persen: null, tren: kosong }, telat: { hari: 0, tren: kosong }, tidak_hadir: { hari: 0, tren: kosong }, lembur: { hari: 0, tren: kosong }, komposisi: { EXCELLENT: 0, GOOD: 0, BAD: 0 }, jumlah_karyawan: 0, telat_minggu: [{ label: 'Mg 1', jumlah: 0 }, { label: 'Mg 2', jumlah: 0 }, { label: 'Mg 3', jumlah: 0 }, { label: 'Mg 4', jumlah: 0 }], kalimat_minggu: '', telat_hari: [], hari_terbanyak: '', paling_sering: [], karyawan: [], perlu_evaluasi: 0 }; }
+    if (b.aksi === 'evaluasi_jumlah') { d = { status: 'ok', jumlah: 0 }; }
+    if (d) { return Promise.resolve({ json: function () { return Promise.resolve(d); } }); }
+    return f0(url, opsi);
+  };
+})();

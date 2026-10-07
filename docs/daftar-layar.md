@@ -22,17 +22,17 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | No | Layar mockup | Status | Catatan |
 |---|---|---|---|
 | 29 | 8. HP Pribadi - Login | tersambung | Persis mockup: satu kolom Password (PIN karyawan atau kata sandi admin; server `login_pribadi` yang membedakan). Keypad PIN dan tautan "Masuk sebagai admin" dihapus. Tombol kembali di layar ini tidak ada di mockup, jadi kembali lewat tombol Back HP. |
-| 30 | 9a. Beranda - badge EXCELLENT | tersambung | Lencana performa disembunyikan: **menunggu data** (label belum dihitung). |
-| 31 | 9b. Beranda - badge GOOD | tersambung | Sama. |
-| 32 | 9c. Beranda - badge BAD | tersambung | Sama. |
+| 30 | 9a. Beranda - badge EXCELLENT | tersambung (Tahap 2) | Lencana label (EXCELLENT/GOOD/BAD) tampil di beranda pribadi dari `laporan_saya` bila bulan ini sudah ada hari yang bisa dinilai; kalau belum, tetap nonaktif "Segera". |
+| 31 | 9b. Beranda - badge GOOD | tersambung (Tahap 2) | Sama dengan 30. |
+| 32 | 9c. Beranda - badge BAD | tersambung (Tahap 2) | Sama dengan 30. |
 | 33 | 9d. Absen luar - wajah dikenali | tersambung | Beda sengaja: tanpa chip Keperluan (satu kolom Keterangan). Baris "Wajah cocok" diganti "Pengenalan wajah · Segera". |
 | 34 | 9e. Absen luar - cadangan PIN | tersambung (tampilan saja) | Layar KEJADIAN, belum bisa dipicu. PIN 5 titik; chip Keperluan dihapus, satu kolom Keterangan (wajib minimal 5, maksimal 100) seperti absen luar (keputusan pemilik 2026-10-07). |
 | 35 | 9f. Pop-up absen luar terkirim | tersambung (dipakai sebagai pop-up nyata) | `lb35` tampil setelah absen luar masuk/pulang/lembur DITERIMA server (nama, jam tiket server, "Menunggu persetujuan admin"; kotak "Bulan ini" nonaktif "–"); menutup sendiri 4 detik atau ketuk. Pengiriman gagal = pesan galat lama. |
-| 36 | 10a. Report EXCELLENT | tersambung (tampilan saja) | `lb36e` = berwarna penuh EXCELLENT, TIDAK bisa dibuka dari navigasi. Layar Report yang bisa dibuka = `lb36` (lencana netral nonaktif "Segera", tanpa warna label). |
-| 37 | 10b. Report GOOD | tersambung (tampilan saja) | `lb37`: layar tersendiri berwarna penuh GOOD; TIDAK bisa dibuka (label belum dihitung). |
-| 38 | 10c. Report BAD | tersambung (tampilan saja) | `lb38`: layar tersendiri berwarna penuh BAD; TIDAK bisa dibuka (label belum dihitung). |
-| 39 | 10d. Detail lembur | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: Sama. |
-| 40 | 10e. Detail telat (tabel) | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: Sama. |
+| 36 | 10a. Report EXCELLENT | tersambung (Tahap 2) | Report netral: dibuka bila bulan ini belum ada data; label tetap "Segera" nonaktif. Layar Report dipilih menurut label (36e / 37 / 38) lewat tombol Report; detail Telat (40) dan Lembur (39) aktif, Detail lain nonaktif. |
+| 37 | 10b. Report GOOD | tersambung (Tahap 2) | `lb37` = Report GOOD, dibuka lewat tombol Report bila label GOOD. Angka, tren, catatan, daftar Menunggu ACC dan Ditolak dari server (lihat selisih SD3). |
+| 38 | 10c. Report BAD | tersambung (Tahap 2) | `lb38` = Report BAD, dibuka lewat tombol Report bila label BAD. |
+| 39 | 10d. Detail lembur | tersambung (Tahap 2) | Detail lembur disetujui: jumlah per tingkat dan tabel dari server. |
+| 40 | 10e. Detail telat (tabel) | tersambung (Tahap 2) | Detail telat: tabel tanggal, jam masuk, menit telat, alasan dari server. |
 | 41 | 11. Form izin / cuti | tersambung (Fitur A: form izin/cuti) | Jenis, sisa cuti, hari kerja, kelebihan hari (Cuti / Izin biasa) dan "Hasil pengajuan" dihitung server (izin_pratinjau); Kirim = izin_ajukan. |
 | 42 | 11d. Ajukan tukar shift | tersambung (Fitur B: ajukan tukar shift) | Karyawan memilih Tukar dengan rekan / Pindah shift, tanggal, rekan (Shift berbeda), alasan; pratinjau dari server; Kirim = tukar_ajukan. Admin tidak bisa mengajukan (pesan jelas). |
 | 43 | 11e. Rekan menyetujui tukar shift | tersambung (Fitur B: rekan menyetujui) | Muncul sendiri di beranda pribadi bila ada ajakan menunggu jawaban (maksimal sekali per 5 menit sampai dijawab); Setuju/Tolak = tukar_jawab. Ajakan yang lewat jam masuk shift = BATAL otomatis. |
@@ -46,7 +46,7 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 
 | No | Layar mockup | Status | Catatan |
 |---|---|---|---|
-| 49 | 13. Admin - Beranda | tersambung | Angka Hadir/Telat/Belum absen/Izin per shift dari aksi baru `beranda_hari_ini`; kartu bisa digeser (Semua shift + tiap shift), daftar "Belum absen" mengikuti kartu (bawaan: semua shift; mockup menampilkan shift 1), "Menunggu konfirmasi", ikon segarkan. "Perlu evaluasi (BAD)" disembunyikan: **menunggu data** (label performa). Izin/cuti = 0 sampai fitur izin ada. |
+| 49 | 13. Admin - Beranda | tersambung | Kotak "Perlu evaluasi (BAD)" aktif (Tahap 2): jumlah dari `evaluasi_jumlah`; ketuk = layar 69 terfilter "Perlu evaluasi". |
 | 50 | 13b. Admin - menu | tersambung | Item sama seperti mockup (belum ada fitur = "Segera"). Tambahan di app: "Ubah nama HP ini" dan "Tutup menu". Angka di "Konfirmasi" polos seperti mockup. |
 | 51 | 13c. Konfirmasi log out | tersambung | Ikon lingkaran hitam ditambahkan di dialog Log out (HP toko, HP pribadi, owner). |
 | 52 | 14. Admin - Konfirmasi | tersambung | Judul 30 px, badge "Admin Ngawi", tanggal "Hari ini/Kemarin/Sabtu 26 Sep", label lembur "1–2 jam", link Maps hitam. Chip Izin dan Lupa absen aktif (Fitur A dan C); kartu Lupa absen, Konflik absen, dan Shift tidak sesuai jadwal ada (Fitur C). Edit wajib alasan (lihat tabel perubahan). |
@@ -65,9 +65,9 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 65 | 33. Admin - Edit absen | tersambung (Fitur C: edit absen) | Dibuka dari pensil di layar 64. Tab Masuk/Pulang, foto + jam foto, Update foto (opsional), jam, "Sebelum → sesudah" dari server, alasan wajib minimal 5 karakter; status dihitung ulang, log EDIT_ABSEN. |
 | 66 | 34. Admin - Input izin | tersambung (Fitur A: input izin admin) | Karyawan dan jenis dari server; hari kerja dihitung server; Simpan = izin_input (langsung DITERIMA, log INPUT_IZIN); foto surat opsional untuk Sakit. |
 | 67 | 35. Admin - Kalender libur | tersambung (Fitur A: kalender libur) | Kalender bulan berjalan dari server (kalender_baca); ketuk tanggal depan = dialog ubah libur; saklar Libur setiap Minggu dan "+ Libur khusus" menyimpan (kalender_simpan, log). Geser kiri/kanan ganti bulan. |
-| 68 | 36. Dashboard bulanan - tab Ringkasan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** (butuh rekap bulanan + label) |
-| 69 | 36. Dashboard bulanan - tab Per karyawan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: sama |
-| 70 | 36b. Detail karyawan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: sama |
+| 68 | 36. Dashboard bulanan - tab Ringkasan | tersambung (Tahap 2) | Dashboard bulanan admin: kartu angka, komposisi label, telat per minggu/hari, paling sering telat, pilihan Bulan, dari `laporan_cabang`. Dikerjakan paling akhir di tahap ini. |
+| 69 | 36. Dashboard bulanan - tab Per karyawan | tersambung (Tahap 2) | Tab Per karyawan: filter Semua / Perlu evaluasi, ketuk baris = layar 70. |
+| 70 | 36b. Detail karyawan | tersambung (Tahap 2) | Detail karyawan (format Report) dari `laporan_karyawan`; warna menyesuaikan label (lihat selisih SD2). |
 
 ## 3. Owner
 
@@ -75,7 +75,7 @@ Selisih per layar (siapa yang memutuskan, gambar berdampingan): lihat `docs/daft
 
 | No | Layar mockup | Status | Catatan |
 |---|---|---|---|
-| 71 | 23. Owner - Beranda | tersambung | Dropdown Cabang selalu tampil; satu kartu + dropdown Shift; Belum absen; Perlu evaluasi nonaktif; Telat 7 hari dari data nyata |
+| 71 | 23. Owner - Beranda | tersambung | Kotak "Perlu evaluasi (BAD)" aktif (Tahap 2), ketuk = layar 82 terfilter. |
 | 72 | 23b. Owner - menu | tersambung | Urutan dan isi menu = mockup; item tanpa fitur "Segera" |
 | 73 | 24. Owner - Log per kategori | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
 | 74 | 25. Owner - Log detail | tersambung (tampilan saja) | Di mockup 74 = tabel "Log: Edit absen" (bukan layar edit). Tetap tampilan saja; lihat selisih D1. |
@@ -85,8 +85,8 @@ Selisih per layar (siapa yang memutuskan, gambar berdampingan): lihat `docs/daft
 | 78 | 29. HP baru - pilih jenis HP | tersambung | Tombol "Masuk sebagai Owner" dipertahankan (TANYA) |
 | 79 | 30. Daftarkan HP toko | tersambung | Cabang/ID/Kode = "Segera" |
 | 80 | 31. Owner - Daftar perangkat | tersambung | Filter cabang, saklar nonaktif, Ubah nama dipertahankan (TANYA) |
-| 81 | Owner - Laporan bulanan - Ringkasan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
-| 82 | Owner - Laporan bulanan - Per karyawan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
+| 81 | Owner - Laporan bulanan - Ringkasan | tersambung (Tahap 2) | Laporan bulanan owner: seperti 68 dengan pilihan Cabang; "Ekspor Excel" tetap nonaktif "Segera". |
+| 82 | Owner - Laporan bulanan - Per karyawan | tersambung (Tahap 2) | Per karyawan owner: seperti 69. |
 
 ## 4. HP Toko (urutan galeri 01–28; 22–28 tercampur di galeri)
 
@@ -217,3 +217,7 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 ## Tahap 1 (perbaikan A–C)
 - Hidup: layar 25 (Data absensi owner), tombol "Isi jam" di Konfirmasi owner (lupa absen ADMIN), layar 54/65 dengan kredensial owner, tombol "Batalkan pengajuan" di beranda pribadi (SF4).
 - Server baru/berubah: `pengajuan_saya`; `absen_manual_*`, `absensi_*` menerima sesi owner (`autentikasiKoreksi`, `bolehTargetKoreksi`). Layar 73 dan 76 tetap tampilan saja.
+
+## Tahap 2 (laporan dan label)
+- Hidup: lencana label (30-32), Report 36/36e/37/38 menurut label, detail 39/40, kotak "Perlu evaluasi (BAD)" di beranda admin (49) dan owner (71), dashboard admin 68/69, detail karyawan 70, laporan owner 81/82. Ekspor Excel tetap nonaktif "Segera".
+- Server baru: `laporan_saya`, `laporan_karyawan`, `laporan_cabang`, `evaluasi_jumlah` (dihitung langsung dari absensi, izin, kalender; sheet `rekap_bulanan` TIDAK dipakai).

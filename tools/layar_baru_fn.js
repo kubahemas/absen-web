@@ -206,4 +206,65 @@ var FN = {
     tandai(cari(root, /^Simpan/, 'button'), 'simpan');
   }
 
+  ,
+  // ---- Tahap 2: laporan (Report 36/36e/37/38/70, detail 39/40, dashboard 68/69, laporan owner 81/82) ----
+  'report': function (root) {
+    tandai(root.querySelector('button'), 'bulan');
+    var perf = cari(root, /^Performa/); tandai(perf, 'perf');
+    if (perf) {
+      tandai(perf.nextElementSibling, 'label');
+      tandai(perf.parentElement.previousElementSibling, 'ikon');
+      var baris = perf.parentElement.parentElement;
+      tandai(baris.nextElementSibling, 'tren');
+      if (baris.nextElementSibling) { tandai(baris.nextElementSibling.nextElementSibling, 'catatan'); }
+    }
+    var peta = { 'Masuk': 'masuk', 'Telat': 'telat', 'Pulang awal': 'plg', 'Alpha': 'alpha', 'Izin biasa': 'izinb', 'Izin khusus': 'izink', 'Sisa cuti': 'cuti', 'Lembur disetujui': 'lembur' };
+    Object.keys(peta).forEach(function (k) {
+      var e = cari(root, k);
+      if (e && e.parentElement && e.parentElement.parentElement) { tandai(e.parentElement.parentElement, 'r_' + peta[k]); }
+    });
+    var tel = root.querySelector('[data-f="r_telat"]');
+    if (tel) {
+      Array.prototype.slice.call(tel.firstElementChild.children).forEach(function (e, i) { if (i === 0) { return; } tandai(e, /^Total/.test(teksLangsung(e)) ? 'totalMenit' : 'trenTelat'); });
+    }
+    tandai(cari(root, 'Menunggu ACC'), 'hMenunggu');
+    tandai(cari(root, 'Ditolak bulan ini'), 'hDitolak');
+  },
+  '39': function (root) {
+    var j = cari(root, 'Detail lembur disetujui'); if (j) { tandai(j.nextElementSibling, 'sub'); }
+    var k = cari(root, /^1–2 jam$/); if (k) { tandai(k.parentElement.parentElement, 'hitung'); }
+    tandai(root.querySelector('tbody'), 'tbody');
+  },
+  '40': function (root) {
+    var j = cari(root, 'Detail telat'); if (j) { tandai(j.nextElementSibling, 'sub'); }
+    tandai(root.querySelector('tbody'), 'tbody');
+    tandai(cari(root, /^Dihitung dari jam masuk/), 'catatan');
+  },
+  '70': function (root) {
+    FN['report'](root);
+    var info = cari(root, /^Cabang .*Shift/); tandai(info, 'info');
+    if (info) { tandai(info.previousElementSibling, 'nama'); }
+  },
+  'dash': function (root) {
+    tandai(root.querySelector('select[id$="_lbm"]'), 'bulan');
+    tandai(root.querySelector('select[id$="_lcab"]'), 'cab');
+    var judul = cari(root, /^(Dashboard bulanan|Laporan bulanan)$/); if (judul) { tandai(judul.nextElementSibling, 'sub'); }
+    var peta = { 'Kehadiran': 'kehadiran', 'Telat': 'telat', 'Tidak hadir': 'tidak', 'Lembur disetujui': 'lembur' };
+    Object.keys(peta).forEach(function (k) { var e = cari(root, k); if (e) { tandai(e.parentElement, 'k_' + peta[k]); } });
+    var kp = cari(root, 'Komposisi label'); if (kp) { tandai(kp.parentElement.parentElement, 'komposisi'); }
+    var tm = cari(root, 'Telat per minggu'); if (tm) { tandai(tm.parentElement.parentElement, 'minggu'); }
+    var th = cari(root, 'Telat per hari'); if (th) { tandai(th.parentElement.parentElement, 'hari'); }
+    var ps = cari(root, 'Paling sering telat'); if (ps) { tandai(ps.parentElement.parentElement, 'sering'); }
+    tandai(cari(root, /^Ekspor Excel/, 'button'), 'ekspor');
+  },
+  'perk': function (root) {
+    tandai(root.querySelector('select[id$="_lbm"]'), 'bulan');
+    tandai(root.querySelector('select[id$="_lcab"]'), 'cab');
+    var judul = cari(root, /^(Dashboard bulanan|Laporan bulanan)$/); if (judul) { tandai(judul.nextElementSibling, 'sub'); }
+    tandai(cari(root, /^Semua/, 'button'), 'fSemua');
+    tandai(cari(root, /^Perlu evaluasi/, 'button'), 'fEval');
+    tandai(root.querySelector('tbody'), 'tbody');
+    tandai(cari(root, /^Ketuk baris/), 'petunjuk');
+  }
+
 };
