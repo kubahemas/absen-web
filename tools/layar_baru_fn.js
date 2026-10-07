@@ -267,4 +267,16 @@ var FN = {
     tandai(cari(root, /^Ketuk baris/), 'petunjuk');
   }
 
+  ,
+  // ---- Tahap 3: layar 45 (ganti password) ----
+  '45': function (root) {
+    var j = cari(root, 'Ganti password'); if (j && j.nextElementSibling) { tandai(j.nextElementSibling, 'sub'); }
+    tandai(root.querySelector('input[id$="_pl"]'), 'lama');
+    tandai(root.querySelector('input[id$="_pb"]'), 'baru');
+    tandai(root.querySelector('input[id$="_pu"]'), 'ulang');
+    tandai(cari(root, /^Kedua password baru sama/), 'aturan4');
+    var lp = cari(root, /^Lupa password lama/); if (lp) { tandai(lp.previousElementSibling, 'pesan'); }
+    tandai(cari(root, /^Simpan/, 'button'), 'simpan');
+  }
+
 };

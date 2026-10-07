@@ -374,3 +374,22 @@ Selisih berikut DIPERTAHANKAN apa adanya (bukan lagi selisih terbuka). SB1 dan S
 | SD4 | 49, 71 | Kotak "Perlu evaluasi (BAD)" kini bisa diketuk (membuka daftar Per karyawan terfilter) dan menampilkan "N orang" | — |
 | SD5 | 36e, 37, 38, 70 | Daftar "Menunggu ACC" kosong = tidak ada tulisan apa pun (mockup tidak punya teks kosong); Detail untuk Masuk, Pulang awal, Alpha, Izin biasa, Izin khusus, Sisa cuti tetap nonaktif (mockup tidak punya layar detailnya) | `38_dampingan.png` |
 | SD6 | 68, 69, 81, 82 | Tab yang sedang terbuka tampil gelap (bukan pudar) | `68_dampingan.png`, `69_dampingan.png` |
+
+## TAHAP 3 (akun) — asumsi yang diambil (butuh setuju atau koreksi pemilik)
+
+| No | Aturan yang tidak ada di dokumen | Pilihan yang dipakai (paling aman dan sederhana) |
+|---|---|---|
+| G1 | Apa yang diganti di layar 45 | KARYAWAN: PIN (5 angka; dipakai login HP pribadi DAN absen di HP toko, jadi keduanya berganti sekaligus). ADMIN: kata sandi (min. 8, maks. 100 karakter, besar/kecil sama); PIN admin untuk HP toko TIDAK berubah (belum ada layarnya). Aturan mockup lama (6 angka, "bukan 123456", dst.) sudah diganti keputusan pemilik sebelumnya. |
+| G2 | Aturan tambahan | Yang lama wajib diisi dan benar; yang baru harus BERBEDA dari yang lama (admin: besar/kecil dianggap sama). Diperiksa di HP dan di server. |
+| G3 | Salah yang lama | Menaikkan hitungan salah seperti login; 5x berturut-turut mengunci akun (log KUNCI_AKUN) dan sesi dihapus. |
+| G4 | Setelah berhasil | Sesi HP pribadi LAIN milik akun itu dicabut (sesi ini tetap); dicatat di log GANTI_PIN / GANTI_PASSWORD tanpa nilai PIN/kata sandi. |
+| G5 | "Ganti PIN" di Akun saya (44) | TETAP nonaktif "Segera": untuk karyawan PIN = password (sudah diganti lewat "Ganti password"), untuk admin belum ada layar khusus PIN HP toko. MOHON KEPUTUSAN: karyawan memakai satu menu saja? admin perlu layar ganti PIN HP toko? |
+| G6 | Teks "Lupa password lama? Hubungi admin cabang untuk reset." | Tetap seperti mockup. Untuk ADMIN yang mereset sebenarnya owner (pemulihan lewat sheet akun). MOHON KEPUTUSAN apakah teks dibedakan menurut peran. |
+| G7 | Shift bawaan (44) | Diisi dari sheet shift cabang: "Shift 1 (07:45 – 16:30)"; bila tidak ditemukan tetap "Segera". |
+
+## TAHAP 3 — selisih tampilan baru (butuh keputusan pemilik)
+
+| No | Layar | Selisih | Gambar (kiri mockup, kanan app) |
+|---|---|---|---|
+| SE1 | 45 | Aturan yang BELUM terpenuhi tampil dengan tanda "•" abu (mockup hanya menggambarkan ✓ hijau); pesan galat merah ("PIN lama salah") tampil di ruang kosong di atas "Lupa password lama?" | `45_dampingan.png` |
+| SE2 | 44 | "Ganti PIN" tetap nonaktif (lihat G5); Shift bawaan kini terisi | `44_dampingan.png` |

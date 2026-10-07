@@ -136,7 +136,7 @@ async function ke(tombol, id, asal, nama) {
       ok('45 (KARYAWAN): aturan = PIN tepat 5 angka; tanpa "6 angka" dan "123456"; tombol Simpan nonaktif "Segera"', ar.length === 3 && /PIN tepat 5 angka/.test(ar[0]) && !/6 angka|123456|8 karakter/.test(el('lb45').textContent) && /Simpan/.test(el('lb45').textContent) && Array.prototype.every.call(el('lb45').querySelectorAll('button'), function (b) { return b.disabled || b.hasAttribute('data-lb-kembali'); }));
       tombolKembali().click(); await tunggu(150);
       ok('Back dari 45 kembali ke Akun saya', aktif() === 'layarAkun');
-      ok('tidak ada panggilan server baru dari layar baru', panggil.slice(n0).every(function (x) { return /^(pribadi_hari_ini|konfirmasi_jumlah|izin_info|izin_pratinjau|tukar_rekan|laporan_saya)$/.test(x.aksi); }));
+      ok('tidak ada panggilan server baru dari layar baru', panggil.slice(n0).every(function (x) { return /^(pribadi_hari_ini|konfirmasi_jumlah|izin_info|izin_pratinjau|tukar_rekan|laporan_saya|pribadi_profil)$/.test(x.aksi); }));
     }
     if (K === 'pribadiadmin') {
       el('btnJenisPribadi').click(); el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12'; el('btnMasukPribadi').click(); await tunggu(900);

@@ -39,6 +39,7 @@ var CFG = {
   '41': { home: 'prib', fn: FN['41'], hapusTeks: [/izin khusus menikah/, /hari cuti/, /^Sisa cuti jadi/] },
   '42': { home: 'prib', hapusSatu: [/Anda →/], fn: FN['42'] },
   '43': { home: 'prib', fn: FN['43'] }, '45': { home: 'prib', ganti: [[/Password lama \(awal: –\)/, 'Password lama']], fn: function (root) {
+    FN['45'](root);
     // Aturan sandi: teks diisi saat layar dibuka menurut peran akun (KARYAWAN = PIN 5 angka; ADMIN = kata sandi minimal 8 karakter). Di markup hanya "–".
     var re = [/^– angka$/, /^Bukan angka berurutan atau kembar/, /^Bukan – dan tidak sama dengan PIN$/];
     Array.prototype.forEach.call(root.querySelectorAll('div, span'), function (d) {

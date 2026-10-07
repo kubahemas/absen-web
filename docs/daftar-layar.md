@@ -36,10 +36,10 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 41 | 11. Form izin / cuti | tersambung (Fitur A: form izin/cuti) | Jenis, sisa cuti, hari kerja, kelebihan hari (Cuti / Izin biasa) dan "Hasil pengajuan" dihitung server (izin_pratinjau); Kirim = izin_ajukan. |
 | 42 | 11d. Ajukan tukar shift | tersambung (Fitur B: ajukan tukar shift) | Karyawan memilih Tukar dengan rekan / Pindah shift, tanggal, rekan (Shift berbeda), alasan; pratinjau dari server; Kirim = tukar_ajukan. Admin tidak bisa mengajukan (pesan jelas). |
 | 43 | 11e. Rekan menyetujui tukar shift | tersambung (Fitur B: rekan menyetujui) | Muncul sendiri di beranda pribadi bila ada ajakan menunggu jawaban (maksimal sekali per 5 menit sampai dijawab); Setuju/Tolak = tukar_jawab. Ajakan yang lewat jam masuk shift = BATAL otomatis. |
-| 44 | 11b. Akun saya | tersambung | Dibuka dari ikon akun (menu "Akun saya"). Nama, ID, cabang terisi; Shift bawaan, Ganti password, Ganti PIN = "Segera". Baris "HP terikat" dan teks "Ganti HP? Minta admin reset ikatan HP" DIHAPUS (keputusan pemilik: tidak ada ikatan akun ke HP). |
-| 45 | 11c. Ganti password | tersambung (tampilan saja) | Aturan sandi mengikuti peran akun (KARYAWAN: PIN tepat 5 angka; ADMIN: kata sandi minimal 8 karakter); Simpan nonaktif "Segera". Label "Password" untuk karyawan: lihat selisih 18. |
+| 44 | 11b. Akun saya | tersambung (Tahap 3) | Dibuka dari ikon akun (menu "Akun saya"). Nama, ID, cabang dari akun; Shift bawaan dari server (`pribadi_profil`: nama shift dan jamnya). Ganti password aktif (membuka 45). "Ganti PIN" tetap nonaktif "Segera" (lihat selisih G5). Baris "HP terikat" dan teks "Ganti HP?" tetap dihapus (keputusan pemilik: tidak ada ikatan akun ke HP). |
+| 45 | 11c. Ganti password | tersambung (Tahap 3) | Ganti password hidup: karyawan mengganti PIN 5 angka, admin mengganti kata sandi (min. 8 karakter, besar/kecil sama). Aturan dengan tanda ✓/• langsung di HP dan diperiksa lagi di server (`ganti_rahasia_pribadi`); yang lama wajib benar (salah 5x = akun terkunci); sesi lain akun dicabut; tidak dicatat di log. |
 | 46 | 9g. Beranda - akun ber-role ADMIN | tersambung | Beda sengaja: kotak "Konfirmasi data karyawan" menggantikan kartu "Menu admin". Strip "2 pengajuan menunggu ACC" disembunyikan: **menunggu data** (fitur izin). |
-| 47 | 8b. Login - akun terkunci | tersambung | Kotak merah "Akun terkunci. Hubungi admin." tampil bila server membalas `TERKUNCI`. |
+| 47 | 8b. Login - akun terkunci | tersambung | Login akun terkunci: kotak merah "Akun terkunci. Hubungi admin." tampil bila server membalas `TERKUNCI` (juga setelah salah password lama 5x di layar 45: sesi dihapus dan kembali ke layar awal). Diuji di `tools/uji_alur_akun.js` (konteks terkunci). |
 | 48 | 9h. Beranda - offline | tersambung (tampilan saja) | Layar KEJADIAN (`lb48`): belum bisa dipicu; tanpa "Halo,", nama besar "–"; tanpa antrean offline. |
 
 ## 2. Admin cabang
@@ -221,3 +221,6 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 ## Tahap 2 (laporan dan label)
 - Hidup: lencana label (30-32), Report 36/36e/37/38 menurut label, detail 39/40, kotak "Perlu evaluasi (BAD)" di beranda admin (49) dan owner (71), dashboard admin 68/69, detail karyawan 70, laporan owner 81/82. Ekspor Excel tetap nonaktif "Segera".
 - Server baru: `laporan_saya`, `laporan_karyawan`, `laporan_cabang`, `evaluasi_jumlah` (dihitung langsung dari absensi, izin, kalender; sheet `rekap_bulanan` TIDAK dipakai).
+
+## Tahap 3 (akun)
+- Hidup: layar 45 (Ganti password), Shift bawaan di Akun saya (44). Layar 47 sudah hidup sebelumnya dan kini diuji. Server baru: `ganti_rahasia_pribadi`; `pribadi_profil` menambah `shift_teks`.
