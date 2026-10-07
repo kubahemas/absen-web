@@ -325,9 +325,9 @@ Selisih berikut DIPERTAHANKAN apa adanya (bukan lagi selisih terbuka). SB1 dan S
 | SB3 | 57 | Mockup tidak menggambarkan cara mengubah urutan: ketuk chip = ganti ke shift berikutnya; setelah shift terakhir ketuk lagi = hapus (minimal 2). Layar 57 menampilkan scrollbar tipis di pratinjau | dipertahankan |
 | SB6 | 55, 56, 57, 42 | Kolom tanggal memakai pemilih tanggal bawaan HP ("07/10/2026") bukan teks "Selasa, 6 Okt 2026" | dipertahankan |
 | SC1 | 52 | Kartu "Konflik absen" tidak ada di mockup 52; dibuat seperti kartu Lupa absen dengan tombol "Lihat detail" (satu-satunya jalan ke layar 53) | dipertahankan |
-| SC2 | 54 | Foto memakai pemilih foto bawaan HP (kamera atau galeri), bukan kamera langsung; tulisan "Wajah harus cocok dengan nama" tetap tampil padahal pencocokan wajah belum ada | dipertahankan |
+| SC2 | 54 | Foto memakai pemilih foto bawaan HP (kamera atau galeri), bukan kamera langsung; tulisan "Wajah harus cocok dengan nama" tetap tampil padahal pencocokan wajah belum ada | **DICABUT 2026-10-07 (Tahap 4):** foto absen kini lewat kamera dalam aplikasi (lihat SG1); galeri tidak boleh |
 | SC4 | 64 | Pilihan filter Tanggal 3 buah (Pekan ini, Hari ini, Bulan ini); mockup hanya memperlihatkan "Pekan ini". Daftar memuat bertahap saat digulir (mockup tidak punya tombol "muat lagi") | dipertahankan |
-| SC5 | 65 | Jam diubah dengan pemilih jam bawaan HP; foto lama dimuat otomatis di kotak | dipertahankan |
+| SC5 | 65 | Jam diubah dengan pemilih jam bawaan HP; foto lama dimuat otomatis di kotak | pemilih jam dipertahankan; **pemilih foto DICABUT 2026-10-07 (Tahap 4):** Update foto kini kamera dalam aplikasi (SG1) |
 | SC6 | 05 | Untuk absen pulang yang kedua, header "ABSEN PULANG" dan kalimat "sudah absen pulang jam" (mockup hanya menggambarkan masuk) | dipertahankan |
 | SC7 | 07 | Baris pil: "Lembur 1 jam 18 menit · 1–2 jam" (mockup "Lembur – jam – menit · –") | dipertahankan |
 | SC8 | 13, 18, 19 | Hitung mundur menutup otomatis (8 detik untuk 13, 6 detik untuk 18 dan 19; mockup hanya menulis "– detik"); tanpa confetti pada 18 | dipertahankan |
@@ -393,3 +393,16 @@ Selisih berikut DIPERTAHANKAN apa adanya (bukan lagi selisih terbuka). SB1 dan S
 |---|---|---|---|
 | SE1 | 45 | Aturan yang BELUM terpenuhi tampil dengan tanda "•" abu (mockup hanya menggambarkan ✓ hijau); pesan galat merah ("PIN lama salah") tampil di ruang kosong di atas "Lupa password lama?" | `45_dampingan.png` |
 | SE2 | 44 | "Ganti PIN" tetap nonaktif (lihat G5); Shift bawaan kini terisi | `44_dampingan.png` |
+
+
+## Keputusan pemilik 2026-10-07 (Tahap 4, pemutus = pemilik)
+
+Dipertahankan: SD1, SD2, SD3, SD4, SD5, SD6, SE1, SE2, SF3, SF4. G5: "Ganti PIN" di layar 44 tetap nonaktif "Segera"; karyawan memakai satu menu "Ganti password"; admin tidak perlu layar ganti PIN HP toko sekarang. Disetujui: E1-E11 (hari izin atau cuti yang sudah diterima tidak dihitung hari kerja), D2-D4, G1-G7. SC2 dan SC5 (bagian pemilih foto) DICABUT. A1-A14 dan B1-B14 tetap terbuka.
+
+## TAHAP 4 (kamera dalam aplikasi, log edit absen) — selisih tampilan baru (butuh keputusan pemilik)
+
+| No | Layar | Selisih | Gambar (kiri mockup, kanan app) |
+|---|---|---|---|
+| SG1 | 54, 65 | Mockup hanya punya kotak foto. Mengetuk kotak foto (54) atau "Update foto" (65) membuka layar penuh kuning "Foto karyawan" dengan lingkaran kamera depan, tombol AMBIL FOTO, lalu PAKAI FOTO / ULANGI dan Batal (gaya layar 09, dibuat sendiri karena mockup tidak menggambarkannya). Foto 640 px JPEG 0,6. Kamera ditolak/tidak ada: pesan "Izinkan akses kamera untuk mengambil foto", SIMPAN tetap nonaktif, tidak ada jalan ke galeri. | `54_dampingan.png`, `65_dampingan.png` |
+| SG2 | 74 | Log hanya 20 tindakan terbaru (mockup tidak punya "Muat lebih"); kalimat di bawah judul = "N tindakan · terbaru di atas". Kolom Alasan kosong tampil "—". Tanpa foto. | `74_dampingan.png` |
+| SG3 | 74 | Popup pilihan Admin (di mockup selalu terbuka) kini tertutup di awal dan dibuka dengan mengetuk judul kolom Admin, supaya tidak menutupi data; isinya daftar admin nyata + "Semua admin". Penyaring Waktu, Cabang, Karyawan dan tombol Ekspor tetap nonaktif. | `74_dampingan.png` |

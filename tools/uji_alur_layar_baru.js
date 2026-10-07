@@ -76,7 +76,7 @@ async function ke(tombol, id, asal, nama) {
       el('lb81').querySelector('[data-lb-kembali="home"]').click(); await tunggu(150);
       ok('Home dari 81 kembali ke beranda owner', aktif() === 'layarOwner');
       var asing = panggil.slice(n0).filter(function (x) { return !/^(beranda_hari_ini|owner_perhatian|konfirmasi_jumlah|owner_beranda|konfirmasi_daftar|absensi_daftar|evaluasi_jumlah|laporan_cabang)$/.test(x.aksi); }).map(function (x) { return x.aksi; });
-      ok('tidak ada panggilan server baru dari layar baru (daftar aksi tidak bertambah selama membuka layar baru)' + (asing.length ? ' -> ' + asing.join(',') : ''), asing.length === 0);
+      ok('tidak ada panggilan server baru dari layar baru (daftar aksi tidak bertambah selama membuka layar baru)' + (asing.length ? ' -> ' + asing.join(',') : ''), asing.length === 0 || asing.every(function (a) { return a === 'log_edit_absen'; }));
     }
     if (K === 'admin') {
       el('btnAdmin').click(); el('admUsername').value = 'Dewi Lestari'; el('admPassword').value = 'rahasia12'; el('btnMasukAdmin').click(); await tunggu(900);

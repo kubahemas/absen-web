@@ -175,6 +175,8 @@ function doPost(e) {
   if (data.aksi === 'absensi_edit') { return prosesAbsensiEdit(data); }
   if (data.aksi === 'absensi_edit_pratinjau') { return prosesAbsensiEdit(Object.assign({}, data, { pratinjau: true })); }
   if (data.aksi === 'absensi_foto') { return prosesAbsensiFoto(data); }
+  if (data.aksi === 'foto_tiket') { return prosesFotoTiket(data); }
+  if (data.aksi === 'log_edit_absen') { return prosesLogEditAbsen(data); }
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
   const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto', 'tidak_masuk_hari_ini', 'jadwal_hari_ini', 'tukar_pengingat', 'laporkan_dobel', 'foto_dobel'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
@@ -1896,6 +1898,35 @@ function tesServer() {
     ujiBebas('ganti password admin: minimal 8 dan maksimal 100 karakter; 7 ditolak, 101 ditolak; bebas huruf/angka', adm('rahasia12', 'sandibaru8').ok === true && adm('rahasia12', 'abcdefg').ok === false && adm('rahasia12', 'x'.repeat(100)).ok === true && adm('rahasia12', 'x'.repeat(101)).ok === false && adm('rahasia12', '12345678').ok === true);
     ujiBebas('ganti password admin: baru sama dengan lama (huruf besar/kecil dianggap sama) ditolak; lama kosong ditolak; pesan menyebut "Password"', adm('Rahasia12', 'rAHASIA12').ok === false && /berbeda dari Password lama/.test(adm('Rahasia12', 'rAHASIA12').pesan) && adm('', 'sandibaru8').ok === false && /Password lama wajib/.test(adm('', 'sandibaru8').pesan));
     ujiBebas('ganti password hanya untuk KARYAWAN dan ADMIN (owner dan perangkat ditolak)', rencanaGantiRahasia({ role: 'OWNER', lama: 'a', baru: 'bbbbbbbb' }).ok === false && rencanaGantiRahasia({ role: 'PERANGKAT', lama: 'a', baru: 'bbbbbbbb' }).ok === false);
+  })();
+  // ---- Tahap 4: jam foto dan Log Edit absen ----
+  (function () {
+    const logF = [
+      { aksi: 'UBAH_FOTO_ABSEN', id: 'M-K003-261005-075200-A', alasan: 'foto diambil 09:14:02; wajah belum diverifikasi' },
+      { aksi: 'UBAH_FOTO_ABSEN', id: 'M-K003-261005-075200-A', alasan: 'foto diambil 10:30:45; wajah belum diverifikasi' },
+      { aksi: 'UBAH_FOTO_ABSEN', id: 'P-K003-261005-163100-T1', alasan: 'wajah belum diverifikasi' },
+      { aksi: 'EDIT_ABSEN', id: 'M-K003-261005-075200-A', alasan: 'x' }
+    ];
+    ujiBebas('jam foto dari log: foto TERBARU untuk id itu (10:30:45); id tanpa catatan jam atau tanpa log = kosong (pakai jam tiket di id)', jamFotoDariLog(logF, 'M-K003-261005-075200-A') === '10:30:45' && jamFotoDariLog(logF, 'P-K003-261005-163100-T1') === '' && jamFotoDariLog(logF, 'M-K999-261005-075200-T1') === '' && jamFotoDariLog([], 'x') === '');
+    ujiBebas('ringkasan jam log: "Masuk 07:52 (TELAT 7 mnt)", "masuk=07:52; st=TELAT", "Masuk kosong" dibaca; teks lain null', jamDariRingkasLog('Masuk 07:52 (TELAT 7 mnt)').jam === '07:52' && jamDariRingkasLog('Pulang 16:31 (PULANG NORMAL)').jenis === 'Pulang' && jamDariRingkasLog('masuk=07:52; st=TELAT; ket=').jam === '07:52' && jamDariRingkasLog('masuk=07:52; st=TELAT; ket=').jenis === 'Masuk' && jamDariRingkasLog('Masuk kosong').jam === '' && jamDariRingkasLog('acak') === null);
+    ujiBebas('nama karyawan dari target log: tanggal dan jenis dibuang; waktu pendek d/M HH:mm', namaKaryawanDariTarget('Rina Wati 2026-10-05') === 'Rina Wati' && namaKaryawanDariTarget('Rina Wati MASUK 2026-10-05') === 'Rina Wati' && namaKaryawanDariTarget('Rina Wati 2026-10-05 masuk 07:52') === 'Rina Wati' && waktuLogPendek('2026-10-28 07:58') === '28/10 07:58' && waktuLogPendek('2026-09-05 16:16') === '5/9 16:16');
+    const petaL = { K009: { nama: 'Dewi Lestari', panggilan: 'Dewi' }, K003: { nama: 'Budi Santoso', panggilan: 'Budi' } };
+    const baris = [
+      { waktu: '2026-10-05 08:00', jenis: 'ABSENSI', oleh: 'K009', cabang: 'Ngawi', aksi: 'EDIT_ABSEN', target: 'Budi Santoso 2026-10-05', id: 'M-1', sebelum: 'Masuk 07:52 (TELAT 7 mnt)', sesudah: 'Masuk 07:44 (HADIR)', alasan: 'Salah catat jam' },
+      { waktu: '2026-10-06 09:10', jenis: 'ABSENSI', oleh: 'K009', cabang: 'Ngawi', aksi: 'ABSEN_MANUAL', target: 'Budi Santoso 2026-10-05 pulang 16:31', id: 'P-1', sebelum: '', sesudah: 'Status: PULANG NORMAL (Shift 1)', alasan: 'Lupa absen; wajah belum diverifikasi (pencocokan wajah dilewati)' },
+      { waktu: '2026-10-06 10:00', jenis: 'ABSENSI', oleh: 'K003', cabang: 'Ngawi', aksi: 'KONFLIK_ABSEN', target: 'Budi Santoso 2026-10-06 masuk 07:40', id: 'M-2', sebelum: JSON.stringify({ jenis: 'MASUK', jam: '07:40', tanggal: '2026-10-06' }), sesudah: 'absen baru dicatat 07:52', alasan: 'BUKAN SAYA' },
+      { waktu: '2026-10-06 10:30', jenis: 'KONFIRMASI', oleh: 'K009', cabang: 'Ngawi', aksi: 'KONFLIK_SELESAI', target: 'Budi Santoso 2026-10-06 MASUK', id: 'M-2', sebelum: 'konflik terbuka', sesudah: 'dipindahkan ke Rina Wati (07:40 HADIR)', alasan: 'Salah pilih nama' },
+      { waktu: '2026-10-06 11:00', jenis: 'KONFIRMASI', oleh: 'K009', cabang: 'Ngawi', aksi: 'EDIT_ABSEN', target: 'Budi Santoso PULANG 2026-10-06', id: 'K003', sebelum: 'pulang=17:00; st=LEMBUR DI TOKO; ket=x', sesudah: 'pulang=17:10; st=LEMBUR DI TOKO; ket=x', alasan: 'Koreksi jam' },
+      { waktu: '2026-10-06 12:00', jenis: 'KEAMANAN', oleh: 'K009', cabang: 'Ngawi', aksi: 'GANTI_PASSWORD', target: 'akun', id: 'K009', sebelum: '', sesudah: '', alasan: '' },
+      { waktu: '2026-10-06 12:30', jenis: 'ABSENSI', oleh: 'K009', cabang: 'Ngawi', aksi: 'EDIT_ABSEN', target: 'x', id: 'x', sebelum: 'acak', sesudah: 'acak', alasan: '' }
+    ];
+    const lg = rakitLogEditAbsen(baris, petaL, 20);
+    ujiBebas('log edit absen: hanya 4 jenis tindakan yang dikenal (GANTI_PASSWORD dan baris rusak dilewati); total 5; terbaru di atas', lg.total === 5 && lg.daftar[0].perubahan === 'Pulang 17:00 → 17:10' && lg.daftar[4].perubahan === 'Masuk 07:52 → 07:44');
+    ujiBebas('log edit absen: kolom waktu d/M, admin (panggilan), cabang, karyawan, alasan terisi; edit jam: "Masuk 07:52 → 07:44"', lg.daftar[4].waktu === '5/10 08:00' && lg.daftar[4].admin === 'Dewi' && lg.daftar[4].cabang === 'Ngawi' && lg.daftar[4].karyawan === 'Budi Santoso' && lg.daftar[4].alasan === 'Salah catat jam');
+    ujiBebas('log edit absen: absen manual "Pulang — → 16:31 (diisi manual)"; BUKAN SAYA "Masuk 07:40 dikeluarkan (BUKAN SAYA)" oleh karyawan sendiri; pindah konflik "Masuk dipindahkan ke Rina Wati"', lg.daftar[3].perubahan === 'Pulang — → 16:31 (diisi manual)' && lg.daftar[2].perubahan === 'Masuk 07:40 dikeluarkan (BUKAN SAYA)' && lg.daftar[2].admin === 'Budi' && lg.daftar[1].perubahan === 'Masuk dipindahkan ke Rina Wati');
+    const banyak = []; for (let i = 0; i < 30; i++) { banyak.push({ waktu: '2026-10-05 08:' + ('0' + (i % 60)).slice(-2), jenis: 'ABSENSI', oleh: 'K009', cabang: 'Ngawi', aksi: 'EDIT_ABSEN', target: 'Budi Santoso 2026-10-05', id: 'M-' + i, sebelum: 'Masuk 07:52', sesudah: 'Masuk 07:44', alasan: 'a' }); }
+    ujiBebas('log edit absen: penyaring admin (id) menyaring baris dan total; daftar pilihan admin tetap memuat semua (Dewi dan Budi)', rakitLogEditAbsen(baris, petaL, 20, 'K009').total === 4 && rakitLogEditAbsen(baris, petaL, 20, 'K003').total === 1 && rakitLogEditAbsen(baris, petaL, 20, 'K003').daftar[0].perubahan === 'Masuk 07:40 dikeluarkan (BUKAN SAYA)' && rakitLogEditAbsen(baris, petaL, 20, 'K009').admin_daftar.map(function (x) { return x.id; }).join() === 'K003,K009' && rakitLogEditAbsen(baris, petaL, 20, 'K009').admin_daftar[1].cabang === 'Ngawi');
+    ujiBebas('log edit absen: dibatasi 20 baris, total tetap seluruhnya (30); tidak ada kolom foto', rakitLogEditAbsen(banyak, petaL, 20).daftar.length === 20 && rakitLogEditAbsen(banyak, petaL, 20).total === 30 && Object.keys(lg.daftar[0]).join() === 'waktu,admin,cabang,karyawan,perubahan,alasan');
   })();
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
@@ -6604,6 +6635,12 @@ function prosesAbsensiUnggahFoto(d) {
   if (t.gagal) { return t.gagal; }
   if (d.jenis !== 'MASUK' && d.jenis !== 'PULANG') { return respon({ status: 'gagal', pesan: 'Pilih Masuk atau Pulang' }); }
   if (!tanggalIzinSah(d.tanggal)) { return respon({ status: 'gagal', pesan: 'Tanggal tidak valid' }); }
+  // Jam foto = saat foto DIAMBIL menurut jam server (tiket foto dari aksi foto_tiket), bukan jam yang diketik dan bukan metadata berkas.
+  const kunciFoto = kunciTiket();
+  if (!kunciFoto) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const tkFoto = periksaTiket(String(d.tiket_foto || ''), 'FOTO', a.s.akun.cabang, kunciFoto, Date.now(), String(a.s.akun.id));
+  if (!tkFoto.ok) { return respon({ status: 'gagal', pesan: 'Waktu foto tidak sah atau sudah lewat, ambil foto lagi' }); }
+  const jamFotoDiambil = Utilities.formatDate(new Date(tkFoto.t), ZONA_ABSEN, 'HH:mm:ss');
   const g = periksaGambarJpeg(d.gambar);
   if (!g.ok) { return respon({ status: 'gagal', pesan: g.pesan }); }
   const kunci = LockService.getScriptLock();
@@ -6633,7 +6670,7 @@ function prosesAbsensiUnggahFoto(d) {
     }
     const ubah = {}; ubah[kolom] = berkas.getUrl();
     perbaruiKolom(cari.bacaan, b, ubah);
-    tambahLog({ jenis: 'ABSENSI', oleh: a.s.akun.id, cabang: t.akun.cabang, aksi: 'UBAH_FOTO_ABSEN', target: t.akun.nama + ' ' + d.tanggal + ' ' + d.jenis, id: String(d.jenis === 'MASUK' ? b.id_masuk : b.id_pulang), sebelum: lama || '(kosong)', sesudah: berkas.getUrl(), alasan: 'wajah belum diverifikasi' });
+    tambahLog({ jenis: 'ABSENSI', oleh: a.s.akun.id, cabang: t.akun.cabang, aksi: 'UBAH_FOTO_ABSEN', target: t.akun.nama + ' ' + d.tanggal + ' ' + d.jenis, id: String(d.jenis === 'MASUK' ? b.id_masuk : b.id_pulang), sebelum: lama || '(kosong)', sesudah: berkas.getUrl(), alasan: 'foto diambil ' + jamFotoDiambil + '; wajah belum diverifikasi' });
     return respon({ status: 'ok' });
   } finally {
     kunci.releaseLock();
@@ -6675,11 +6712,13 @@ function prosesAbsensiEditInfo(d) {
   const cari = cariBarisAbsensiTampil(String(t.akun.id), String(d.tanggal));
   if (!cari) { return respon({ status: 'gagal', pesan: 'Absen tidak ditemukan' }); }
   const b = cari.baris;
+  let logFoto = [];
+  try { logFoto = bacaLogAksi(['UBAH_FOTO_ABSEN'], 1500); } catch (e) { logFoto = []; }
   const jamFoto = function (id) { const m = /-(\d{2})(\d{2})(\d{2})-(?:T\d+|P|A)$/.exec(String(id)); return m ? m[1] + ':' + m[2] + ':' + m[3] : ''; };
   return respon({
     status: 'ok', karyawan: String(t.akun.id), nama: String(t.akun.nama), tanggal: String(d.tanggal), hari_ini: hariIniServer(),
-    masuk: { jam: b.masuk_teks, st: String(b.st_masuk), telat_mnt: Number(b.telat_mnt) || 0, jam_foto: jamFoto(b.id_masuk), foto: !!idBerkasDrive(String(b.foto_masuk)) },
-    pulang: { jam: b.pulang_teks, st: String(b.st_pulang), jam_foto: jamFoto(b.id_pulang), foto: !!idBerkasDrive(String(b.foto_pulang)) }
+    masuk: { jam: b.masuk_teks, st: String(b.st_masuk), telat_mnt: Number(b.telat_mnt) || 0, jam_foto: jamFotoDariLog(logFoto, String(b.id_masuk)) || jamFoto(b.id_masuk), foto: !!idBerkasDrive(String(b.foto_masuk)) },
+    pulang: { jam: b.pulang_teks, st: String(b.st_pulang), jam_foto: jamFotoDariLog(logFoto, String(b.id_pulang)) || jamFoto(b.id_pulang), foto: !!idBerkasDrive(String(b.foto_pulang)) }
   });
 }
 
@@ -7354,4 +7393,109 @@ function prosesGantiRahasiaPribadi(d) {
   } finally {
     kunci.releaseLock();
   }
+}
+
+// ---------- Foto absen dari kamera dalam aplikasi: tiket waktu foto ----------
+
+/** Aksi foto_tiket { kredensial owner/admin }: tiket waktu server saat foto DIAMBIL (berlaku 30 menit, terikat ke akun). Dikirim bersama foto di absensi_unggah_foto. */
+function prosesFotoTiket(d) {
+  const a = autentikasiKoreksi(d);
+  if (a.gagal) { return a.gagal; }
+  const kunci = kunciTiket();
+  if (!kunci) { return respon({ status: 'gagal', pesan: 'Server belum siap: KODE_RAHASIA belum diisi di Script Properties.' }); }
+  const t = Date.now();
+  const tiket = buatTiket({ j: 'FOTO', t: t, e: t + 30 * 60000, c: String(a.s.akun.cabang || ''), a: String(a.s.akun.id), n: Utilities.getUuid().replace(/-/g, '').slice(0, 16) }, kunci);
+  return respon({ status: 'ok', tiket: tiket, jam: Utilities.formatDate(new Date(t), ZONA_ABSEN, 'HH:mm:ss') });
+}
+
+/** Fungsi murni: jam foto (HH:mm:ss) dari baris log UBAH_FOTO_ABSEN TERBARU untuk id absen itu; '' kalau tidak ada. logRows urut lama ke baru. */
+function jamFotoDariLog(logRows, idAbsen) {
+  let hasil = '';
+  logRows.forEach(function (r) {
+    if (String(r.aksi) !== 'UBAH_FOTO_ABSEN' || String(r.id) !== String(idAbsen)) { return; }
+    const m = /foto diambil (\d{2}:\d{2}:\d{2})/.exec(String(r.alasan));
+    if (m) { hasil = m[1]; }
+  });
+  return hasil;
+}
+
+function bacaLogAksi(daftarAksi, maks) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('log');
+  const terakhir = sheet.getLastRow();
+  if (terakhir < 2) { return []; }
+  const lebar = sheet.getLastColumn();
+  const header = sheet.getRange(1, 1, 1, lebar).getValues()[0];
+  const awal = Math.max(2, terakhir - maks + 1);
+  return sheet.getRange(awal, 1, terakhir - awal + 1, lebar).getDisplayValues().map(function (baris) {
+    const r = {}; header.forEach(function (nama, idx) { r[nama] = baris[idx]; }); return r;
+  }).filter(function (r) { return daftarAksi.indexOf(r.aksi) >= 0; });
+}
+
+// ---------- Layar 74: Log Edit absen (owner) ----------
+
+/** Fungsi murni: { jenis: 'Masuk'|'Pulang', jam: 'HH:mm' atau '' } dari ringkasan "Masuk 07:52 (TELAT 7 mnt)", "Masuk kosong" atau "masuk=07:52; st=...". */
+function jamDariRingkasLog(teks) {
+  const m = /^\s*(masuk|pulang)(?:=| )\s*(\d{2}:\d{2})?/i.exec(String(teks === undefined || teks === null ? '' : teks));
+  if (!m) { return null; }
+  return { jenis: m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase(), jam: m[2] || '' };
+}
+
+function namaKaryawanDariTarget(target) {
+  return String(target || '').replace(/\s+(?:MASUK|PULANG)?\s*\d{4}-\d{2}-\d{2}.*$/, '').trim();
+}
+
+function waktuLogPendek(w) {
+  const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})/.exec(String(w));
+  return m ? Number(m[3]) + '/' + Number(m[2]) + ' ' + m[4] : String(w);
+}
+
+/**
+ * Fungsi murni: baris tabel Log Edit absen dari baris log (lama ke baru). Yang dimuat: EDIT_ABSEN (jam lama → baru), ABSEN_MANUAL (jam diisi admin/owner),
+ * KONFLIK_ABSEN ("BUKAN SAYA": absen lama dikeluarkan) dan KONFLIK_SELESAI (dipindahkan/dihapus). Terbaru di atas, paling banyak maks baris.
+ * peta = { idAkun: { nama, panggilan } }. Kembalian { total, daftar: [{ waktu, admin, cabang, karyawan, perubahan, alasan }] }. Tidak memuat foto.
+ */
+function rakitLogEditAbsen(rows, peta, maks, filterAdmin) {
+  const hasil = [];
+  rows.forEach(function (r, urut) {
+    const aksi = String(r.aksi);
+    let perubahan = '';
+    const karyawan = namaKaryawanDariTarget(r.target);
+    if (aksi === 'EDIT_ABSEN') {
+      const lama = jamDariRingkasLog(r.sebelum), baru = jamDariRingkasLog(r.sesudah);
+      if (!lama || !baru) { return; }
+      perubahan = baru.jenis + ' ' + (lama.jam || '—') + ' → ' + (baru.jam || '—');
+    } else if (aksi === 'ABSEN_MANUAL') {
+      const m = /(masuk|pulang) (\d{2}:\d{2})\s*$/i.exec(String(r.target));
+      if (!m) { return; }
+      perubahan = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase() + ' — → ' + m[2] + ' (diisi manual)';
+    } else if (aksi === 'KONFLIK_ABSEN') {
+      let d = null; try { d = JSON.parse(String(r.sebelum)); } catch (e) { d = null; }
+      if (!d || !d.jenis) { return; }
+      perubahan = (d.jenis === 'MASUK' ? 'Masuk ' : 'Pulang ') + (d.jam || '') + ' dikeluarkan (BUKAN SAYA)';
+    } else if (aksi === 'KONFLIK_SELESAI') {
+      const j = /(MASUK|PULANG)\s*$/.exec(String(r.target));
+      const dipindah = /^dipindahkan ke (.+?)(?: \(|$)/.exec(String(r.sesudah));
+      perubahan = (j && j[1] === 'PULANG' ? 'Pulang' : 'Masuk') + (dipindah ? ' dipindahkan ke ' + dipindah[1] : ' dihapus');
+    } else { return; }
+    const p = peta[String(r.oleh)] || {};
+    hasil.push({ u: urut, id: String(r.oleh), waktu: String(r.waktu), admin: String(p.panggilan || p.nama || r.oleh), cabang: String(r.cabang), karyawan: karyawan, perubahan: perubahan, alasan: String(r.alasan || '') });
+  });
+  hasil.sort(function (a, b) { return a.waktu < b.waktu ? 1 : (a.waktu > b.waktu ? -1 : b.u - a.u); });
+  // daftar pilihan admin (untuk penyaring kolom Admin) dari SEMUA tindakan sebelum disaring
+  const adm = {};
+  hasil.forEach(function (x) { if (!adm[x.id]) { adm[x.id] = { id: x.id, nama: x.admin, cabang: x.cabang }; } });
+  const adminDaftar = Object.keys(adm).map(function (k) { return adm[k]; }).sort(function (a, b) { return a.nama.toLowerCase() < b.nama.toLowerCase() ? -1 : 1; });
+  const tersaring = filterAdmin ? hasil.filter(function (x) { return x.id === String(filterAdmin); }) : hasil;
+  return {
+    total: tersaring.length, admin_daftar: adminDaftar,
+    daftar: tersaring.slice(0, maks).map(function (x) { return { waktu: waktuLogPendek(x.waktu), admin: x.admin, cabang: x.cabang, karyawan: x.karyawan, perubahan: x.perubahan, alasan: x.alasan }; })
+  };
+}
+
+/** Aksi log_edit_absen { sesi }: HANYA owner. Maksimal 20 baris terbaru; jumlah seluruhnya di "total". */
+function prosesLogEditAbsen(d) {
+  if (!validasiSesi(d.sesi, 'OWNER')) { return respon({ status: 'gagal', kode: 'SESI_TIDAK_VALID', pesan: 'Sesi berakhir atau dicabut, silakan masuk lagi' }); }
+  const rows = bacaLogAksi(['EDIT_ABSEN', 'ABSEN_MANUAL', 'KONFLIK_ABSEN', 'KONFLIK_SELESAI'], 3000);
+  const h = rakitLogEditAbsen(rows, petaAkunUntukIzin(), 20, d.admin ? String(d.admin).slice(0, 20) : '');
+  return respon({ status: 'ok', total: h.total, daftar: h.daftar, admin_daftar: h.admin_daftar });
 }

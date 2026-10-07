@@ -348,6 +348,17 @@
   .pb-batal { align-self: flex-start; min-height: 40px; padding: 0 16px; border: 2px solid var(--abu); border-radius: 14px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 800; color: var(--hitam); white-space: nowrap; }
   .baris-batal { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--krem-gelap); font-size: 14px; text-align: left; }
   .baris-batal span { font-size: 12px; color: var(--abu-teks); }
+  .kk { position: fixed; inset: 0; z-index: 9500; background: var(--kuning); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); }
+  .kk.tampil { display: flex; }
+  .kk-judul { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; }
+  .kk-lingkaran { width: 240px; height: 240px; border-radius: 50%; border: 9px solid var(--hitam); overflow: hidden; background: var(--krem); }
+  .kk-lingkaran video, .kk-lingkaran img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .kk-pesan { font-size: 15px; font-weight: 700; text-align: center; max-width: 300px; min-height: 22px; }
+  .kk-tombol { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+  .kk-tombol button { height: 56px; border-radius: 18px; font-family: inherit; font-size: 17px; font-weight: 800; white-space: nowrap; }
+  .kk-tombol .utama { border: 4px solid var(--hijau-garis); background: var(--hijau); color: var(--putih); }
+  .kk-tombol .gelap { border: none; background: var(--hitam); color: var(--putih); }
+  .kk-tombol .garis { border: 3px solid var(--hitam); background: transparent; color: var(--hitam); }
   .baris-batal button { flex: 0 0 auto; width: auto; min-height: 38px; padding: 0 14px; white-space: nowrap; }
   .pb-offline { display: flex; align-items: center; justify-content: space-between; background: var(--abu); color: var(--putih); border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700; }
   .pb-offline .kiri { display: flex; align-items: center; gap: 8px; }
@@ -1395,12 +1406,12 @@
 </div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">– tindakan · –</div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; border: 3px solid var(--merah);"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--merah)">Mengubah data sendiri</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--merah)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Detail</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--hitam)">ACC / tolak lembur</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Detail</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--hitam)">ACC / tolak absen luar</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Detail</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--hitam)">ACC / tolak izin</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Detail</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--hitam)">Absen manual</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Detail</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--hitam)">Edit absen</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" data-lb-ke="lb74">Detail</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--hitam)">Pindah konflik</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Detail</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--hitam)">Jadwal &amp; kalender</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Detail</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;"><div style="box-sizing: content-box; flex-grow: 1; font-size: 15px; font-weight: 700; color: var(--hitam)">Karyawan, PIN, reset HP</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; color: var(--hitam)">–</div><button style="min-height: 38px; border: none; background: var(--abu); border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--kuning); padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Detail</button></div></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="home">Home</button></div></div>
 </div>
 <div id="lb74" class="layar" data-lb-home="own">
-<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--hitam); color: var(--kuning); font-size: 12px; font-weight: 800">Owner</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.1">Log: Edit absen</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">– tindakan · terbaru di atas</div></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 8px"><button style="min-height: 44px; border: none; border-radius: 999px; background: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700; color: var(--kuning); padding: 0 16px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Ekspor Excel<span class="segera" style="margin-left: 6px;">Segera</span></button></div><div style="box-sizing: content-box; flex-grow: 1; min-height: 0; position: relative">
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--hitam); color: var(--kuning); font-size: 12px; font-weight: 800">Owner</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.1">Log: Edit absen</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600" data-f="sub">– tindakan · terbaru di atas</div></div></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; gap: 8px"><button style="min-height: 44px; border: none; border-radius: 999px; background: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700; color: var(--kuning); padding: 0 16px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Ekspor Excel<span class="segera" style="margin-left: 6px;">Segera</span></button></div><div style="box-sizing: content-box; flex-grow: 1; min-height: 0; position: relative">
 <div style="box-sizing: content-box; position: absolute; inset: 0; background: var(--putih); border-radius: 18px; overflow: auto">
 <table style="box-sizing: content-box; border-collapse: collapse; width: 100%">
-<thead><tr><th style="box-sizing: content-box; padding: 0; background: var(--abu); position: sticky; top: 0"><button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--kuning); display: flex; align-items: center; gap: 6px; padding: 6px 10px; white-space: nowrap; text-align: left" type="button" disabled="" aria-disabled="true" class="belum-aktif"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: flex-start; gap: 0"><span>Waktu</span><span style="box-sizing: content-box; font-size: 11px; font-weight: 600">Bulan ini</span></div><svg aria-hidden="true" fill="none" height="12" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></th><th style="box-sizing: content-box; padding: 0; background: var(--kuning); position: sticky; top: 0"><button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--hitam); display: flex; align-items: center; gap: 6px; padding: 6px 10px; white-space: nowrap; text-align: left" type="button" disabled="" aria-disabled="true" class="belum-aktif"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: flex-start; gap: 0"><span>Admin</span><span style="box-sizing: content-box; font-size: 11px; font-weight: 600">–</span></div><svg aria-hidden="true" fill="none" height="12" stroke="var(--hitam)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></th><th style="box-sizing: content-box; padding: 0; background: var(--abu); position: sticky; top: 0"><button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--kuning); display: flex; align-items: center; gap: 6px; padding: 6px 10px; white-space: nowrap; text-align: left" type="button" disabled="" aria-disabled="true" class="belum-aktif"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: flex-start; gap: 0"><span>Cabang</span><span style="box-sizing: content-box; font-size: 11px; font-weight: 600">Semua</span></div><svg aria-hidden="true" fill="none" height="12" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></th><th style="box-sizing: content-box; padding: 0; background: var(--abu); position: sticky; top: 0"><button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--kuning); display: flex; align-items: center; gap: 6px; padding: 6px 10px; white-space: nowrap; text-align: left" type="button" disabled="" aria-disabled="true" class="belum-aktif"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: flex-start; gap: 0"><span>Karyawan</span><span style="box-sizing: content-box; font-size: 11px; font-weight: 600">Semua</span></div><svg aria-hidden="true" fill="none" height="12" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></th><th style="box-sizing: content-box; padding: 6px 10px; background: var(--abu); position: sticky; top: 0; font-size: 12px; font-weight: 800; color: var(--kuning); text-align: left; white-space: nowrap">Perubahan</th><th style="box-sizing: content-box; padding: 6px 10px; background: var(--abu); position: sticky; top: 0; font-size: 12px; font-weight: 800; color: var(--kuning); text-align: left; white-space: nowrap">Alasan</th></tr></thead>
-<tbody></tbody></table></div>
-<div style="box-sizing: content-box; position: absolute; top: 44px; left: 140px; width: 190px; background: var(--putih); border-radius: 16px; box-shadow: 0 8px 24px rgba(20,17,17,.25); padding: 6px; display: flex; flex-direction: column; z-index: 2"><button style="min-height: 44px; border: none; border-radius: 10px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--hitam); display: flex; justify-content: space-between; align-items: center; padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Semua admin</button><button style="min-height: 44px; border: none; border-radius: 10px; background: var(--kuning-muda); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--hitam); display: flex; justify-content: space-between; align-items: center; padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">– (–)<span aria-hidden="true">✓</span></button><button style="min-height: 44px; border: none; border-radius: 10px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--hitam); display: flex; justify-content: space-between; align-items: center; padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">– (–)</button><button style="min-height: 44px; border: none; border-radius: 10px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--hitam); display: flex; justify-content: space-between; align-items: center; padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">– (–)</button></div>
+<thead><tr><th style="box-sizing: content-box; padding: 0; background: var(--abu); position: sticky; top: 0"><button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--kuning); display: flex; align-items: center; gap: 6px; padding: 6px 10px; white-space: nowrap; text-align: left" type="button" disabled="" aria-disabled="true" class="belum-aktif"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: flex-start; gap: 0"><span>Waktu</span><span style="box-sizing: content-box; font-size: 11px; font-weight: 600">Bulan ini</span></div><svg aria-hidden="true" fill="none" height="12" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></th><th style="box-sizing: content-box; padding: 0; background: var(--kuning); position: sticky; top: 0"><button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--hitam); display: flex; align-items: center; gap: 6px; padding: 6px 10px; white-space: nowrap; text-align: left" type="button" data-f="fAdmin" disabled="" aria-disabled="true" class="belum-aktif"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: flex-start; gap: 0"><span>Admin</span><span style="box-sizing: content-box; font-size: 11px; font-weight: 600" data-f="fAdminNilai">–</span></div><svg aria-hidden="true" fill="none" height="12" stroke="var(--hitam)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></th><th style="box-sizing: content-box; padding: 0; background: var(--abu); position: sticky; top: 0"><button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--kuning); display: flex; align-items: center; gap: 6px; padding: 6px 10px; white-space: nowrap; text-align: left" type="button" disabled="" aria-disabled="true" class="belum-aktif"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: flex-start; gap: 0"><span>Cabang</span><span style="box-sizing: content-box; font-size: 11px; font-weight: 600">Semua</span></div><svg aria-hidden="true" fill="none" height="12" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></th><th style="box-sizing: content-box; padding: 0; background: var(--abu); position: sticky; top: 0"><button style="width: 100%; min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--kuning); display: flex; align-items: center; gap: 6px; padding: 6px 10px; white-space: nowrap; text-align: left" type="button" disabled="" aria-disabled="true" class="belum-aktif"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: flex-start; gap: 0"><span>Karyawan</span><span style="box-sizing: content-box; font-size: 11px; font-weight: 600">Semua</span></div><svg aria-hidden="true" fill="none" height="12" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12"><path d="M6 9l6 6 6-6"></path></svg></button></th><th style="box-sizing: content-box; padding: 6px 10px; background: var(--abu); position: sticky; top: 0; font-size: 12px; font-weight: 800; color: var(--kuning); text-align: left; white-space: nowrap">Perubahan</th><th style="box-sizing: content-box; padding: 6px 10px; background: var(--abu); position: sticky; top: 0; font-size: 12px; font-weight: 800; color: var(--kuning); text-align: left; white-space: nowrap">Alasan</th></tr></thead>
+<tbody data-f="tbody"></tbody></table></div>
+<div style="box-sizing: content-box; position: absolute; top: 44px; left: 140px; width: 190px; background: var(--putih); border-radius: 16px; box-shadow: 0 8px 24px rgba(20,17,17,.25); padding: 6px; display: flex; flex-direction: column; z-index: 2" data-f="popup"><button style="min-height: 44px; border: none; border-radius: 10px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--hitam); display: flex; justify-content: space-between; align-items: center; padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Semua admin</button><button style="min-height: 44px; border: none; border-radius: 10px; background: var(--kuning-muda); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--hitam); display: flex; justify-content: space-between; align-items: center; padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">– (–)<span aria-hidden="true">✓</span></button><button style="min-height: 44px; border: none; border-radius: 10px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--hitam); display: flex; justify-content: space-between; align-items: center; padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">– (–)</button><button style="min-height: 44px; border: none; border-radius: 10px; background: transparent; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--hitam); display: flex; justify-content: space-between; align-items: center; padding: 0 12px" type="button" disabled="" aria-disabled="true" class="belum-aktif">– (–)</button></div>
 </div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Ketuk judul kolom untuk menyaring.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹ Back</button></div></div>
 </div>
 <div id="lb75" class="layar" data-lb-home="own">
@@ -1551,6 +1562,17 @@
 </div>
 
 <div id="dialog" role="dialog"></div>
+<div id="kameraKoreksi" class="kk" role="dialog" aria-label="Kamera foto absen">
+  <div class="kk-judul" id="kkJudul">Foto</div>
+  <div class="kk-lingkaran"><video id="kkVideo" playsinline muted autoplay></video><img id="kkHasil" alt="Hasil foto" style="display:none"></div>
+  <div class="kk-pesan" id="kkPesan"></div>
+  <div class="kk-tombol">
+    <button type="button" class="utama" id="kkAmbil">AMBIL FOTO</button>
+    <button type="button" class="utama" id="kkPakai" style="display:none">PAKAI FOTO</button>
+    <button type="button" class="gelap" id="kkUlang" style="display:none">ULANGI</button>
+    <button type="button" class="garis" id="kkBatal">Batal</button>
+  </div>
+</div>
 
 <div id="popup" class="popup" role="alertdialog" aria-live="assertive"></div>
 
@@ -5720,8 +5742,86 @@
   lbF('lb53', 'hapus').addEventListener('click', function () { if (!this.disabled) { putuskanKonflik('HAPUS'); } });
   ['fotoLama', 'fotoBaru'].forEach(function (n) { lbF('lb53', n).addEventListener('click', function () { fotoBesar(this.getAttribute('data-foto')); }); });
 
+  // ---------- Kamera dalam aplikasi untuk foto absen koreksi (layar 54 dan 65) ----------
+  // Foto wajah/absen HANYA dari kamera depan lewat getUserMedia (seperti layar 09): tidak ada pemilih berkas/galeri sama sekali di sini.
+  // Hasil dipotong persegi, sisi terpanjang maksimal 640 px, JPEG kualitas 0,6 (sama seperti foto absen lain). Jam foto = tiket waktu server saat tombol AMBIL ditekan (aksi foto_tiket).
+  const PESAN_KAMERA = 'Izinkan akses kamera untuk mengambil foto';
+  const kk = { stream: null, url: '', tiket: '', jam: '', sukses: null, gagal: null, sibuk: false };
+  function kkEl(id) { return document.getElementById(id); }
+  function kkTerbuka() { return kkEl('kameraKoreksi').classList.contains('tampil'); }
+  function kkHentikan() {
+    if (kk.stream) { kk.stream.getTracks().forEach(function (t) { t.stop(); }); }
+    kk.stream = null;
+    const v = kkEl('kkVideo'); v.srcObject = null;
+  }
+  function kkMode(mode) { // live | hasil | galat
+    kkEl('kkVideo').style.display = mode === 'live' ? 'block' : 'none';
+    kkEl('kkHasil').style.display = mode === 'hasil' ? 'block' : 'none';
+    kkEl('kkAmbil').style.display = mode === 'live' ? '' : 'none';
+    kkEl('kkUlang').style.display = mode === 'hasil' || mode === 'galat' ? '' : 'none';
+    kkEl('kkPakai').style.display = mode === 'hasil' ? '' : 'none';
+    kkEl('kkUlang').textContent = mode === 'galat' ? 'COBA LAGI' : 'ULANGI';
+  }
+  function kkGalat(pesan) {
+    kkHentikan(); kkMode('galat');
+    kkEl('kkPesan').textContent = pesan;
+    if (kk.gagal) { kk.gagal(pesan); }
+  }
+  function kkMulai() {
+    kk.url = ''; kk.tiket = ''; kk.jam = ''; kk.sibuk = false;
+    kkEl('kkPesan').textContent = '';
+    kkHentikan();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { kkGalat(PESAN_KAMERA); return; }
+    kkMode('live');
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }, audio: false })
+      .then(function (stream) {
+        if (!kkTerbuka()) { stream.getTracks().forEach(function (t) { t.stop(); }); return; }
+        kk.stream = stream;
+        const v = kkEl('kkVideo'); v.srcObject = stream;
+        const p = v.play(); if (p && p.catch) { p.catch(function () { /* tetap bisa memotret setelah video siap */ }); }
+      })
+      .catch(function () { kkGalat(PESAN_KAMERA); });
+  }
+  function kkTutup() { kkHentikan(); kkEl('kameraKoreksi').classList.remove('tampil'); }
+  function kkBatalkan() { kkTutup(); }
+  // opsi = { judul, sukses(url, tiket, jam), gagal(pesan) }
+  function ambilFotoKamera(opsi) {
+    kk.sukses = opsi.sukses; kk.gagal = opsi.gagal || null;
+    kkEl('kkJudul').textContent = opsi.judul || 'Foto';
+    kkEl('kameraKoreksi').classList.add('tampil');
+    kkMulai();
+  }
+  kkEl('kkAmbil').addEventListener('click', function () {
+    const v = kkEl('kkVideo');
+    if (kk.sibuk || !v.videoWidth || !v.videoHeight) { return; }
+    kk.sibuk = true;
+    const w = v.videoWidth, h = v.videoHeight, sisi = Math.min(w, h), keluar = Math.min(sisi, 640);
+    const c = document.createElement('canvas'); c.width = keluar; c.height = keluar;
+    c.getContext('2d').drawImage(v, (w - sisi) / 2, (h - sisi) / 2, sisi, sisi, 0, 0, keluar, keluar);
+    const url = c.toDataURL('image/jpeg', 0.6);
+    kkEl('kkPesan').textContent = 'Mengambil jam server...';
+    kirimPost(Object.assign({ aksi: 'foto_tiket' }, kredKor()))
+      .then(function (d) {
+        if (gagalSesiLb(d)) { kkTutup(); return; }
+        if (!d || d.status !== 'ok') { kk.sibuk = false; kkEl('kkPesan').textContent = 'Jam server belum bisa diambil. Coba ambil foto lagi.'; return; }
+        kk.url = url; kk.tiket = d.tiket; kk.jam = d.jam; kk.sibuk = false;
+        kkHentikan(); kkMode('hasil');
+        kkEl('kkHasil').src = url;
+        kkEl('kkPesan').textContent = 'Foto diambil pukul ' + d.jam;
+      })
+      .catch(function () { kk.sibuk = false; kkEl('kkPesan').textContent = 'Tidak bisa terhubung ke server. Coba ambil foto lagi.'; });
+  });
+  kkEl('kkUlang').addEventListener('click', kkMulai);
+  kkEl('kkPakai').addEventListener('click', function () {
+    if (!kk.url || !kk.tiket) { return; }
+    const s = kk.sukses, u = kk.url, t = kk.tiket, j = kk.jam;
+    kkTutup();
+    if (s) { s(u, t, j); }
+  });
+  kkEl('kkBatal').addEventListener('click', kkBatalkan);
+
   // ---------- Layar 54: absen manual ----------
-  const man = { info: null, jenis: '', alasan: '', foto: '', pra: null, minta: 0, mengirim: false, pratinjauOk: false };
+  const man = { info: null, jenis: '', alasan: '', foto: '', tiketFoto: '', jamFoto: '', pesanKamera: '', pra: null, minta: 0, mengirim: false, pratinjauOk: false };
   function gayaPilih(b, aktif) {
     b.style.border = aktif ? 'none' : '2px solid var(--abu)';
     b.style.background = aktif ? 'var(--hitam)' : 'var(--putih)';
@@ -5734,8 +5834,8 @@
     gayaPilih(lbF(L, 'jMasuk'), man.jenis === 'MASUK'); gayaPilih(lbF(L, 'jPulang'), man.jenis === 'PULANG');
     ['a0', 'a1', 'a2', 'a3'].forEach(function (k, i) { gayaPilih(lbF(L, k), man.alasan === man.info.alasan[i]); });
     const f = lbF(L, 'fotoTombol');
-    if (man.foto) { f.style.backgroundImage = 'url(' + man.foto + ')'; f.style.backgroundSize = 'cover'; f.style.backgroundPosition = 'center'; f.style.borderStyle = 'solid'; f.style.color = 'transparent'; lbF(L, 'fotoJudul').textContent = 'Foto siap'; lbF(L, 'fotoPetunjuk').textContent = 'Ketuk lagi untuk mengganti foto'; }
-    else { f.style.backgroundImage = ''; f.style.borderStyle = ''; f.style.color = ''; lbF(L, 'fotoJudul').textContent = 'Foto belum ada'; lbF(L, 'fotoPetunjuk').textContent = 'Ketuk kotak kamera untuk memotret'; }
+    if (man.foto) { f.style.backgroundImage = 'url(' + man.foto + ')'; f.style.backgroundSize = 'cover'; f.style.backgroundPosition = 'center'; f.style.borderStyle = 'solid'; f.style.color = 'transparent'; lbF(L, 'fotoJudul').textContent = 'Foto siap' + (man.jamFoto ? ' (diambil ' + man.jamFoto + ')' : ''); lbF(L, 'fotoPetunjuk').textContent = 'Ketuk lagi untuk mengambil ulang'; lbF(L, 'fotoPetunjuk').style.color = ''; }
+    else { f.style.backgroundImage = ''; f.style.borderStyle = ''; f.style.color = ''; lbF(L, 'fotoJudul').textContent = 'Foto belum ada'; lbF(L, 'fotoPetunjuk').textContent = man.pesanKamera || 'Ketuk kotak kamera untuk memotret'; lbF(L, 'fotoPetunjuk').style.color = man.pesanKamera ? 'var(--merah)' : ''; }
     const siap = !!lbF(L, 'karyawan').value && !!lbF(L, 'tanggal').value && !!lbF(L, 'jam').value && !!man.jenis && !!man.alasan && !!man.foto && man.pratinjauOk && !man.mengirim;
     if (siap) { hidupkanEl(lbF(L, 'simpan')); } else { matikanEl(lbF(L, 'simpan')); }
   }
@@ -5757,7 +5857,7 @@
       .catch(function () { st.textContent = 'Tidak bisa terhubung ke server.'; st.style.color = 'var(--merah)'; });
   }
   function kosongkanManual() {
-    man.jenis = ''; man.alasan = ''; man.foto = ''; man.pratinjauOk = false;
+    man.jenis = ''; man.alasan = ''; man.foto = ''; man.tiketFoto = ''; man.jamFoto = ''; man.pesanKamera = ''; man.pratinjauOk = false;
     const L = 'lb54';
     lbF(L, 'karyawan').value = ''; lbF(L, 'jam').value = ''; lbF(L, 'tanggal').value = man.info ? man.info.hari_ini : '';
   }
@@ -5777,7 +5877,7 @@
         tgl.type = 'date'; tgl.max = d.hari_ini; tgl.min = geserTanggalKlien(d.hari_ini, -31);
         jam.type = 'time';
         [kar, tgl, jam, lbF(L, 'jMasuk'), lbF(L, 'jPulang'), lbF(L, 'a0'), lbF(L, 'a1'), lbF(L, 'a2'), lbF(L, 'a3'), lbF(L, 'fotoTombol')].forEach(hidupkanEl);
-        man.jenis = 'MASUK'; man.alasan = ''; man.foto = ''; man.pratinjauOk = false;
+        man.jenis = 'MASUK'; man.alasan = ''; man.foto = ''; man.tiketFoto = ''; man.jamFoto = ''; man.pesanKamera = ''; man.pratinjauOk = false;
         tgl.value = d.hari_ini; jam.value = '';
         const p = man.pra; man.pra = null;
         if (p) { kar.value = p.karyawan || ''; tgl.value = p.tanggal || d.hari_ini; man.jenis = p.jenis === 'MASUK' ? 'MASUK' : 'PULANG'; }
@@ -5792,7 +5892,11 @@
   ['a0', 'a1', 'a2', 'a3'].forEach(function (n, i) { lbF('lb54', n).addEventListener('click', function () { if (this.disabled || !man.info) { return; } man.alasan = man.info.alasan[i]; gambarManual(); }); });
   lbF('lb54', 'fotoTombol').addEventListener('click', function () {
     if (this.disabled) { return; }
-    pilihFotoJpeg(640, 0.6, function (url) { man.foto = url; gambarManual(); });
+    ambilFotoKamera({
+      judul: 'Foto karyawan',
+      sukses: function (url, tiket, jam) { man.foto = url; man.tiketFoto = tiket; man.jamFoto = jam; man.pesanKamera = ''; gambarManual(); },
+      gagal: function (pesan) { man.pesanKamera = pesan; gambarManual(); }
+    });
   });
   lbF('lb54', 'simpan').addEventListener('click', function () {
     if (this.disabled || man.mengirim) { return; }
@@ -5803,7 +5907,7 @@
       .then(function (d) {
         if (gagalSesiLb(d)) { man.mengirim = false; return; }
         if (d.status !== 'ok') { man.mengirim = false; gambarManual(); infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return; }
-        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: isi.karyawan, tanggal: isi.tanggal, jenis: isi.jenis, gambar: man.foto }, kredKor()))
+        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: isi.karyawan, tanggal: isi.tanggal, jenis: isi.jenis, gambar: man.foto, tiket_foto: man.tiketFoto }, kredKor()))
           .then(function (f) { return f; }, function () { return { status: 'gagal' }; })
           .then(function (f) {
             man.mengirim = false;
@@ -5888,7 +5992,7 @@
   }
 
   // ---------- Layar 65: edit absen ----------
-  const ed = { karyawan: '', tanggal: '', info: null, jenis: 'MASUK', foto: '', minta: 0, mengirim: false, pratinjau: null };
+  const ed = { karyawan: '', tanggal: '', info: null, jenis: 'MASUK', foto: '', tiketFoto: '', minta: 0, mengirim: false, pratinjau: null };
   function bukaEditAbsen(karyawan, tanggal) { ed.karyawan = karyawan; ed.tanggal = tanggal; bukaLb('lb65'); }
   function gayaTab(b, aktif) { b.style.background = aktif ? 'var(--hitam)' : 'transparent'; b.style.color = aktif ? 'var(--kuning)' : 'var(--hitam)'; }
   function gambarEdit() {
@@ -5923,7 +6027,7 @@
   }
   function muatFotoEdit() {
     const L = 'lb65', foto = lbF(L, 'foto'), kotak = foto.parentElement;
-    ed.foto = '';
+    ed.foto = ''; ed.tiketFoto = '';
     kotak.style.backgroundImage = ''; foto.textContent = '[Memuat foto...]';
     kirimPost(Object.assign({ aksi: 'absensi_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis }, kredKor()))
       .then(function (d) {
@@ -5936,7 +6040,7 @@
   SIAP_LB.lb65 = function () {
     const L = 'lb65';
     isiBadgeKor(L);
-    ed.info = null; ed.jenis = 'MASUK'; ed.foto = ''; ed.pratinjau = null; ed.mengirim = false;
+    ed.info = null; ed.jenis = 'MASUK'; ed.foto = ''; ed.tiketFoto = ''; ed.pratinjau = null; ed.mengirim = false;
     lbF(L, 'jam').removeAttribute('data-tab'); lbF(L, 'alasan').value = '';
     kirimPost(Object.assign({ aksi: 'absensi_edit_info', karyawan: ed.karyawan, tanggal: ed.tanggal }, kredKor()))
       .then(function (d) {
@@ -5962,11 +6066,15 @@
   lbF('lb65', 'alasan').addEventListener('input', function () { gambarEdit(); });
   lbF('lb65', 'updateFoto').addEventListener('click', function () {
     if (this.disabled) { return; }
-    pilihFotoJpeg(640, 0.6, function (url) {
-      ed.foto = url;
-      const foto = lbF('lb65', 'foto'), kotak = foto.parentElement;
-      foto.textContent = ''; kotak.style.backgroundImage = 'url(' + url + ')'; kotak.style.backgroundSize = 'cover'; kotak.style.backgroundPosition = 'center';
-      lbF('lb65', 'jamFoto').textContent = 'foto baru';
+    ambilFotoKamera({
+      judul: 'Foto karyawan',
+      sukses: function (url, tiket, jam) {
+        ed.foto = url; ed.tiketFoto = tiket;
+        const foto = lbF('lb65', 'foto'), kotak = foto.parentElement;
+        foto.textContent = ''; kotak.style.backgroundImage = 'url(' + url + ')'; kotak.style.backgroundSize = 'cover'; kotak.style.backgroundPosition = 'center';
+        lbF('lb65', 'jamFoto').textContent = jam; // jam foto = saat foto diambil (jam server)
+      },
+      gagal: function (pesan) { const foto = lbF('lb65', 'foto'); foto.parentElement.style.backgroundImage = ''; foto.textContent = '[' + pesan + ']'; }
     });
   });
   lbF('lb65', 'simpan').addEventListener('click', function () {
@@ -5983,7 +6091,7 @@
           infoDialog('Absen diperbarui', d.sesudah + (fotoOk === false ? '. Foto belum terunggah, coba lagi.' : ''), function () { kembaliLb('kembali'); segarkanAbsensiAktif(); });
         };
         if (!ed.foto) { sesudah(true); return; }
-        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, gambar: ed.foto }, kredKor()))
+        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, gambar: ed.foto, tiket_foto: ed.tiketFoto }, kredKor()))
           .then(function (f) { sesudah(f && f.status === 'ok'); }, function () { sesudah(false); });
       })
       .catch(function () { ed.mengirim = false; gambarEdit(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
@@ -6415,6 +6523,55 @@
       .catch(function () { /* tetap tampil seperti semula */ });
   }
 
+  // ---------- Layar 74: Log Edit absen (owner) ----------
+  // Dari sheet log (EDIT_ABSEN, ABSEN_MANUAL, KONFLIK_ABSEN, KONFLIK_SELESAI). Maksimal 20 baris terbaru (mockup tidak punya tombol "Muat lebih"); tanpa foto.
+  // Penyaring kolom Admin berfungsi (ketuk judul kolom Admin = daftar admin, seperti mockup); Waktu, Cabang, Karyawan belum (tetap nonaktif).
+  const lg = { admin: '', adminDaftar: [], tmplBiasa: null, tmplPilih: null };
+  function tutupPopupLog() { lbF('lb74', 'popup').style.display = 'none'; }
+  function gambarPopupLog() {
+    const pop = lbF('lb74', 'popup');
+    if (!lg.tmplBiasa) { lg.tmplBiasa = pop.children[2].cloneNode(true); lg.tmplPilih = pop.children[1].cloneNode(true); }
+    pop.innerHTML = '';
+    [{ id: '', teks: 'Semua admin' }].concat(lg.adminDaftar.map(function (a) { return { id: a.id, teks: a.nama + ' (' + a.cabang + ')' }; })).forEach(function (x) {
+      const pilih = x.id === lg.admin;
+      const b = (pilih ? lg.tmplPilih : lg.tmplBiasa).cloneNode(true);
+      b.textContent = x.teks;
+      if (pilih) { const c = document.createElement('span'); c.setAttribute('aria-hidden', 'true'); c.textContent = '✓'; b.appendChild(c); }
+      hidupkanEl(b);
+      b.addEventListener('click', function (e) { e.stopPropagation(); lg.admin = x.id; tutupPopupLog(); muatLogEdit(); });
+      pop.appendChild(b);
+    });
+    const nilai = lbF('lb74', 'fAdminNilai');
+    const terpilih = lg.adminDaftar.filter(function (a) { return a.id === lg.admin; })[0];
+    nilai.textContent = terpilih ? terpilih.nama : 'Semua';
+  }
+  function muatLogEdit() {
+    const L = 'lb74';
+    lbF(L, 'sub').textContent = 'Memuat...';
+    lbF(L, 'tbody').innerHTML = '';
+    const isi = { aksi: 'log_edit_absen', sesi: sesiOwner };
+    if (lg.admin) { isi.admin = lg.admin; }
+    kirimPost(isi)
+      .then(function (d) {
+        if (ownerGagalSesi(d)) { return; }
+        if (!d || d.status !== 'ok') { lbF(L, 'sub').textContent = 'Belum bisa dimuat'; infoDialog('Belum bisa dibuka', (d && d.pesan) || 'Coba lagi.'); return; }
+        lg.adminDaftar = d.admin_daftar || [];
+        lbF(L, 'sub').textContent = d.total + ' tindakan · terbaru di atas';
+        lbF(L, 'tbody').innerHTML = d.daftar.map(function (x) { return barisTabel([x.waktu, x.admin, x.cabang, x.karyawan, x.perubahan, x.alasan || '—']); }).join('');
+        gambarPopupLog();
+        hidupkanEl(lbF(L, 'fAdmin'));
+      })
+      .catch(function () { lbF(L, 'sub').textContent = 'Tidak bisa terhubung'; infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  SIAP_LB.lb74 = function () { lg.admin = ''; tutupPopupLog(); muatLogEdit(); };
+  lbF('lb74', 'fAdmin').addEventListener('click', function (e) {
+    if (this.disabled) { return; }
+    e.stopPropagation();
+    const pop = lbF('lb74', 'popup');
+    pop.style.display = pop.style.display === 'none' ? 'flex' : 'none';
+  });
+  document.getElementById('lb74').addEventListener('click', function (e) { if (!e.target.closest('[data-f="popup"]')) { tutupPopupLog(); } });
+
   // ================= LAYAR BARU (tampilan saja): navigasi =================
   // Semua layar lbNN dibuat dari mockup oleh tools/bangun_layar_baru.sh: tanpa data contoh, tombol aksi nonaktif "Segera", tanpa panggilan server.
   // Hanya Kembali/Home/Tutup/Batal dan tautan navigasi (data-lb-ke) yang berfungsi. Layar yang muncul karena KEJADIAN (04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 43, 53, 62, 65, 70, 56)
@@ -6499,6 +6656,7 @@
     history.pushState({ absen: 1 }, '');
     if (wajib || popup.classList.contains('tampil')) { return; }
     if (dialog.classList.contains('tampil')) { tutupDialog(); return; }
+    if (typeof kkTerbuka === 'function' && kkTerbuka()) { kkBatalkan(); return; }
     if (menuOwner.classList.contains('tampil')) { tutupMenuOwner(); return; }
     if (menuAdmin.classList.contains('tampil')) { tutupMenuAdmin(); return; }
     if (layarBaruAktif()) { kembaliLb('kembali'); return; }

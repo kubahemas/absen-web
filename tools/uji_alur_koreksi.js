@@ -16,7 +16,13 @@ function semua(aksi) { return panggil.filter(function (x) { return x.aksi === ak
 function terakhir(aksi) { return semua(aksi).pop(); }
 function jumlah(aksi) { return semua(aksi).length; }
 var FOTO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
-window.__pilihFotoUji = FOTO;
+// Kamera tiruan (foto absen koreksi HANYA lewat kamera dalam aplikasi): getUserMedia dihitung; kamTolak = izin kamera ditolak.
+var kamPanggil = 0, kamTolak = false;
+try {
+  Object.defineProperty(HTMLVideoElement.prototype, 'videoWidth', { configurable: true, get: function () { return 640; } });
+  Object.defineProperty(HTMLVideoElement.prototype, 'videoHeight', { configurable: true, get: function () { return 480; } });
+  Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: function () { kamPanggil++; return kamTolak ? Promise.reject(new Error('ditolak')) : Promise.resolve(new MediaStream()); } } });
+} catch (e) { /* tes kamera tidak bisa jalan */ }
 var HARI_INI = '2026-10-07';
 var PENGGANTI = [];
 // ---------------- server tiruan ----------------
@@ -45,7 +51,9 @@ window.fetch = function (url, opsi) {
   if (b.aksi === 'absen_manual_info') { d = { status: 'ok', hari_ini: HARI_INI, jam: '10:00', karyawan: K === 'owner' ? [{ id: 'K009', nama: 'Dewi Lestari', panggilan: 'Dewi', cabang: 'Ngawi' }, { id: 'K010', nama: 'Sari Utami', panggilan: 'Sari', cabang: 'Pusat' }] : [{ id: 'K003', nama: 'Budi Santoso', panggilan: 'Budi', cabang: 'Ngawi' }, { id: 'K004', nama: 'Rina Wati', panggilan: 'Rina', cabang: 'Ngawi' }], alasan: ['Lupa absen', 'HP toko bermasalah', 'Internet / listrik mati', 'Lainnya'] }; }
   if (b.aksi === 'absen_manual_pratinjau') { d = b.jenis === 'PULANG' && b.jam ? { status: 'ok', bisa: true, pesan: '', tampil: 'Status: PULANG NORMAL (Shift 1)' } : { status: 'ok', bisa: !!b.jam, pesan: '', tampil: 'Status: HADIR (Shift 1)' }; }
   if (b.aksi === 'absen_manual') { d = { status: 'ok', id_absen: 'P-K004-261005-163100-A', jenis: b.jenis, tanggal: b.tanggal, tampil: 'Status: PULANG NORMAL (Shift 1)' }; }
-  if (b.aksi === 'absensi_unggah_foto') { d = { status: 'ok' }; }
+  if (b.aksi === 'absensi_unggah_foto') { d = b.tiket_foto === 'TIKETFOTO' ? { status: 'ok' } : { status: 'gagal', pesan: 'Waktu foto tidak sah atau sudah lewat, ambil foto lagi' }; }
+  if (b.aksi === 'foto_tiket') { d = { status: 'ok', tiket: 'TIKETFOTO', jam: '09:14:02' }; }
+  if (b.aksi === 'log_edit_absen') { d = b.admin === 'K009' ? { status: 'ok', total: 1, admin_daftar: [{ id: 'K003', nama: 'Rina', cabang: 'Ngawi' }, { id: 'K009', nama: 'Dewi', cabang: 'Ngawi' }], daftar: [{ waktu: '6/10 11:00', admin: 'Dewi', cabang: 'Ngawi', karyawan: 'Budi Santoso', perubahan: 'Pulang 17:00 → 17:10', alasan: 'Koreksi jam' }] } : { status: 'ok', total: 14, admin_daftar: [{ id: 'K003', nama: 'Rina', cabang: 'Ngawi' }, { id: 'K009', nama: 'Dewi', cabang: 'Ngawi' }], daftar: [{ waktu: '6/10 11:00', admin: 'Dewi', cabang: 'Ngawi', karyawan: 'Budi Santoso', perubahan: 'Pulang 17:00 → 17:10', alasan: 'Koreksi jam' }, { waktu: '5/10 08:00', admin: 'Dewi', cabang: 'Ngawi', karyawan: 'Rina Wati', perubahan: 'Masuk 07:52 → 07:44', alasan: 'Salah catat jam' }] }; }
   if (b.aksi === 'absensi_daftar') {
     d = { status: 'ok', cabang: b.cabang || '', daftar_cabang: K === 'owner' ? ['Ngawi', 'Pusat'] : undefined, dari: '2026-10-05', sampai: '2026-10-11', hari_ini: HARI_INI, total: 3, ada_lagi: false,
       karyawan: [{ id: 'K003', nama: 'Budi Santoso' }, { id: 'K004', nama: 'Rina Wati' }],
@@ -75,6 +83,7 @@ konfDaftar = [
   itemKonf('K005|2026-10-06|MASUK', 'SHIFT_BEDA', { karyawan: 'K005', nama: 'Ari Pratama', tanggal: '2026-10-06', shift: '2', jam: '13:10', status: 'HADIR', ket: 'SHIFT BEDA: jadwal Shift 1', foto: 'ADA' })
 ];
 if (K === 'owner') { konfDaftar = [itemKonf('K009|2026-10-05|PULANG', 'LUPA', { id: 'LUPA|K009|2026-10-05|PULANG', jenis: 'PULANG', karyawan: 'K009', nama: 'Dewi Lestari', role: 'ADMIN', judul: 'Lupa absen pulang', rincian: 'Sen 5 Okt, masuk 07:40', menunggu_hari: 2, jam: '07:40' })]; }
+async function fotoKamera(tombol) { tombol.click(); await tunggu(300); el('kkAmbil').click(); await tunggu(400); el('kkPakai').click(); await tunggu(200); }
 async function tekan(id) {
   var b = el(id); b.disabled = false; b.click(); await tunggu(1900);
   el('lb08').querySelector('[data-lb-aksi="pilihnama"]').click(); await tunggu(200);
@@ -208,13 +217,23 @@ async function dariMenuAdmin(nama) {
       ok('status dari server tampil: "Status: PULANG NORMAL (Shift 1)"', teks(f('lb54', 'status')) === 'Status: PULANG NORMAL (Shift 1)' && terakhir('absen_manual_pratinjau').jenis === 'PULANG');
       f('lb54', 'a0').click(); await tunggu(100);
       ok('alasan terpilih tampil hitam; SIMPAN masih nonaktif tanpa foto', f('lb54', 'a0').style.background.indexOf('--hitam') >= 0 && f('lb54', 'simpan').disabled);
-      f('lb54', 'fotoTombol').click(); await tunggu(200);
+      kamTolak = true;
+      f('lb54', 'fotoTombol').click(); await tunggu(400);
+      ok('izin kamera DITOLAK: layar kamera menampilkan "Izinkan akses kamera untuk mengambil foto", tombol AMBIL FOTO tidak ada, tidak ada pemilih berkas/galeri', el('kameraKoreksi').classList.contains('tampil') && /Izinkan akses kamera untuk mengambil foto/.test(teks(el('kkPesan'))) && el('kkAmbil').style.display === 'none' && document.querySelectorAll('input[type="file"]').length === 0);
+      el('kkBatal').click(); await tunggu(200);
+      ok('setelah ditutup, layar 54 tetap menampilkan pesan kamera (merah) dan SIMPAN tetap nonaktif tanpa foto', /Izinkan akses kamera untuk mengambil foto/.test(teks(f('lb54', 'fotoPetunjuk'))) && f('lb54', 'simpan').disabled && !el('kameraKoreksi').classList.contains('tampil'));
+      kamTolak = false;
+      var kam0 = kamPanggil, tk0 = panggil.filter(function (x) { return x.aksi === 'foto_tiket'; }).length;
+      await fotoKamera(f('lb54', 'fotoTombol'));
+      ok('layar 54 memakai kamera dalam aplikasi: getUserMedia dipanggil, jam server diminta lewat foto_tiket SAAT AMBIL FOTO, tidak ada input file di layar 54 maupun di seluruh halaman', kamPanggil === kam0 + 1 && panggil.filter(function (x) { return x.aksi === 'foto_tiket'; }).length === tk0 + 1 && !!terakhir('foto_tiket').sesi && document.querySelectorAll('input[type="file"]').length === 0 && document.querySelectorAll('#lb54 input[type="file"], #lb65 input[type="file"]').length === 0);
+      ok('foto dipakai: judul "Foto siap (diambil 09:14:02)" (jam dari server, bukan jam yang diketik)', /Foto siap \(diambil 09:14:02\)/.test(teks(f('lb54', 'fotoJudul'))));
       ok('foto dipilih: tombol kamera berisi foto, "Foto siap"; SIMPAN aktif', /Foto siap/.test(teks(f('lb54', 'fotoJudul'))) && !f('lb54', 'simpan').disabled && !/Segera/.test(teks(f('lb54', 'simpan'))));
       f('lb54', 'simpan').click(); await tunggu(700);
       var am = terakhir('absen_manual');
       ok('SIMPAN mengirim absen_manual: karyawan K004, tanggal 2026-10-05, jam 16:31, jenis PULANG, alasan "Lupa absen"', !!am && am.karyawan === 'K004' && am.tanggal === '2026-10-05' && am.jam === '16:31' && am.jenis === 'PULANG' && am.alasan === 'Lupa absen' && am.sesi === 'S'.repeat(40));
       var fu = terakhir('absensi_unggah_foto');
       ok('foto diunggah sesudahnya lewat absensi_unggah_foto (karyawan, tanggal, jenis, gambar)', !!fu && fu.karyawan === 'K004' && fu.jenis === 'PULANG' && /^data:image\/jpeg/.test(fu.gambar));
+      ok('foto diunggah dengan tiket waktu foto (tiket_foto) dari server', terakhir('absensi_unggah_foto').tiket_foto === 'TIKETFOTO');
       ok('dialog "Absen manual tersimpan" tampil', /Absen manual tersimpan/.test(el('dialog').textContent));
       var d0 = jumlah('konfirmasi_daftar');
       el('dlgOk').click(); await tunggu(700);
@@ -248,7 +267,7 @@ async function dariMenuAdmin(nama) {
       kl2.querySelector('[data-konf="isijam"]').click(); await tunggu(800);
       var mi = terakhir('absen_manual_info');
       ok('layar 54 dibuka dengan SESI OWNER (tanpa token HP toko), badge "Owner", daftar karyawan = admin dengan cabangnya', aktif() === 'lb54' && !!mi && !!mi.sesi && !mi.token && /Owner/.test(teks(document.querySelector('#lb54'))) && /Dewi Lestari · Ngawi/.test(f('lb54', 'karyawan').textContent) && f('lb54', 'karyawan').value === 'K009');
-      ubah(f('lb54', 'jam'), '16:31'); await tunggu(400); f('lb54', 'a0').click(); f('lb54', 'fotoTombol').click(); await tunggu(300);
+      ubah(f('lb54', 'jam'), '16:31'); await tunggu(400); f('lb54', 'a0').click(); await fotoKamera(f('lb54', 'fotoTombol'));
       ok('foto wajib: SIMPAN aktif setelah jam, alasan, foto', !f('lb54', 'simpan').disabled);
       f('lb54', 'simpan').click(); await tunggu(700);
       var amo = terakhir('absen_manual');
@@ -264,13 +283,31 @@ async function dariMenuAdmin(nama) {
       f('lb25', 'daftar').querySelectorAll('button[data-edit]')[2].click(); await tunggu(900);
       ok('pensil membuka layar 65 untuk owner: absensi_edit_info dengan sesi owner; badge "Owner"; Back kembali ke 25', aktif() === 'lb65' && !terakhir('absensi_edit_info').token && !!terakhir('absensi_edit_info').sesi && /Owner/.test(teks(document.querySelector('#lb65'))) && document.getElementById('lb65').getAttribute('data-lb-home') === 'own');
       ubah(f('lb65', 'jam'), '07:44'); await tunggu(500); ubah(f('lb65', 'alasan'), 'Koreksi oleh owner'); await tunggu(100);
-      f('lb65', 'updateFoto').click(); await tunggu(200);
+      await fotoKamera(f('lb65', 'updateFoto'));
       f('lb65', 'simpan').click(); await tunggu(800);
       var aeo = terakhir('absensi_edit');
       ok('edit absen oleh owner: absensi_edit dengan sesi owner + Update foto (absensi_unggah_foto) sesudahnya', !!aeo && !aeo.token && aeo.alasan === 'Koreksi oleh owner' && terakhir('absensi_unggah_foto').jenis === 'MASUK');
       el('dlgOk').click(); await tunggu(700);
       ok('OK kembali ke layar 25 dan memuat ulang', aktif() === 'lb25');
       el('lb25').querySelector('[data-lb-kembali="home"]').click(); await tunggu(300);
+      el('btnMenuOwner').click(); await tunggu(150);
+      Array.prototype.filter.call(document.querySelectorAll('#menuOwner .menu-kartu button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim().indexOf('Kunci periode') === 0; })[0].click(); await tunggu(500);
+      el('lb76').querySelector('[data-lb-kembali]').click(); await tunggu(300);
+      el('btnMenuOwner').click(); await tunggu(150);
+      Array.prototype.filter.call(document.querySelectorAll('#menuOwner .menu-kartu button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim().indexOf('Log admin') === 0; })[0].click(); await tunggu(400);
+      el('lb73').querySelector('[data-lb-ke="lb74"]').click(); await tunggu(700);
+      var tb74 = el('lb74').querySelector('tbody');
+      ok('layar 74 (Log Edit absen): log_edit_absen dengan SESI OWNER (tanpa token), sub "14 tindakan · terbaru di atas", dua baris dari log', aktif() === 'lb74' && !!terakhir('log_edit_absen') && !terakhir('log_edit_absen').token && !!terakhir('log_edit_absen').sesi && /14 tindakan · terbaru di atas/.test(teks(el('lb74'))) && tb74.rows.length === 2);
+      ok('kolom: Waktu 6/10 11:00, Admin Dewi, Cabang Ngawi, Karyawan Budi Santoso, Perubahan "Pulang 17:00 → 17:10", Alasan "Koreksi jam"; tanpa foto', Array.prototype.map.call(tb74.rows[0].cells, function (c) { return c.textContent; }).join('|') === '6/10 11:00|Dewi|Ngawi|Budi Santoso|Pulang 17:00 → 17:10|Koreksi jam' && !tb74.querySelector('img'));
+      var pop74 = el('lb74').querySelector('[data-f="popup"]');
+      ok('popup penyaring Admin tertutup di awal (tidak menutupi data); tombol Ekspor Excel dan penyaring Waktu/Cabang/Karyawan tetap nonaktif', pop74.style.display === 'none' && !f('lb74', 'fAdmin').disabled && Array.prototype.every.call(el('lb74').querySelectorAll('button:not([data-lb-kembali])'), function (b) { return b === f('lb74', 'fAdmin') || pop74.contains(b) || b.disabled; }));
+      f('lb74', 'fAdmin').click(); await tunggu(200);
+      ok('ketuk judul Admin: popup terbuka dengan "Semua admin" (terpilih) + Rina (Ngawi) + Dewi (Ngawi)', pop74.style.display === 'flex' && /Semua admin[\s\/]*✓[\s\/]*Rina \(Ngawi\)[\s\/]*Dewi \(Ngawi\)/.test(teks(pop74)));
+      pop74.children[2].click(); await tunggu(500);
+      ok('pilih Dewi: log_edit_absen diminta ulang dengan admin K009, popup menutup, nilai kolom "Dewi", 1 baris', terakhir('log_edit_absen').admin === 'K009' && pop74.style.display === 'none' && /Dewi/.test(teks(f('lb74', 'fAdminNilai'))) && tb74.rows.length === 1 && /1 tindakan/.test(teks(f('lb74', 'sub'))));
+      el('lb74').querySelector('[data-lb-kembali]').click(); await tunggu(300);
+      ok('Back dari 74 kembali ke 73', aktif() === 'lb73');
+      el('lb73').querySelector('[data-lb-kembali="home"]').click(); await tunggu(400);
       el('btnMenuOwner').click(); await tunggu(150);
       Array.prototype.filter.call(document.querySelectorAll('#menuOwner .menu-kartu button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim().indexOf('Kunci periode') === 0; })[0].click(); await tunggu(500);
       var tmb = Array.prototype.filter.call(document.querySelectorAll('#lb76 button'), function (b) { return !b.hasAttribute('data-lb-kembali') && !b.hasAttribute('data-lb-ke'); });
@@ -323,17 +360,17 @@ async function dariMenuAdmin(nama) {
       ok('tab Pulang: label "Jam pulang", jam 16:31, foto pulang dimuat ulang', teks(f('lb65', 'labelJam')) === 'Jam pulang' && f('lb65', 'jam').value === '16:31' && terakhir('absensi_foto').jenis === 'PULANG');
       f('lb65', 'tabMasuk').click(); await tunggu(700);
       ubah(f('lb65', 'jam'), '07:44'); await tunggu(500);
-      f('lb65', 'updateFoto').click(); await tunggu(200);
-      ok('Update foto: foto baru tampil di kotak', /url\(/.test(f('lb65', 'foto').parentElement.style.backgroundImage) && teks(f('lb65', 'jamFoto')) === 'foto baru');
+      await fotoKamera(f('lb65', 'updateFoto'));
+      ok('Update foto lewat kamera dalam aplikasi: foto baru tampil di kotak, jam foto = jam server saat diambil (09:14:02), tidak ada input file', /url\(/.test(f('lb65', 'foto').parentElement.style.backgroundImage) && teks(f('lb65', 'jamFoto')) === '09:14:02' && document.querySelectorAll('input[type="file"]').length === 0);
       f('lb65', 'simpan').click(); await tunggu(800);
       var ae = terakhir('absensi_edit');
       ok('Simpan mengirim absensi_edit: K003, 2026-10-05, MASUK, jam 07:44, alasan "Salah catat jam"', !!ae && ae.karyawan === 'K003' && ae.tanggal === '2026-10-05' && ae.jenis === 'MASUK' && ae.jam === '07:44' && ae.alasan === 'Salah catat jam');
-      ok('foto baru ikut diunggah (absensi_unggah_foto jenis MASUK)', terakhir('absensi_unggah_foto').jenis === 'MASUK' && terakhir('absensi_unggah_foto').karyawan === 'K003');
+      ok('foto baru ikut diunggah (absensi_unggah_foto jenis MASUK) dengan tiket_foto', terakhir('absensi_unggah_foto').jenis === 'MASUK' && terakhir('absensi_unggah_foto').karyawan === 'K003' && terakhir('absensi_unggah_foto').tiket_foto === 'TIKETFOTO');
       ok('dialog "Absen diperbarui" dengan hasil sesudah', /Absen diperbarui/.test(el('dialog').textContent) && /Masuk 07:44 \(HADIR\)/.test(el('dialog').textContent));
       var dl = jumlah('absensi_daftar');
       el('dlgOk').click(); await tunggu(800);
       ok('OK kembali ke Data absensi dan memuat ulang daftar', aktif() === 'lb64' && jumlah('absensi_daftar') > dl);
     }
-  } catch (e) { H.push('GALAT ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
+  } catch (e) { H.push('PANGGIL ' + panggil.slice(-14).map(function (x) { return x.aksi; }).join(' ')); H.push('GALAT ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
   H.unshift(H.filter(function (x) { return /^GAGAL|^GALAT/.test(x); }).length ? 'ADA YANG GAGAL' : 'SEMUA OK');
 })();

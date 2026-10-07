@@ -59,11 +59,24 @@ JS
     54) cat > "$FILE" <<JS
 await masukPribadi('Dewi Lestari'); await dariMenuAdmin('Konfirmasi');
 document.querySelector('#daftarKonfirmasi [data-kel="LUPA"] [data-konf="isijam"]').click(); await tunggu(800);
-ubah(f('lb54', 'jam'), '16:31'); await tunggu(400); f('lb54', 'a0').click(); f('lb54', 'fotoTombol').click(); await tunggu(300);
+ubah(f('lb54', 'jam'), '16:31'); await tunggu(400); f('lb54', 'a0').click(); await fotoKamera(f('lb54', 'fotoTombol'));
 JS
     ;;
     64) cat > "$FILE" <<JS
 await masukPribadi('Dewi Lestari'); await dariMenuAdmin('Data absensi'); await tunggu(500);
+JS
+    ;;
+    74) K=owner; PRA="$(cat tools/pra_owner.js)"; cat > "$FILE" <<JS
+el('btnJenisOwner').click(); el('ownUsername').value='owner'; el('ownPassword').value='rahasia123'; el('btnMasukOwner').click(); await tunggu(1200);
+el('btnMenuOwner').click(); await tunggu(150);
+Array.prototype.filter.call(document.querySelectorAll('#menuOwner .menu-kartu button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim().indexOf('Log admin') === 0; })[0].click(); await tunggu(400);
+el('lb73').querySelector('[data-lb-ke="lb74"]').click(); await tunggu(700);
+JS
+    ;;
+    kamera) cat > "$FILE" <<JS
+await masukPribadi('Dewi Lestari'); await dariMenuAdmin('Konfirmasi');
+document.querySelector('#daftarKonfirmasi [data-kel="LUPA"] [data-konf="isijam"]').click(); await tunggu(800);
+f('lb54', 'fotoTombol').click(); await tunggu(300); el('kkAmbil').click(); await tunggu(500);
 JS
     ;;
     65) cat > "$FILE" <<JS

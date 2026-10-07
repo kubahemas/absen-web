@@ -59,7 +59,7 @@ var CFG = {
   '69': { home: 'adm', fn: FN['perk'], hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb68', ganti: true } } },
   '70': { home: 'adm', fn: FN['70'], hapusTeks: REPORT.hapusTeks, hapusBaris: REPORT.hapusBaris, ganti: TREN.concat([[/^GOOD$/, 'Segera']]), pudar: [/^Segera$/], nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } },
   '73': { home: 'own', nav: { 'Detail#5': { ke: 'lb74' } } },
-  '74': { home: 'own' }, '75': { home: 'own' },
+  '74': { home: 'own', fn: FN['74'] }, '75': { home: 'own' },
   '76': { home: 'own', hapusBaris: ['Semua absen lengkap', 'Agustus 2026'] },
   '77': { home: 'own', hapusBaris: ['Dewi Lestari', 'Budi Santoso'] },
   '81': { home: 'own', fn: FN['dash'], ganti: TREN, hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb82', ganti: true } } },

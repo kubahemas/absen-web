@@ -15,7 +15,7 @@ my $pra = decode('UTF-8', $ENV{PRA} // ''); # skrip yang dijalankan di <head> SE
 local $/;
 open my $h, '<:utf8', $ARGV[0] or die "tidak bisa membuka $ARGV[0]";
 my $t = <$h>; close $h;
-my $kepala = '<script>window.__g=[];window.addEventListener("error",function(e){__g.push(String(e.message)+" @"+e.lineno)});</script>';
+my $kepala = '<script>(function(){var asli=window.fetch;window.fetch=function(u,o){if(/script\.google\.com|googleusercontent/.test(String(u))){return Promise.reject(new TypeError("offline (tes)"));}return asli.apply(this,arguments);};})();</script><script>window.__g=[];window.addEventListener("error",function(e){__g.push(String(e.message)+" @"+e.lineno)});</script>';
 my $pilih = $id ne '' ? 'document.querySelectorAll(".layar").forEach(function(l){l.classList.toggle("aktif",l.id==="' . $id . '");});' : '';
 my $badan = '<script type="text/plain" id="__fix">' . $fix . '</script><script>(function(){' .
   'function p(){' . $pilih . '}' .

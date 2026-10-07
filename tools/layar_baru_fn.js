@@ -279,4 +279,13 @@ var FN = {
     tandai(cari(root, /^Simpan/, 'button'), 'simpan');
   }
 
+  ,
+  // ---- Tahap 4: layar 74 (Log Edit absen owner) ----
+  '74': function (root) {
+    var j = cari(root, 'Log: Edit absen'); if (j && j.nextElementSibling) { tandai(j.nextElementSibling, 'sub'); }
+    tandai(root.querySelector('tbody'), 'tbody');
+    var pop = root.querySelector('div[style*="top: 44px"]'); if (pop) { tandai(pop, 'popup'); }
+    var sp = cari(root, /^Admin$/, 'span'); if (sp) { tandai(sp.closest('button'), 'fAdmin'); tandai(sp.nextElementSibling, 'fAdminNilai'); }
+  }
+
 };
