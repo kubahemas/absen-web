@@ -202,12 +202,12 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - Kelompok 4 (HP toko): tampilan diselaraskan (layar utama, pilih nama + PIN, pop-up, absen terlalu pagi); logika absen tidak diubah. Selisih yang belum diputuskan pemilik: `docs/daftar-selisih.md`. Mockup 61 ("PIN 4 digit") dan 63 ("password awal") usang; pemilik yang merevisi mockup (jangan diedit).
 - Pengisi uji HP toko: `PRA="$(cat tools/pra_toko.js)"` + `tools/isi_alur_toko.js` (alur absen dengan server tiruan; atur `window.__MODE`, `window.__absen`, `window.__TAHAN`).
 
-## Paket 2026-10-08
+## Paket 2026-10-07
 - Konfirmasi (layar 28 owner dan 52 admin): semua pengajuan dimuat, diurut dari yang PALING LAMA, hanya MAKSIMAL 5 kartu tampil; kartu berikutnya naik setelah satu di-ACC/ditolak; angka total tetap seluruhnya. Hanya tampilan; hak di server tidak berubah.
 - Pop-up 15 (pulang awal) dan 17 (lembur) tampil lebih dulu sebelum layar alasan/pekerjaan lembur; penyimpanan tetap setelah alasan/pekerjaan dikirim. Judul layar pilih nama: "Absen Masuk PIN" / "Absen Pulang PIN" / "Lembur PIN". Tanggal layar utama HP toko: "NamaHari, d NamaBulan yyyy".
 - Uji baru: `tools/uji_alur_hp_toko.js`, `tools/uji_alur_konfirmasi_antrean.js` (admin; versi owner lewat `tools/pra_owner.js` dan `window.__MODE_OWNER = true`), `tools/uji_tombol_segera.js`.
 
-## Paket 2026-10-09
+## Paket 2026-10-07
 - Beranda HP pribadi: nama saja (tanpa "Halo,"), ikon segarkan di bawah ikon akun. Tarik-ke-bawah untuk refresh di beranda HP pribadi, admin HP toko, owner (ambang 90 px, hanya di paling atas, memanggil `segarkanBeranda`, bukan memuat ulang halaman; `overscroll-behavior-y: contain`).
 - Lingkaran foto kamera 160 px / border 9 px di layar 09 dan absen luar (usulan, belum final). `tools/potret.sh` mendukung `LEBAR=360 TINGGI=640`.
 - Uji baru: `tools/uji_alur_tarik_refresh.js` (konteks pribadi/admin/owner lewat `window.__KONTEKS`), `tools/uji_alur_foto_lingkaran.js` (konteks toko/luar), `uji_alur_pribadi.js` memeriksa nama dan posisi ikon.
@@ -218,3 +218,4 @@ Singkatan yang dipakai: `st`=status, `ket`=keterangan, `mnt`=menit, `plg`=pulang
 - Layar KEJADIAN sengaja belum bisa dicapai dari navigasi (daftar di `docs/daftar-layar.md`). Daftar selisih baru: `docs/daftar-selisih.md`.
 - Nama di beranda HP pribadi: Oswald 30 px tebal (seperti mockup), tanpa "Halo,".
 - Tes: `uji_tombol_segera.js`, `uji_layar_baru_tanpa_contoh.js` (butuh `token_contoh.js` dari `buat_token_contoh.pl`), `uji_alur_layar_baru.js` (KONTEKS toko/pribadi/pribadiadmin/admin/owner), alur wajah di `uji_alur_hp_toko.js`.
+- Putaran keputusan 2026-10-07 (lanjutan): layar 59 dihapus (Pola shift = 57); layar 34 PIN 5 angka + satu kolom Keterangan; kalimat tren = "–"; layar baru 35, 36e, 37, 38, 48 (tidak bisa dipicu); id layar baru boleh berakhiran huruf (`lb36e`). Layar Report yang bisa dibuka (36) memakai lencana netral nonaktif.

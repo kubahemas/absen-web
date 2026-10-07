@@ -140,7 +140,7 @@ Semua selisih di bawah **belum diputuskan pemilik**: tidak diubah, hanya dicatat
 | 24 Owner · Cabang dan shift, 25 Owner · Data absensi | Seluruh layar | Belum dibuat; item menu "Segera" | Belum ada fungsi | – |
 | 27 Owner · Keluarkan semua perangkat | Daftar perangkat yang sedang login | Daftar tampil bila server mengirim; dialog tanpa latar gelap penuh (beranda samar di belakang) | Claude Code | `27_dampingan.png` |
 
-## Keputusan pemilik 2026-10-08 (sudah diterapkan, pemutus = pemilik)
+## Keputusan pemilik 2026-10-07 (sudah diterapkan, pemutus = pemilik)
 
 | No | Layar | Keputusan | Gambar |
 |---|---|---|---|
@@ -166,7 +166,7 @@ Semua selisih di bawah **belum diputuskan pemilik**: tidak diubah, hanya dicatat
 | 52 | Chip "Izin 1", "Lupa absen 1", kartu izin/lupa absen/tukar shift | Chip "Segera" nonaktif; kartu itu belum ada | `52_dampingan.png` |
 | 03, 04, 05, 06, 07, 08, 13, 18, 19, 22–25 | Seluruh layar | Belum dibuat (butuh fitur wajah/jadwal/izin/server) | – |
 
-## Keputusan pemilik 2026-10-09 (sudah diterapkan, pemutus = pemilik)
+## Keputusan pemilik 2026-10-07 (sudah diterapkan, pemutus = pemilik)
 
 | No | Layar | Keputusan | Gambar |
 |---|---|---|---|
@@ -182,12 +182,38 @@ Semua layar baru = tampilan saja (aksi "Segera", tanpa angka/nama contoh). Gamba
 | No | Layar | Selisih dari mockup | Gambar |
 |---|---|---|---|
 | 1 | Semua layar baru | Angka, nama, tanggal, jam contoh diganti "–"; baris tabel/daftar contoh dibuang (hanya kepala kolom); dropdown/filter/input nonaktif tanpa isi | `NN_dampingan.png` tiap layar |
-| 2 | 36 (37, 38) | Satu layar Report dipakai untuk tiga kondisi (mockup 36/37/38 beda hanya label); lencana label (EXCELLENT/GOOD/BAD) nonaktif "Segera"; 38 tidak punya layar sendiri | `36_dampingan.png` |
-| 3 | 57 dan 59 | Mockup 57 (jalur lain ke Pola shift) belum punya jalur; Pola shift dibuka dari sheet karyawan → 59 | `57_dampingan.png`, `59_dampingan.png` |
+| 2 | 36, 36e, 37, 38 | DIGANTIKAN keputusan pemilik 2026-10-07 butir 8: 37 dan 38 kini layar tersendiri (berwarna penuh, tidak bisa dibuka); 36e = EXCELLENT berwarna (tidak bisa dibuka); 36 = satu-satunya yang bisa dibuka, lencana netral nonaktif "Segera" | `36_dampingan.png` (36e), `37_dampingan.png`, `38_dampingan.png`, `36_netral_dampingan.png` |
+| 3 | 57, 59 | SELESAI (keputusan pemilik): 57 satu-satunya layar Pola shift; 59 dihapus dari app | `57_dampingan.png` |
 | 4 | 67 | Warna sampel pada kalender libur memakai warna mockup; hari libur nyata belum ada | `67_dampingan.png` |
-| 5 | 70 | Dibuat mirip 36 (detail karyawan); tanpa baris riwayat, tanda naik/turun, dan "Telat N kali"; tombol Detail membuka 40 / 39 | `70_dampingan.png` |
-| 6 | 68, 81 | Ringkasan: kalimat tren ("naik/turun/sama dengan…", "Paling banyak hari…", "Minggu ke-N") dihapus karena berisi angka contoh | `68_dampingan.png`, `81_dampingan.png` |
+| 5 | 70 | DISETUJUI pemilik (mirip 36, tanpa baris riwayat). Kalimat tren dikembalikan "–". Kalimat "Telat N kali. Tanpa pelanggaran untuk EXCELLENT/…" (36, 37, 38, 70) masih dihapus karena berisi angka dan nama label: BELUM diputuskan | `70_dampingan.png` |
+| 6 | 68, 81 | SELESAI (keputusan pemilik butir 4): kartu empat angka dan caption grafik tampil di posisi mockup berisi "–" saja, tanpa panah/angka | `68_dampingan.png`, `81_dampingan.png` |
 | 7 | 02 | Latar di balik layar jadwal berbeda sedikit dari mockup (layar utama nyata, bukan gambar) | `02_dampingan.png` |
 | 8 | 04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 43, 53, 56, 62, 65, 70 | Layar KEJADIAN: dibuat lengkap tetapi SENGAJA belum bisa dibuka dari navigasi apa pun dan belum disambung ke logika absen; 57 juga belum punya jalur | dampingan tiap layar |
 | 9 | 03, 08 | Alur wajah hanya tampilan: 03 tampil 1–2 detik lalu 08; ULANGI nonaktif; kamera tidak dibuka; MANUAL → 09 | `03_dampingan.png`, `08_dampingan.png` |
-| 10 | 30, 31, 32, 46 | Nama besar kembali seperti mockup (Oswald 30 px tebal), tetap TANPA "Halo,". Menggantikan gaya blok "Cabang…" 15 px dari keputusan 2026-10-09 butir 1 (selisih dari mockup tinggal: tanpa "Halo,") | `30_dampingan.png` |
+| 10 | 30, 31, 32, 46 | Nama besar kembali seperti mockup (Oswald 30 px tebal), tetap TANPA "Halo,". Menggantikan gaya blok "Cabang…" 15 px dari keputusan 2026-10-07 butir 1 (selisih dari mockup tinggal: tanpa "Halo,") | `30_dampingan.png` |
+
+## Keputusan pemilik 2026-10-07 (putaran perbaikan 10 butir, pemutus = pemilik)
+
+| No | Layar | Keputusan | Gambar |
+|---|---|---|---|
+| 1 | 34 | PIN 5 angka; chip "Keperluan" dihapus; satu kolom "Keterangan tujuan (nama klien atau alamat), wajib minimal 5 karakter" (min 5, maks 100) sama dengan layar absen luar yang berjalan | `34_dampingan.png` |
+| 1 | 45 | Teks "(awal: 123456)" (sisa password awal) diganti "Password lama" | `45_dampingan.png` |
+| 2 | 57, 59 | 57 = satu-satunya layar Pola shift; semua jalur membuka 57; 59 dihapus (mockup 59 tidak diubah) | `57_dampingan.png` |
+| 3 | 70 | Mirip 36 tanpa baris riwayat: disetujui | `70_dampingan.png` |
+| 4 | 68, 81, 36/36e/37/38, 70 | Kalimat tren dikembalikan: hanya "–" (tanpa panah, tanpa angka); panah baru muncul bila ada perbedaan nyata (fitur laporan nanti) | `68_dampingan.png`, `81_dampingan.png` |
+| 5 | 02 | Latar di balik layar dipertahankan | – |
+| 6 | 03, 08 → 09 | Alur wajah dipertahankan | – |
+| 7 | 35, 48 | Dibuat sebagai tampilan (layar kejadian, tidak bisa dipicu, tanpa angka/nama contoh, tanpa antrean offline) | `35_dampingan.png`, `48_dampingan.png` |
+| 8 | 36e, 37, 38 | Layar Report tersendiri berwarna penuh, tidak bisa dibuka; 36 yang bisa dibuka = lencana netral nonaktif | `36_dampingan.png`, `37_dampingan.png`, `38_dampingan.png` |
+
+## Selisih BARU yang butuh keputusan pemilik (putaran 2026-10-07 butir 1–8)
+
+| No | Layar | Selisih dari mockup | Gambar |
+|---|---|---|---|
+| 11 | 45 | Aturan sandi di mockup masih gaya lama ("6 angka", "Bukan angka berurutan atau kembar", "Bukan 123456 dan tidak sama dengan PIN"); app memakai aturan baru (admin: minimal 8 karakter). Tampil dengan "–" menggantikan angka, belum diubah | `45_dampingan.png` |
+| 12 | 36, 36e, 37, 38, 70 | Kalimat "Telat N kali. Tanpa pelanggaran untuk …" / "Telat 7 kali (batas 5) dan 1 alpha. …" masih dihapus (berisi angka dan nama label) | `36_dampingan.png`, `37_dampingan.png`, `38_dampingan.png` |
+| 13 | 48 | "Halo, –" masih ada seperti mockup (keputusan "tanpa Halo," hanya untuk 30, 31, 32, 46) | `48_dampingan.png` |
+| 14 | 35 | Pop-up nyata setelah absen luar dikirim adalah pop-up yang sudah berjalan (bukan layar 35); 35 hanya tampilan yang belum bisa dipicu | `35_dampingan.png` |
+| 15 | 75 | Daftar pengaturan memuat "Keperluan absen luar" (kategori sheet `KEPERLUAN_LUAR`) padahal layar absen luar tidak memakainya lagi | `75_dampingan.png` |
+| 16 | 68, 81 | Teks tren "–" memakai warna hijau/merah seperti teks tren mockup (warna tidak diubah, hanya isi); mohon dinilai apakah warna perlu netral | `68_dampingan.png`, `81_dampingan.png` |
+| 17 | 36 (bisa dibuka) | Bersumber dari mockup 36 (latar kuning), seluruh kartu performa pudar, lencana "Segera" abu netral; tulisan "Tanpa pelanggaran. Pertahankan!" ikut pudar | `36_netral_dampingan.png` |

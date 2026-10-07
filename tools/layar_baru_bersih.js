@@ -5,7 +5,7 @@
 var NAMA = ['Budi Santoso', 'Dewi Lestari', 'Rina Wati', 'Siti Rohmah', 'Ahmad Fauzi', 'Andi Pratama', 'Joko Susilo', 'Sari Utami', 'Dimas Saputra', 'Wulan Sari', 'Tono Wibowo',
   'Budi', 'Dewi', 'Rina', 'Siti', 'Ahmad', 'Andi', 'Joko', 'Sari', 'Dimas', 'Wulan', 'Tono', 'Ari', 'Dina', 'EMP012', 'K003', 'K005', 'HP Toko 1', 'HP Toko 2', 'Ngawi', 'Pusat', 'NGW', 'Madiun'];
 var FRASA = ['Salah tekan IYA saat pengenalan wajah', 'Antar ibu ke dokter pagi', 'Pernikahan di Madiun', 'Kendaraan bermasalah', 'Melayani pelanggan', 'HP toko lambat', 'Kendala sistem', 'Koreksi jam', 'Salah tekan',
-  'Stok opname', 'bongkar muat', 'penataan barang', 'pemasangan', 'renovasi toko', 'Demam', 'Macet', 'Hujan', 'Pagi', 'Siang', 'service'];
+  'Pemasangan', 'Stok opname', 'bongkar muat', 'penataan barang', 'pemasangan', 'renovasi toko', 'Demam', 'Macet', 'Hujan', 'Pagi', 'Siang', 'service'];
 var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember', 'Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Agu', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
 function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 var RE_NAMA = new RegExp('(?<![A-Za-z])(' + NAMA.concat(FRASA).sort(function (a, b) { return b.length - a.length; }).map(esc).join('|') + ')(?![A-Za-z])', 'g');
@@ -75,6 +75,7 @@ function bersih(nomor, cfg) {
     n.nodeValue = bersihTeks(v, false);
   });
   (cfg.ganti || []).forEach(function (p) { semuaElemen(root).forEach(function (e) { e.childNodes.forEach(function (n) { if (n.nodeType === 3 && p[0].test(n.nodeValue)) { n.nodeValue = n.nodeValue.replace(p[0], p[1]); } }); }); });
+  if (cfg.fn) { cfg.fn(root, log); }
   if (cfg.pudar) { cfg.pudar.forEach(function (re) { pudar(root, re); }); }
   // kontrol isian
   root.querySelectorAll('input, textarea, select').forEach(function (e) {
@@ -99,7 +100,7 @@ function bersih(nomor, cfg) {
     }
     if (aria === 'Kembali' || KEMBALI.test(teks)) { b.setAttribute('data-lb-kembali', /^Home$/.test(teks) ? 'home' : (/layar utama/.test(teks) ? 'utama' : 'kembali')); b.setAttribute('type', 'button'); return; }
     b.setAttribute('type', 'button'); b.disabled = true; b.setAttribute('aria-disabled', 'true'); b.classList.add('belum-aktif');
-    if ((AKSI.test(teks) || cfg.semuaSegera) && !b.querySelector('.segera') && teks.length && teks.length < 60) {
+    if ((AKSI.test(teks) || cfg.semuaSegera) && !(cfg.tanpaSegera && cfg.tanpaSegera.test(teks)) && !b.querySelector('.segera') && teks.length && teks.length < 60) {
       var s = document.createElement('span'); s.className = 'segera'; s.style.marginLeft = '6px'; s.textContent = 'Segera'; b.appendChild(s);
     }
   });

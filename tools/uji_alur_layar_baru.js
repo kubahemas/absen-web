@@ -95,15 +95,15 @@ async function ke(tombol, id, asal, nama) {
       ok('tab "Ringkasan" kembali ke 68', aktif() === 'lb68');
       el('lb68').querySelector('[data-lb-kembali="home"]').click(); await tunggu(150);
       ok('Home dari dashboard kembali ke beranda admin', aktif() === 'layarAdmin');
-      // Karyawan -> sheet -> Pola shift -> 59 -> Back kembali ke daftar Karyawan
+      // Karyawan -> sheet -> Pola shift -> 57 -> Back kembali ke daftar Karyawan
       el('btnMenuAdmin').click(); await tunggu(120); el('btnMenuKaryawan').click(); await tunggu(700);
       var baris = el('daftarKaryawanAdmin').querySelector('[data-kry="buka"]'); baris.click(); await tunggu(150);
-      var pola = document.querySelector('#dialog [data-lb-ke="lb59"]');
-      ok('sheet karyawan: "Pola shift" AKTIF dan menuju layar 59; "Daftar wajah" tetap nonaktif "Segera"', !!pola && !pola.disabled && !!Array.prototype.filter.call(document.querySelectorAll('#dialog button[disabled]'), function (b) { return /Daftar wajah/.test(b.textContent); }).length);
+      var pola = document.querySelector('#dialog [data-lb-ke="lb57"]');
+      ok('sheet karyawan: "Pola shift" AKTIF dan menuju layar 57; "Daftar wajah" tetap nonaktif "Segera"', !!pola && !pola.disabled && !!Array.prototype.filter.call(document.querySelectorAll('#dialog button[disabled]'), function (b) { return /Daftar wajah/.test(b.textContent); }).length);
       pola.click(); await tunggu(150);
-      ok('Pola shift membuka layar 59 dan menutup sheet', aktif() === 'lb59' && !el('dialog').classList.contains('tampil'));
+      ok('Pola shift membuka layar 57 dan menutup sheet', aktif() === 'lb57' && !el('dialog').classList.contains('tampil'));
       tombolKembali().click(); await tunggu(150);
-      ok('Back dari 59 kembali ke daftar Karyawan', aktif() === 'layarKaryawan');
+      ok('Back dari 57 kembali ke daftar Karyawan', aktif() === 'layarKaryawan');
     }
     if (K === 'pribadi') {
       el('btnJenisPribadi').click(); el('pribNama').value = 'Budi Santoso'; el('pribRahasia').value = '12345'; el('btnMasukPribadi').click(); await tunggu(900);

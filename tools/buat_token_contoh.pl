@@ -3,9 +3,9 @@
 # Pakai: perl tools/buat_token_contoh.pl
 use strict; use utf8; local $/;
 binmode(STDOUT,':utf8');
-my @nama = ('Budi Santoso','Dewi Lestari','Rina Wati','Siti Rohmah','Ahmad Fauzi','Andi Pratama','Joko Susilo','Sari Utami','Dimas Saputra','Wulan Sari','Tono Wibowo','Budi','Dewi','Rina','Siti','Ahmad','Andi','Joko','Sari','Dimas','Wulan','Tono','Ari','Dina','EMP012','Ngawi','Madiun','Samsung','Infinix','Stok opname','Antar ibu ke dokter pagi','Pernikahan di Madiun','Demam','Kendaraan bermasalah','HP toko lambat');
-my $sumber = { '36' => '37' };
-my @nomor = qw(02 03 04 05 06 07 08 13 18 19 22 23 24 25 34 36 39 40 41 42 43 45 53 54 55 56 57 59 62 64 65 66 67 68 69 70 73 74 75 76 77 81 82);
+my @nama = ('Budi Santoso','Dewi Lestari','Rina Wati','Siti Rohmah','Ahmad Fauzi','Andi Pratama','Joko Susilo','Sari Utami','Dimas Saputra','Wulan Sari','Tono Wibowo','Budi','Dewi','Rina','Siti','Ahmad','Andi','Joko','Sari','Dimas','Wulan','Tono','Ari','Dina','EMP012','Ngawi','Madiun','Samsung','Infinix','Stok opname','Antar ibu ke dokter pagi','Pernikahan di Madiun','Demam','Kendaraan bermasalah','HP toko lambat','Pemasangan');
+my $sumber = { '36e' => '36' };
+my @nomor = qw(02 03 04 05 06 07 08 13 18 19 22 23 24 25 34 35 36 36e 37 38 39 40 41 42 43 45 48 53 54 55 56 57 62 64 65 66 67 68 69 70 73 74 75 76 77 81 82);
 my %hasil;
 for my $n (@nomor) {
   my $s = $sumber->{$n} // $n;

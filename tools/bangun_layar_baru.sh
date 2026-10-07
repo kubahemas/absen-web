@@ -6,7 +6,7 @@ EDGE="/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 AKAR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$AKAR"
 NOMOR="$@"
-[ -z "$NOMOR" ] && NOMOR=$(grep -oE "'[0-9]{2}': {" tools/layar_baru_cfg.js | grep -oE "[0-9]{2}" | sort -u | tr '\n' ' ')
+[ -z "$NOMOR" ] && NOMOR=$(grep -oE "'[0-9]{2}[a-z]?': {" tools/layar_baru_cfg.js | grep -oE "[0-9]{2}[a-z]?" | sort -u | tr '\n' ' ')
 for n in $NOMOR; do
   src=$(grep -oE "'$n': '[0-9]+'" tools/layar_baru_cfg.js | head -1 | sed -E "s/.*: '([0-9]+)'/\1/"); [ -z "$src" ] && src=$n
   f=$(ls docs/mockup/layar | grep "^$src - " | head -1)

@@ -26,11 +26,11 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 31 | 9b. Beranda - badge GOOD | tersambung | Sama. |
 | 32 | 9c. Beranda - badge BAD | tersambung | Sama. |
 | 33 | 9d. Absen luar - wajah dikenali | tersambung | Beda sengaja: tanpa chip Keperluan (satu kolom Keterangan). Baris "Wajah cocok" diganti "Pengenalan wajah · Segera". |
-| 34 | 9e. Absen luar - cadangan PIN | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: **Menunggu fitur** pengenalan wajah (layar ini hanya muncul bila wajah gagal). |
-| 35 | 9f. Pop-up absen luar terkirim | belum | Pop-up dipakai bersama HP Toko: dirapikan di kelompok 4. Kotak "Bulan ini" **menunggu data** (belum ada hitungan rekap bulan). |
-| 36 | 10a. Report EXCELLENT | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** Report. Tombol Report di beranda tampil nonaktif "Segera". |
-| 37 | 10b. Report GOOD | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; satu layar Report (36) dipakai bersama; lencana label nonaktif. Fitur aslinya: Sama. |
-| 38 | 10c. Report BAD | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; satu layar Report (36) dipakai bersama; lencana label nonaktif. Fitur aslinya: Sama. |
+| 34 | 9e. Absen luar - cadangan PIN | tersambung (tampilan saja) | Layar KEJADIAN, belum bisa dipicu. PIN 5 titik; chip Keperluan dihapus, satu kolom Keterangan (wajib minimal 5, maksimal 100) seperti absen luar (keputusan pemilik 2026-10-07). |
+| 35 | 9f. Pop-up absen luar terkirim | tersambung (tampilan saja) | Layar KEJADIAN (`lb35`): belum bisa dipicu; kotak "Bulan ini" nonaktif tanpa angka. Pop-up nyata setelah absen luar dikirim tetap pop-up yang sudah berjalan (tidak diubah). |
+| 36 | 10a. Report EXCELLENT | tersambung (tampilan saja) | `lb36e` = berwarna penuh EXCELLENT, TIDAK bisa dibuka dari navigasi. Layar Report yang bisa dibuka = `lb36` (lencana netral nonaktif "Segera", tanpa warna label). |
+| 37 | 10b. Report GOOD | tersambung (tampilan saja) | `lb37`: layar tersendiri berwarna penuh GOOD; TIDAK bisa dibuka (label belum dihitung). |
+| 38 | 10c. Report BAD | tersambung (tampilan saja) | `lb38`: layar tersendiri berwarna penuh BAD; TIDAK bisa dibuka (label belum dihitung). |
 | 39 | 10d. Detail lembur | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: Sama. |
 | 40 | 10e. Detail telat (tabel) | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: Sama. |
 | 41 | 11. Form izin / cuti | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** izin. Tombol Izin/Cuti nonaktif "Segera". |
@@ -40,7 +40,7 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 45 | 11c. Ganti password | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** (belum ada aksi server). Tombol di Akun saya nonaktif "Segera". |
 | 46 | 9g. Beranda - akun ber-role ADMIN | tersambung | Beda sengaja: kotak "Konfirmasi data karyawan" menggantikan kartu "Menu admin". Strip "2 pengajuan menunggu ACC" disembunyikan: **menunggu data** (fitur izin). |
 | 47 | 8b. Login - akun terkunci | tersambung | Kotak merah "Akun terkunci. Hubungi admin." tampil bila server membalas `TERKUNCI`. |
-| 48 | 9h. Beranda - offline | belum | **Menunggu fitur** absen offline (spanduk "1 absen belum terkirim" butuh antrean lokal yang belum ada). |
+| 48 | 9h. Beranda - offline | tersambung (tampilan saja) | Layar KEJADIAN (`lb48`): belum bisa dipicu; tidak ada antrean offline; angka "–", lencana "Segera". |
 
 ## 2. Admin cabang
 
@@ -54,9 +54,9 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 54 | 16. Admin - Absen manual | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur**; item menu "Segera" |
 | 55 | 17. Admin - Jadwal shift | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur**; item menu "Segera" |
 | 56 | 17b. Tukar shift satu hari | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: **Menunggu fitur** tukar shift |
-| 57 | 17c. Admin - Pola shift karyawan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; belum ada jalur (jalur ke Pola shift lewat 59). Fitur aslinya: **Menunggu fitur** (di daftar karyawan: "Pola shift · Segera") |
+| 57 | 17c. Admin - Pola shift karyawan | tersambung (tampilan saja) | SATU-SATUNYA layar Pola shift (keputusan pemilik 2026-10-07): dibuka dari sheet karyawan (admin HP toko/HP pribadi). Tanpa angka/nama contoh ("–"), aksi "Segera". |
 | 58 | 18. Admin - Daftar karyawan | tersambung | Satu daftar (aktif lalu nonaktif); ketuk baris = sheet aksi (Reset PIN, Nonaktifkan / Aktifkan kembali; Ubah data, Pola shift, Daftar wajah = "Segera"). Baris role Admin tidak tampil (server hanya mengirim karyawan). Teks bawah tanpa "password" dan "lepas ikatan HP". |
-| 59 | 18b. Pola shift karyawan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
+| 59 | 18b. Pola shift karyawan | **DIHAPUS dari app** | Dihapus atas keputusan pemilik (2026-10-07), digantikan layar 57 (satu-satunya layar Pola shift). Mockup 59 di folder mockup tidak diubah. |
 | 60 | 19. Karyawan baru - data | tersambung | Langkah 1 dari 4. Tanpa "Nama tersedia." (belum ada pemeriksaan nama di server) dan tanpa "Jatah cuti" di kotak info. |
 | 61 | 20. Karyawan baru - persetujuan + PIN | tersambung | Langkah 2 dari 4. "Saya setuju" = "Segera". PIN **5 digit** (aturan server), bukan 4. Tombol ⌫ ditambahkan di sel kosong keypad. Layar sama dipakai Reset PIN (tanpa bilah langkah dan persetujuan). |
 | 62 | 21. Karyawan baru - daftar wajah | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: **Menunggu fitur** pengenalan wajah (langkah 3 dilewati) |
@@ -176,7 +176,7 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 - `tools/isi_beranda_pribadi.js`: pengisi potret (server tiruan + login HP pribadi → beranda).
 - `tools/mockup_ke_layar.pl`: sekarang menambah `box-sizing: content-box` pada elemen non-form supaya ukuran sama dengan mockup (aplikasi memakai `border-box` global; tanpa ini blok dengan padding + tinggi tetap bergeser).
 
-## Paket 2026-10-09 (keputusan pemilik)
+## Paket 2026-10-07 (keputusan pemilik)
 
 - 30, 31, 32, 46: nama tanpa "Halo,", ikon segarkan di bawah ikon akun (selisih dari mockup, keputusan pemilik; lihat `docs/daftar-selisih.md`).
 - Tarik-ke-bawah refresh di beranda HP pribadi, admin HP toko, owner.
@@ -188,3 +188,10 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 - Alur wajah HP toko (tampilan saja): ABSEN MASUK/PULANG/LEMBUR → 03 (1–2 detik, "Pengenalan wajah · Segera", kamera TIDAK dibuka) → 08 (ULANGI nonaktif "Segera") → MANUAL aktif → layar 09 seperti sebelumnya. Tiket waktu tetap diminta SAAT TOMBOL DITEKAN (sekali saja).
 - Layar KEJADIAN (04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 43, 53, 56, 62, 65, 70) dibuat lengkap tetapi sengaja belum bisa dipicu dan tidak disambung ke logika absen (penolakan dobel dari server tetap pop-up "Tidak tersimpan"). Layar 57 belum punya jalur (jalur Pola shift lewat 59).
 - Tes: `tools/uji_tombol_segera.js`, `tools/uji_layar_baru_tanpa_contoh.js` (+ `tools/buat_token_contoh.pl`), `tools/uji_alur_layar_baru.js`, alur wajah di `tools/uji_alur_hp_toko.js`.
+
+## Putaran keputusan pemilik 2026-10-07 (butir 1-8)
+- 34: PIN 5 angka, tanpa chip Keperluan, kolom Keterangan seperti absen luar. 45: "(awal: ...)" dihapus (sisa password awal 123456).
+- Pola shift: hanya layar 57; layar 59 dihapus (markup, jalur, tes, gambar dampingan).
+- Kalimat tren (68, 81, Report, 70) dikembalikan sebagai "–" tanpa panah dan tanpa angka.
+- Layar baru: 35, 37, 38, 48 dan 36e (Report EXCELLENT berwarna). Tidak bisa dipicu: 35, 36e, 37, 38, 48 (selain 04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 43, 53, 56, 62, 65, 70).
+- Layar Report yang bisa dibuka (36) memakai lencana netral nonaktif.
