@@ -27,7 +27,7 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 32 | 9c. Beranda - badge BAD | tersambung | Sama. |
 | 33 | 9d. Absen luar - wajah dikenali | tersambung | Beda sengaja: tanpa chip Keperluan (satu kolom Keterangan). Baris "Wajah cocok" diganti "Pengenalan wajah · Segera". |
 | 34 | 9e. Absen luar - cadangan PIN | tersambung (tampilan saja) | Layar KEJADIAN, belum bisa dipicu. PIN 5 titik; chip Keperluan dihapus, satu kolom Keterangan (wajib minimal 5, maksimal 100) seperti absen luar (keputusan pemilik 2026-10-07). |
-| 35 | 9f. Pop-up absen luar terkirim | tersambung (tampilan saja) | Layar KEJADIAN (`lb35`): belum bisa dipicu; kotak "Bulan ini" nonaktif tanpa angka. Pop-up nyata setelah absen luar dikirim tetap pop-up yang sudah berjalan (tidak diubah). |
+| 35 | 9f. Pop-up absen luar terkirim | tersambung (dipakai sebagai pop-up nyata) | `lb35` tampil setelah absen luar masuk/pulang/lembur DITERIMA server (nama, jam tiket server, "Menunggu persetujuan admin"; kotak "Bulan ini" nonaktif "–"); menutup sendiri 4 detik atau ketuk. Pengiriman gagal = pesan galat lama. |
 | 36 | 10a. Report EXCELLENT | tersambung (tampilan saja) | `lb36e` = berwarna penuh EXCELLENT, TIDAK bisa dibuka dari navigasi. Layar Report yang bisa dibuka = `lb36` (lencana netral nonaktif "Segera", tanpa warna label). |
 | 37 | 10b. Report GOOD | tersambung (tampilan saja) | `lb37`: layar tersendiri berwarna penuh GOOD; TIDAK bisa dibuka (label belum dihitung). |
 | 38 | 10c. Report BAD | tersambung (tampilan saja) | `lb38`: layar tersendiri berwarna penuh BAD; TIDAK bisa dibuka (label belum dihitung). |
@@ -37,10 +37,10 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 42 | 11d. Ajukan tukar shift | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** tukar shift. Tombol nonaktif "Segera". |
 | 43 | 11e. Rekan menyetujui tukar shift | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: Sama. |
 | 44 | 11b. Akun saya | tersambung | Dibuka dari ikon akun (menu "Akun saya"). Nama, ID, cabang terisi; Shift bawaan, Ganti password, Ganti PIN = "Segera". Baris "HP terikat" dan teks "Ganti HP? Minta admin reset ikatan HP" DIHAPUS (keputusan pemilik: tidak ada ikatan akun ke HP). |
-| 45 | 11c. Ganti password | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** (belum ada aksi server). Tombol di Akun saya nonaktif "Segera". |
+| 45 | 11c. Ganti password | tersambung (tampilan saja) | Aturan sandi mengikuti peran akun (KARYAWAN: PIN tepat 5 angka; ADMIN: kata sandi minimal 8 karakter); Simpan nonaktif "Segera". Label "Password" untuk karyawan: lihat selisih 18. |
 | 46 | 9g. Beranda - akun ber-role ADMIN | tersambung | Beda sengaja: kotak "Konfirmasi data karyawan" menggantikan kartu "Menu admin". Strip "2 pengajuan menunggu ACC" disembunyikan: **menunggu data** (fitur izin). |
 | 47 | 8b. Login - akun terkunci | tersambung | Kotak merah "Akun terkunci. Hubungi admin." tampil bila server membalas `TERKUNCI`. |
-| 48 | 9h. Beranda - offline | tersambung (tampilan saja) | Layar KEJADIAN (`lb48`): belum bisa dipicu; tidak ada antrean offline; angka "–", lencana "Segera". |
+| 48 | 9h. Beranda - offline | tersambung (tampilan saja) | Layar KEJADIAN (`lb48`): belum bisa dipicu; tanpa "Halo,", nama besar "–"; tanpa antrean offline. |
 
 ## 2. Admin cabang
 
@@ -195,3 +195,7 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 - Kalimat tren (68, 81, Report, 70) dikembalikan sebagai "–" tanpa panah dan tanpa angka.
 - Layar baru: 35, 37, 38, 48 dan 36e (Report EXCELLENT berwarna). Tidak bisa dipicu: 35, 36e, 37, 38, 48 (selain 04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 43, 53, 56, 62, 65, 70).
 - Layar Report yang bisa dibuka (36) memakai lencana netral nonaktif.
+
+## Putaran keputusan pemilik 2026-10-07 (selisih 11–17)
+- 35 kini pop-up nyata absen luar (bukan layar kejadian lagi); layar kejadian yang tersisa: 04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 36e, 37, 38, 43, 48, 53, 56, 62, 65, 70.
+- 45 aturan sandi menurut peran; 48 tanpa "Halo,"; kalimat "Telat N kali…" = "–" pudar; teks tren "–" abu netral; 75 daftar Keperluan absen luar dipertahankan nonaktif.

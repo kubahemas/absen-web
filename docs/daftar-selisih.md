@@ -113,9 +113,9 @@ Kolom **Siapa yang memutuskan**:
 | 8 | 58 | Baris Admin ditambahkan HANYA BACA (tanpa ketuk, tanpa aksi); `karyawan_daftar` mengirim `admin_daftar` (id, nama, panggilan, shift, aktif) | Pemilik | `58_dampingan.png` |
 | 9 | 60 | Tombol hijau bawah di posisi app dan ikon kalender dipertahankan; baris info persis mockup "ID otomatis: K005 · Cabang: Ngawi · Jatah cuti: 6 hari · Role: Karyawan" dengan nilai dari server (`id_berikutnya`, cabang admin, `jatah_cuti` di pengaturan) | Pemilik | `60_dampingan.png` |
 | 10 | 61 | Tombol ⌫ di keypad dipertahankan | Pemilik | `61_dampingan.png` |
-| 11 | 61, 63 | Mockup usang: "Buat PIN 4 digit" (61) dan "Password awal 123456 / PIN awal 1234" (63). App memakai PIN 5 angka buatan karyawan sendiri. **Pemilik yang akan merevisi mockup**; mockup tidak diedit | Pemilik | `61_dampingan.png`, `63_dampingan.png` |
-| 12 | 78 | "Masuk sebagai Owner" dipertahankan | Pemilik | `78_dampingan.png` |
-| 13 | 80 | Filter cabang, saklar "Tampilkan nonaktif", "Ubah nama" dipertahankan | Pemilik | `80_dampingan.png` |
+| 11 | 45 | SELESAI (keputusan pemilik 2026-10-07): aturan sandi gaya lama diganti aturan akun yang berlaku, teks mengikuti peran: KARYAWAN = "PIN tepat 5 angka / Hanya angka / Angka apa pun boleh"; ADMIN = "Kata sandi minimal 8 karakter / Maksimal 100 karakter / Huruf besar dan kecil dianggap sama". Tombol Simpan tetap nonaktif "Segera" | `45_dampingan.png` |
+| 12 | 36, 36e, 37, 38, 70 | SELESAI (keputusan pemilik): kalimat "Telat N kali. Tanpa pelanggaran untuk …" kembali di posisi mockup, isinya "–" abu dan pudar (tanpa angka, nama label, panah). Mockup 36 (EXCELLENT) tidak punya kalimat itu; kalimat "Tanpa pelanggaran. Pertahankan!" di 36/36e tetap seperti mockup | `37_dampingan.png`, `38_dampingan.png`, `70_dampingan.png` |
+| 13 | 48 | SELESAI (keputusan pemilik): "Halo," dihapus; nama besar Oswald 30 px berisi "–" | `48_dampingan.png` |
 
 ## Kelompok 4: HP Toko (01–28), selisih yang butuh keputusan pemilik
 
@@ -213,7 +213,19 @@ Semua layar baru = tampilan saja (aksi "Segera", tanpa angka/nama contoh). Gamba
 | 11 | 45 | Aturan sandi di mockup masih gaya lama ("6 angka", "Bukan angka berurutan atau kembar", "Bukan 123456 dan tidak sama dengan PIN"); app memakai aturan baru (admin: minimal 8 karakter). Tampil dengan "–" menggantikan angka, belum diubah | `45_dampingan.png` |
 | 12 | 36, 36e, 37, 38, 70 | Kalimat "Telat N kali. Tanpa pelanggaran untuk …" / "Telat 7 kali (batas 5) dan 1 alpha. …" masih dihapus (berisi angka dan nama label) | `36_dampingan.png`, `37_dampingan.png`, `38_dampingan.png` |
 | 13 | 48 | "Halo, –" masih ada seperti mockup (keputusan "tanpa Halo," hanya untuk 30, 31, 32, 46) | `48_dampingan.png` |
-| 14 | 35 | Pop-up nyata setelah absen luar dikirim adalah pop-up yang sudah berjalan (bukan layar 35); 35 hanya tampilan yang belum bisa dipicu | `35_dampingan.png` |
-| 15 | 75 | Daftar pengaturan memuat "Keperluan absen luar" (kategori sheet `KEPERLUAN_LUAR`) padahal layar absen luar tidak memakainya lagi | `75_dampingan.png` |
-| 16 | 68, 81 | Teks tren "–" memakai warna hijau/merah seperti teks tren mockup (warna tidak diubah, hanya isi); mohon dinilai apakah warna perlu netral | `68_dampingan.png`, `81_dampingan.png` |
-| 17 | 36 (bisa dibuka) | Bersumber dari mockup 36 (latar kuning), seluruh kartu performa pudar, lencana "Segera" abu netral; tulisan "Tanpa pelanggaran. Pertahankan!" ikut pudar | `36_netral_dampingan.png` |
+| 14 | 35 | SELESAI (keputusan pemilik): layar 35 dipakai sebagai pop-up nyata setelah absen luar (masuk, pulang, lembur) diterima server; jam = jam tiket server; kotak "Bulan ini" nonaktif "–"; tidak lagi layar kejadian. Pengiriman gagal: pesan galat lama tetap | `35_dampingan.png` |
+| 15 | 75 | SELESAI (keputusan pemilik): daftar "Keperluan absen luar" DIPERTAHANKAN sebagai tampilan nonaktif; diputuskan ulang saat fitur Pengaturan dibangun (absen luar sudah ketik bebas) | `75_dampingan.png` |
+| 16 | 68, 81, 36, 36e, 37, 38, 70, 82 | SELESAI (keputusan pemilik): teks tren "–" berwarna ABU NETRAL (bukan hijau/merah); hijau/merah baru dipakai kelak bila ada naik/turun nyata | `68_dampingan.png`, `81_dampingan.png` |
+| 17 | 36 (bisa dibuka) | DISETUJUI pemilik, tidak diubah | `36_netral_dampingan.png` |
+
+## Keputusan pemilik 2026-10-07 (selisih 11–17, pemutus = pemilik)
+Lihat tabel "Selisih BARU" di atas: nomor 11–17 sudah diputuskan dan diterapkan.
+
+## Selisih BARU yang butuh keputusan pemilik (putaran selisih 11–17)
+
+| No | Layar | Selisih dari mockup | Gambar |
+|---|---|---|---|
+| 18 | 45 | Untuk KARYAWAN aturan memakai kata "PIN", tetapi label kolom masih "Password lama / Password baru / Ulangi password baru" dan judul "Ganti password" seperti mockup (karyawan hanya punya PIN). Tidak diubah; perlu keputusan teks label untuk karyawan | `45_dampingan.png` |
+| 19 | 35 (pop-up nyata) | Mockup 35 hanya punya varian MASUK. Untuk pulang dan lembur luar kerangka 35 dipakai dengan judul "Terima kasih, {nama}!" dan kata kerja dari pop-up lama ("Pulang …", "Lembur …, 1 jam 15 menit"); ikon jempol hijau tetap | `35_dampingan.png` |
+| 20 | pop-up telat luar, 15, 17 | Pop-up telat (merah, ISI ALASAN) dan pop-up 15/17 tetap pop-up lama; layar 35 hanya untuk absen luar yang sudah diterima dan tersimpan | – |
+| 21 | 35 (pop-up nyata) | Pil jam memuat 20 huruf pertama keterangan yang diketik (seperti pop-up lama), padahal mockup memuat nama keperluan | `35_dampingan.png` |

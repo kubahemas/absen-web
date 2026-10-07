@@ -59,13 +59,13 @@ document.querySelectorAll('[data-lb-ke]').forEach(function (b) {
   var dariLb = induk && /^lb\d+$/.test(induk.id) ? induk.id : '';
   (tujuanTerhubung[dariLb] = tujuanTerhubung[dariLb] || []).push(tujuan);
 });
-var DINAMIS = ['lb54', 'lb64', 'lb55', 'lb66', 'lb67', 'lb68', 'lb57']; // menu HP pribadi (dibuat lewat JS) dan sheet karyawan
+var DINAMIS = ['lb54', 'lb64', 'lb55', 'lb66', 'lb67', 'lb68', 'lb57', 'lb35']; // menu HP pribadi (dibuat lewat JS) dan sheet karyawan
 var alur = ['lb03', 'lb08'];                                         // alur wajah HP toko (lewat JS: tombol absen -> 03 -> 08)
 var terjangkau = {}; var antre = [].concat(tujuanTerhubung[''] || [], DINAMIS, alur);
 while (antre.length) { var x = antre.pop(); if (terjangkau[x]) { continue; } terjangkau[x] = true; (tujuanTerhubung[x] || []).forEach(function (y) { antre.push(y); }); }
 var semuaTujuan = Object.keys(terjangkau);
 ok('semua tujuan navigasi (' + semuaTujuan.length + ' layar) ada di markup dan tidak kosong', semuaTujuan.every(function (id) { var e = document.getElementById(id); return !!e && (e.textContent || '').trim().length > 0; }));
-var KEJADIAN = ['35', '36e', '37', '38', '48', '04', '05', '06', '07', '13', '18', '19', '22', '23', '34', '43', '53', '56', '62', '65', '70'];
+var KEJADIAN = ['36e', '37', '38', '48', '04', '05', '06', '07', '13', '18', '19', '22', '23', '34', '43', '53', '56', '62', '65', '70'];
 var bisaDicapai = KEJADIAN.filter(function (n) { return terjangkau['lb' + n]; });
 ok('layar yang muncul karena KEJADIAN (' + KEJADIAN.join(', ') + ') TIDAK bisa dicapai dari navigasi mana pun' + (bisaDicapai.length ? ' -> terjangkau: ' + bisaDicapai.join(',') : ''), bisaDicapai.length === 0);
 var tidakTerjangkau = semuaLb.filter(function (n) { return !terjangkau['lb' + n]; });
@@ -88,4 +88,39 @@ var tren = ['lb68', 'lb81', 'lb36', 'lb36e', 'lb37', 'lb38', 'lb70'].map(functio
 ok('kalimat tren (68, 81, Report 36/36e/37/38, 70) tampil sebagai "-" tanpa panah segitiga, tanpa kata naik/turun dan tanpa angka' + (tren.length ? ' -> ' + tren.join(' | ') : ''), tren.length === 0);
 var l36 = document.getElementById('lb36'), s36 = tk('lb36');
 ok('Report yang bisa dibuka (36): lencana netral nonaktif "Segera", TANPA tulisan/warna EXCELLENT, GOOD, BAD', !/EXCELLENT|GOOD|BAD/.test(s36) && /Segera/.test(s36) && Array.prototype.some.call(l36.querySelectorAll('*'), function (e) { return e.classList.contains('belum-aktif') && e.textContent.trim() === 'Segera'; }));
-ok('Report berwarna penuh ada tetapi tidak bisa dibuka: 36e EXCELLENT, 37 GOOD, 38 BAD', /EXCELLENT/.test(tk('lb36e')) && /GOOD/.test(tk('lb37')) && /BAD/.test(tk('lb38')) && ['lb36e', 'lb37', 'lb38', 'lb35', 'lb48'].every(function (id) { return !!document.getElementById(id) && !terjangkau[id]; }));
+ok('Report berwarna penuh ada tetapi tidak bisa dibuka: 36e EXCELLENT, 37 GOOD, 38 BAD', /EXCELLENT/.test(tk('lb36e')) && /GOOD/.test(tk('lb37')) && /BAD/.test(tk('lb38')) && ['lb36e', 'lb37', 'lb38', 'lb48'].every(function (id) { return !!document.getElementById(id) && !terjangkau[id]; }));
+
+// ---- Keputusan pemilik 2026-10-07 (selisih 11-17) ----
+var STRIP = String.fromCharCode(8211);
+function warnaRgb(e) { var m = /rgb\((\d+), (\d+), (\d+)/.exec(getComputedStyle(e).color) || [0, 0, 0, 0]; return [Number(m[1]), Number(m[2]), Number(m[3])]; }
+function berwarna(e) { var c = warnaRgb(e); return Math.max(c[0], c[1], c[2]) - Math.min(c[0], c[1], c[2]) > 25; }
+// elemen daun "–" harus dihitung saat layar tampil (warna komputasi) -> tampilkan sementara tiap layar
+function stripBerwarna(id) {
+  var e = document.getElementById(id), salah = 0, abu = 0, tampak = !e.classList.contains('aktif');
+  if (tampak) { e.classList.add('aktif'); }
+  Array.prototype.forEach.call(e.querySelectorAll('div, span'), function (d) {
+    if (d.children.length === 0 && d.textContent.trim() === STRIP) { if (berwarna(d)) { salah++; } else if (warnaRgb(d).join() === '90,91,94') { abu++; } }
+  });
+  if (tampak) { e.classList.remove('aktif'); }
+  return { salah: salah, abu: abu };
+}
+var warna = ['lb68', 'lb81', 'lb36', 'lb36e', 'lb37', 'lb38', 'lb70', 'lb82'].map(function (id) {
+  var r = stripBerwarna(id), minimal = (id === 'lb68' || id === 'lb81') ? 6 : (id === 'lb82' ? 0 : 2);
+  return (r.salah > 0 || r.abu < minimal) ? id + ' (berwarna hijau/merah: ' + r.salah + ', abu netral: ' + r.abu + ', minimal ' + minimal + ')' : '';
+}).filter(Boolean);
+ok('teks tren "' + STRIP + '" berwarna ABU NETRAL (bukan hijau/merah) di 68, 81, 36, 36e, 37, 38, 70, 82' + (warna.length ? ' -> ' + warna.join(' | ') : ''), warna.length === 0);
+var telat = ['lb37', 'lb38', 'lb70'].map(function (id) {
+  var e = document.getElementById(id);
+  var ada = Array.prototype.some.call(e.querySelectorAll('div'), function (d) { return d.children.length === 0 && d.textContent.trim() === STRIP && d.classList.contains('belum-aktif'); });
+  return (!ada || /Telat \S+ kali|Tanpa pelanggaran untuk|batas|daftar evaluasi/.test(tk(id))) ? id : '';
+}).filter(Boolean);
+ok('kalimat "Telat N kali. Tanpa pelanggaran untuk ..." kembali sebagai "' + STRIP + '" pudar (tanpa angka, tanpa nama label, tanpa panah) di 37, 38, 70' + (telat.length ? ' -> ' + telat.join(',') : ''), telat.length === 0);
+ok('layar 48 tanpa "Halo,": nama besar Oswald 30 px berisi "' + STRIP + '"', !/Halo/.test(tk('lb48')) && (function () {
+  var e = document.getElementById('lb48'), a = !e.classList.contains('aktif'); if (a) { e.classList.add('aktif'); }
+  var n = Array.prototype.filter.call(e.querySelectorAll('div'), function (d) { return d.children.length === 0 && d.textContent.trim() === STRIP && parseFloat(getComputedStyle(d).fontSize) === 30; });
+  if (a) { e.classList.remove('aktif'); }
+  return n.length === 1 && /Oswald/.test(getComputedStyle(n[0]).fontFamily);
+})());
+ok('layar 45: tanpa "6 angka" dan "123456"; aturan diisi saat dibuka menurut peran (3 baris data-aturan)', !/6 angka|123456/.test(tk('lb45')) && document.querySelectorAll('#lb45 [data-aturan]').length === 3);
+ok('layar 35 DIPAKAI sebagai pop-up absen luar (tidak lagi layar kejadian): dapat dicapai lewat alur absen luar, tanpa angka contoh', !!terjangkau['lb35'] && KEJADIAN.indexOf('35') < 0 && !/\d/.test(tk('lb35').replace(/dalam . detik/, '')));
+ok('layar 75: daftar "Keperluan absen luar" tetap tampil nonaktif', /Keperluan absen luar/.test(tk('lb75')) && Array.prototype.some.call(document.querySelectorAll('#lb75 button'), function (b) { return /Keperluan absen luar/.test(b.textContent) && b.disabled; }));

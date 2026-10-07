@@ -206,3 +206,10 @@ Bukti: `docs/audit/visual/paket_*_app.png` (layar), `uji_alur_*_hasil.png` (alur
 | 2026-10-07 | Kalimat tren 68, 81, Report, 70 | Tampil "–" saja tanpa panah dan tanpa angka; panah hanya bila ada perbedaan nyata | Keputusan pemilik | berlaku |
 | 2026-10-07 | Layar 37, 38, 36e, 35, 48 | Layar tersendiri (tampilan saja), tidak bisa dipicu dari navigasi | Keputusan pemilik "semua tampilan dibuat" | berlaku |
 | 2026-10-07 | Layar Report yang bisa dibuka (36) | Lencana label netral nonaktif ("Segera") sampai label dihitung; warna penuh hanya di 36e/37/38 yang tidak bisa dibuka | Keputusan pemilik | berlaku |
+| 2026-10-07 | Layar 45 (Ganti password) | Aturan sandi gaya lama diganti aturan akun yang berlaku menurut peran: KARYAWAN = PIN tepat 5 angka; ADMIN = kata sandi minimal 8 karakter, maksimal 100, besar/kecil sama | Keputusan pemilik | belum disinkron ke mockup |
+| 2026-10-07 | Layar 36/36e/37/38/70 | Kalimat "Telat N kali. Tanpa pelanggaran untuk …" tampil "–" abu pudar | Keputusan pemilik | berlaku |
+| 2026-10-07 | Layar 48 | "Halo," dihapus; nama besar (Oswald 30 px) berisi "–" | Keputusan pemilik | belum disinkron ke mockup |
+| 2026-10-07 | Pop-up absen luar terkirim (35) | Layar 35 dipakai sebagai pop-up nyata setelah absen luar masuk/pulang/lembur diterima server (data nyata: nama, jam tiket, menunggu ACC; kotak Bulan ini nonaktif) | Keputusan pemilik | berlaku |
+| 2026-10-07 | Layar 75 (Pengaturan) | Daftar "Keperluan absen luar" dipertahankan nonaktif; diputuskan ulang saat Pengaturan dibangun | Keputusan pemilik | berlaku |
+| 2026-10-07 | Teks tren 68, 81, 36, 36e, 37, 38, 70, 82 | "–" berwarna abu netral (bukan hijau/merah) sampai ada naik/turun nyata | Keputusan pemilik | berlaku |
+| 2026-10-07 | Layar 36 yang bisa dibuka | Report netral lencana abu: disetujui | Keputusan pemilik | berlaku |

@@ -130,12 +130,21 @@ async function ke(tombol, id, asal, nama) {
       ok('Akun saya: "Ganti password" AKTIF, "Ganti PIN" tetap nonaktif', !!gp && !gp.disabled && Array.prototype.some.call(el('layarAkun').querySelectorAll('button[disabled]'), function (b) { return /Ganti PIN/.test(b.textContent); }));
       gp.click(); await tunggu(150);
       ok('Ganti password membuka 45', aktif() === 'lb45');
+      var ar = Array.prototype.map.call(el('lb45').querySelectorAll('[data-aturan]'), function (e) { return e.textContent; });
+      ok('45 (KARYAWAN): aturan = PIN tepat 5 angka; tanpa "6 angka" dan "123456"; tombol Simpan nonaktif "Segera"', ar.length === 3 && /PIN tepat 5 angka/.test(ar[0]) && !/6 angka|123456|8 karakter/.test(el('lb45').textContent) && /Simpan/.test(el('lb45').textContent) && Array.prototype.every.call(el('lb45').querySelectorAll('button'), function (b) { return b.disabled || b.hasAttribute('data-lb-kembali'); }));
       tombolKembali().click(); await tunggu(150);
       ok('Back dari 45 kembali ke Akun saya', aktif() === 'layarAkun');
       ok('tidak ada panggilan server baru dari layar baru', panggil.slice(n0).every(function (x) { return /^(pribadi_hari_ini|konfirmasi_jumlah)$/.test(x.aksi); }));
     }
     if (K === 'pribadiadmin') {
       el('btnJenisPribadi').click(); el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12'; el('btnMasukPribadi').click(); await tunggu(900);
+      el('btnMenuPribadi').click(); await tunggu(150);
+      document.querySelector('#menuPribadiIsi [data-menu="akun"]').click(); await tunggu(150);
+      Array.prototype.filter.call(el('layarAkun').querySelectorAll('button'), function (b) { return /Ganti password/.test(b.textContent); })[0].click(); await tunggu(150);
+      var ara = Array.prototype.map.call(el('lb45').querySelectorAll('[data-aturan]'), function (e) { return e.textContent; });
+      ok('45 (ADMIN): aturan = kata sandi minimal 8 karakter, maksimal 100, besar/kecil sama; tanpa "6 angka" dan "123456" -> ' + ara.join(' | '), ara.length === 3 && /minimal 8 karakter/.test(ara[0]) && /100/.test(ara[1]) && /dianggap sama/.test(ara[2]) && !/6 angka|123456/.test(el('lb45').textContent));
+      tombolKembali().click(); await tunggu(150);
+      el('btnAkunHome').click(); await tunggu(150);
       var petaP = { 'Absen manual': 'lb54', 'Data absensi': 'lb64', 'Jadwal shift': 'lb55', 'Input izin': 'lb66', 'Kalender libur': 'lb67', 'Dashboard bulanan': 'lb68' };
       for (var np in petaP) {
         el('btnMenuPribadi').click(); await tunggu(150);

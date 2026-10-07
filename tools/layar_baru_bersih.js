@@ -52,6 +52,13 @@ function hapusSatu(root, marker) {
 }
 function hapusTeks(root, re) { var n = 0; semuaElemen(root).forEach(function (e) { if (e.isConnected && re.test(teksLangsung(e))) { e.remove(); n++; } }); return n; }
 function pudar(root, re) { semuaElemen(root).forEach(function (e) { if (re.test(teksLangsung(e))) { e.classList.add('belum-aktif'); if (e.parentElement && e.parentElement.children.length <= 3 && e.parentElement !== root) { e.parentElement.classList.add('belum-aktif'); } } }); }
+// Teks tren/kalimat pengganti "–": warna abu netral (keputusan pemilik 2026-10-07); bukan hijau/merah.
+function netralkan(e) {
+  var st = e.getAttribute('style') || '';
+  e.style.color = 'var(--abu-teks)';
+  if (/border/.test(st)) { e.style.borderColor = 'var(--abu-teks)'; }
+  if (/background/.test(st)) { e.style.background = 'var(--krem)'; }
+}
 function bersih(nomor, cfg) {
   var root = document.getElementById('x' + nomor);
   var log = [];
@@ -74,7 +81,7 @@ function bersih(nomor, cfg) {
     if (tombolAngka) { return; }
     n.nodeValue = bersihTeks(v, false);
   });
-  (cfg.ganti || []).forEach(function (p) { semuaElemen(root).forEach(function (e) { e.childNodes.forEach(function (n) { if (n.nodeType === 3 && p[0].test(n.nodeValue)) { n.nodeValue = n.nodeValue.replace(p[0], p[1]); } }); }); });
+  (cfg.ganti || []).forEach(function (p) { semuaElemen(root).forEach(function (e) { e.childNodes.forEach(function (n) { if (n.nodeType === 3 && p[0].test(n.nodeValue)) { n.nodeValue = n.nodeValue.replace(p[0], p[1]); if (p[2]) { netralkan(e); } if (p[3]) { e.classList.add('belum-aktif'); } } }); }); });
   if (cfg.fn) { cfg.fn(root, log); }
   if (cfg.pudar) { cfg.pudar.forEach(function (re) { pudar(root, re); }); }
   // kontrol isian

@@ -2,9 +2,10 @@
 // SUMBER: nomor layar app -> berkas mockup (36 memakai mockup 37 GOOD sebagai satu layar Report).
 var SUMBER = { '36': '36', '36e': '36' };
 // Kalimat tren (mockup 36/37/38/68/70/81): tampil di tempat yang sama, isinya hanya "–" (tanpa panah dan tanpa angka). Keputusan pemilik 2026-10-07.
-var TREN = [[/^\s*[▲▼][^]*$/, '–'], [/^\s*sama dengan[^]*$/, '–'], [/^\s*Minggu ke-[^]*$/, '–'], [/^\s*Paling banyak hari[^]*$/, '–']];
+// Elemen ke-3 = 'tren' (warna abu netral, keputusan pemilik 16), ke-4 = 'pudar' (kalimat "Telat N kali ..." nonaktif, keputusan pemilik 12).
+var TREN = [[/^\s*[▲▼][^]*$/, '–', 'tren'], [/^\s*sama dengan[^]*$/, '–', 'tren'], [/^\s*Minggu ke-[^]*$/, '–', 'tren'], [/^\s*Paling banyak hari[^]*$/, '–', 'tren'], [/^\s*Telat \S+ kali[^]*$/, '–', 'tren', 'pudar']];
 // Layar Report: tiga kondisi label. 36 = versi yang bisa dibuka (lencana netral/nonaktif); 36e (EXCELLENT), 37 (GOOD), 38 (BAD) = berwarna penuh, TIDAK bisa dibuka dari navigasi.
-var REPORT = { home: 'prib', hapusTeks: [/^Telat \d+ kali/], hapusBaris: [/^Menunggu$/], ganti: TREN, nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } };
+var REPORT = { home: 'prib', hapusTeks: [], hapusBaris: [/^Menunggu$/], ganti: TREN, nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } };
 var CFG = {
   '02': { home: 'toko', hapusBaris: ['Ahmad', 'Ari'] },
   '03': { home: 'toko', judulMode: true, ganti: [[/Memindai.*/, 'Pengenalan wajah · Segera']] },
@@ -23,7 +24,7 @@ var CFG = {
     Array.prototype.forEach.call(root.querySelectorAll('label'), function (l) { if (/^Keterangan tujuan/.test(l.textContent)) { l.textContent = 'Keterangan tujuan (nama klien atau alamat), wajib minimal 5 karakter'; } });
     Array.prototype.forEach.call(root.querySelectorAll('textarea'), function (a) { a.setAttribute('maxlength', '100'); });
   } },
-  '35': { home: 'prib', fn: function (root) { Array.prototype.forEach.call(root.querySelectorAll('div'), function (d) { if (teksLangsung(d) === 'Bulan ini' && d.parentElement) { d.parentElement.classList.add('belum-aktif'); } }); } },
+  '35': { home: 'prib', fn: function (root) { Array.prototype.forEach.call(root.querySelectorAll('div'), function (d) { if (teksLangsung(d) === 'Bulan ini') { d.classList.add('belum-aktif'); if (d.nextElementSibling) { d.nextElementSibling.classList.add('belum-aktif'); } } }); } },
   // 36 = Report yang BISA dibuka: sumber mockup 36 (latar kuning netral); lencana label diganti "Segera" nonaktif berwarna netral (tanpa EXCELLENT/GOOD/BAD).
   '36': { home: 'prib', hapusTeks: [], hapusBaris: REPORT.hapusBaris, ganti: TREN.concat([[/^EXCELLENT$/, 'Segera']]), pudar: [/^Segera$/, /^Tanpa pelanggaran/], nav: REPORT.nav, fn: function (root) {
     var lencana = Array.prototype.filter.call(root.querySelectorAll('div'), function (d) { return teksLangsung(d) === 'Segera'; })[0];
@@ -31,12 +32,19 @@ var CFG = {
     Array.prototype.forEach.call(root.querySelectorAll('div'), function (d) { if (teksLangsung(d) === String.fromCharCode(8211) && /border-radius: 999px/.test(d.getAttribute('style') || '')) { d.style.borderColor = 'var(--abu-teks)'; d.style.background = 'var(--krem)'; d.style.color = 'var(--abu-teks)'; } });
   } },
   '36e': Object.assign({}, REPORT, { hapusTeks: [] }), '37': REPORT, '38': REPORT,
-  '48': { home: 'prib', ganti: [[/^GOOD$/, 'Segera']], pudar: [/^Segera$/], tanpaSegera: /^Tukar shift$/ },
+  '48': { home: 'prib', ganti: [[/^GOOD$/, 'Segera'], [/^Halo, –$/, '–']], pudar: [/^Segera$/], tanpaSegera: /^Tukar shift$/ },
   '39': { home: 'prib', hapusBaris: ['24 Sep'] },
   '40': { home: 'prib', hapusBaris: ['28 Sep'] },
   '41': { home: 'prib', hapusTeks: [/izin khusus menikah/, /hari cuti/, /^Sisa cuti jadi/] },
   '42': { home: 'prib', hapusSatu: [/Anda →/] },
-  '43': { home: 'prib' }, '45': { home: 'prib', ganti: [[/Password lama \(awal: –\)/, 'Password lama']] },
+  '43': { home: 'prib' }, '45': { home: 'prib', ganti: [[/Password lama \(awal: –\)/, 'Password lama']], fn: function (root) {
+    // Aturan sandi: teks diisi saat layar dibuka menurut peran akun (KARYAWAN = PIN 5 angka; ADMIN = kata sandi minimal 8 karakter). Di markup hanya "–".
+    var re = [/^– angka$/, /^Bukan angka berurutan atau kembar/, /^Bukan – dan tidak sama dengan PIN$/];
+    Array.prototype.forEach.call(root.querySelectorAll('div, span'), function (d) {
+      var t = teksLangsung(d);
+      re.forEach(function (r, i) { if (r.test(t)) { d.setAttribute('data-aturan', String(i + 1)); d.textContent = '–'; } });
+    });
+  } },
   '53': { home: 'adm' }, '54': { home: 'adm' },
   '55': { home: 'adm', hapusSatu: ['Andi Pratama', 'Budi Santoso', 'Dewi Lestari', 'Joko Susilo', 'Rina Wati', 'Sari Utami'] },
   '56': { home: 'adm' },
