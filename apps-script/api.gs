@@ -134,6 +134,7 @@ function doPost(e) {
   if (data.aksi === 'izin_pratinjau') { return prosesIzinPratinjau(data); }
   if (data.aksi === 'izin_ajukan') { return prosesIzinAjukan(data); }
   if (data.aksi === 'izin_batal') { return prosesIzinBatal(data); }
+  if (data.aksi === 'pengajuan_saya') { return prosesPengajuanSaya(data); }
   if (data.aksi === 'izin_unggah_surat') { return prosesIzinUnggahSurat(data); }
   if (data.aksi === 'izin_input') { return prosesIzinInput(data); }
   if (data.aksi === 'izin_input_pratinjau') { return prosesIzinInputPratinjau(data); }
@@ -1819,6 +1820,26 @@ function tesServer() {
     ujiBebas('kode perangkat: absen manual admin = A (id absen M-K003-261005-075200-A)', kodePerangkatDariHp('MANUAL') === 'A' && kodePerangkatDariHp('PRIBADI') === 'P' && kodePerangkatDariHp('HPT-NGW-03') === 'T3');
     ujiBebas('menit lembur dari kolom: "2|75" = 75; kosong atau rusak = 0', menitLemburDariKolom('2|75') === 75 && menitLemburDariKolom('') === 0 && menitLemburDariKolom('abc') === 0);
     ujiBebas('hak Konfirmasi untuk item koreksi: admin Ngawi melihat konflik/lupa karyawan Ngawi (bukan miliknya); owner hanya milik admin', saringItemKonfirmasi(itemKonflik.concat(itemLupa), { role: 'ADMIN', id: 'K009', cabang: 'Ngawi' }, '').length === 3 && saringItemKonfirmasi(itemKonflik.concat(itemLupa), { role: 'OWNER', id: 'OWN01', cabang: '' }, '').length === 0 && saringItemKonfirmasi(itemKonflik, { role: 'ADMIN', id: 'K003', cabang: 'Ngawi' }, '').length === 0);
+  })();
+  // ---- Tahap 1: koreksi absen oleh owner, pengajuan sendiri yang bisa dibatalkan ----
+  (function () {
+    const adm = { role: 'ADMIN', id: 'K009', cabang: 'Ngawi' }, own = { role: 'OWNER', id: 'OWN01', cabang: '' };
+    const kary = { id: 'K003', role: 'KARYAWAN', cabang: 'Ngawi' }, admLain = { id: 'K010', role: 'ADMIN', cabang: 'Pusat' }, karyPusat = { id: 'K050', role: 'KARYAWAN', cabang: 'Pusat' };
+    ujiBebas('absen manual: admin boleh KARYAWAN cabangnya; TIDAK boleh dirinya sendiri, admin lain, atau karyawan cabang lain', bolehTargetKoreksi(adm, kary, 'MANUAL').boleh === true && bolehTargetKoreksi(adm, { id: 'K009', role: 'ADMIN', cabang: 'Ngawi' }, 'MANUAL').boleh === false && bolehTargetKoreksi(adm, admLain, 'MANUAL').boleh === false && bolehTargetKoreksi(adm, karyPusat, 'MANUAL').boleh === false);
+    ujiBebas('absen manual: owner hanya untuk ADMIN (semua cabang); karyawan ditolak', bolehTargetKoreksi(own, admLain, 'MANUAL').boleh === true && bolehTargetKoreksi(own, { id: 'K009', role: 'ADMIN', cabang: 'Ngawi' }, 'MANUAL').boleh === true && bolehTargetKoreksi(own, kary, 'MANUAL').boleh === false);
+    ujiBebas('lihat/foto/edit: owner boleh karyawan DAN admin di semua cabang; admin tetap hanya karyawan cabangnya (bukan miliknya)', bolehTargetKoreksi(own, kary, 'LIHAT').boleh === true && bolehTargetKoreksi(own, admLain, 'LIHAT').boleh === true && bolehTargetKoreksi(adm, kary, 'LIHAT').boleh === true && bolehTargetKoreksi(adm, admLain, 'LIHAT').boleh === false && bolehTargetKoreksi({ role: 'KARYAWAN', id: 'K003' }, kary, 'LIHAT').boleh === false && bolehTargetKoreksi(own, { id: 'X', role: 'OWNER', cabang: '' }, 'LIHAT').boleh === false);
+    const dasE2 = { jenis: 'MASUK', jam: '07:44', alasan: 'Salah catat jam', hariIni: '2026-10-07', tanggal: '2026-10-05', jamServer: '10:00', shift: { nama: 'Shift 1', masuk: '07:45', tutup: '16:00', pulang: '16:30', toleransi: 5 }, baris: { masuk: '07:52', pulang: '16:31', st_masuk: 'TELAT', telat_mnt: 7, st_pulang: 'PULANG NORMAL', lembur: '' }, jendelaMenit: 60, terkunci: true, aktor: { role: 'OWNER', id: 'OWN01' }, pemilik: { id: 'K009', role: 'ADMIN' } };
+    ujiBebas('edit absen owner: boleh mengedit data ADMIN dan bulan terkunci; status dihitung ulang (TELAT jadi HADIR)', rencanaEditAbsenAdmin(dasE2).ok === true && rencanaEditAbsenAdmin(dasE2).ubah.st_masuk === 'HADIR');
+    const izinRows = [
+      { id: 'IZN-2026-0007-A', grup: 'IZN-2026-0007', karyawan: 'K003', jenis: 'Menikah', mulai: '2026-10-12', selesai: '2026-10-13', status: 'MENUNGGU' },
+      { id: 'IZN-2026-0007-B', grup: 'IZN-2026-0007', karyawan: 'K003', jenis: 'Cuti', mulai: '2026-10-14', selesai: '2026-10-14', status: 'MENUNGGU' },
+      { id: 'IZN-2026-0008-A', grup: 'IZN-2026-0008', karyawan: 'K003', jenis: 'TUKAR_SHIFT', mulai: '2026-10-13', selesai: '2026-10-13', status: 'MENUNGGU' },
+      { id: 'IZN-2026-0009-A', grup: 'IZN-2026-0009', karyawan: 'K003', jenis: 'Sakit', mulai: '2026-10-01', selesai: '2026-10-01', status: 'DITERIMA' },
+      { id: 'IZN-2026-0010-A', grup: 'IZN-2026-0010', karyawan: 'K004', jenis: 'Sakit', mulai: '2026-10-08', selesai: '2026-10-08', status: 'MENUNGGU' }
+    ];
+    const saya = rakitPengajuanSaya(izinRows, 'K003');
+    ujiBebas('pengajuan saya: hanya milik sendiri yang MENUNGGU, satu item per grup (izin dua bagian jadi satu), tukar shift ikut dan bertanda tukar', saya.length === 2 && saya[0].grup === 'IZN-2026-0007' && saya[0].rincian === '12–14 Okt' && saya[1].judul === 'Tukar shift' && saya[1].tukar === true && saya[0].tukar === false);
+    ujiBebas('pengajuan saya: yang sudah diputuskan atau milik orang lain tidak muncul', saya.every(function (x) { return x.grup !== 'IZN-2026-0009' && x.grup !== 'IZN-2026-0010'; }) && rakitPengajuanSaya(izinRows, 'K999').length === 0);
   })();
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
@@ -4824,6 +4845,32 @@ function prosesIzinBatal(d) {
   }
 }
 
+/**
+ * Fungsi murni: pengajuan izin/cuti dan ajakan tukar shift MILIK SENDIRI yang masih MENUNGGU (belum diputuskan admin), satu item per grup, terlama dulu.
+ * rows = baris sheet izin (mulai/selesai teks). Kembalian [{ grup, judul, rincian, tukar }].
+ */
+function rakitPengajuanSaya(rows, karyawan) {
+  const peta = {}, urut = [];
+  rows.forEach(function (r) {
+    if (String(r.karyawan) !== String(karyawan) || String(r.status).toUpperCase() !== 'MENUNGGU') { return; }
+    const g = String(r.grup || r.id);
+    if (!peta[g]) { peta[g] = { grup: g, jenis: String(r.jenis), mulai: String(r.mulai), selesai: String(r.selesai), tukar: jenisTukar(r.jenis) }; urut.push(g); }
+    else if (String(r.selesai) > peta[g].selesai) { peta[g].selesai = String(r.selesai); }
+  });
+  return urut.map(function (g) {
+    const p = peta[g];
+    const judul = String(p.jenis).toUpperCase() === 'TUKAR_SHIFT' ? 'Tukar shift' : (String(p.jenis).toUpperCase() === 'PINDAH_SHIFT' ? 'Pindah shift' : p.jenis);
+    return { grup: g, judul: judul, rincian: rentangPendek(p.mulai, p.selesai), tukar: p.tukar };
+  }).sort(function (x, y) { return x.grup < y.grup ? -1 : 1; });
+}
+
+/** Aksi pengajuan_saya { sesi }: daftar pengajuan sendiri yang masih bisa dibatalkan (dibatalkan lewat izin_batal). */
+function prosesPengajuanSaya(d) {
+  const a = aktorIzinPribadi(d);
+  if (a.gagal) { return a.gagal; }
+  return respon({ status: 'ok', daftar: rakitPengajuanSaya(bacaIzinTernormalisasi().data, a.akun.id) });
+}
+
 /** Fungsi murni: jalur folder surat dokter di bawah folder akar + nama berkas. akun = { id, nama, cabang }; hariIni 'yyyy-MM-dd'. */
 function jalurSuratIzin(baris, akun, hariIni) {
   const t = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(baris.mulai));
@@ -6361,27 +6408,55 @@ function bulanTerkunci(bulan) {
   } catch (e) { return false; }
 }
 
-/** Karyawan yang boleh diubah/diisi admin: role KARYAWAN aktif di cabang admin, bukan dirinya. { akun } atau { gagal }. */
-function targetKoreksi(adminAkun, idTarget) {
+/**
+ * Fungsi murni: siapa boleh diisi/diubah absennya? aktor = { role, id, cabang }; t = { id, role, cabang }; mode = 'MANUAL' (isi absen manual) | 'LIHAT' (lihat, foto, edit).
+ * ADMIN: hanya KARYAWAN di cabangnya dan bukan dirinya. OWNER: absen manual hanya untuk ADMIN; lihat dan edit untuk KARYAWAN maupun ADMIN di semua cabang.
+ */
+function bolehTargetKoreksi(aktor, t, mode) {
+  if (!t || (t.role !== 'KARYAWAN' && t.role !== 'ADMIN')) { return { boleh: false, pesan: 'Pilih karyawan yang valid' }; }
+  if (aktor.role === 'OWNER') {
+    if (mode === 'MANUAL' && t.role !== 'ADMIN') { return { boleh: false, pesan: 'Owner hanya mengisi absen manual untuk admin' }; }
+    return { boleh: true };
+  }
+  if (aktor.role !== 'ADMIN') { return { boleh: false, pesan: 'Tidak punya hak' }; }
+  if (String(t.id) === String(aktor.id)) { return { boleh: false, pesan: 'Admin tidak boleh mengubah absennya sendiri. Itu tugas owner.' }; }
+  if (t.role !== 'KARYAWAN') { return { boleh: false, pesan: 'Data admin hanya boleh diubah owner' }; }
+  if (t.cabang !== aktor.cabang) { return { boleh: false, pesan: 'Hanya boleh untuk karyawan di cabang sendiri' }; }
+  return { boleh: true };
+}
+
+/** Kredensial koreksi absen: OWNER (sesi owner) atau ADMIN (token HP toko + sesi admin, atau sesi admin HP pribadi). Balasan: { s: { akun: { id, nama, cabang, role } } } atau { gagal }. */
+function autentikasiKoreksi(d) {
+  if (!d.token) {
+    const o = validasiSesi(d.sesi, 'OWNER');
+    if (o) { return { s: { akun: { id: o.akun.id, nama: o.akun.nama, cabang: '', role: 'OWNER' } } }; }
+  }
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a; }
+  return { s: { akun: { id: a.s.akun.id, nama: a.s.akun.nama, cabang: a.s.akun.cabang, role: 'ADMIN' } } };
+}
+
+/** Target koreksi dari sheet: { akun } atau { gagal }. */
+function targetKoreksi(aktor, idTarget, mode) {
   const t = akunLengkapAktif(idTarget);
-  if (!t || t.role !== 'KARYAWAN') { return { gagal: respon({ status: 'gagal', pesan: 'Pilih karyawan yang valid' }) }; }
-  if (String(t.id) === String(adminAkun.id)) { return { gagal: respon({ status: 'gagal', pesan: 'Admin tidak boleh mengubah absennya sendiri. Itu tugas owner.' }) }; }
-  if (t.cabang !== adminAkun.cabang) { return { gagal: respon({ status: 'gagal', pesan: 'Hanya boleh untuk karyawan di cabang sendiri' }) }; }
+  const h = bolehTargetKoreksi(aktor, t, mode || 'LIHAT');
+  if (!h.boleh) { return { gagal: respon({ status: 'gagal', pesan: h.pesan }) }; }
   return { akun: t };
 }
 
 /** Aksi absen_manual_info { kredensial admin }: karyawan cabang, alasan, hari ini dan jam server. */
 function prosesAbsenManualInfo(d) {
-  const a = autentikasiAdminToko(d);
+  const a = autentikasiKoreksi(d);
   if (a.gagal) { return a.gagal; }
-  const daftar = bacaSheet('akun').data.filter(function (r) { return r.aktif === true && r.role === 'KARYAWAN' && r.cabang === a.s.akun.cabang; })
-    .map(function (r) { return { id: String(r.id), nama: String(r.nama), panggilan: String(r.panggilan || r.nama) }; })
+  const owner = a.s.akun.role === 'OWNER';
+  const daftar = bacaSheet('akun').data.filter(function (r) { return r.aktif === true && (owner ? r.role === 'ADMIN' : (r.role === 'KARYAWAN' && r.cabang === a.s.akun.cabang)); })
+    .map(function (r) { return { id: String(r.id), nama: String(r.nama), panggilan: String(r.panggilan || r.nama), cabang: String(r.cabang) }; })
     .sort(function (x, y) { return x.nama.toLowerCase() < y.nama.toLowerCase() ? -1 : 1; });
   return respon({ status: 'ok', hari_ini: hariIniServer(), jam: Utilities.formatDate(new Date(), ZONA_ABSEN, 'HH:mm'), karyawan: daftar, alasan: ALASAN_ABSEN_MANUAL });
 }
 
 function rencanaManualDariData(admin, d) {
-  const t = targetKoreksi(admin, d.karyawan);
+  const t = targetKoreksi(admin, d.karyawan, 'MANUAL');
   if (t.gagal) { return { gagal: t.gagal }; }
   const tanggal = String(d.tanggal || '');
   const cari = tanggalIzinSah(tanggal) ? cariBarisAbsensiTampil(String(t.akun.id), tanggal) : null;
@@ -6397,7 +6472,7 @@ function rencanaManualDariData(admin, d) {
 
 /** Aksi absen_manual_pratinjau { karyawan, tanggal, jam, jenis, kredensial admin }: teks "Status: ..." tanpa menyimpan. */
 function prosesAbsenManualPratinjau(d) {
-  const a = autentikasiAdminToko(d);
+  const a = autentikasiKoreksi(d);
   if (a.gagal) { return a.gagal; }
   const x = rencanaManualDariData(a.s.akun, d);
   if (x.gagal) { return respon({ status: 'ok', bisa: false, pesan: 'Pilih karyawan' }); }
@@ -6415,7 +6490,7 @@ function msDariTanggalJam(tanggal, jam) {
  * Pencocokan wajah DILEWATI (belum ada fitur wajah): dicatat di log "wajah belum diverifikasi". Foto menyusul lewat absensi_unggah_foto.
  */
 function prosesAbsenManual(d) {
-  const a = autentikasiAdminToko(d);
+  const a = autentikasiKoreksi(d);
   if (a.gagal) { return a.gagal; }
   const admin = a.s.akun;
   const alasan = String(d.alasan || '');
@@ -6459,7 +6534,7 @@ function prosesAbsenManual(d) {
  * Foto lama TIDAK dihapus dari Drive dan tidak tampil di aplikasi; tautannya dicatat di log. Struktur folder sama dengan foto absen biasa.
  */
 function prosesAbsensiUnggahFoto(d) {
-  const a = autentikasiAdminToko(d);
+  const a = autentikasiKoreksi(d);
   if (a.gagal) { return a.gagal; }
   const t = targetKoreksi(a.s.akun, d.karyawan);
   if (t.gagal) { return t.gagal; }
@@ -6505,23 +6580,30 @@ function prosesAbsensiUnggahFoto(d) {
 
 /** Aksi absensi_daftar { rentang: HARI | PEKAN | BULAN, karyawan?, offset?, kredensial admin }: absensi cabang admin, terbaru di atas, 30 baris per muatan. */
 function prosesAbsensiDaftar(d) {
-  const a = autentikasiAdminToko(d);
+  const a = autentikasiKoreksi(d);
   if (a.gagal) { return a.gagal; }
-  const cabang = a.s.akun.cabang;
+  const owner = a.s.akun.role === 'OWNER';
+  const cabang = owner ? String(d.cabang || '').slice(0, 60) : a.s.akun.cabang; // owner: kosong = semua cabang
   const hariIni = hariIniServer();
   let dari = seninDariTanggal(hariIni), sampai = geserTanggal(dari, 6);
   if (d.rentang === 'HARI') { dari = hariIni; sampai = hariIni; }
   else if (d.rentang === 'BULAN') { dari = hariIni.slice(0, 8) + '01'; sampai = hariIni; }
   const rows = bacaAbsensiTampilTerbaru(2500);
   const h = saringDaftarAbsensi(rows, { dari: dari, sampai: sampai, karyawan: d.karyawan ? String(d.karyawan) : '', cabang: cabang, offset: d.offset, ukuran: 30 }, hariIni);
-  const kar = bacaSheet('akun').data.filter(function (r) { return r.aktif === true && r.role === 'KARYAWAN' && r.cabang === cabang; })
+  const kar = bacaSheet('akun').data.filter(function (r) { return r.aktif === true && (owner ? ((r.role === 'KARYAWAN' || r.role === 'ADMIN') && (!cabang || r.cabang === cabang)) : (r.role === 'KARYAWAN' && r.cabang === cabang)); })
     .map(function (r) { return { id: String(r.id), nama: String(r.nama) }; }).sort(function (x, y) { return x.nama.toLowerCase() < y.nama.toLowerCase() ? -1 : 1; });
-  return respon({ status: 'ok', cabang: cabang, dari: dari, sampai: sampai, hari_ini: hariIni, daftar: h.daftar, total: h.total, ada_lagi: h.ada_lagi, karyawan: kar });
+  let daftarCabang;
+  if (owner) {
+    daftarCabang = [];
+    bacaSemuaShift().forEach(function (x) { if (daftarCabang.indexOf(x.cabang) === -1) { daftarCabang.push(x.cabang); } });
+    bacaSheet('pengaturan').data.forEach(function (r) { if (r.kategori === 'CABANG' && daftarCabang.indexOf(String(r.nama)) === -1) { daftarCabang.push(String(r.nama)); } });
+  }
+  return respon({ status: 'ok', cabang: cabang, daftar_cabang: daftarCabang, dari: dari, sampai: sampai, hari_ini: hariIni, daftar: h.daftar, total: h.total, ada_lagi: h.ada_lagi, karyawan: kar });
 }
 
 /** Aksi absensi_edit_info { karyawan, tanggal, kredensial admin }: isi layar Edit absen. */
 function prosesAbsensiEditInfo(d) {
-  const a = autentikasiAdminToko(d);
+  const a = autentikasiKoreksi(d);
   if (a.gagal) { return a.gagal; }
   const t = targetKoreksi(a.s.akun, d.karyawan);
   if (t.gagal) { return t.gagal; }
@@ -6539,12 +6621,12 @@ function prosesAbsensiEditInfo(d) {
 
 /** Aksi absensi_edit { karyawan, tanggal, jenis: MASUK | PULANG, jam, alasan (min. 5), kredensial admin }: status dihitung ulang, log EDIT_ABSEN berisi sebelum/sesudah dan alasan. */
 function prosesAbsensiEdit(d) {
-  const a = autentikasiAdminToko(d);
+  const a = autentikasiKoreksi(d);
   if (a.gagal) { return a.gagal; }
   const admin = a.s.akun;
   const t = akunLengkapAktif(d.karyawan);
   if (!t || (t.role !== 'KARYAWAN' && t.role !== 'ADMIN')) { return respon({ status: 'gagal', pesan: 'Pilih karyawan yang valid' }); }
-  if (t.cabang !== admin.cabang) { return respon({ status: 'gagal', pesan: 'Hanya boleh untuk karyawan di cabang sendiri' }); }
+  if (admin.role !== 'OWNER' && t.cabang !== admin.cabang) { return respon({ status: 'gagal', pesan: 'Hanya boleh untuk karyawan di cabang sendiri' }); }
   if (!tanggalIzinSah(d.tanggal)) { return respon({ status: 'gagal', pesan: 'Tanggal tidak valid' }); }
   const kunci = LockService.getScriptLock();
   kunci.waitLock(15000);
@@ -6558,7 +6640,7 @@ function prosesAbsensiEdit(d) {
     const r = rencanaEditAbsenAdmin({
       jenis: String(d.jenis || ''), jam: String(d.jam || ''), alasan: d.pratinjau === true ? 'pratinjau' : d.alasan, hariIni: Utilities.formatDate(sekarang, ZONA_ABSEN, 'yyyy-MM-dd'), tanggal: String(d.tanggal), jamServer: Utilities.formatDate(sekarang, ZONA_ABSEN, 'HH:mm'),
       shift: shift, baris: { masuk: b.masuk_teks, pulang: b.pulang_teks, st_masuk: String(b.st_masuk), telat_mnt: Number(b.telat_mnt) || 0, st_pulang: String(b.st_pulang), lembur: String(b.lembur) },
-      jendelaMenit: ambilNilaiUmum('jendela_absen_menit', 60), terkunci: bulanTerkunci(String(d.tanggal).slice(0, 7)), aktor: { role: 'ADMIN', id: admin.id }, pemilik: { id: t.id, role: t.role }
+      jendelaMenit: ambilNilaiUmum('jendela_absen_menit', 60), terkunci: bulanTerkunci(String(d.tanggal).slice(0, 7)), aktor: { role: admin.role, id: admin.id }, pemilik: { id: t.id, role: t.role }
     });
     if (d.pratinjau === true) { return respon(r.ok ? { status: 'ok', bisa: true, sebelum: r.sebelum, sesudah: r.sesudah } : { status: 'ok', bisa: false, pesan: r.pesan }); }
     if (!r.ok) { return respon({ status: 'gagal', pesan: r.pesan }); }
@@ -6743,7 +6825,7 @@ function belumPulangKemarin(karyawan, hariIni) {
 
 /** Aksi absensi_foto { karyawan, tanggal, jenis: MASUK | PULANG, kredensial admin }: foto satu absen untuk layar Edit absen (tidak publik; hanya untuk karyawan cabang admin, bukan miliknya). */
 function prosesAbsensiFoto(d) {
-  const a = autentikasiAdminToko(d);
+  const a = autentikasiKoreksi(d);
   if (a.gagal) { return a.gagal; }
   const t = targetKoreksi(a.s.akun, d.karyawan);
   if (t.gagal) { return t.gagal; }

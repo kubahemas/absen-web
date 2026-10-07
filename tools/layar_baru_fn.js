@@ -189,6 +189,10 @@ var FN = {
     if (grid && grid.nextElementSibling) { tandai(grid.nextElementSibling.firstElementChild, 'daftar'); }
     tandai(cari(root, /^Ketuk pensil/), 'petunjuk');
   },
+  '25': function (root) {
+    FN['64'](root);
+    tandai(root.querySelector('select[aria-label="Cabang"]'), 'cabang');
+  },
   '65': function (root) {
     var j = cari(root, 'Edit absen'); if (j && j.nextElementSibling) { tandai(j.nextElementSibling, 'sub'); }
     tandai(cari(root, 'Masuk', 'button'), 'tabMasuk');

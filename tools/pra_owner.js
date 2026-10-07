@@ -54,3 +54,12 @@ window.fetch = function (url, opsi) {
     return f0(url, opsi);
   };
 })();
+// Layar 25 (Data absensi owner) memanggil absensi_daftar: balasan kosong supaya tes lama tidak terganggu.
+(function () {
+  var f0 = window.fetch;
+  window.fetch = function (url, opsi) {
+    var b = {}; try { b = JSON.parse(opsi.body); } catch (e) {}
+    if (b.aksi === 'absensi_daftar') { var d = { status: 'ok', cabang: '', daftar_cabang: ['Ngawi', 'Pusat'], dari: '', sampai: '', hari_ini: '2026-09-28', total: 0, ada_lagi: false, karyawan: [], daftar: [] }; return Promise.resolve({ json: function () { return Promise.resolve(d); } }); }
+    return f0(url, opsi);
+  };
+})();

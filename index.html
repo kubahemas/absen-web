@@ -345,6 +345,10 @@
   .pb-strip { background: var(--abu); border-radius: 18px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; color: var(--putih); }
   .pb-strip .a { font-size: 14px; font-weight: 700; }
   .pb-strip .segera { color: var(--kuning); font-size: 12px; }
+  .pb-batal { align-self: flex-start; min-height: 40px; padding: 0 16px; border: 2px solid var(--abu); border-radius: 14px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 800; color: var(--hitam); white-space: nowrap; }
+  .baris-batal { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--krem-gelap); font-size: 14px; text-align: left; }
+  .baris-batal span { font-size: 12px; color: var(--abu-teks); }
+  .baris-batal button { flex: 0 0 auto; width: auto; min-height: 38px; padding: 0 14px; white-space: nowrap; }
   .pb-offline { display: flex; align-items: center; justify-content: space-between; background: var(--abu); color: var(--putih); border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700; }
   .pb-offline .kiri { display: flex; align-items: center; gap: 8px; }
   .pb-offline .titik { width: 8px; height: 8px; border-radius: 50%; background: var(--kuning); }
@@ -895,6 +899,7 @@
       </div>
       <button type="button" class="btn-konf-kartu" id="btnPribMenuAdmin" style="display:none"><div class="k"><div class="t">Konfirmasi data karyawan</div><div class="s">Absen luar, lembur, pulang cepat milik karyawan</div></div><div class="jml" id="pribMenuAdminJumlah"></div></button>
       <div class="pb-strip belum-aktif" id="pribStrip" aria-disabled="true"><div class="a" id="pribStripTeks">Pengajuan menunggu ACC</div><div class="segera" id="pribStripLihat">Segera</div></div>
+      <button type="button" class="pb-batal" id="btnPribBatal" style="display:none">Batalkan pengajuan</button>
       <div style="flex-grow:1"></div>
       <div class="catatan-kecil" id="pribPesan" style="color:var(--merah);text-align:center"></div>
       <div class="pb-catatan">Absen di HP ini perlu ACC admin.</div>
@@ -1137,7 +1142,7 @@
 <div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb25" class="layar" data-lb-home="own">
-<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 14px; "><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--hitam); color: var(--kuning); font-size: 12px; font-weight: 800">Owner</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Data absensi</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Urut terbaru di atas</div></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Cabang</div><select aria-label="Cabang" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" class="belum-aktif" disabled=""><option class="belum-aktif">Semua cabang</option></select></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb25_ft" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal</label><select id="lb25_ft" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" class="belum-aktif" disabled=""><option class="belum-aktif">Pekan ini</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb25_fk" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb25_fk" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" class="belum-aktif" disabled=""><option class="belum-aktif">Semua</option></select></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 0px"><div style="box-sizing: content-box; display: flex; flex-direction: column"></div></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Ketuk pensil untuk koreksi.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="home">Home</button></div></div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 14px; "><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--hitam); color: var(--kuning); font-size: 12px; font-weight: 800">Owner</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Data absensi</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Urut terbaru di atas</div></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Cabang</div><select aria-label="Cabang" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="cabang" class="belum-aktif" disabled=""><option class="belum-aktif">Semua cabang</option></select></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb25_ft" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal</label><select id="lb25_ft" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="ft" class="belum-aktif" disabled=""><option class="belum-aktif">Pekan ini</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb25_fk" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb25_fk" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="fk" class="belum-aktif" disabled=""><option class="belum-aktif">Semua</option></select></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 0px"><div style="box-sizing: content-box; display: flex; flex-direction: column" data-f="daftar"></div></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600" data-f="petunjuk">Ketuk pensil untuk koreksi.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="home">Home</button></div></div>
 </div>
 <div id="lb34" class="layar" data-lb-home="prib">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px">
@@ -3665,6 +3670,7 @@
       const lihat = document.getElementById('pribStripLihat');
       lihat.textContent = 'Lihat'; lihat.classList.remove('segera'); lihat.style.opacity = '.55'; lihat.style.fontWeight = '700';
       document.getElementById('pribStrip').classList.toggle('belum-aktif', d.izin_menunggu === 0);
+      document.getElementById('btnPribBatal').style.display = d.izin_menunggu > 0 ? '' : 'none';
     }
     document.getElementById('subPribMasuk').textContent = d.sudah_masuk ? 'Sudah masuk ' + d.jam_masuk : 'Absen luar';
     document.getElementById('subPribPulang').textContent = d.sudah_pulang ? 'Sudah pulang ' + d.jam_pulang + ' · ketuk untuk lembur' : (d.sudah_masuk ? 'Absen luar' : 'Belum absen masuk');
@@ -5466,11 +5472,22 @@
   function gagalSesiLb(d) {
     if (!d) { return false; }
     if (modeKonf) { return konfGagalSesi(d); }
+    if (ownerKonteksLb) { return ownerGagalSesi(d); }
     if (d.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return true; }
     if (d.kode === 'SESI_TIDAK_VALID') { if (sesiAdmin) { keluarAdmin(); } else { sesiPribadiHabis(d.pesan); } return true; }
     return false;
   }
   function kredKoreksi() { return modeKonf ? kredKonf() : kredAdminLb(); }
+  // Konteks owner (layar 25 dan layar yang dibuka darinya, atau Konfirmasi owner): kredensial = sesi owner; selain itu admin.
+  let ownerKonteksLb = false;
+  function ownerLb() { return modeKonf === 'OWNER' || ownerKonteksLb; }
+  function kredKor() { return ownerKonteksLb && modeKonf !== 'OWNER' ? { sesi: sesiOwner } : kredKoreksi(); }
+  function isiBadgeKor(id) {
+    const blok = document.getElementById(id);
+    blok.setAttribute('data-lb-home', ownerLb() ? 'own' : 'adm');
+    if (!ownerLb()) { isiBadgeAdminLb(id); return; }
+    Array.prototype.forEach.call(blok.querySelectorAll('div'), function (e) { if (e.children.length === 0 && /^(Admin|Owner)/.test(e.textContent.trim()) && /border-radius: 999px/.test(e.getAttribute('style') || '')) { e.textContent = 'Owner'; } });
+  }
   const HARI_KLIEN = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
   function tglPendekKlien(t) { const p = String(t).split('-').map(Number); return p[2] + ' ' + BLN_PENDEK[p[1] - 1]; }
   function hariTglKlien(t) { const p = String(t).split('-').map(Number); return HARI_KLIEN[new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay()] + ', ' + p[2] + ' ' + BLN_PENDEK[p[1] - 1]; }
@@ -5600,9 +5617,7 @@
       '<div class="konf-baris"><div class="konf-isi"><div class="konf-tipe">' + escHtml(it.judul) + '</div><div class="konf-nama">' + escHtml(it.nama) + '</div>' +
       '<div class="konf-detail">' + escHtml(detail.join(', ')) + '</div></div></div>' +
       (lupa ? '<div class="konf-menunggu">Menunggu ' + escHtml(it.menunggu_hari) + ' hari</div>' : '') +
-      (lupa && modeKonf === 'OWNER'
-        ? '<button type="button" class="konf-isi-jam" disabled aria-disabled="true">Isi jam (absen manual)<span class="segera" style="margin-left:6px">Segera</span></button></div>'
-        : '<button type="button" class="konf-isi-jam" data-konf="' + (lupa ? 'isijam' : 'konflik') + '">' + (lupa ? 'Isi jam (absen manual)' : 'Lihat detail') + '</button></div>');
+      '<button type="button" class="konf-isi-jam" data-konf="' + (lupa ? 'isijam' : 'konflik') + '">' + (lupa ? 'Isi jam (absen manual)' : 'Lihat detail') + '</button></div>';
   }
   function sesudahKoreksiKonf() {
     kembaliLb('kembali');
@@ -5745,15 +5760,16 @@
   }
   SIAP_LB.lb54 = function () {
     const L = 'lb54';
-    isiBadgeAdminLb(L);
+    if (modeKonf !== 'OWNER') { ownerKonteksLb = false; }
+    isiBadgeKor(L);
     man.info = null;
-    kirimPost(Object.assign({ aksi: 'absen_manual_info' }, kredAdminLb()))
+    kirimPost(Object.assign({ aksi: 'absen_manual_info' }, kredKor()))
       .then(function (d) {
         if (gagalSesiLb(d)) { return; }
         if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.', function () { kembaliLb('kembali'); }); return; }
         man.info = d;
         const kar = lbF(L, 'karyawan'), tgl = lbF(L, 'tanggal'), jam = lbF(L, 'jam');
-        kar.innerHTML = '<option value="">Pilih karyawan</option>' + d.karyawan.map(function (k) { return '<option value="' + escHtml(k.id) + '">' + escHtml(k.nama) + '</option>'; }).join('');
+        kar.innerHTML = '<option value="">Pilih karyawan</option>' + d.karyawan.map(function (k) { return '<option value="' + escHtml(k.id) + '">' + escHtml(ownerLb() ? k.nama + ' · ' + k.cabang : k.nama) + '</option>'; }).join('');
         ['a0', 'a1', 'a2', 'a3'].forEach(function (k, i) { lbF(L, k).textContent = d.alasan[i]; });
         tgl.type = 'date'; tgl.max = d.hari_ini; tgl.min = geserTanggalKlien(d.hari_ini, -31);
         jam.type = 'time';
@@ -5780,11 +5796,11 @@
     const L = 'lb54';
     const isi = { karyawan: lbF(L, 'karyawan').value, tanggal: lbF(L, 'tanggal').value, jam: lbF(L, 'jam').value, jenis: man.jenis, alasan: man.alasan };
     man.mengirim = true; gambarManual();
-    kirimPost(Object.assign({ aksi: 'absen_manual' }, isi, kredAdminLb()))
+    kirimPost(Object.assign({ aksi: 'absen_manual' }, isi, kredKor()))
       .then(function (d) {
         if (gagalSesiLb(d)) { man.mengirim = false; return; }
         if (d.status !== 'ok') { man.mengirim = false; gambarManual(); infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return; }
-        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: isi.karyawan, tanggal: isi.tanggal, jenis: isi.jenis, gambar: man.foto }, kredAdminLb()))
+        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: isi.karyawan, tanggal: isi.tanggal, jenis: isi.jenis, gambar: man.foto }, kredKor()))
           .then(function (f) { return f; }, function () { return { status: 'gagal' }; })
           .then(function (f) {
             man.mengirim = false;
@@ -5796,9 +5812,9 @@
       .catch(function () { man.mengirim = false; gambarManual(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
   });
 
-  // ---------- Layar 64: data absensi ----------
+  // ---------- Layar 64 (admin) dan 25 (owner): data absensi ----------
   const IKON_PENSIL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>';
-  const abs64 = { rows: [], total: 0, adaLagi: false, memuat: false, karyawanDiisi: false };
+  const ABS = { lb64: { rows: [], adaLagi: false, memuat: false, karyawanDiisi: false }, lb25: { rows: [], adaLagi: false, memuat: false, karyawanDiisi: false, cabangDiisi: false } };
   function barisAbsensiHtml(r) {
     const chips = r.tanda.map(function (t) {
       const merah = t === 'TELAT' || t === 'LUPA PULANG' || t === 'LUPA MASUK';
@@ -5809,50 +5825,64 @@
       '<div style="font-size:12px;color:var(--abu-tua);display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + escHtml(tglPendekKlien(r.tanggal)) + ' · masuk ' + escHtml(r.masuk || '—') + ' · pulang ' + escHtml(r.pulang || '—') + ' ' + chips + '</div></div>' +
       '<button type="button" aria-label="Edit absen ' + escHtml(r.nama) + '" data-edit="' + escHtml(r.karyawan + '|' + r.tanggal) + '" style="width:44px;height:44px;border:2px solid var(--hitam);border-radius:12px;background:var(--putih);display:flex;align-items:center;justify-content:center">' + IKON_PENSIL + '</button></div>';
   }
-  function muatAbsensi64(dariAwal) {
-    if (abs64.memuat) { return; }
-    const L = 'lb64', daftar = lbF(L, 'daftar');
-    if (dariAwal) { abs64.rows = []; abs64.adaLagi = false; daftar.innerHTML = ''; }
-    abs64.memuat = true;
-    kirimPost(Object.assign({ aksi: 'absensi_daftar', rentang: lbF(L, 'ft').value || 'PEKAN', karyawan: lbF(L, 'fk').value, offset: abs64.rows.length }, kredAdminLb()))
+  function muatAbsensi(L, dariAwal) {
+    const S = ABS[L];
+    if (S.memuat) { return; }
+    const daftar = lbF(L, 'daftar');
+    if (dariAwal) { S.rows = []; S.adaLagi = false; daftar.innerHTML = ''; }
+    S.memuat = true;
+    const isi = { aksi: 'absensi_daftar', rentang: lbF(L, 'ft').value || 'PEKAN', karyawan: lbF(L, 'fk').value, offset: S.rows.length };
+    if (L === 'lb25') { isi.cabang = lbF(L, 'cabang').value; }
+    kirimPost(Object.assign(isi, kredKor()))
       .then(function (d) {
-        abs64.memuat = false;
+        S.memuat = false;
         if (gagalSesiLb(d)) { return; }
         if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.'); return; }
-        if (!abs64.karyawanDiisi) {
+        if (!S.karyawanDiisi) {
           lbF(L, 'fk').innerHTML = '<option value="">Semua</option>' + d.karyawan.map(function (k) { return '<option value="' + escHtml(k.id) + '">' + escHtml(k.nama) + '</option>'; }).join('');
-          abs64.karyawanDiisi = true;
+          S.karyawanDiisi = true;
         }
-        d.daftar.forEach(function (r) { abs64.rows.push(r); });
-        abs64.adaLagi = d.ada_lagi; abs64.total = d.total;
+        if (L === 'lb25' && !S.cabangDiisi && d.daftar_cabang) {
+          lbF(L, 'cabang').innerHTML = '<option value="">Semua cabang</option>' + d.daftar_cabang.map(function (c) { return '<option value="' + escHtml(c) + '">' + escHtml(c) + '</option>'; }).join('');
+          S.cabangDiisi = true;
+        }
+        d.daftar.forEach(function (r) { S.rows.push(r); });
+        S.adaLagi = d.ada_lagi;
         daftar.insertAdjacentHTML('beforeend', d.daftar.map(barisAbsensiHtml).join(''));
-        if (!abs64.rows.length) { daftar.innerHTML = '<div class="hp-ket">Belum ada absen pada rentang ini.</div>'; }
+        if (!S.rows.length) { daftar.innerHTML = '<div class="hp-ket">Belum ada absen pada rentang ini.</div>'; }
       })
-      .catch(function () { abs64.memuat = false; infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+      .catch(function () { S.memuat = false; infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
   }
-  SIAP_LB.lb64 = function () {
-    const L = 'lb64';
-    isiBadgeAdminLb(L);
-    abs64.karyawanDiisi = false;
+  function siapAbsensi(L) {
+    const S = ABS[L];
+    ownerKonteksLb = L === 'lb25';
+    isiBadgeKor(L);
+    S.karyawanDiisi = false;
     const ft = lbF(L, 'ft'), fk = lbF(L, 'fk');
     ft.innerHTML = '<option value="PEKAN">Pekan ini</option><option value="HARI">Hari ini</option><option value="BULAN">Bulan ini</option>';
     fk.innerHTML = '<option value="">Semua</option>';
     hidupkanEl(ft); hidupkanEl(fk);
-    muatAbsensi64(true);
-  };
-  lbF('lb64', 'ft').addEventListener('change', function () { muatAbsensi64(true); });
-  lbF('lb64', 'fk').addEventListener('change', function () { muatAbsensi64(true); });
-  lbF('lb64', 'daftar').addEventListener('click', function (e) {
-    const b = e.target.closest('button[data-edit]');
-    if (!b) { return; }
-    const p = b.getAttribute('data-edit').split('|');
-    bukaEditAbsen(p[0], p[1]);
-  });
-  (function () {
-    let wadah = lbF('lb64', 'daftar');
+    if (L === 'lb25') { S.cabangDiisi = false; lbF(L, 'cabang').innerHTML = '<option value="">Semua cabang</option>'; hidupkanEl(lbF(L, 'cabang')); }
+    muatAbsensi(L, true);
+  }
+  ['lb64', 'lb25'].forEach(function (L) {
+    SIAP_LB[L] = function () { siapAbsensi(L); };
+    lbF(L, 'ft').addEventListener('change', function () { muatAbsensi(L, true); });
+    lbF(L, 'fk').addEventListener('change', function () { muatAbsensi(L, true); });
+    lbF(L, 'daftar').addEventListener('click', function (e) {
+      const b = e.target.closest('button[data-edit]');
+      if (!b) { return; }
+      const p = b.getAttribute('data-edit').split('|');
+      bukaEditAbsen(p[0], p[1]);
+    });
+    let wadah = lbF(L, 'daftar');
     while (wadah && !/overflow-y/.test(wadah.getAttribute('style') || '')) { wadah = wadah.parentElement; }
-    if (wadah) { wadah.addEventListener('scroll', function () { if (abs64.adaLagi && !abs64.memuat && wadah.scrollTop + wadah.clientHeight >= wadah.scrollHeight - 120) { muatAbsensi64(false); } }); }
-  })();
+    if (wadah) { wadah.addEventListener('scroll', function () { const S = ABS[L]; if (S.adaLagi && !S.memuat && wadah.scrollTop + wadah.clientHeight >= wadah.scrollHeight - 120) { muatAbsensi(L, false); } }); }
+  });
+  lbF('lb25', 'cabang').addEventListener('change', function () { ABS.lb25.karyawanDiisi = false; lbF('lb25', 'fk').innerHTML = '<option value="">Semua</option>'; muatAbsensi('lb25', true); });
+  function segarkanAbsensiAktif() {
+    ['lb64', 'lb25'].forEach(function (L) { if (document.getElementById(L).classList.contains('aktif')) { muatAbsensi(L, true); } });
+  }
 
   // ---------- Layar 65: edit absen ----------
   const ed = { karyawan: '', tanggal: '', info: null, jenis: 'MASUK', foto: '', minta: 0, mengirim: false, pratinjau: null };
@@ -5880,7 +5910,7 @@
     ed.pratinjau = null;
     if (!/^\d{2}:\d{2}$/.test(jam)) { gambarEdit(); return; }
     rg.textContent = 'Memuat...';
-    kirimPost(Object.assign({ aksi: 'absensi_edit_pratinjau', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, jam: jam }, kredAdminLb()))
+    kirimPost(Object.assign({ aksi: 'absensi_edit_pratinjau', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, jam: jam }, kredKor()))
       .then(function (d) {
         if (minta !== ed.minta || gagalSesiLb(d)) { return; }
         if (d.status === 'ok' && d.bisa) { ed.pratinjau = d; gambarEdit(); }
@@ -5892,7 +5922,7 @@
     const L = 'lb65', foto = lbF(L, 'foto'), kotak = foto.parentElement;
     ed.foto = '';
     kotak.style.backgroundImage = ''; foto.textContent = '[Memuat foto...]';
-    kirimPost(Object.assign({ aksi: 'absensi_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis }, kredAdminLb()))
+    kirimPost(Object.assign({ aksi: 'absensi_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis }, kredKor()))
       .then(function (d) {
         if (gagalSesiLb(d)) { return; }
         if (d && d.status === 'ok' && d.foto && /^data:image\/jpeg;base64,/.test(d.foto)) { foto.textContent = ''; kotak.style.backgroundImage = 'url(' + d.foto + ')'; kotak.style.backgroundSize = 'cover'; kotak.style.backgroundPosition = 'center'; }
@@ -5902,10 +5932,10 @@
   }
   SIAP_LB.lb65 = function () {
     const L = 'lb65';
-    isiBadgeAdminLb(L);
+    isiBadgeKor(L);
     ed.info = null; ed.jenis = 'MASUK'; ed.foto = ''; ed.pratinjau = null; ed.mengirim = false;
     lbF(L, 'jam').removeAttribute('data-tab'); lbF(L, 'alasan').value = '';
-    kirimPost(Object.assign({ aksi: 'absensi_edit_info', karyawan: ed.karyawan, tanggal: ed.tanggal }, kredAdminLb()))
+    kirimPost(Object.assign({ aksi: 'absensi_edit_info', karyawan: ed.karyawan, tanggal: ed.tanggal }, kredKor()))
       .then(function (d) {
         if (gagalSesiLb(d)) { return; }
         if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.', function () { kembaliLb('kembali'); }); return; }
@@ -5941,20 +5971,58 @@
     const L = 'lb65';
     const isi = { karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, jam: lbF(L, 'jam').value, alasan: String(lbF(L, 'alasan').value || '').trim() };
     ed.mengirim = true; gambarEdit();
-    kirimPost(Object.assign({ aksi: 'absensi_edit' }, isi, kredAdminLb()))
+    kirimPost(Object.assign({ aksi: 'absensi_edit' }, isi, kredKor()))
       .then(function (d) {
         if (gagalSesiLb(d)) { ed.mengirim = false; return; }
         if (d.status !== 'ok') { ed.mengirim = false; gambarEdit(); infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return; }
         const sesudah = function (fotoOk) {
           ed.mengirim = false;
-          infoDialog('Absen diperbarui', d.sesudah + (fotoOk === false ? '. Foto belum terunggah, coba lagi.' : ''), function () { kembaliLb('kembali'); if (document.getElementById('lb64').classList.contains('aktif')) { muatAbsensi64(true); } });
+          infoDialog('Absen diperbarui', d.sesudah + (fotoOk === false ? '. Foto belum terunggah, coba lagi.' : ''), function () { kembaliLb('kembali'); segarkanAbsensiAktif(); });
         };
         if (!ed.foto) { sesudah(true); return; }
-        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, gambar: ed.foto }, kredAdminLb()))
+        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, gambar: ed.foto }, kredKor()))
           .then(function (f) { sesudah(f && f.status === 'ok'); }, function () { sesudah(false); });
       })
       .catch(function () { ed.mengirim = false; gambarEdit(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
   });
+
+  // ---------- Batalkan pengajuan sendiri (izin/cuti dan ajakan tukar shift yang masih menunggu) ----------
+  // Tombol ini TIDAK ada di mockup (selisih SF4). Pembatalan hanya lewat server (izin_batal): hanya milik sendiri dan hanya yang belum diputuskan.
+  function bukaDaftarBatal() {
+    kirimPost({ aksi: 'pengajuan_saya', sesi: sesiPribadi })
+      .then(function (d) {
+        if (pribadiGagalSesi(d)) { return; }
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.'); return; }
+        if (!d.daftar.length) { infoDialog('Tidak ada pengajuan', 'Tidak ada pengajuan yang masih menunggu ACC.', function () { muatStatusHariIni(); }); return; }
+        bukaDialog('<div class="dialog-judul">Batalkan pengajuan</div><div class="dialog-sub">Hanya yang masih menunggu ACC.</div>' +
+          d.daftar.map(function (x) {
+            return '<div class="baris-batal"><div><b>' + escHtml(x.judul) + '</b><br><span>' + escHtml(x.rincian) + (x.tukar ? ' · ajakan tukar shift' : '') + '</span></div>' +
+              '<button type="button" class="btn-garis" data-grup="' + escHtml(x.grup) + '" data-judul="' + escHtml(x.judul + ' ' + x.rincian) + '">Batalkan</button></div>';
+          }).join('') +
+          '<div class="dialog-tombol"><button type="button" class="btn-gelap" id="dlgTutup">Tutup</button></div>');
+        document.getElementById('dlgTutup').addEventListener('click', tutupDialog);
+        dialog.querySelectorAll('button[data-grup]').forEach(function (b) {
+          b.addEventListener('click', function () { konfirmasiBatal(b.getAttribute('data-grup'), b.getAttribute('data-judul')); });
+        });
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  function konfirmasiBatal(grup, judul) {
+    bukaDialog('<div class="dialog-judul">Batalkan pengajuan ini?</div><div class="dialog-sub">' + escHtml(judul) + '</div>' +
+      '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Tidak</button><button type="button" class="btn-gelap" id="dlgYa">Ya, batalkan</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', function () {
+      this.disabled = true;
+      kirimPost({ aksi: 'izin_batal', sesi: sesiPribadi, grup: grup })
+        .then(function (d) {
+          if (pribadiGagalSesi(d)) { return; }
+          if (d.status !== 'ok') { infoDialog('Belum bisa dibatalkan', d.pesan || 'Coba lagi.', function () { muatStatusHariIni(); }); return; }
+          infoDialog('Pengajuan dibatalkan', 'Pengajuan tidak diteruskan ke admin.', function () { muatStatusHariIni(); });
+        })
+        .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+    });
+  }
+  document.getElementById('btnPribBatal').addEventListener('click', bukaDaftarBatal);
 
   // ================= LAYAR BARU (tampilan saja): navigasi =================
   // Semua layar lbNN dibuat dari mockup oleh tools/bangun_layar_baru.sh: tanpa data contoh, tombol aksi nonaktif "Segera", tanpa panggilan server.

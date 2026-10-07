@@ -14,7 +14,7 @@ var CFG = {
   '13': { home: 'toko', fn: FN['13'] }, '18': { home: 'toko', fn: FN['18'] }, '19': { home: 'toko', fn: FN['19'] },
   '22': { home: 'adm', fn: FN['22'] }, '23': { home: 'prib', fn: FN['23'] },
   '24': { home: 'own', hapusSatu: ['Shift 2 · Siang'] },
-  '25': { home: 'own', hapusBaris: ['Ahmad Fauzi'], pudar: [/^Semua cabang$/, /^Pekan ini$/, /^Semua$/] },
+  '25': { home: 'own', fn: FN['25'], hapusBaris: ['Ahmad Fauzi'], pudar: [/^Semua cabang$/, /^Pekan ini$/, /^Semua$/] },
   '34': { home: 'prib', tombolAngka: true, fn: function (root) {
     // Keputusan pemilik 2026-10-07: PIN 5 angka; chip "Keperluan" dihapus, diganti satu kolom Keterangan seperti layar absen luar yang berjalan.
     var titik = Array.prototype.filter.call(root.querySelectorAll('div'), function (d) { return /width: 16px; height: 16px; border-radius: 50%/.test(d.getAttribute('style') || ''); });

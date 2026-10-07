@@ -14,7 +14,7 @@ for k in pribadi admin owner; do salin tools/uji_alur_tarik_refresh.js "window._
 salin tools/uji_alur_foto_lingkaran.js "window.__KONTEKS='toko';" fl_toko
 salin tools/uji_alur_foto_lingkaran.js "window.__KONTEKS='luar';" fl_luar
 salin tools/uji_alur_konfirmasi_antrean.js "window.__MODE_OWNER=true;" ka_owner
-for k in toko admin admin2; do salin tools/uji_alur_koreksi.js "window.__KONTEKS='$k';" "koreksi_$k"; done
+for k in toko admin admin2 owner pribadi; do salin tools/uji_alur_koreksi.js "window.__KONTEKS='$k';" "koreksi_$k"; done
 ( cat tools/token_contoh.js tools/uji_layar_baru_tanpa_contoh.js ) > "$S/tanpa_contoh.js"
 PT="$(cat tools/pra_toko.js)"; PO="$(cat tools/pra_owner.js)"
 j() { ID="" bash tools/potret.sh app "" "$@" > /dev/null; }
@@ -51,6 +51,8 @@ BUDGET=40000 PRA="$PT" j $V/uji_alur_jadwal_toko.png "$S/jadwal_toko.js"
 BUDGET=90000 PRA="$PT" j $V/uji_alur_koreksi_toko.png "$S/koreksi_toko.js"
 BUDGET=90000 j $V/uji_alur_koreksi_admin.png "$S/koreksi_admin.js"
 BUDGET=90000 j $V/uji_alur_koreksi_admin2.png "$S/koreksi_admin2.js"
+BUDGET=90000 PRA="$PO" j $V/uji_alur_koreksi_owner.png "$S/koreksi_owner.js"
+BUDGET=90000 j $V/uji_alur_koreksi_pribadi.png "$S/koreksi_pribadi.js"
 bash tools/uji_server.sh $V/uji_server_hasil.png > /dev/null 2>&1
 bash tools/cek_sintaks.sh $V/cek_sintaks_hasil.png > /dev/null 2>&1
 echo selesai > $V/_semua.out

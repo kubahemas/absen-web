@@ -1,6 +1,6 @@
 // Skrip uji (server TIRUAN, tidak menulis ke sheet): Fitur C koreksi absen.
-// Konteks lewat window.__KONTEKS = 'toko' (peringatan HP toko: 05, 06, 07, 13, 18, 19) | 'admin' (Konfirmasi lupa/konflik/shift beda, 53, 54, 64, 65).
-// 'toko' butuh PRA tools/pra_toko.js. Pakai BUDGET=90000.
+// Konteks lewat window.__KONTEKS = 'toko' (peringatan HP toko: 05, 06, 07, 13, 18, 19) | 'admin' (Konfirmasi lupa/konflik/shift beda, 53, 54) | 'admin2' (64, 65) | 'owner' (Konfirmasi lupa admin, absen manual admin, 25, edit absen) | 'pribadi' (batal pengajuan).
+// 'toko' butuh PRA tools/pra_toko.js; 'owner' butuh tools/pra_owner.js. Pakai BUDGET=90000.
 window.__hasil = [];
 var H = window.__hasil;
 var K = window.__KONTEKS || 'toko';
@@ -22,6 +22,7 @@ var PENGGANTI = [];
 // ---------------- server tiruan ----------------
 var f0 = window.fetch;
 var konfDaftar = [];
+var pengajuan = [{ grup: 'IZN-2026-0007', judul: 'Menikah', rincian: '12–14 Okt', tukar: false }, { grup: 'IZN-2026-0008', judul: 'Tukar shift', rincian: '13 Okt', tukar: true }];
 var konfPutus = [];
 window.fetch = function (url, opsi) {
   var b = {}; try { b = JSON.parse(opsi.body); } catch (e) {}
@@ -33,18 +34,20 @@ window.fetch = function (url, opsi) {
   if (b.aksi === 'laporkan_dobel') { d = { status: 'ok', st_masuk: 'HADIR', jam: '07:52', shift: 'Shift 1', panggilan: 'Budi', id_absen: 'M-K002-261007-075200-T1', konflik: true }; }
   if (b.aksi === 'foto_dobel') { d = { status: 'ok', foto: FOTO }; }
   // admin
-  if (b.aksi === 'login_pribadi') { d = { status: 'ok', sesi: 'S'.repeat(40), id: 'K009', nama: 'Dewi Lestari', panggilan: 'Dewi', role: 'ADMIN', cabang: 'Ngawi' }; }
-  if (b.aksi === 'pribadi_hari_ini') { d = { status: 'ok', sudah_masuk: false, sudah_pulang: false, jam_masuk: '', jam_pulang: '', cara_masuk: '', st_pulang: '', lembur_boleh: false, izin_menunggu: 0, tukar_masuk: 0 }; }
+  if (b.aksi === 'login_pribadi') { d = K === 'pribadi' ? { status: 'ok', sesi: 'S'.repeat(40), id: 'K003', nama: 'Budi Santoso', panggilan: 'Budi', role: 'KARYAWAN', cabang: 'Ngawi' } : { status: 'ok', sesi: 'S'.repeat(40), id: 'K009', nama: 'Dewi Lestari', panggilan: 'Dewi', role: 'ADMIN', cabang: 'Ngawi' }; }
+  if (b.aksi === 'pengajuan_saya') { d = { status: 'ok', daftar: pengajuan.slice() }; }
+  if (b.aksi === 'izin_batal') { pengajuan = pengajuan.filter(function (x) { return x.grup !== b.grup; }); d = { status: 'ok' }; }
+  if (b.aksi === 'pribadi_hari_ini') { d = { status: 'ok', sudah_masuk: false, sudah_pulang: false, jam_masuk: '', jam_pulang: '', cara_masuk: '', st_pulang: '', lembur_boleh: false, izin_menunggu: K === 'pribadi' ? pengajuan.length : 0, tukar_masuk: 0 }; }
   if (b.aksi === 'konfirmasi_jumlah') { d = { status: 'ok', jumlah: konfDaftar.length, jumlah_teks: String(konfDaftar.length) }; }
   if (b.aksi === 'konfirmasi_daftar') { d = { status: 'ok', daftar: konfDaftar.slice(), total: konfDaftar.length, jumlah_teks: String(konfDaftar.length), ada_lagi: false }; }
   if (b.aksi === 'konfirmasi_putuskan') { konfPutus.push(b.id); konfDaftar = konfDaftar.filter(function (x) { return x.id !== b.id; }); d = { status: 'ok', keputusan: 'DITERIMA' }; }
   if (b.aksi === 'ambil_foto') { d = { status: 'ok', foto: null, teks: 'TANPA FOTO' }; }
-  if (b.aksi === 'absen_manual_info') { d = { status: 'ok', hari_ini: HARI_INI, jam: '10:00', karyawan: [{ id: 'K003', nama: 'Budi Santoso', panggilan: 'Budi' }, { id: 'K004', nama: 'Rina Wati', panggilan: 'Rina' }], alasan: ['Lupa absen', 'HP toko bermasalah', 'Internet / listrik mati', 'Lainnya'] }; }
+  if (b.aksi === 'absen_manual_info') { d = { status: 'ok', hari_ini: HARI_INI, jam: '10:00', karyawan: K === 'owner' ? [{ id: 'K009', nama: 'Dewi Lestari', panggilan: 'Dewi', cabang: 'Ngawi' }, { id: 'K010', nama: 'Sari Utami', panggilan: 'Sari', cabang: 'Pusat' }] : [{ id: 'K003', nama: 'Budi Santoso', panggilan: 'Budi', cabang: 'Ngawi' }, { id: 'K004', nama: 'Rina Wati', panggilan: 'Rina', cabang: 'Ngawi' }], alasan: ['Lupa absen', 'HP toko bermasalah', 'Internet / listrik mati', 'Lainnya'] }; }
   if (b.aksi === 'absen_manual_pratinjau') { d = b.jenis === 'PULANG' && b.jam ? { status: 'ok', bisa: true, pesan: '', tampil: 'Status: PULANG NORMAL (Shift 1)' } : { status: 'ok', bisa: !!b.jam, pesan: '', tampil: 'Status: HADIR (Shift 1)' }; }
   if (b.aksi === 'absen_manual') { d = { status: 'ok', id_absen: 'P-K004-261005-163100-A', jenis: b.jenis, tanggal: b.tanggal, tampil: 'Status: PULANG NORMAL (Shift 1)' }; }
   if (b.aksi === 'absensi_unggah_foto') { d = { status: 'ok' }; }
   if (b.aksi === 'absensi_daftar') {
-    d = { status: 'ok', cabang: 'Ngawi', dari: '2026-10-05', sampai: '2026-10-11', hari_ini: HARI_INI, total: 3, ada_lagi: false,
+    d = { status: 'ok', cabang: b.cabang || '', daftar_cabang: K === 'owner' ? ['Ngawi', 'Pusat'] : undefined, dari: '2026-10-05', sampai: '2026-10-11', hari_ini: HARI_INI, total: 3, ada_lagi: false,
       karyawan: [{ id: 'K003', nama: 'Budi Santoso' }, { id: 'K004', nama: 'Rina Wati' }],
       daftar: [
         { karyawan: 'K003', nama: 'Budi Santoso', tanggal: '2026-10-06', masuk: '07:45', pulang: '18:35', tanda: ['LEMBUR'], diedit: true },
@@ -71,6 +74,7 @@ konfDaftar = [
   itemKonf('KONFLIK|M-K003-261005-074000-T1', 'KONFLIK', { judul: 'Konflik absen', rincian: 'Sen 5 Okt · masuk 07:40 · ditolak oleh Budi', jam: '07:40' }),
   itemKonf('K005|2026-10-06|MASUK', 'SHIFT_BEDA', { karyawan: 'K005', nama: 'Ari Pratama', tanggal: '2026-10-06', shift: '2', jam: '13:10', status: 'HADIR', ket: 'SHIFT BEDA: jadwal Shift 1', foto: 'ADA' })
 ];
+if (K === 'owner') { konfDaftar = [itemKonf('K009|2026-10-05|PULANG', 'LUPA', { id: 'LUPA|K009|2026-10-05|PULANG', jenis: 'PULANG', karyawan: 'K009', nama: 'Dewi Lestari', role: 'ADMIN', judul: 'Lupa absen pulang', rincian: 'Sen 5 Okt, masuk 07:40', menunggu_hari: 2, jam: '07:40' })]; }
 async function tekan(id) {
   var b = el(id); b.disabled = false; b.click(); await tunggu(1900);
   el('lb08').querySelector('[data-lb-aksi="pilihnama"]').click(); await tunggu(200);
@@ -236,6 +240,61 @@ async function dariMenuAdmin(nama) {
 
     }
 
+    if (K === 'owner') {
+      el('btnJenisOwner').click(); el('ownUsername').value = 'owner'; el('ownPassword').value = 'rahasia123'; el('btnMasukOwner').click(); await tunggu(900);
+      el('btnOwnerKonf').click(); await tunggu(800);
+      var kl2 = document.querySelector('#daftarKonfirmasi [data-kel="LUPA"]');
+      ok('Konfirmasi OWNER: kartu Lupa absen milik ADMIN dengan tombol "Isi jam (absen manual)" AKTIF (bukan "Segera")', !!kl2 && /Dewi Lestari/.test(kl2.textContent) && !!kl2.querySelector('[data-konf="isijam"]') && !kl2.querySelector('.segera'));
+      kl2.querySelector('[data-konf="isijam"]').click(); await tunggu(800);
+      var mi = terakhir('absen_manual_info');
+      ok('layar 54 dibuka dengan SESI OWNER (tanpa token HP toko), badge "Owner", daftar karyawan = admin dengan cabangnya', aktif() === 'lb54' && !!mi && !!mi.sesi && !mi.token && /Owner/.test(teks(document.querySelector('#lb54'))) && /Dewi Lestari · Ngawi/.test(f('lb54', 'karyawan').textContent) && f('lb54', 'karyawan').value === 'K009');
+      ubah(f('lb54', 'jam'), '16:31'); await tunggu(400); f('lb54', 'a0').click(); f('lb54', 'fotoTombol').click(); await tunggu(300);
+      ok('foto wajib: SIMPAN aktif setelah jam, alasan, foto', !f('lb54', 'simpan').disabled);
+      f('lb54', 'simpan').click(); await tunggu(700);
+      var amo = terakhir('absen_manual');
+      ok('absen_manual dikirim dengan sesi owner untuk admin K009 (jenis PULANG) dan foto diunggah', !!amo && amo.karyawan === 'K009' && amo.jenis === 'PULANG' && !amo.token && !!amo.sesi && terakhir('absensi_unggah_foto').karyawan === 'K009');
+      el('dlgOk').click(); await tunggu(600);
+      el('btnKembaliKonf').click(); await tunggu(300);
+      el('btnMenuOwner').click(); await tunggu(150);
+      Array.prototype.filter.call(document.querySelectorAll('#menuOwner .menu-kartu button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim().indexOf('Data absensi') === 0; })[0].click(); await tunggu(800);
+      ok('layar 25 (owner) AKTIF: absensi_daftar dengan sesi owner, tanpa cabang (semua cabang); Cabang, Tanggal, Karyawan aktif', aktif() === 'lb25' && !!terakhir('absensi_daftar') && !terakhir('absensi_daftar').token && terakhir('absensi_daftar').cabang === '' && !f('lb25', 'cabang').disabled && !f('lb25', 'ft').disabled && f('lb25', 'cabang').options.length === 3);
+      ok('tiga baris tampil dengan penanda; pensil ada', f('lb25', 'daftar').children.length === 3 && /LUPA PULANG/.test(f('lb25', 'daftar').textContent) && f('lb25', 'daftar').querySelectorAll('button[data-edit]').length === 3);
+      ubah(f('lb25', 'cabang'), 'Pusat'); await tunggu(500);
+      ok('ganti Cabang ke Pusat memuat ulang dengan cabang Pusat', terakhir('absensi_daftar').cabang === 'Pusat');
+      f('lb25', 'daftar').querySelectorAll('button[data-edit]')[2].click(); await tunggu(900);
+      ok('pensil membuka layar 65 untuk owner: absensi_edit_info dengan sesi owner; badge "Owner"; Back kembali ke 25', aktif() === 'lb65' && !terakhir('absensi_edit_info').token && !!terakhir('absensi_edit_info').sesi && /Owner/.test(teks(document.querySelector('#lb65'))) && document.getElementById('lb65').getAttribute('data-lb-home') === 'own');
+      ubah(f('lb65', 'jam'), '07:44'); await tunggu(500); ubah(f('lb65', 'alasan'), 'Koreksi oleh owner'); await tunggu(100);
+      f('lb65', 'updateFoto').click(); await tunggu(200);
+      f('lb65', 'simpan').click(); await tunggu(800);
+      var aeo = terakhir('absensi_edit');
+      ok('edit absen oleh owner: absensi_edit dengan sesi owner + Update foto (absensi_unggah_foto) sesudahnya', !!aeo && !aeo.token && aeo.alasan === 'Koreksi oleh owner' && terakhir('absensi_unggah_foto').jenis === 'MASUK');
+      el('dlgOk').click(); await tunggu(700);
+      ok('OK kembali ke layar 25 dan memuat ulang', aktif() === 'lb25');
+      el('lb25').querySelector('[data-lb-kembali="home"]').click(); await tunggu(300);
+      el('btnMenuOwner').click(); await tunggu(150);
+      Array.prototype.filter.call(document.querySelectorAll('#menuOwner .menu-kartu button'), function (b) { return b.textContent.replace(/\s+/g, ' ').trim().indexOf('Kunci periode') === 0; })[0].click(); await tunggu(500);
+      var tmb = Array.prototype.filter.call(document.querySelectorAll('#lb76 button'), function (b) { return !b.hasAttribute('data-lb-kembali') && !b.hasAttribute('data-lb-ke'); });
+      ok('layar 76 (Kunci periode) tetap tampilan saja: semua tombol aksi nonaktif', tmb.length > 0 && tmb.every(function (b) { return b.disabled; }));
+    }
+    if (K === 'pribadi') {
+      await masukPribadi('Budi Santoso');
+      var tb = el('btnPribBatal');
+      ok('beranda karyawan: kartu "2 pengajuan menunggu ACC", "Lihat" tetap pudar; tombol baru "Batalkan pengajuan" tampil', /2 pengajuan menunggu ACC/.test(teks(el('pribStrip'))) && !!tb && tb.style.display !== 'none' && /Batalkan pengajuan/.test(tb.textContent));
+      tb.click(); await tunggu(500);
+      ok('daftar pengajuan dari server (pengajuan_saya + sesi): "Menikah 12–14 Okt" dan "Tukar shift 13 Okt · ajakan tukar shift"', !!terakhir('pengajuan_saya') && terakhir('pengajuan_saya').sesi === 'S'.repeat(40) && /Menikah/.test(el('dialog').textContent) && /12–14 Okt/.test(el('dialog').textContent) && /ajakan tukar shift/.test(el('dialog').textContent));
+      el('dialog').querySelector('button[data-grup="IZN-2026-0007"]').click(); await tunggu(200);
+      ok('Batalkan meminta konfirmasi dulu; belum ada izin_batal', /Batalkan pengajuan ini/.test(el('dialog').textContent) && !terakhir('izin_batal'));
+      el('dlgYa').click(); await tunggu(500);
+      ok('izin_batal dikirim untuk grup izin, dialog "Pengajuan dibatalkan"', terakhir('izin_batal').grup === 'IZN-2026-0007' && terakhir('izin_batal').sesi === 'S'.repeat(40) && /Pengajuan dibatalkan/.test(el('dialog').textContent));
+      el('dlgOk').click(); await tunggu(600);
+      ok('beranda disegarkan: "1 pengajuan menunggu ACC"', /1 pengajuan menunggu ACC/.test(teks(el('pribStrip'))));
+      el('btnPribBatal').click(); await tunggu(500);
+      ok('tinggal ajakan tukar shift; batal oleh pemohon', /Tukar shift/.test(el('dialog').textContent) && !el('dialog').querySelector('button[data-grup="IZN-2026-0007"]'));
+      el('dialog').querySelector('button[data-grup="IZN-2026-0008"]').click(); await tunggu(200); el('dlgYa').click(); await tunggu(500);
+      ok('izin_batal untuk grup tukar shift', terakhir('izin_batal').grup === 'IZN-2026-0008');
+      el('dlgOk').click(); await tunggu(600);
+      ok('tidak ada pengajuan lagi: tombol "Batalkan pengajuan" hilang', /0 pengajuan menunggu ACC/.test(teks(el('pribStrip'))) && el('btnPribBatal').style.display === 'none');
+    }
     if (K === 'admin2') {
       await masukPribadi('Dewi Lestari');
       // ---- data absensi (64) ----

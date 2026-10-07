@@ -78,7 +78,7 @@ Selisih per layar (siapa yang memutuskan, gambar berdampingan): lihat `docs/daft
 | 71 | 23. Owner - Beranda | tersambung | Dropdown Cabang selalu tampil; satu kartu + dropdown Shift; Belum absen; Perlu evaluasi nonaktif; Telat 7 hari dari data nyata |
 | 72 | 23b. Owner - menu | tersambung | Urutan dan isi menu = mockup; item tanpa fitur "Segera" |
 | 73 | 24. Owner - Log per kategori | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
-| 74 | 25. Owner - Log detail | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
+| 74 | 25. Owner - Log detail | tersambung (tampilan saja) | Di mockup 74 = tabel "Log: Edit absen" (bukan layar edit). Tetap tampilan saja; lihat selisih D1. |
 | 75 | 26. Owner - Pengaturan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
 | 76 | 27. Owner - Kunci periode | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
 | 77 | 28. Owner - Role & admin | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
@@ -118,7 +118,7 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 | 22 | Admin - Cek Surat Dokter | tersambung (Fitur A: cek surat dokter) | Dibuka dari kartu izin sakit dengan surat di Konfirmasi (ACC). Surat dimuat dari server (aksi ambil_foto), ACC dan "Surat tidak sah: jadikan sakit tanpa surat" memutuskan lewat konfirmasi_putuskan. Tolak dari kartu Konfirmasi. |
 | 23 | HP Pribadi - Izin Sakit dengan Surat Dokter | tersambung (Fitur A: form Sakit + foto surat) | Varian Sakit dari form izin: ganti jenis ke/dari Sakit memindahkan layar 41 <-> 23. Foto dari kamera/galeri dikecilkan di HP (1280 px, 0,7) lalu diunggah SESUDAH pengajuan tersimpan. |
 | 24 | Owner - Cabang dan Shift | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
-| 25 | Owner - Data Absensi | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
+| 25 | Owner - Data Absensi | tersambung (Tahap 1) | Sama seperti 64 tetapi lintas cabang dan termasuk data admin (dropdown Cabang aktif); pensil membuka layar 65 (lihat selisih D1/SF3). |
 | 26 | Owner - Ganti Password | tersambung | Versi app dipertahankan (keputusan pemilik) |
 | 27 | Owner - Keluarkan Semua Perangkat | tersambung (ada selisih) | Daftar perangkat dari server |
 | 28 | Owner - Konfirmasi Data Admin | tersambung | Versi app dipertahankan; maksimal 5 kartu terlama (keputusan pemilik) |
@@ -213,3 +213,7 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 - Hidup: 05, 06, 07, 13, 18, 19 (peringatan HP toko), 53 (konflik), 54 (absen manual), 64 (data absensi), 65 (edit absen), kartu Lupa absen / Konflik absen / Shift tidak sesuai jadwal di Konfirmasi (52).
 - Server baru: laporkan_dobel, foto_dobel, konflik_detail, konflik_pratinjau, konflik_putuskan, konflik_foto, absen_manual_info, absen_manual_pratinjau, absen_manual, absensi_unggah_foto, absensi_daftar, absensi_edit_info, absensi_edit_pratinjau, absensi_edit, absensi_foto. absen_masuk dan absen_pulang tetap sama (penolakan tidak berubah) tetapi balasannya membawa data peringatan; absen_masuk menerima shift_pilihan, absen_pulang menerima konfirmasi_revisi.
 - Masih tampilan saja / nonaktif: layar owner 25 (Data absensi), 74 (Edit absen), 73 (Pindah konflik) dan 76 (Kunci periode); tombol "Isi jam (absen manual)" di Konfirmasi OWNER (nonaktif "Segera"); pengenalan wajah di 03/08/53/54/65 (belum ada).
+
+## Tahap 1 (perbaikan A–C)
+- Hidup: layar 25 (Data absensi owner), tombol "Isi jam" di Konfirmasi owner (lupa absen ADMIN), layar 54/65 dengan kredensial owner, tombol "Batalkan pengajuan" di beranda pribadi (SF4).
+- Server baru/berubah: `pengajuan_saya`; `absen_manual_*`, `absensi_*` menerima sesi owner (`autentikasiKoreksi`, `bolehTargetKoreksi`). Layar 73 dan 76 tetap tampilan saja.

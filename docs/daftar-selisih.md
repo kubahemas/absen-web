@@ -253,13 +253,7 @@ Lihat tabel "Selisih BARU" di atas: nomor 11–17 sudah diputuskan dan diterapka
 
 | No | Layar | Selisih | Gambar |
 |---|---|---|---|
-| SA1 | 30-32, 46 | "Lihat" pada kartu "N pengajuan menunggu ACC" tampil pudar dan tidak bisa diketuk (mockup tidak punya layar daftar pengajuan) | `31_dampingan.png` |
-| SA2 | 01 | "Ketuk untuk lihat semua" pada kartu "Hari ini tidak masuk" dipudarkan dan kartu tidak bisa diketuk (mockup tidak punya daftar lengkap) | `01_dampingan.png` |
-| SA3 | 67 | Mockup tidak punya tampilan ubah tanggal: dipakai kotak dialog standar (jenis + keterangan + Simpan/Hapus). Mockup juga tidak punya tombol ganti bulan: bulan diganti dengan geser kiri/kanan di kalender | `67_dampingan.png` |
-| SA4 | 41, 23, 66 | Kolom Mulai/Selesai memakai pemilih tanggal bawaan HP ("12/10/2026"), mockup menampilkan teks "Sen, 5 Okt 2026" | `41_dampingan.png`, `23_dampingan.png`, `66_dampingan.png` |
 | SA5 | 41, 23, 66 | Pesan salah (mis. "Tidak ada hari kerja terjadwal") tampil merah di baris "N hari kerja"; hasil kirim tampil di kotak dialog standar "Pengajuan terkirim" (tidak ada di mockup) | – |
-| SA6 | 41/23 | Layar yang terbuka dari tombol Izin/Cuti mengikuti jenis pertama di pengaturan (Sakit) sehingga biasanya terbuka varian 23; mockup membuka 41 dengan jenis Menikah | `23_dampingan.png` |
-| SA7 | 22 | Foto surat memakai kotak foto mockup; tidak ada Tolak di layar 22 (sama mockup), Tolak dilakukan dari kartu Konfirmasi | `22_dampingan.png` |
 | SA8 | 52 | Kartu izin tidak punya kotak "Foto" (sama mockup); chip "Izin N" aktif, "Lupa absen" tetap nonaktif | `52_dampingan.png` |
 
 ## SESI A-C, FITUR B (jadwal dan shift) — ASUMSI yang diambil (butuh setuju atau koreksi pemilik)
@@ -285,12 +279,9 @@ Lihat tabel "Selisih BARU" di atas: nomor 11–17 sudah diputuskan dan diterapka
 
 | No | Layar | Selisih | Gambar |
 |---|---|---|---|
-| SB1 | 55 | Tombol "Tukar shift" (menuju 56) DITAMBAHKAN di bawah "Salin minggu lalu": keputusan-desain.md menyebutnya tetapi mockup 55 tidak punya, sehingga 56 tidak punya jalur | `55_dampingan.png` |
 | SB2 | 55 | Nama karyawan memakai nama lengkap dari server dan daftar mengikuti cabang; tabel hanya Senin-Sabtu seperti mockup (tidak ada kolom Minggu) | `55_dampingan.png` |
-| SB3 | 57 | Mockup tidak menggambarkan cara mengubah urutan: ketuk chip = ganti ke shift berikutnya; setelah shift terakhir ketuk lagi = hapus (minimal 2). Layar 57 menampilkan scrollbar tipis di pratinjau | `57_dampingan.png` |
 | SB4 | 42 | Pada mode "Pindah shift" label "Tukar dengan" berubah jadi "Pindah ke shift" dan pratinjau hanya "Anda -> Shift N" (mockup hanya menggambarkan tukar) | `42_dampingan.png` |
 | SB5 | 43 | Untuk ajakan "pindah shift" judul "{nama} ingin pindah shift" dan baris "Anda tetap di Shift N" (mockup hanya tukar) | `43_dampingan.png` |
-| SB6 | 55, 56, 57, 42 | Kolom tanggal memakai pemilih tanggal bawaan HP ("07/10/2026") bukan teks "Selasa, 6 Okt 2026" | `56_dampingan.png`, `42_dampingan.png` |
 | SB7 | 52 | Kartu tukar shift tampil di "Semua" tanpa chip tersendiri (mockup 52 tidak punya chip Tukar shift) | `52_dampingan.png` |
 
 ## SESI A-C, FITUR C (koreksi absen) — ASUMSI yang diambil (butuh setuju atau koreksi pemilik)
@@ -315,12 +306,44 @@ Lihat tabel "Selisih BARU" di atas: nomor 11–17 sudah diputuskan dan diterapka
 
 | No | Layar | Selisih | Gambar |
 |---|---|---|---|
-| SC1 | 52 | Kartu "Konflik absen" tidak ada di mockup 52; dibuat seperti kartu Lupa absen dengan tombol "Lihat detail" (satu-satunya jalan ke layar 53) | `52_dampingan.png` |
-| SC2 | 54 | Foto memakai pemilih foto bawaan HP (kamera atau galeri), bukan kamera langsung; tulisan "Wajah harus cocok dengan nama" tetap tampil padahal pencocokan wajah belum ada | `54_dampingan.png` |
 | SC3 | 53 | Teks "wajah" di bawah foto tetap seperti mockup (belum ada data wajah); pilihan Alasan 3 buah (1 dari mockup) | `53_dampingan.png` |
-| SC4 | 64 | Pilihan filter Tanggal 3 buah (Pekan ini, Hari ini, Bulan ini); mockup hanya memperlihatkan "Pekan ini". Daftar memuat bertahap saat digulir (mockup tidak punya tombol "muat lagi") | `64_dampingan.png` |
-| SC5 | 65 | Jam diubah dengan pemilih jam bawaan HP; foto lama dimuat otomatis di kotak | `65_dampingan.png` |
-| SC6 | 05 | Untuk absen pulang yang kedua, header "ABSEN PULANG" dan kalimat "sudah absen pulang jam" (mockup hanya menggambarkan masuk) | `05_dampingan.png` |
-| SC7 | 07 | Baris pil: "Lembur 1 jam 18 menit · 1–2 jam" (mockup "Lembur – jam – menit · –") | `07_dampingan.png` |
-| SC8 | 13, 18, 19 | Hitung mundur menutup otomatis (8 detik untuk 13, 6 detik untuk 18 dan 19; mockup hanya menulis "– detik"); tanpa confetti pada 18 | `13_dampingan.png`, `18_dampingan.png`, `19_dampingan.png` |
 | SC9 | 52 | Chip "Lupa absen" kini aktif (sebelumnya "Segera") | `52_dampingan.png` |
+
+## Keputusan pemilik 2026-10-07 (selisih Fitur A–C, pemutus = pemilik)
+
+Selisih berikut DIPERTAHANKAN apa adanya (bukan lagi selisih terbuka). SB1 dan SC1 juga dicatat di tabel "Perubahan dari mockup" di `docs/keputusan-desain.md`. Asumsi A1–A14 dan B1–B14 BELUM disetujui dan tetap terbuka di atas. Selisih lain (SA5, SA8, SB2, SB4, SB5, SB7, SC3, SC9) masih menunggu keputusan.
+
+| No | Layar | Selisih (ringkas) | Keputusan |
+|---|---|---|---|
+| SA1 | 30-32, 46 | "Lihat" pada kartu "N pengajuan menunggu ACC" tampil pudar dan tidak bisa diketuk (mockup tidak punya layar daftar pengajuan) | dipertahankan |
+| SA2 | 01 | "Ketuk untuk lihat semua" pada kartu "Hari ini tidak masuk" dipudarkan dan kartu tidak bisa diketuk (mockup tidak punya daftar lengkap) | dipertahankan |
+| SA3 | 67 | Mockup tidak punya tampilan ubah tanggal: dipakai kotak dialog standar (jenis + keterangan + Simpan/Hapus). Mockup juga tidak punya tombol ganti bulan: bulan diganti dengan geser kiri/kanan di kalender | dipertahankan |
+| SA4 | 41, 23, 66 | Kolom Mulai/Selesai memakai pemilih tanggal bawaan HP ("12/10/2026"), mockup menampilkan teks "Sen, 5 Okt 2026" | dipertahankan |
+| SA6 | 41/23 | Layar yang terbuka dari tombol Izin/Cuti mengikuti jenis pertama di pengaturan (Sakit) sehingga biasanya terbuka varian 23; mockup membuka 41 dengan jenis Menikah | dipertahankan |
+| SA7 | 22 | Foto surat memakai kotak foto mockup; tidak ada Tolak di layar 22 (sama mockup), Tolak dilakukan dari kartu Konfirmasi | dipertahankan |
+| SB1 | 55 | Tombol "Tukar shift" (menuju 56) DITAMBAHKAN di bawah "Salin minggu lalu": keputusan-desain.md menyebutnya tetapi mockup 55 tidak punya, sehingga 56 tidak punya jalur | dipertahankan |
+| SB3 | 57 | Mockup tidak menggambarkan cara mengubah urutan: ketuk chip = ganti ke shift berikutnya; setelah shift terakhir ketuk lagi = hapus (minimal 2). Layar 57 menampilkan scrollbar tipis di pratinjau | dipertahankan |
+| SB6 | 55, 56, 57, 42 | Kolom tanggal memakai pemilih tanggal bawaan HP ("07/10/2026") bukan teks "Selasa, 6 Okt 2026" | dipertahankan |
+| SC1 | 52 | Kartu "Konflik absen" tidak ada di mockup 52; dibuat seperti kartu Lupa absen dengan tombol "Lihat detail" (satu-satunya jalan ke layar 53) | dipertahankan |
+| SC2 | 54 | Foto memakai pemilih foto bawaan HP (kamera atau galeri), bukan kamera langsung; tulisan "Wajah harus cocok dengan nama" tetap tampil padahal pencocokan wajah belum ada | dipertahankan |
+| SC4 | 64 | Pilihan filter Tanggal 3 buah (Pekan ini, Hari ini, Bulan ini); mockup hanya memperlihatkan "Pekan ini". Daftar memuat bertahap saat digulir (mockup tidak punya tombol "muat lagi") | dipertahankan |
+| SC5 | 65 | Jam diubah dengan pemilih jam bawaan HP; foto lama dimuat otomatis di kotak | dipertahankan |
+| SC6 | 05 | Untuk absen pulang yang kedua, header "ABSEN PULANG" dan kalimat "sudah absen pulang jam" (mockup hanya menggambarkan masuk) | dipertahankan |
+| SC7 | 07 | Baris pil: "Lembur 1 jam 18 menit · 1–2 jam" (mockup "Lembur – jam – menit · –") | dipertahankan |
+| SC8 | 13, 18, 19 | Hitung mundur menutup otomatis (8 detik untuk 13, 6 detik untuk 18 dan 19; mockup hanya menulis "– detik"); tanpa confetti pada 18 | dipertahankan |
+
+## TAHAP 1 (perbaikan A–C) — asumsi dan selisih baru
+
+| No | Aturan yang tidak ada di dokumen | Pilihan yang dipakai |
+|---|---|---|
+| D1 | Layar 74 | Di mockup layar 74 adalah "Log: Edit absen" (TABEL log per kategori), BUKAN layar edit. Karena itu pensil di layar 25 (Data absensi owner) membuka layar 65 yang sama dengan admin (lencana "Owner", Back kembali ke 25). Layar 74 tetap tampilan saja. Mohon dipastikan apakah ini yang dimaksud. |
+| D2 | Owner mengisi absen manual | Hanya untuk akun ADMIN (semua cabang), lewat tombol "Isi jam (absen manual)" pada kartu Lupa absen di Konfirmasi owner. Foto wajib. Ditegakkan di server (`bolehTargetKoreksi`): admin ditolak mengisi/mengubah absennya sendiri, data admin lain, dan karyawan cabang lain. |
+| D3 | Edit absen oleh owner | Owner boleh mengedit KARYAWAN maupun ADMIN di semua cabang, termasuk bulan terkunci; admin tetap hanya karyawan cabangnya dan bukan miliknya. |
+| D4 | Membatalkan pengajuan sendiri | Hanya yang masih MENUNGGU (izin/cuti, ajakan tukar/pindah shift oleh pemohon). Setelah dibatalkan tidak diteruskan ke admin (status BATAL, baris tidak dihapus, dicatat di log BATAL_IZIN). |
+
+## TAHAP 1 — selisih tampilan baru (butuh keputusan pemilik)
+
+| No | Layar | Selisih | Gambar (kiri app, kanan mockup) |
+|---|---|---|---|
+| SF3 | 25, 65, 74 | Pensil di layar 25 membuka layar 65 (lihat D1); layar 74 (log) tidak dihubungkan | `25_dampingan.png` (kiri mockup, kanan app) |
+| SF4 | 30-32, 46 | Tombol baru "Batalkan pengajuan" di bawah kartu "N pengajuan menunggu ACC" (hanya tampil bila N > 0) dan dialog daftar pengajuan dengan tombol "Batalkan" + konfirmasi. Tidak ada di mockup; "Lihat" tetap pudar sesuai keputusan SA1 | `SF4_dampingan.png`, `SF4_dialog.png` |
