@@ -12,7 +12,7 @@ for n in $NOMOR; do
   f=$(ls docs/mockup/layar | grep "^$src - " | head -1)
   perl tools/mockup_ke_layar.pl "docs/mockup/layar/$f" "x$n" "$TEMP/lb_$n.blok" 2>/dev/null
   H="$AKAR/__lb_$n.html"
-  { echo '<!doctype html><html><head><meta charset="utf-8"></head><body>'; cat "$TEMP/lb_$n.blok"; echo '<script>'; cat tools/layar_baru_bersih.js tools/layar_baru_cfg.js;
+  { echo '<!doctype html><html><head><meta charset="utf-8"></head><body>'; cat "$TEMP/lb_$n.blok"; echo '<script>'; cat tools/layar_baru_bersih.js tools/layar_baru_fn.js tools/layar_baru_cfg.js;
     echo "var l = bersih('$n', CFG['$n'] || {}); var h = document.getElementById('lb$n').outerHTML; var b = btoa(unescape(encodeURIComponent(h))); console.log('LBLOG:' + l.join(';'));"
     echo "for (var i = 0; i < b.length; i += 1500) { console.log('LBCH:' + (i / 1500) + ':' + b.slice(i, i + 1500)); } console.log('LBEND');"
     echo '</script></body></html>'; } > "$H"

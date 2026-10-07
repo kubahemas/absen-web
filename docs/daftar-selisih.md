@@ -229,3 +229,35 @@ Lihat tabel "Selisih BARU" di atas: nomor 11–17 sudah diputuskan dan diterapka
 | 19 | 35 (pop-up nyata) | Mockup 35 hanya punya varian MASUK. Untuk pulang dan lembur luar kerangka 35 dipakai dengan judul "Terima kasih, {nama}!" dan kata kerja dari pop-up lama ("Pulang …", "Lembur …, 1 jam 15 menit"); ikon jempol hijau tetap | `35_dampingan.png` |
 | 20 | pop-up telat luar, 15, 17 | Pop-up telat (merah, ISI ALASAN) dan pop-up 15/17 tetap pop-up lama; layar 35 hanya untuk absen luar yang sudah diterima dan tersimpan | – |
 | 21 | 35 (pop-up nyata) | Pil jam memuat 20 huruf pertama keterangan yang diketik (seperti pop-up lama), padahal mockup memuat nama keperluan | `35_dampingan.png` |
+
+## SESI A-C, FITUR A (izin dan cuti) — ASUMSI yang diambil (butuh setuju atau koreksi pemilik)
+
+| No | Aturan yang tidak ada di dokumen | Pilihan yang dipakai (paling aman dan sederhana) |
+|---|---|---|
+| A1 | Cuti per tahun atau berjalan? | Sisa cuti dihitung per TAHUN KALENDER dari tanggal mulai cuti: jatah (`akun.jatah_cuti`, kosong = pengaturan UMUM `jatah_cuti` = 6) dikurangi cuti MENUNGGU/DITERIMA tahun itu. |
+| A2 | Batas panjang pengajuan | Satu pengajuan maksimal 31 hari dan paling jauh 1 tahun ke depan; lebih dari itu ditolak. |
+| A3 | Pengajuan bertumpuk | Ditolak bila tanggalnya bertumpuk dengan izin/cuti yang masih MENUNGGU atau DITERIMA (tukar/pindah shift tidak ikut). |
+| A4 | Kelebihan hari jenis khusus (Menikah maks 3, dst.) | Seperti mockup 41: kelebihan diambil dari Cuti (harus cukup sisa) atau Izin biasa (Keperluan pribadi) sesuai pilihan; pengajuan jadi dua baris satu grup (-A, -B). Pada Input izin admin (66) tidak ada pilihan di mockup, jadi pengajuan yang melebihi batas DITOLAK (kurangi tanggalnya). |
+| A5 | Kapan Sakit menjadi "khusus" | Sakit tanpa surat = biasa. Kelompok berubah jadi khusus HANYA setelah surat berhasil tersimpan di Drive (unggah sesudah pengajuan). Gagal unggah tidak menggagalkan pengajuan. |
+| A6 | Satu pengajuan terbelah dua baris | Konfirmasi menampilkan SATU kartu per grup; ACC/Tolak berlaku untuk semua baris grup yang masih MENUNGGU. |
+| A7 | Izin sakit dengan surat | ACC selalu lewat layar 22 (cek surat dulu). "Surat tidak sah" = izin tetap DITERIMA tetapi kelompok jadi biasa (memengaruhi performa). Izin lain di-ACC langsung dari kartu. |
+| A8 | Input izin admin (66) | Hanya untuk role KARYAWAN aktif di cabang admin, bukan untuk diri sendiri; aturan tanggal (H+2) dan tumpang tindih sama dengan pengajuan biasa. Surat boleh dilampirkan admin hanya pada izin yang ia input. |
+| A9 | Kalender libur: penyimpanan | Tanggal merah/libur khusus = baris kalender cabang (isi `LIBUR TANGGAL MERAH` / `LIBUR KHUSUS: ket`). "Minggu masuk" = isi `MASUK: ket` (mengalahkan libur Minggu). Menghapus = isi sel dikosongkan (baris tidak dihapus). Hanya hari ini dan seterusnya. |
+| A10 | Saklar "Libur setiap Minggu" | Disimpan sebagai satu nilai pengaturan `libur_minggu_<KODE>` sehingga berlaku untuk SEMUA tanggal (tidak bisa "hanya ke depan"); riwayat Minggu yang dulu libur ikut berubah. |
+| A11 | "Hari ini tidak masuk" | Hanya karyawan yang izin/cuti (MENUNGGU/DITERIMA) atau libur milik sendiri di kalender. Libur seluruh toko (Minggu/tanggal merah umum) tidak dihitung. Tanpa jenis izin. |
+| A12 | Kolom `telat_aju` | Disimpan sebagai TRUE/FALSE (TRUE bila tanggal mulai sudah lewat dari hari pengajuan). |
+| A13 | Pembatalan pengajuan | Server siap (`izin_batal`: hanya milik sendiri, hanya MENUNGGU, status jadi BATAL) tetapi belum ada tombolnya karena mockup tidak punya layar daftar pengajuan. |
+| A14 | Menambah surat setelah pengajuan | Server siap (`izin_unggah_surat`, selama MENUNGGU) tetapi belum ada tombol di app (sama dengan A13). |
+
+## SESI A-C, FITUR A — selisih tampilan baru (butuh keputusan pemilik)
+
+| No | Layar | Selisih | Gambar |
+|---|---|---|---|
+| SA1 | 30-32, 46 | "Lihat" pada kartu "N pengajuan menunggu ACC" tampil pudar dan tidak bisa diketuk (mockup tidak punya layar daftar pengajuan) | `31_dampingan.png` |
+| SA2 | 01 | "Ketuk untuk lihat semua" pada kartu "Hari ini tidak masuk" dipudarkan dan kartu tidak bisa diketuk (mockup tidak punya daftar lengkap) | `01_dampingan.png` |
+| SA3 | 67 | Mockup tidak punya tampilan ubah tanggal: dipakai kotak dialog standar (jenis + keterangan + Simpan/Hapus). Mockup juga tidak punya tombol ganti bulan: bulan diganti dengan geser kiri/kanan di kalender | `67_dampingan.png` |
+| SA4 | 41, 23, 66 | Kolom Mulai/Selesai memakai pemilih tanggal bawaan HP ("12/10/2026"), mockup menampilkan teks "Sen, 5 Okt 2026" | `41_dampingan.png`, `23_dampingan.png`, `66_dampingan.png` |
+| SA5 | 41, 23, 66 | Pesan salah (mis. "Tidak ada hari kerja terjadwal") tampil merah di baris "N hari kerja"; hasil kirim tampil di kotak dialog standar "Pengajuan terkirim" (tidak ada di mockup) | – |
+| SA6 | 41/23 | Layar yang terbuka dari tombol Izin/Cuti mengikuti jenis pertama di pengaturan (Sakit) sehingga biasanya terbuka varian 23; mockup membuka 41 dengan jenis Menikah | `23_dampingan.png` |
+| SA7 | 22 | Foto surat memakai kotak foto mockup; tidak ada Tolak di layar 22 (sama mockup), Tolak dilakukan dari kartu Konfirmasi | `22_dampingan.png` |
+| SA8 | 52 | Kartu izin tidak punya kotak "Foto" (sama mockup); chip "Izin N" aktif, "Lupa absen" tetap nonaktif | `52_dampingan.png` |

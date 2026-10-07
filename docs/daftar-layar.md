@@ -33,7 +33,7 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 38 | 10c. Report BAD | tersambung (tampilan saja) | `lb38`: layar tersendiri berwarna penuh BAD; TIDAK bisa dibuka (label belum dihitung). |
 | 39 | 10d. Detail lembur | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: Sama. |
 | 40 | 10e. Detail telat (tabel) | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: Sama. |
-| 41 | 11. Form izin / cuti | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** izin. Tombol Izin/Cuti nonaktif "Segera". |
+| 41 | 11. Form izin / cuti | tersambung (Fitur A: form izin/cuti) | Jenis, sisa cuti, hari kerja, kelebihan hari (Cuti / Izin biasa) dan "Hasil pengajuan" dihitung server (izin_pratinjau); Kirim = izin_ajukan. |
 | 42 | 11d. Ajukan tukar shift | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** tukar shift. Tombol nonaktif "Segera". |
 | 43 | 11e. Rekan menyetujui tukar shift | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: Sama. |
 | 44 | 11b. Akun saya | tersambung | Dibuka dari ikon akun (menu "Akun saya"). Nama, ID, cabang terisi; Shift bawaan, Ganti password, Ganti PIN = "Segera". Baris "HP terikat" dan teks "Ganti HP? Minta admin reset ikatan HP" DIHAPUS (keputusan pemilik: tidak ada ikatan akun ke HP). |
@@ -63,8 +63,8 @@ Bukti visual (mockup kiri, app kanan): `docs/audit/visual/NN_dampingan.png` (dib
 | 63 | 22. Karyawan baru - selesai + akun | tersambung | Langkah 4 dari 4. Uji coba wajah dan "Kirim akun via WA" = "Segera". Kotak akun: Username + "Login: PIN 5 angka" (tidak ada password awal 123456 / PIN awal 1234). |
 | 64 | 32. Admin - Data absensi | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur**; item menu "Segera" |
 | 65 | 33. Admin - Edit absen | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: **Menunggu fitur** |
-| 66 | 34. Admin - Input izin | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** izin |
-| 67 | 35. Admin - Kalender libur | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
+| 66 | 34. Admin - Input izin | tersambung (Fitur A: input izin admin) | Karyawan dan jenis dari server; hari kerja dihitung server; Simpan = izin_input (langsung DITERIMA, log INPUT_IZIN); foto surat opsional untuk Sakit. |
+| 67 | 35. Admin - Kalender libur | tersambung (Fitur A: kalender libur) | Kalender bulan berjalan dari server (kalender_baca); ketuk tanggal depan = dialog ubah libur; saklar Libur setiap Minggu dan "+ Libur khusus" menyimpan (kalender_simpan, log). Geser kiri/kanan ganti bulan. |
 | 68 | 36. Dashboard bulanan - tab Ringkasan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** (butuh rekap bulanan + label) |
 | 69 | 36. Dashboard bulanan - tab Per karyawan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: sama |
 | 70 | 36b. Detail karyawan | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: sama |
@@ -94,7 +94,7 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 
 | No | Layar mockup | Status | Catatan |
 |---|---|---|---|
-| 01 | 1. HP Toko - Layar utama | tersambung (ada selisih) | Tanggal ikut mockup (keputusan pemilik); LEMBUR pudar dan kartu "Hari ini tidak masuk" nonaktif (belum diputuskan) |
+| 01 | 1. HP Toko - Layar utama | tersambung (kartu "Hari ini tidak masuk" hidup) | Kartu "Hari ini tidak masuk (N)" berisi nama panggilan yang izin/cuti atau libur sendiri (aksi tidak_masuk_hari_ini, token HP toko); maksimal 2 baris + "+N lainnya"; tidak bisa diketuk (mockup tidak punya daftar lengkap). |
 | 02 | 1c. Shift 1 aktif - jadwal hari ini | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** jadwal (label tidak membuka apa pun) |
 | 03 | 2. Pindai wajah | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** wajah |
 | 04 | 3. Wajah dikenali | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: **Menunggu fitur** wajah |
@@ -115,8 +115,8 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 | 19 | 6g. Pulang + belum absen masuk | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: **Menunggu fitur** |
 | 20 | 7. Lembur | tersambung | Versi app dipertahankan (keputusan pemilik) |
 | 21 | 6h. Absen terlalu pagi | tersambung | Versi app dipertahankan (keputusan pemilik); baris sisa waktu nonaktif |
-| 22 | Admin - Cek Surat Dokter | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: **Menunggu fitur** izin |
-| 23 | HP Pribadi - Izin Sakit dengan Surat Dokter | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; layar KEJADIAN: dibuat lengkap, TIDAK bisa dipicu dari navigasi nyata. Fitur aslinya: **Menunggu fitur** izin |
+| 22 | Admin - Cek Surat Dokter | tersambung (Fitur A: cek surat dokter) | Dibuka dari kartu izin sakit dengan surat di Konfirmasi (ACC). Surat dimuat dari server (aksi ambil_foto), ACC dan "Surat tidak sah: jadikan sakit tanpa surat" memutuskan lewat konfirmasi_putuskan. Tolak dari kartu Konfirmasi. |
+| 23 | HP Pribadi - Izin Sakit dengan Surat Dokter | tersambung (Fitur A: form Sakit + foto surat) | Varian Sakit dari form izin: ganti jenis ke/dari Sakit memindahkan layar 41 <-> 23. Foto dari kamera/galeri dikecilkan di HP (1280 px, 0,7) lalu diunggah SESUDAH pengajuan tersimpan. |
 | 24 | Owner - Cabang dan Shift | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
 | 25 | Owner - Data Absensi | tersambung (tampilan saja) | Tampilan persis mockup tanpa angka/nama contoh ("–"); semua tombol aksi nonaktif "Segera"; bisa dibuka dari tombol/menu mockup. Fitur aslinya: **Menunggu fitur** |
 | 26 | Owner - Ganti Password | tersambung | Versi app dipertahankan (keputusan pemilik) |
@@ -199,3 +199,8 @@ Tidak ada layar kelompok 4 yang ditandai "sesuai" penuh: semua yang tersambung m
 ## Putaran keputusan pemilik 2026-10-07 (selisih 11–17)
 - 35 kini pop-up nyata absen luar (bukan layar kejadian lagi); layar kejadian yang tersisa: 04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 36e, 37, 38, 43, 48, 53, 56, 62, 65, 70.
 - 45 aturan sandi menurut peran; 48 tanpa "Halo,"; kalimat "Telat N kali…" = "–" pudar; teks tren "–" abu netral; 75 daftar Keperluan absen luar dipertahankan nonaktif.
+
+## Sesi A-C, Fitur A: izin dan cuti (2026-10-07)
+- Hidup: 41/23 (form izin), 22 (cek surat dokter), 66 (input izin admin), 67 (kalender libur), item izin di Konfirmasi (chip "Izin"), kartu "N pengajuan menunggu ACC" di beranda pribadi (30-32, 46), kartu "Hari ini tidak masuk" di 01.
+- Server baru di `apps-script/api.gs`: izin_info, izin_pratinjau, izin_ajukan, izin_batal, izin_unggah_surat, izin_input_info, izin_input_pratinjau, izin_input, kalender_baca, kalender_simpan, tidak_masuk_hari_ini; Konfirmasi (jumlah, daftar, putuskan, ambil_foto) kini juga memuat izin.
+- Masih tampilan saja / nonaktif: tombol "Lihat" pada kartu pengajuan (mockup tidak punya layar daftar pengajuan); pembatalan pengajuan (server ada, belum ada tombol).

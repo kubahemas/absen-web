@@ -891,7 +891,7 @@
         </button>
       </div>
       <button type="button" class="btn-konf-kartu" id="btnPribMenuAdmin" style="display:none"><div class="k"><div class="t">Konfirmasi data karyawan</div><div class="s">Absen luar, lembur, pulang cepat milik karyawan</div></div><div class="jml" id="pribMenuAdminJumlah"></div></button>
-      <div class="pb-strip belum-aktif" aria-disabled="true"><div class="a">Pengajuan menunggu ACC</div><div class="segera">Segera</div></div>
+      <div class="pb-strip belum-aktif" id="pribStrip" aria-disabled="true"><div class="a" id="pribStripTeks">Pengajuan menunggu ACC</div><div class="segera" id="pribStripLihat">Segera</div></div>
       <div style="flex-grow:1"></div>
       <div class="catatan-kecil" id="pribPesan" style="color:var(--merah);text-align:center"></div>
       <div class="pb-catatan">Absen di HP ini perlu ACC admin.</div>
@@ -1120,13 +1120,13 @@
 </div>
 <div id="lb22" class="layar" data-lb-home="adm">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 12px">
-<div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Cek surat dokter</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">–</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 10px; display: flex; flex-direction: column; gap: 8px"><div style="box-sizing: content-box; height: 330px; border-radius: 14px; background: var(--krem); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--abu-teks)">[Foto surat dokter · ketuk untuk perbesar]</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; font-size: 14px"><span style="box-sizing: content-box; font-weight: 600; color: var(--abu-teks)">Tanggal izin</span><span style="box-sizing: content-box; font-weight: 800">– hari</span></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; font-size: 14px"><span style="box-sizing: content-box; font-weight: 600; color: var(--abu-teks)">Keterangan</span><span style="box-sizing: content-box; font-weight: 800">–</span></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700">Cek tanggal di surat sama dengan tanggal izin.</div></div><button type="button" style="min-height: 48px; border: 2px solid var(--merah); border-radius: 16px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--merah)" disabled="" aria-disabled="true" class="belum-aktif">Surat tidak sah: jadikan sakit tanpa surat<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
-<div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">ACC<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
+<div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Cek surat dokter</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600" data-f="sub">–</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 10px; display: flex; flex-direction: column; gap: 8px"><div style="box-sizing: content-box; height: 330px; border-radius: 14px; background: var(--krem); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--abu-teks)" data-f="foto">[Foto surat dokter · ketuk untuk perbesar]</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; font-size: 14px"><span style="box-sizing: content-box; font-weight: 600; color: var(--abu-teks)">Tanggal izin</span><span style="box-sizing: content-box; font-weight: 800" data-f="tgl">– hari</span></div><div style="box-sizing: content-box; display: flex; justify-content: space-between; font-size: 14px"><span style="box-sizing: content-box; font-weight: 600; color: var(--abu-teks)">Keterangan</span><span style="box-sizing: content-box; font-weight: 800" data-f="ket">–</span></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700">Cek tanggal di surat sama dengan tanggal izin.</div></div><button type="button" style="min-height: 48px; border: 2px solid var(--merah); border-radius: 16px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--merah)" data-f="tidakSah" disabled="" aria-disabled="true" class="belum-aktif">Surat tidak sah: jadikan sakit tanpa surat<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
+<div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" data-f="acc" disabled="" aria-disabled="true" class="belum-aktif">ACC<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb23" class="layar" data-lb-home="prib">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 12px">
-<div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 4px"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 36px; width: auto; align-self: flex-start"><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Ajukan izin / cuti</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Jenis izin</div><select aria-label="Jenis izin" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>Sakit</option></select></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Mulai</div><input aria-label="Mulai" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Selesai</div><input aria-label="Selesai" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">– hari kerja</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Surat dokter</div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: center"><div style="box-sizing: content-box; width: 92px; height: 120px; border-radius: 12px; background: var(--krem); border: 2px solid var(--hijau); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--abu-teks); text-align: center; flex-shrink: 0">[Foto surat]</div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 8px"><div style="box-sizing: content-box; font-size: 13px; font-weight: 800; color: var(--hijau-tua)">✓ Surat terpasang</div><button type="button" style="min-height: 40px; border: 2px solid var(--hitam); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 13px; font-weight: 800; color: var(--hitam); padding: 0 12px" disabled="" aria-disabled="true" class="belum-aktif">Ganti foto<span class="segera" style="margin-left: 6px;">Segera</span></button><div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-teks)">Kamera atau galeri</div></div></div><div style="box-sizing: content-box; background: var(--hijau-muda); border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 800; color: var(--hijau-tua)">Izin khusus. Tidak memengaruhi performa.</div></div><div style="box-sizing: content-box; flex-grow: 1"></div></div>
-<div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Kirim<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
+<div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 4px"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 36px; width: auto; align-self: flex-start"><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Ajukan izin / cuti</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Jenis izin</div><select aria-label="Jenis izin" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="jenis" disabled="" class="belum-aktif"><option>Sakit</option></select></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Mulai</div><input aria-label="Mulai" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="mulai" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Selesai</div><input aria-label="Selesai" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="selesai" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700" data-f="info">– hari kerja</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800">Surat dokter</div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: center"><div style="box-sizing: content-box; width: 92px; height: 120px; border-radius: 12px; background: var(--krem); border: 2px solid var(--hijau); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--abu-teks); text-align: center; flex-shrink: 0" data-f="fotoBox">[Foto surat]</div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 8px"><div style="box-sizing: content-box; font-size: 13px; font-weight: 800; color: var(--hijau-tua)" data-f="terpasang">✓ Surat terpasang</div><button type="button" style="min-height: 40px; border: 2px solid var(--hitam); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 13px; font-weight: 800; color: var(--hitam); padding: 0 12px" data-f="ganti" disabled="" aria-disabled="true" class="belum-aktif">Ganti foto<span class="segera" style="margin-left: 6px;">Segera</span></button><div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-teks)">Kamera atau galeri</div></div></div><div style="box-sizing: content-box; background: var(--hijau-muda); border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 800; color: var(--hijau-tua)" data-f="catatan">Izin khusus. Tidak memengaruhi performa.</div></div><div style="box-sizing: content-box; flex-grow: 1"></div></div>
+<div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" data-f="kirim" disabled="" aria-disabled="true" class="belum-aktif">Kirim<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb24" class="layar" data-lb-home="own">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 12px">
@@ -1230,19 +1230,19 @@
 <input id="lb41_selesai" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif">
 </div>
 </div>
-<div style="box-sizing: content-box; font-size: 14px; font-weight: 700">– hari kerja. Menikah maksimal – hari.</div>
-<div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Kelebihan – hari diambil dari</div>
-<div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
-<button style="min-height: 40px; border: none; border-radius: 16px; background: var(--abu); font-family: inherit; color: var(--kuning); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px" type="button" disabled="" aria-disabled="true" class="belum-aktif">
+<div style="box-sizing: content-box; font-size: 14px; font-weight: 700" data-f="info">– hari kerja. Menikah maksimal – hari.</div>
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 700" data-f="lebihJudul">Kelebihan – hari diambil dari</div>
+<div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px" data-f="lebihPilih">
+<button style="min-height: 40px; border: none; border-radius: 16px; background: var(--abu); font-family: inherit; color: var(--kuning); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px" type="button" data-f="lebihCuti" disabled="" aria-disabled="true" class="belum-aktif">
 <div style="box-sizing: content-box; font-size: 16px; font-weight: 800">Cuti</div>
-<div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--putih)">sisa – hari</div>
+<div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--putih)" data-f="sisaCuti">sisa – hari</div>
 </button>
-<button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 16px; background: var(--putih); font-family: inherit; color: var(--hitam); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px" type="button" disabled="" aria-disabled="true" class="belum-aktif">
+<button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 16px; background: var(--putih); font-family: inherit; color: var(--hitam); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px" type="button" data-f="lebihBiasa" disabled="" aria-disabled="true" class="belum-aktif">
 <div style="box-sizing: content-box; font-size: 16px; font-weight: 800">Izin biasa</div>
 <div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-teks)">memengaruhi performa</div>
 </button>
 </div>
-<div style="box-sizing: content-box; background: var(--kuning-muda); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+<div style="box-sizing: content-box; background: var(--kuning-muda); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 4px" data-f="hasil">
 <div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Hasil pengajuan</div>
 
 
@@ -1253,7 +1253,7 @@
 <textarea id="lb41_ket" style="height: 80px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; color: var(--hitam); padding: 10px; box-sizing: border-box; resize: none; width: 321px" disabled="" class="belum-aktif"></textarea>
 </div>
 </div>
-<div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 22px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Kirim<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
+<div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 22px; font-weight: 800" type="button" data-f="kirim" disabled="" aria-disabled="true" class="belum-aktif">Kirim<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
 </div>
 </div>
 <div id="lb42" class="layar" data-lb-home="prib">
@@ -1359,13 +1359,13 @@
 <button style="min-height: 44px; border: 2px solid var(--hitam); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--hitam); display: flex; align-items: center; justify-content: center; gap: 8px" type="button" disabled="" aria-disabled="true" class="belum-aktif"><svg aria-hidden="true" fill="none" height="16" stroke="var(--hitam)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="16"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Update foto<span class="segera" style="margin-left: 6px;">Segera</span></button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: grid; grid-template-columns: 1fr; gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb65_em" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jam masuk</label><input id="lb65_em" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px; font-size: 13px"><div style="box-sizing: content-box; font-weight: 800">Sebelum → sesudah</div><div>Masuk – (TELAT – min) → <b>– (HADIR)</b></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb65_ea" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Alasan edit (wajib)</label><input id="lb65_ea" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; background: var(--krem); border-radius: 12px; padding: 10px 12px; font-size: 12px; font-weight: 700">Data lama tetap tersimpan di log.</div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb66" class="layar" data-lb-home="adm">
-<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px; "><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Input izin</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Untuk karyawan yang tidak punya HP</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ik" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb66_ik" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>–</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ij" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jenis izin</label><select id="lb66_ij" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>Sakit</option></select></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_im" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Mulai</label><input id="lb66_im" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_is" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Selesai</label><input id="lb66_is" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">– hari kerja</div><button style="min-height: 40px; border: 2px dashed var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam)" type="button" disabled="" aria-disabled="true" class="belum-aktif">Foto surat dokter (opsional)</button><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ik2" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Keterangan (opsional)</label><input id="lb66_ik2" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Langsung disetujui.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px; "><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Input izin</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Untuk karyawan yang tidak punya HP</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ik" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb66_ik" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>–</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ij" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jenis izin</label><select id="lb66_ij" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>Sakit</option></select></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_im" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Mulai</label><input id="lb66_im" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_is" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Selesai</label><input id="lb66_is" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700" data-f="info">– hari kerja</div><button style="min-height: 40px; border: 2px dashed var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam)" type="button" data-f="foto" disabled="" aria-disabled="true" class="belum-aktif">Foto surat dokter (opsional)</button><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ik2" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Keterangan (opsional)</label><input id="lb66_ik2" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600" data-f="catatan">Langsung disetujui.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" type="button" data-f="simpan" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb67" class="layar" data-lb-home="adm">
-<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px; "><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Kalender libur</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">– · Cabang –</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px; "><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Kalender libur</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600" data-f="sub">– · Cabang –</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
 <div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Libur setiap Minggu</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-teks)">Minggu tertentu bisa diubah dengan ketuk tanggal</div></div>
-<button aria-checked="true" aria-label="Libur setiap Minggu" role="switch" style="width: 56px; height: 32px; border: none; border-radius: 999px; background: var(--hijau); padding: 3px; display: flex; justify-content: flex-end; flex-shrink: 0" type="button" disabled="" aria-disabled="true" class="belum-aktif"><span style="box-sizing: content-box; width: 26px; height: 26px; border-radius: 50%; background: var(--putih); display: block"></span></button>
-</div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px"><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Sen</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Sel</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Rab</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Kam</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Jum</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Sab</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Min</div><div></div><div></div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--merah-muda); color: var(--merah); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu); color: var(--kuning); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); border: 2px solid var(--hijau); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div></div><div style="box-sizing: content-box; display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; font-weight: 700"><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 14px; height: 14px; border-radius: 4px; background: var(--abu-garis)"></div>Libur Minggu</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 14px; height: 14px; border-radius: 4px; background: var(--merah-muda)"></div>Tanggal merah</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 14px; height: 14px; border-radius: 4px; background: var(--abu)"></div>Libur khusus</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 16px; padding: 12px 14px; font-size: 13px; font-weight: 700; display: flex; flex-direction: column; gap: 4px"></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Ketuk tanggal untuk ubah libur.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">+ Libur khusus<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
+<button aria-checked="true" aria-label="Libur setiap Minggu" role="switch" style="width: 56px; height: 32px; border: none; border-radius: 999px; background: var(--hijau); padding: 3px; display: flex; justify-content: flex-end; flex-shrink: 0" type="button" data-f="saklar" disabled="" aria-disabled="true" class="belum-aktif"><span style="box-sizing: content-box; width: 26px; height: 26px; border-radius: 50%; background: var(--putih); display: block"></span></button>
+</div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px" data-f="grid"><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Sen</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Sel</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Rab</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Kam</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Jum</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Sab</div><div style="box-sizing: content-box; font-size: 11px; font-weight: 800; text-align: center">Min</div><div></div><div></div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--merah-muda); color: var(--merah); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu); color: var(--kuning); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--abu-garis); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); border: 2px solid var(--hijau); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div><div style="box-sizing: content-box; height: 40px; border-radius: 10px; background: var(--putih); color: var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">–</div></div><div style="box-sizing: content-box; display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; font-weight: 700"><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 14px; height: 14px; border-radius: 4px; background: var(--abu-garis)"></div>Libur Minggu</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 14px; height: 14px; border-radius: 4px; background: var(--merah-muda)"></div>Tanggal merah</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 14px; height: 14px; border-radius: 4px; background: var(--abu)"></div>Libur khusus</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 16px; padding: 12px 14px; font-size: 13px; font-weight: 700; display: flex; flex-direction: column; gap: 4px"></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Ketuk tanggal untuk ubah libur.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800" type="button" data-f="tambah" disabled="" aria-disabled="true" class="belum-aktif">+ Libur khusus<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb68" class="layar" data-lb-home="adm">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 14px; "><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Dashboard bulanan</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Cabang –</div></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb68_lbm" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Bulan</label><select id="lb68_lbm" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>–</option></select></div><div role="tablist" style="box-sizing: content-box; display: flex; gap: 4px; padding: 4px; background: var(--putih); border-radius: 16px"><button style="flex: 1; height: 44px; border: none; border-radius: 12px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 15px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Ringkasan</button><button style="flex: 1; height: 44px; border: none; border-radius: 12px; background: transparent; color: var(--hitam); font-family: inherit; font-size: 15px; font-weight: 800" type="button" data-lb-ke="lb69" data-lb-ganti="1">Per karyawan</button></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-tua)">Kehadiran</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 30px; font-weight: 700; line-height: 1.1">–</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; color: var(--abu-teks);">–</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-tua)">Telat</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 30px; font-weight: 700; line-height: 1.1">– Hari</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; color: var(--abu-teks);">–</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-tua)">Tidak hadir</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 30px; font-weight: 700; line-height: 1.1">– Hari</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; color: var(--abu-teks);">–</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-tua)">Lembur disetujui</div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 30px; font-weight: 700; line-height: 1.1">– Hari</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; color: var(--abu-teks);">–</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: baseline"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Komposisi label</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-teks)">– karyawan</div></div><div style="box-sizing: content-box; display: flex; height: 22px; border-radius: 999px; overflow: hidden; gap: 2px"><div style="box-sizing: content-box; flex: 1; background: var(--emas-tua)"></div><div style="box-sizing: content-box; flex: 2; background: var(--hijau)"></div><div style="box-sizing: content-box; flex: 1; background: var(--merah)"></div></div><div style="box-sizing: content-box; display: flex; gap: 14px; flex-wrap: wrap"><div style="box-sizing: content-box; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700"><div style="box-sizing: content-box; width: 12px; height: 12px; border-radius: 3px; background: var(--emas-tua)"></div>EXCELLENT –</div><div style="box-sizing: content-box; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700"><div style="box-sizing: content-box; width: 12px; height: 12px; border-radius: 3px; background: var(--hijau)"></div>GOOD –</div><div style="box-sizing: content-box; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700"><div style="box-sizing: content-box; width: 12px; height: 12px; border-radius: 3px; background: var(--merah)"></div>BAD –</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: baseline"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Telat per minggu</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-teks)">dibanding bulan lalu</div></div><div style="box-sizing: content-box; display: flex; gap: 8px; align-items: flex-end; height: 120px"></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-teks);">–</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: baseline"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Telat per hari</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-teks)">total sebulan</div></div><div style="box-sizing: content-box; display: flex; gap: 8px; align-items: flex-end; height: 120px"></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-teks);">–</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: baseline"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Paling sering telat</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700; color: var(--abu-teks)"></div></div></div><div style="box-sizing: content-box; font-size: 15px; font-weight: 800; padding-top: 4px">Per karyawan</div></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="home">Home</button></div></div>
@@ -1604,6 +1604,7 @@
   function tampilLayar(el) {
     semuaLayar.forEach(function (l) { l.classList.toggle('aktif', l === el); });
     if (['layarUtama', 'layarPribadi', 'layarAdmin', 'layarOwner'].indexOf(el.id) >= 0) { tumpukanLb.length = 0; }
+    if (el.id === 'layarUtama' && typeof muatTidakMasuk === 'function') { setTimeout(function () { muatTidakMasuk(false); }, 60); }
     if (el === layarAdmin && typeof muatBerandaAdmin === 'function') { setTimeout(muatBerandaAdmin, 0); }
     if (el !== layarPilihNama && el !== layarLuar) { matikanKamera(); }
     window.scrollTo(0, 0);
@@ -3634,6 +3635,13 @@
   function gambarStatusPribadi() {
     const d = statusHariIni;
     if (!d) { return; }
+    if (typeof d.izin_menunggu === 'number') {
+      // "N pengajuan menunggu ACC" dari server; "Lihat" tetap nonaktif karena mockup tidak punya layar daftar pengajuan
+      document.getElementById('pribStripTeks').textContent = d.izin_menunggu + ' pengajuan menunggu ACC';
+      const lihat = document.getElementById('pribStripLihat');
+      lihat.textContent = 'Lihat'; lihat.classList.remove('segera'); lihat.style.opacity = '.55'; lihat.style.fontWeight = '700';
+      document.getElementById('pribStrip').classList.toggle('belum-aktif', d.izin_menunggu === 0);
+    }
     document.getElementById('subPribMasuk').textContent = d.sudah_masuk ? 'Sudah masuk ' + d.jam_masuk : 'Absen luar';
     document.getElementById('subPribPulang').textContent = d.sudah_pulang ? 'Sudah pulang ' + d.jam_pulang + ' · ketuk untuk lembur' : (d.sudah_masuk ? 'Absen luar' : 'Belum absen masuk');
     document.getElementById('pribStatus').textContent = !d.sudah_masuk ? 'Belum absen hari ini' : ('Masuk ' + d.jam_masuk + (d.sudah_pulang ? ' · Pulang ' + d.jam_pulang : ' · belum pulang'));
@@ -3888,7 +3896,18 @@
     return ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][d.getDay()] + ' ' + d.getDate() + ' ' + NAMA_BULAN[d.getMonth()].slice(0, 3);
   }
   const NAMA_TIPE = { LUAR: 'Absen luar', LEMBUR: 'Lembur', PULANG_CEPAT: 'Pulang cepat' };
+  function kartuKonfirmasiIzin(it) {
+    const detail = [it.rincian];
+    if (it.ket) { detail.push(it.ket); }
+    if (it.telat_aju) { detail.push('diajukan lewat hari'); }
+    if (it.cabang && modeKonf === 'OWNER') { detail.push(it.cabang); }
+    return '<div class="kartu-konf" data-id="' + escHtml(it.id) + '" data-kel="IZIN" data-surat="' + (it.surat ? '1' : '0') + '" data-rincian="' + escHtml(it.rincian) + '">' +
+      '<div class="konf-baris"><div class="konf-isi"><div class="konf-tipe">' + escHtml(it.judul) + '</div><div class="konf-nama">' + escHtml(it.nama) + '</div>' +
+      '<div class="konf-detail">' + escHtml(detail.join(', ')) + '</div></div></div>' +
+      '<div class="konf-aksi"><button type="button" class="acc" data-konf="acc">ACC</button><button type="button" class="tolak" data-konf="tolak">Tolak</button></div></div>';
+  }
   function kartuKonfirmasi(it) {
+    if (it.kelompok === 'IZIN') { return kartuKonfirmasiIzin(it); }
     let tipe = NAMA_TIPE[it.kelompok] || it.kelompok;
     if (it.kelompok === 'LUAR') { tipe += ', ' + (it.jenis === 'MASUK' ? 'masuk' : 'pulang'); }
     if (it.kelompok === 'LEMBUR' && it.tingkat) { tipe += ' ' + (['', '<1 jam', '1–2 jam', '>2 jam'][it.tingkat] || ''); }
@@ -3920,10 +3939,10 @@
     kotak.style.display = bisa ? '' : 'none';
     if (!bisa) { return; }
     const jml = function (k) { return ' ' + konfAntrean.filter(function (it) { return it.kelompok === k; }).length; };
-    const def = [['', 'Semua ' + (konfTotal > 99 ? '99+' : konfTotal)], ['LEMBUR', 'Lembur' + jml('LEMBUR')], ['LUAR', 'Absen luar' + jml('LUAR')]];
+    const def = [['', 'Semua ' + (konfTotal > 99 ? '99+' : konfTotal)], ['LEMBUR', 'Lembur' + jml('LEMBUR')], ['LUAR', 'Absen luar' + jml('LUAR')], ['IZIN', 'Izin' + jml('IZIN')]];
     kotak.innerHTML = def.map(function (c) {
       return '<button type="button" data-kel="' + c[0] + '"' + (konfKelPilih === c[0] ? ' class="pilih"' : '') + '>' + c[1] + '</button>';
-    }).join('') + '<button type="button" disabled>Izin · Segera</button><button type="button" disabled>Lupa absen · Segera</button>';
+    }).join('') + '<button type="button" disabled>Lupa absen · Segera</button>';
   }
   // Antrean tampilan: semua pengajuan dimuat, diurut dari yang PALING LAMA; hanya MAKSIMAL 5 kartu tampil sekaligus.
   // Kartu berikutnya naik setelah satu di-ACC/ditolak. Hanya pengaturan tampilan: hak, ACC, tolak, edit, foto tetap di server.
@@ -4008,7 +4027,7 @@
     kirimPost(Object.assign({ aksi: 'konfirmasi_putuskan', id: id, keputusan: keputusan }, kredKonf()))
       .then(function (d) {
         if (konfGagalSesi(d)) { return; }
-        if (d.status === 'ok') { pesanKonf(keputusan === 'ACC' ? 'Absen diterima.' : 'Absen ditolak.'); hapusKartuKonfirmasi(kartu); return; }
+        if (d.status === 'ok') { const izinKartu = kartu.getAttribute('data-kel') === 'IZIN'; pesanKonf(keputusan === 'ACC' ? (izinKartu ? 'Izin diterima.' : 'Absen diterima.') : (izinKartu ? 'Izin ditolak.' : 'Absen ditolak.')); hapusKartuKonfirmasi(kartu); return; }
         pesanKonf(d.pesan || 'Gagal.');
         kartu.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
         if (d.pesan && /sudah diputuskan/.test(d.pesan)) { hapusKartuKonfirmasi(kartu); }
@@ -4072,11 +4091,14 @@
       return;
     }
     if (aksi === 'simpan-edit') { simpanEditKonfirmasi(kartu); return; }
-    if (aksi === 'acc') { putuskanKonfirmasi(kartu, 'ACC'); return; }
+    if (aksi === 'acc') {
+      if (kartu.getAttribute('data-kel') === 'IZIN' && kartu.getAttribute('data-surat') === '1') { bukaCekSurat(kartu); return; } // izin sakit dengan surat: cek surat dulu (layar 22)
+      putuskanKonfirmasi(kartu, 'ACC'); return;
+    }
     if (aksi === 'tolak') {
       // konfirmasi singkat sebelum TOLAK
       bukaDialog(
-        '<div class="dialog-judul">Tolak absen ini?</div><div class="dialog-sub">' + escHtml(kartu.querySelector('.konf-nama').textContent) + '</div>' +
+        '<div class="dialog-judul">' + (kartu.getAttribute('data-kel') === 'IZIN' ? 'Tolak izin ini?' : 'Tolak absen ini?') + '</div><div class="dialog-sub">' + escHtml(kartu.querySelector('.konf-nama').textContent) + '</div>' +
         '<div class="dialog-catatan">Keputusan tidak bisa diubah lagi.</div>' +
         '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">TOLAK</button></div>');
       document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
@@ -4329,6 +4351,570 @@
     tampilLayar(layarJenis);
   }
 
+  // ================= FITUR A: IZIN DAN CUTI, KALENDER LIBUR, KARTU "HARI INI TIDAK MASUK" =================
+  // Layar 41/23 (form izin), 22 (cek surat dokter), 66 (input izin admin), 67 (kalender libur) dihidupkan di sini. Penanda elemen: atribut data-f
+  // (dibuat tools/layar_baru_fn.js). Semua tanggal/hitungan dari server; HP hanya menampilkan. Hak diperiksa di server.
+  const SIAP_LB = {}; // id layar baru -> fungsi yang dipanggil setiap kali layar dibuka lewat bukaLb
+  function lbF(id, f) { return document.querySelector('#' + id + ' [data-f="' + f + '"]'); }
+  function hidupkanEl(e) {
+    if (!e) { return; }
+    e.disabled = false; e.removeAttribute('aria-disabled'); e.classList.remove('belum-aktif');
+    const s = e.querySelector('.segera'); if (s) { s.remove(); }
+  }
+  function matikanEl(e) { if (e) { e.disabled = true; e.setAttribute('aria-disabled', 'true'); e.classList.add('belum-aktif'); } }
+  function pudarEl(e, pudar) { if (e) { e.classList.toggle('belum-aktif', pudar); } }
+  function kredAdminLb() { return sesiAdmin ? { token: hpAktif ? hpAktif.token : undefined, sesi: sesiAdmin } : { sesi: sesiPribadi }; }
+  function cabangAdminLb() { return sesiAdmin ? String(document.getElementById('admBadge').textContent || '').replace(/^Admin\s*/, '') : (profilPribadi ? profilPribadi.cabang : ''); }
+  function isiBadgeAdminLb(id) {
+    const blok = document.getElementById(id);
+    Array.prototype.forEach.call(blok.querySelectorAll('div'), function (d) { if (d.children.length === 0 && /^Admin\s*(–)?$/.test(d.textContent.trim())) { d.textContent = 'Admin ' + cabangAdminLb(); } });
+  }
+  function infoDialog(judul, teks, sesudah) {
+    bukaDialog('<div class="dialog-judul">' + escHtml(judul) + '</div><div class="dialog-sub">' + escHtml(teks) + '</div><div class="dialog-tombol"><button type="button" class="btn-gelap" id="dlgOk">OK</button></div>');
+    document.getElementById('dlgOk').addEventListener('click', function () { tutupDialog(); if (sesudah) { sesudah(); } });
+  }
+  const BLN_PENDEK = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  function rentangPendekKlien(mulai, selesai) {
+    const a = mulai.split('-').map(Number), b = selesai.split('-').map(Number);
+    if (mulai === selesai) { return a[2] + ' ' + BLN_PENDEK[a[1] - 1]; }
+    if (a[1] === b[1] && a[0] === b[0]) { return a[2] + '–' + b[2] + ' ' + BLN_PENDEK[a[1] - 1]; }
+    return a[2] + ' ' + BLN_PENDEK[a[1] - 1] + '–' + b[2] + ' ' + BLN_PENDEK[b[1] - 1];
+  }
+  // Pilih foto (kamera atau galeri), kecilkan di HP, kembalikan data URL JPEG. maxSisi px, kualitas 0..1.
+  function pilihFotoJpeg(maxSisi, kualitas, sesudah) {
+    if (window.__pilihFotoUji) { sesudah(window.__pilihFotoUji); return; }
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', function () {
+      const f = inp.files && inp.files[0];
+      inp.remove();
+      if (!f) { return; }
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.onload = function () {
+        const s = Math.min(1, maxSisi / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.width * s)); c.height = Math.max(1, Math.round(img.height * s));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        sesudah(c.toDataURL('image/jpeg', kualitas));
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); infoDialog('Foto tidak terbaca', 'Pilih foto lain.'); };
+      img.src = url;
+    });
+    inp.click();
+  }
+
+  // ---------- Form izin / cuti (41 dan 23) ----------
+  const izin = { info: null, jenis: '', mulai: '', selesai: '', lebih: '', ket: '', foto: '', pratinjau: null, tmr: null, mengirim: false, permintaan: 0 };
+  function izinSakit() { return String(izin.jenis).toLowerCase() === 'sakit'; }
+  function izinLayarId() { return izinSakit() ? 'lb23' : 'lb41'; }
+  function jenisIzinInfo(nama) { return izin.info ? izin.info.jenis.filter(function (j) { return j.nama === nama; })[0] : null; }
+  function pasangPilihanJenis(sel, daftar, nilai) {
+    sel.innerHTML = daftar.map(function (j) { return '<option value="' + escHtml(j.nama) + '">' + escHtml(j.nama) + '</option>'; }).join('');
+    sel.value = nilai;
+  }
+  function selektorIzin(id) {
+    return id === 'lb41'
+      ? { jenis: document.getElementById('lb41_jenis'), mulai: document.getElementById('lb41_mulai'), selesai: document.getElementById('lb41_selesai'), ket: document.getElementById('lb41_ket') }
+      : { jenis: lbF('lb23', 'jenis'), mulai: lbF('lb23', 'mulai'), selesai: lbF('lb23', 'selesai'), ket: null };
+  }
+  function sinkronFormIzin() {
+    ['lb41', 'lb23'].forEach(function (id) {
+      const s = selektorIzin(id);
+      if (!izin.info) { return; }
+      if (s.jenis.getAttribute('data-terisi') !== '1') { pasangPilihanJenis(s.jenis, izin.info.jenis, izin.jenis); s.jenis.setAttribute('data-terisi', '1'); }
+      s.jenis.value = izin.jenis;
+      [s.jenis, s.mulai, s.selesai, s.ket].forEach(hidupkanEl);
+      s.mulai.type = 'date'; s.selesai.type = 'date';
+      s.mulai.value = izin.mulai; s.selesai.value = izin.selesai;
+      if (s.ket) { s.ket.value = izin.ket; s.ket.maxLength = 200; }
+    });
+  }
+  function ubahInfoTeks(e, teks, galat) {
+    if (!e) { return; }
+    e.textContent = teks;
+    e.style.color = galat ? 'var(--merah)' : '';
+  }
+  function gambarFormIzin() {
+    const p = izin.pratinjau;
+    const sakit = izinSakit();
+    const kirim = lbF(izinLayarId(), 'kirim');
+    if (izinLayarId() === 'lb41') {
+      const info = lbF('lb41', 'info');
+      const lj = lbF('lb41', 'lebihJudul'), lp = lbF('lb41', 'lebihPilih'), lc = lbF('lb41', 'lebihCuti'), lb = lbF('lb41', 'lebihBiasa'), hasil = lbF('lb41', 'hasil');
+      const j = jenisIzinInfo(izin.jenis);
+      if (!p) { ubahInfoTeks(info, 'Memuat...', false); }
+      else if (!p.bisa) { ubahInfoTeks(info, p.pesan || 'Pengajuan belum bisa dikirim', true); }
+      else { ubahInfoTeks(info, p.hari + ' hari kerja.' + (j && j.kelompok === 'khusus' && j.maks ? ' ' + j.nama + ' maksimal ' + j.maks + ' hari.' : ''), false); }
+      const adaLebih = !!p && p.kelebihan > 0;
+      pudarEl(lj, !adaLebih); pudarEl(lp, !adaLebih);
+      if (lj) { lj.textContent = adaLebih ? 'Kelebihan ' + p.kelebihan + ' hari diambil dari' : 'Kelebihan – hari diambil dari'; }
+      [lc, lb].forEach(function (b) { if (b) { b.disabled = !adaLebih; b.removeAttribute('aria-disabled'); b.classList.remove('belum-aktif'); } });
+      pudarEl(lc, !adaLebih); pudarEl(lb, !adaLebih);
+      const sc = lbF('lb41', 'sisaCuti');
+      if (sc) { sc.textContent = 'sisa ' + (p && p.sisa_cuti !== null ? p.sisa_cuti : (izin.info ? izin.info.sisa_cuti : '–')) + ' hari'; }
+      const terpilih = adaLebih ? (p.lebih || 'CUTI') : '';
+      [[lc, 'CUTI'], [lb, 'BIASA']].forEach(function (x) {
+        const b = x[0]; if (!b) { return; }
+        const pilih = terpilih === x[1];
+        b.style.background = pilih ? 'var(--abu)' : 'var(--putih)';
+        b.style.border = pilih ? 'none' : '2px solid var(--abu)';
+        b.style.color = pilih ? 'var(--kuning)' : 'var(--hitam)';
+        if (b.children[1]) { b.children[1].style.color = pilih ? 'var(--putih)' : 'var(--abu-teks)'; }
+      });
+      if (hasil) {
+        const judul = hasil.children[0];
+        hasil.innerHTML = '';
+        hasil.appendChild(judul);
+        pudarEl(hasil, !(p && p.bisa));
+        if (p && p.bisa) {
+          p.segmen.forEach(function (s) {
+            const d = document.createElement('div');
+            d.style.cssText = 'font-size:14px;font-weight:700';
+            const nama = s.kelompok === 'cuti' ? 'cuti' : (s.kelompok === 'khusus' ? 'izin khusus ' + s.jenis.toLowerCase() : 'izin ' + s.jenis.toLowerCase());
+            d.textContent = s.hari + ' hari ' + nama + ' (' + rentangPendekKlien(s.mulai, s.selesai) + ')';
+            hasil.appendChild(d);
+          });
+          if (p.segmen.some(function (s) { return s.kelompok === 'cuti'; })) {
+            const d = document.createElement('div');
+            d.style.cssText = 'font-size:13px;color:var(--abu-teks)';
+            d.textContent = 'Sisa cuti jadi ' + p.sisa_setelah + ' hari.';
+            hasil.appendChild(d);
+          }
+        }
+      }
+    } else {
+      const info = lbF('lb23', 'info');
+      if (!p) { ubahInfoTeks(info, 'Memuat...', false); }
+      else if (!p.bisa) { ubahInfoTeks(info, p.pesan || 'Pengajuan belum bisa dikirim', true); }
+      else { ubahInfoTeks(info, p.hari + ' hari kerja', false); }
+      const ada = izin.foto !== '';
+      pudarEl(lbF('lb23', 'terpasang'), !ada); pudarEl(lbF('lb23', 'catatan'), !ada);
+      const box = lbF('lb23', 'fotoBox');
+      if (box) {
+        if (ada) { box.innerHTML = '<img alt="Foto surat" style="width:100%;height:100%;object-fit:cover;border-radius:10px" src="' + izin.foto + '">'; }
+        else { box.textContent = '[Foto surat]'; }
+      }
+      hidupkanEl(lbF('lb23', 'ganti'));
+    }
+    if (kirim) {
+      const siap = !!p && p.bisa && !izin.mengirim && !!izin.mulai && !!izin.selesai;
+      if (siap) { hidupkanEl(kirim); } else { matikanEl(kirim); }
+    }
+  }
+  function mintaPratinjauIzin() {
+    clearTimeout(izin.tmr);
+    izin.pratinjau = null;
+    gambarFormIzin();
+    if (!izin.mulai || !izin.selesai || !izin.jenis) { return; }
+    const nomor = ++izin.permintaan;
+    izin.tmr = setTimeout(function () {
+      kirimPost({ aksi: 'izin_pratinjau', sesi: sesiPribadi, jenis: izin.jenis, mulai: izin.mulai, selesai: izin.selesai, lebih: izin.lebih || undefined })
+        .then(function (d) {
+          if (nomor !== izin.permintaan) { return; }
+          if (pribadiGagalSesi(d)) { return; }
+          izin.pratinjau = d.status === 'ok' ? d : { bisa: false, pesan: 'Pengajuan belum bisa dihitung', segmen: [], kelebihan: 0 };
+          if (izin.pratinjau.lebih && !izin.lebih) { /* tampilan memakai pilihan server sampai pengguna memilih */ }
+          gambarFormIzin();
+        })
+        .catch(function () { if (nomor === izin.permintaan) { izin.pratinjau = { bisa: false, pesan: 'Tidak bisa terhubung ke server', segmen: [], kelebihan: 0 }; gambarFormIzin(); } });
+    }, 250);
+  }
+  function gantiLayarIzinBilaPerlu() {
+    const a = document.querySelector('.layar.aktif');
+    const tujuan = izinLayarId();
+    if (a && (a.id === 'lb41' || a.id === 'lb23') && a.id !== tujuan) { bukaLb(tujuan, true); }
+  }
+  function ubahFormIzin(dari) {
+    const s = selektorIzin(dari);
+    izin.jenis = s.jenis.value; izin.mulai = s.mulai.value; izin.selesai = s.selesai.value;
+    if (s.ket) { izin.ket = s.ket.value; }
+    if (izin.selesai && izin.mulai && izin.selesai < izin.mulai) { izin.selesai = izin.mulai; }
+    if (!izinSakit()) { izin.foto = ''; }
+    izin.lebih = '';
+    sinkronFormIzin();
+    gantiLayarIzinBilaPerlu();
+    mintaPratinjauIzin();
+  }
+  function siapFormIzin() {
+    if (!sesiPribadi) { return; }
+    const mulaiAwal = function () {
+      sinkronFormIzin();
+      mintaPratinjauIzin();
+    };
+    if (izin.info) { gantiLayarIzinBilaPerlu(); mulaiAwal(); return; }
+    kirimPost({ aksi: 'izin_info', sesi: sesiPribadi })
+      .then(function (d) {
+        if (pribadiGagalSesi(d)) { return; }
+        if (d.status !== 'ok' || !d.jenis.length) { infoDialog('Izin belum bisa dibuka', 'Daftar jenis izin belum diatur. Hubungi admin.'); return; }
+        izin.info = d; izin.jenis = d.jenis[0].nama; izin.mulai = d.hari_ini; izin.selesai = d.hari_ini; izin.lebih = ''; izin.ket = ''; izin.foto = '';
+        ['lb41', 'lb23'].forEach(function (id) { selektorIzin(id).jenis.removeAttribute('data-terisi'); });
+        gantiLayarIzinBilaPerlu(); mulaiAwal();
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  SIAP_LB.lb41 = siapFormIzin; SIAP_LB.lb23 = siapFormIzin;
+  ['lb41', 'lb23'].forEach(function (id) {
+    const blok = document.getElementById(id);
+    blok.addEventListener('change', function (e) {
+      if (e.target.closest('[data-lb-ke],[data-lb-kembali]')) { return; }
+      if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') { ubahFormIzin(id); }
+    });
+    blok.addEventListener('input', function (e) { if (e.target.tagName === 'TEXTAREA') { izin.ket = e.target.value; } });
+  });
+  ['lebihCuti', 'lebihBiasa'].forEach(function (f) {
+    lbF('lb41', f).addEventListener('click', function () {
+      if (this.disabled) { return; }
+      izin.lebih = f === 'lebihCuti' ? 'CUTI' : 'BIASA';
+      mintaPratinjauIzin();
+    });
+  });
+  lbF('lb23', 'ganti').addEventListener('click', function () {
+    if (this.disabled) { return; }
+    pilihFotoJpeg(1280, 0.7, function (dataUrl) { izin.foto = dataUrl; gambarFormIzin(); });
+  });
+  function resetFormIzin() {
+    izin.mulai = izin.info ? izin.info.hari_ini : ''; izin.selesai = izin.mulai; izin.ket = ''; izin.foto = ''; izin.lebih = ''; izin.pratinjau = null;
+  }
+  function kirimIzin() {
+    if (izin.mengirim || !izin.pratinjau || !izin.pratinjau.bisa) { return; }
+    izin.mengirim = true; gambarFormIzin();
+    const lebih = izin.pratinjau.kelebihan > 0 ? (izin.lebih || izin.pratinjau.lebih || 'CUTI') : undefined;
+    const fotoKirim = izin.foto;
+    kirimPost({ aksi: 'izin_ajukan', sesi: sesiPribadi, jenis: izin.jenis, mulai: izin.mulai, selesai: izin.selesai, lebih: lebih, ket: izin.ket })
+      .then(function (d) {
+        if (pribadiGagalSesi(d)) { return null; }
+        if (d.status !== 'ok') { izin.mengirim = false; gambarFormIzin(); infoDialog('Belum terkirim', d.pesan || 'Coba lagi.'); return null; }
+        if (fotoKirim && d.id_sakit) {
+          return kirimPost({ aksi: 'izin_unggah_surat', sesi: sesiPribadi, id: d.id_sakit, gambar: fotoKirim })
+            .then(function (u) { return { d: d, suratOk: u.status === 'ok', pesanSurat: u.pesan }; })
+            .catch(function () { return { d: d, suratOk: false, pesanSurat: '' }; });
+        }
+        return { d: d, suratOk: true };
+      })
+      .then(function (h) {
+        if (!h) { return; }
+        izin.mengirim = false;
+        resetFormIzin();
+        muatStatusHariIni();
+        infoDialog('Pengajuan terkirim', 'Menunggu persetujuan admin.' + (h.suratOk ? '' : ' Surat dokter belum tersimpan.'), function () { kembaliLb('home'); });
+      })
+      .catch(function () { izin.mengirim = false; gambarFormIzin(); infoDialog('Belum terkirim', 'Tidak bisa terhubung ke server. Coba lagi.'); });
+  }
+  lbF('lb41', 'kirim').addEventListener('click', function () { if (!this.disabled) { kirimIzin(); } });
+  lbF('lb23', 'kirim').addEventListener('click', function () { if (!this.disabled) { kirimIzin(); } });
+
+  // ---------- Cek surat dokter (22): dibuka dari kartu izin di Konfirmasi ----------
+  let cekSurat = null; // { id, kartu }
+  function bukaCekSurat(kartu) {
+    cekSurat = { id: kartu.getAttribute('data-id'), kartu: kartu, nama: kartu.querySelector('.konf-nama').textContent, rincian: kartu.getAttribute('data-rincian') || '' };
+    bukaLb('lb22');
+  }
+  SIAP_LB.lb22 = function () {
+    if (!cekSurat) { return; }
+    isiBadgeAdminLb('lb22');
+    const sub = lbF('lb22', 'sub'), tgl = lbF('lb22', 'tgl'), ket = lbF('lb22', 'ket'), foto = lbF('lb22', 'foto');
+    sub.textContent = cekSurat.nama + ' · memuat...'; tgl.textContent = '–'; ket.textContent = '–';
+    foto.textContent = 'Memuat surat...';
+    matikanEl(lbF('lb22', 'acc')); matikanEl(lbF('lb22', 'tidakSah'));
+    const id = cekSurat.id;
+    kirimPost(Object.assign({ aksi: 'ambil_foto', id: id }, kredKonf()))
+      .then(function (d) {
+        if (!cekSurat || cekSurat.id !== id || konfGagalSesi(d)) { return; }
+        if (d.status === 'ok' && d.foto && /^data:image\/jpeg;base64,/.test(d.foto)) {
+          foto.innerHTML = '<img alt="Surat dokter" style="max-width:100%;max-height:100%;object-fit:contain" src="' + d.foto + '">';
+          foto.setAttribute('data-foto', d.foto);
+        } else { foto.textContent = d.teks || d.pesan || 'Surat tidak tersedia'; foto.removeAttribute('data-foto'); }
+        const rng = d.mulai ? rentangPendekKlien(d.mulai, d.selesai) : '';
+        sub.textContent = cekSurat.nama + (rng ? ' · ' + rng : '');
+        tgl.textContent = rng ? rng + ' · ' + d.hari + ' hari' : '–';
+        ket.textContent = d.ket || '–';
+        hidupkanEl(lbF('lb22', 'acc')); hidupkanEl(lbF('lb22', 'tidakSah'));
+      })
+      .catch(function () { foto.textContent = 'Tidak bisa terhubung ke server.'; });
+  };
+  lbF('lb22', 'foto').addEventListener('click', function () {
+    const f = this.getAttribute('data-foto');
+    if (!f) { return; }
+    bukaDialog('<div class="dialog-judul">Surat dokter</div><div style="max-height:60vh;overflow:auto"><img alt="Surat dokter" style="width:100%" src="' + f + '"></div><div class="dialog-tombol"><button type="button" class="btn-gelap" id="dlgOk">Tutup</button></div>');
+    document.getElementById('dlgOk').addEventListener('click', tutupDialog);
+  });
+  function putuskanDariCekSurat(tidakSah) {
+    if (!cekSurat) { return; }
+    const kartu = cekSurat.kartu;
+    matikanEl(lbF('lb22', 'acc')); matikanEl(lbF('lb22', 'tidakSah'));
+    kirimPost(Object.assign({ aksi: 'konfirmasi_putuskan', id: cekSurat.id, keputusan: 'ACC', surat_tidak_sah: tidakSah ? true : undefined }, kredKonf()))
+      .then(function (d) {
+        if (konfGagalSesi(d)) { return; }
+        if (d.status === 'ok') { cekSurat = null; kembaliLb('kembali'); pesanKonf('Izin diterima.'); hapusKartuKonfirmasi(kartu); return; }
+        hidupkanEl(lbF('lb22', 'acc')); hidupkanEl(lbF('lb22', 'tidakSah'));
+        infoDialog('Belum bisa', d.pesan || 'Coba lagi.');
+        if (d.pesan && /sudah diputuskan/.test(d.pesan)) { cekSurat = null; kembaliLb('kembali'); hapusKartuKonfirmasi(kartu); }
+      })
+      .catch(function () { hidupkanEl(lbF('lb22', 'acc')); hidupkanEl(lbF('lb22', 'tidakSah')); infoDialog('Tidak bisa terhubung', 'Coba lagi.'); });
+  }
+  lbF('lb22', 'acc').addEventListener('click', function () { if (!this.disabled) { putuskanDariCekSurat(false); } });
+  lbF('lb22', 'tidakSah').addEventListener('click', function () {
+    if (this.disabled) { return; }
+    bukaDialog('<div class="dialog-judul">Surat tidak sah?</div><div class="dialog-sub">Izin tetap diterima sebagai sakit tanpa surat (memengaruhi performa).</div><div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Jadikan tanpa surat</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', function () { tutupDialog(); putuskanDariCekSurat(true); });
+  });
+
+  // ---------- Input izin oleh admin (66) ----------
+  const inputIzin = { info: null, daftar: [], karyawan: '', jenis: '', mulai: '', selesai: '', ket: '', foto: '', pratinjau: null, tmr: null, mengirim: false, permintaan: 0 };
+  function kontrolInput() { return { k: document.getElementById('lb66_ik'), j: document.getElementById('lb66_ij'), m: document.getElementById('lb66_im'), s: document.getElementById('lb66_is'), ket: document.getElementById('lb66_ik2') }; }
+  function gambarInputIzin() {
+    const p = inputIzin.pratinjau, c = kontrolInput();
+    const info = lbF('lb66', 'info');
+    if (!inputIzin.karyawan) { ubahInfoTeks(info, 'Pilih karyawan', false); }
+    else if (!p) { ubahInfoTeks(info, 'Memuat...', false); }
+    else if (!p.bisa) { ubahInfoTeks(info, p.pesan || 'Belum bisa disimpan', true); }
+    else { ubahInfoTeks(info, p.hari + ' hari kerja', false); }
+    const sakit = String(inputIzin.jenis).toLowerCase() === 'sakit';
+    const foto = lbF('lb66', 'foto');
+    if (sakit) { hidupkanEl(foto); } else { matikanEl(foto); }
+    if (foto) { foto.style.borderColor = inputIzin.foto ? 'var(--hijau)' : ''; }
+    const simpan = lbF('lb66', 'simpan');
+    if (inputIzin.karyawan && p && p.bisa && !inputIzin.mengirim) { hidupkanEl(simpan); } else { matikanEl(simpan); }
+    pudarEl(lbF('lb66', 'catatan'), false);
+  }
+  function mintaPratinjauInput() {
+    clearTimeout(inputIzin.tmr);
+    inputIzin.pratinjau = null;
+    gambarInputIzin();
+    if (!inputIzin.karyawan || !inputIzin.mulai || !inputIzin.selesai) { return; }
+    const nomor = ++inputIzin.permintaan;
+    inputIzin.tmr = setTimeout(function () {
+      kirimPost(Object.assign({ aksi: 'izin_input_pratinjau', karyawan: inputIzin.karyawan, jenis: inputIzin.jenis, mulai: inputIzin.mulai, selesai: inputIzin.selesai }, kredAdminLb()))
+        .then(function (d) {
+          if (nomor !== inputIzin.permintaan) { return; }
+          inputIzin.pratinjau = d.status === 'ok' ? d : { bisa: false, pesan: 'Belum bisa dihitung' };
+          gambarInputIzin();
+        })
+        .catch(function () { if (nomor === inputIzin.permintaan) { inputIzin.pratinjau = { bisa: false, pesan: 'Tidak bisa terhubung ke server' }; gambarInputIzin(); } });
+    }, 250);
+  }
+  SIAP_LB.lb66 = function () {
+    isiBadgeAdminLb('lb66');
+    const c = kontrolInput();
+    [c.k, c.j, c.m, c.s, c.ket].forEach(hidupkanEl);
+    c.m.type = 'date'; c.s.type = 'date'; c.ket.maxLength = 200;
+    c.k.innerHTML = '<option value="">Memuat...</option>';
+    Promise.all([kirimPost(Object.assign({ aksi: 'izin_input_info' }, kredAdminLb())), kirimPost(Object.assign({ aksi: 'karyawan_daftar' }, kredAdminLb()))])
+      .then(function (r) {
+        const a = r[0], b = r[1];
+        if (a.status !== 'ok' || b.status !== 'ok') { infoDialog('Belum bisa dibuka', (a.pesan || b.pesan || 'Coba lagi.')); return; }
+        inputIzin.info = a; inputIzin.daftar = b.daftar || [];
+        inputIzin.jenis = a.jenis.length ? a.jenis[0].nama : '';
+        inputIzin.mulai = a.hari_ini; inputIzin.selesai = a.hari_ini; inputIzin.karyawan = ''; inputIzin.ket = ''; inputIzin.foto = '';
+        c.k.innerHTML = '<option value="">Pilih karyawan</option>' + inputIzin.daftar.map(function (k) { return '<option value="' + escHtml(k.id) + '">' + escHtml(k.nama) + '</option>'; }).join('');
+        pasangPilihanJenis(c.j, a.jenis, inputIzin.jenis);
+        c.m.value = inputIzin.mulai; c.s.value = inputIzin.selesai; c.ket.value = '';
+        mintaPratinjauInput();
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  };
+  document.getElementById('lb66').addEventListener('change', function (e) {
+    const c = kontrolInput();
+    if (e.target !== c.k && e.target !== c.j && e.target !== c.m && e.target !== c.s) { return; }
+    inputIzin.karyawan = c.k.value; inputIzin.jenis = c.j.value; inputIzin.mulai = c.m.value; inputIzin.selesai = c.s.value;
+    if (inputIzin.selesai && inputIzin.mulai && inputIzin.selesai < inputIzin.mulai) { inputIzin.selesai = inputIzin.mulai; c.s.value = inputIzin.selesai; }
+    if (String(inputIzin.jenis).toLowerCase() !== 'sakit') { inputIzin.foto = ''; }
+    mintaPratinjauInput();
+  });
+  lbF('lb66', 'foto').addEventListener('click', function () {
+    if (this.disabled) { return; }
+    pilihFotoJpeg(1280, 0.7, function (dataUrl) { inputIzin.foto = dataUrl; gambarInputIzin(); });
+  });
+  lbF('lb66', 'simpan').addEventListener('click', function () {
+    if (this.disabled || inputIzin.mengirim) { return; }
+    inputIzin.mengirim = true; gambarInputIzin();
+    const c = kontrolInput();
+    const fotoKirim = inputIzin.foto;
+    kirimPost(Object.assign({ aksi: 'izin_input', karyawan: inputIzin.karyawan, jenis: inputIzin.jenis, mulai: inputIzin.mulai, selesai: inputIzin.selesai, ket: c.ket.value }, kredAdminLb()))
+      .then(function (d) {
+        if (d.status !== 'ok') { inputIzin.mengirim = false; gambarInputIzin(); infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return null; }
+        if (fotoKirim && d.id_sakit) {
+          return kirimPost(Object.assign({ aksi: 'izin_unggah_surat', id: d.id_sakit, gambar: fotoKirim }, kredAdminLb()))
+            .then(function (u) { return { suratOk: u.status === 'ok' }; }).catch(function () { return { suratOk: false }; });
+        }
+        return { suratOk: true };
+      })
+      .then(function (h) {
+        if (!h) { return; }
+        inputIzin.mengirim = false; inputIzin.karyawan = ''; inputIzin.foto = ''; inputIzin.pratinjau = null; inputIzin.ket = '';
+        infoDialog('Izin tersimpan', 'Langsung disetujui.' + (h.suratOk ? '' : ' Surat dokter belum tersimpan.'), function () { kembaliLb('home'); });
+      })
+      .catch(function () { inputIzin.mengirim = false; gambarInputIzin(); infoDialog('Belum tersimpan', 'Tidak bisa terhubung ke server. Coba lagi.'); });
+  });
+
+  // ---------- Kalender libur (67) ----------
+  const kal = { bulan: '', data: null, hariIni: '', memuat: false };
+  const NAMA_BULAN_PANJANG = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  function geserBulanKal(n) {
+    const p = kal.bulan.split('-').map(Number);
+    const d = new Date(Date.UTC(p[0], p[1] - 1 + n, 1));
+    return d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2);
+  }
+  const GAYA_SEL = 'height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;border:0;font-family:inherit;padding:0;';
+  function gambarKalender() {
+    const d = kal.data, grid = lbF('lb67', 'grid');
+    if (!d) { return; }
+    const p = kal.bulan.split('-').map(Number);
+    lbF('lb67', 'sub').textContent = NAMA_BULAN_PANJANG[p[1] - 1] + ' ' + p[0] + ' · Cabang ' + d.cabang;
+    const sak = lbF('lb67', 'saklar');
+    hidupkanEl(sak);
+    sak.setAttribute('aria-checked', d.libur_minggu ? 'true' : 'false');
+    sak.style.background = d.libur_minggu ? 'var(--hijau)' : 'var(--abu-teks)';
+    sak.style.justifyContent = d.libur_minggu ? 'flex-end' : 'flex-start';
+    Array.prototype.slice.call(grid.children, 7).forEach(function (c) { c.remove(); });
+    const jumlah = new Date(Date.UTC(p[0], p[1], 0)).getUTCDate();
+    const awal = (new Date(Date.UTC(p[0], p[1] - 1, 1)).getUTCDay() + 6) % 7; // Senin = 0
+    for (let i = 0; i < awal; i++) { grid.appendChild(document.createElement('div')); }
+    const peta = {};
+    d.daftar.forEach(function (x) { peta[x.tanggal] = x; });
+    for (let tgl = 1; tgl <= jumlah; tgl++) {
+      const t = kal.bulan + '-' + ('0' + tgl).slice(-2);
+      const hari = new Date(Date.UTC(p[0], p[1] - 1, tgl)).getUTCDay();
+      const x = peta[t];
+      let gaya = 'background:var(--putih);color:var(--hitam);';
+      if (x && x.tipe === 'MERAH') { gaya = 'background:var(--merah-muda);color:var(--merah);'; }
+      else if (x && x.tipe === 'KHUSUS') { gaya = 'background:var(--abu);color:var(--kuning);'; }
+      else if (x && x.tipe === 'MASUK') { gaya = 'background:var(--putih);border:2px solid var(--hijau);color:var(--hitam);'; }
+      else if (hari === 0 && d.libur_minggu) { gaya = 'background:#D9D6CC;color:var(--hitam);'; }
+      const bisa = t >= d.hari_ini && !(x && x.umum);
+      const sel = document.createElement('button');
+      sel.type = 'button'; sel.setAttribute('data-tgl', t); sel.textContent = String(tgl);
+      sel.style.cssText = GAYA_SEL + gaya + (bisa ? 'cursor:pointer;' : 'opacity:.55;cursor:default;');
+      if (!bisa) { sel.setAttribute('aria-disabled', 'true'); }
+      grid.appendChild(sel);
+    }
+    // catatan tanggal yang diatur (di bawah legenda)
+    let cat = lbF('lb67', 'catatanTanggal');
+    if (!cat) {
+      let c = grid.parentElement.nextElementSibling;
+      if (!c || (c.children.length && c.textContent.trim() !== '')) { c = grid.parentElement.children[2] || null; }
+      cat = c; if (cat) { cat.setAttribute('data-f', 'catatanTanggal'); }
+    }
+    if (cat) {
+      cat.innerHTML = '';
+      d.daftar.forEach(function (x) {
+        const baris = document.createElement('div');
+        baris.style.cssText = 'font-size:13px;font-weight:700';
+        const pp = x.tanggal.split('-').map(Number);
+        const nama = x.tipe === 'MERAH' ? 'Libur tanggal merah' : (x.tipe === 'KHUSUS' ? 'Libur khusus' + (x.ket ? ': ' + x.ket : '') : 'Minggu masuk' + (x.ket ? ' (' + x.ket + ')' : ''));
+        baris.textContent = pp[2] + ' ' + BLN_PENDEK[pp[1] - 1] + ' · ' + nama;
+        cat.appendChild(baris);
+      });
+    }
+    hidupkanEl(lbF('lb67', 'tambah'));
+  }
+  function muatKalender(bulan) {
+    if (kal.memuat) { return; }
+    kal.memuat = true;
+    kirimPost(Object.assign({ aksi: 'kalender_baca', bulan: bulan }, kredAdminLb()))
+      .then(function (d) {
+        kal.memuat = false;
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.'); return; }
+        kal.data = d; kal.bulan = d.bulan; kal.hariIni = d.hari_ini;
+        gambarKalender();
+      })
+      .catch(function () { kal.memuat = false; infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  SIAP_LB.lb67 = function () { isiBadgeAdminLb('lb67'); kal.data = null; muatKalender(''); };
+  function simpanKalender(isi, sesudah) {
+    kirimPost(Object.assign({ aksi: 'kalender_simpan' }, isi, kredAdminLb()))
+      .then(function (d) {
+        if (d.status !== 'ok') { infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return; }
+        if (sesudah) { sesudah(); }
+        muatKalender(kal.bulan);
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  lbF('lb67', 'saklar').addEventListener('click', function () {
+    if (this.disabled || !kal.data) { return; }
+    simpanKalender({ libur_minggu: !kal.data.libur_minggu });
+  });
+  // Dialog ubah satu tanggal (mockup 67 tidak punya tampilan ubah tanggal: memakai kotak dialog standar, lihat daftar selisih)
+  function dialogUbahTanggal(tanggal, adaTanggalPilih) {
+    const hari = new Date(tanggal + 'T00:00:00Z').getUTCDay();
+    const ada = kal.data ? kal.data.daftar.filter(function (x) { return x.tanggal === tanggal; })[0] : null;
+    const opsi = [['MERAH', 'Libur tanggal merah'], ['KHUSUS', 'Libur khusus']];
+    if (hari === 0) { opsi.push(['MASUK', 'Minggu masuk']); }
+    bukaDialog(
+      '<div class="dialog-judul">Ubah libur</div>' +
+      (adaTanggalPilih ? '<label class="dialog-sub" for="kalTgl">Tanggal</label><input type="date" id="kalTgl" value="' + escHtml(tanggal) + '" min="' + escHtml(kal.hariIni) + '">' : '<div class="dialog-sub">' + escHtml(rentangPendekKlien(tanggal, tanggal)) + '</div>') +
+      '<label class="dialog-sub" for="kalTipe">Jenis</label><select id="kalTipe">' + opsi.map(function (o) { return '<option value="' + o[0] + '"' + (ada && ada.tipe === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+      '<label class="dialog-sub" for="kalKet">Keterangan (opsional)</label><input type="text" id="kalKet" maxlength="60" autocomplete="off" value="' + escHtml(ada ? ada.ket : '') + '">' +
+      '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button>' + (ada ? '<button type="button" class="btn-garis" id="dlgHapus">Hapus</button>' : '') + '<button type="button" class="btn-gelap" id="dlgSimpan">Simpan</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    const tgl = function () { return adaTanggalPilih ? document.getElementById('kalTgl').value : tanggal; };
+    document.getElementById('dlgSimpan').addEventListener('click', function () {
+      const isi = { tanggal: tgl(), tipe: document.getElementById('kalTipe').value, ket: document.getElementById('kalKet').value };
+      tutupDialog();
+      simpanKalender(isi);
+    });
+    if (ada) { document.getElementById('dlgHapus').addEventListener('click', function () { tutupDialog(); simpanKalender({ tanggal: tanggal, tipe: 'HAPUS', ket: '' }); }); }
+  }
+  lbF('lb67', 'grid').addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-tgl]');
+    if (!b || b.getAttribute('aria-disabled') === 'true') { return; }
+    dialogUbahTanggal(b.getAttribute('data-tgl'), false);
+  });
+  lbF('lb67', 'tambah').addEventListener('click', function () { if (!this.disabled && kal.data) { dialogUbahTanggal(kal.hariIni, true); } });
+  // Ganti bulan dengan geser kiri/kanan di kalender (mockup 67 tidak punya tombol bulan: lihat daftar selisih)
+  (function () {
+    let x0 = null;
+    const grid = lbF('lb67', 'grid');
+    grid.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    grid.addEventListener('touchend', function (e) {
+      if (x0 === null || !kal.data) { return; }
+      const dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 60) { muatKalender(geserBulanKal(dx < 0 ? 1 : -1)); }
+    });
+  })();
+
+  // ---------- Kartu "Hari ini tidak masuk" (layar utama HP toko, mockup 01) ----------
+  let tmMuatTerakhir = 0;
+  function gambarTidakMasuk(d) {
+    const kartu = document.querySelector('.kartu-tidak-masuk');
+    if (!kartu) { return; }
+    const nama = d.daftar || [];
+    // Mockup 01: judul + jumlah, "Ketuk untuk lihat semua", nama dalam pil (maksimal 2 baris), sisanya "+N lainnya".
+    // Mockup tidak punya tampilan daftar lengkap, jadi kartu TIDAK bisa diketuk (tulisan "Ketuk untuk lihat semua" dipudarkan).
+    kartu.innerHTML = '<div class="atas"><div class="j">Hari ini tidak masuk (' + nama.length + ')</div>' +
+      '<div class="tm-sub" style="font-size:11px;font-weight:700;color:var(--abu-teks);opacity:.55">Ketuk untuk lihat semua \u203a</div></div>' +
+      '<div class="tm-nama" style="display:flex;flex-wrap:wrap;gap:6px;max-height:68px;overflow:hidden"></div>';
+    kartu.classList.toggle('belum-aktif', nama.length === 0);
+    const kotak = kartu.querySelector('.tm-nama');
+    const chip = function (teks, gelap) {
+      const c = document.createElement('div');
+      c.style.cssText = 'display:flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;' + (gelap ? 'background:var(--abu);color:var(--kuning);' : 'background:var(--putih);color:var(--hitam);');
+      c.textContent = teks; return c;
+    };
+    const muat = function (c) { return c.getBoundingClientRect().bottom - kotak.getBoundingClientRect().top <= 68.5; };
+    const susun = function (n) {
+      kotak.innerHTML = '';
+      for (let i = 0; i < n; i++) { kotak.appendChild(chip(nama[i], false)); }
+      if (n < nama.length) { const c = chip('+' + (nama.length - n) + ' lainnya', true); c.setAttribute('data-lainnya', '1'); kotak.appendChild(c); }
+    };
+    susun(nama.length);
+    let tampil = nama.length;
+    while (tampil > 0 && !Array.prototype.every.call(kotak.children, muat)) { tampil--; susun(tampil); }
+  }
+  function muatTidakMasuk(paksa) {
+    if (!hpAktif || !hpAktif.token) { return; }
+    const sekarang = Date.now();
+    if (!paksa && sekarang - tmMuatTerakhir < 60000) { return; }
+    kirimPost({ aksi: 'tidak_masuk_hari_ini', token: hpAktif.token })
+      .then(function (d) { if (d && d.status === 'ok') { tmMuatTerakhir = Date.now(); gambarTidakMasuk(d); } })
+      .catch(function () { /* kartu tetap seperti sebelumnya */ });
+  }
+  setInterval(function () { if (layarUtama.classList.contains('aktif')) { muatTidakMasuk(false); } }, 120000);
+
   // ================= LAYAR BARU (tampilan saja): navigasi =================
   // Semua layar lbNN dibuat dari mockup oleh tools/bangun_layar_baru.sh: tanpa data contoh, tombol aksi nonaktif "Segera", tanpa panggilan server.
   // Hanya Kembali/Home/Tutup/Batal dan tautan navigasi (data-lb-ke) yang berfungsi. Layar yang muncul karena KEJADIAN (04, 05, 06, 07, 13, 18, 19, 22, 23, 34, 43, 53, 62, 65, 70, 56)
@@ -4342,11 +4928,17 @@
     if (!ganti && skrg) { tumpukanLb.push(skrg.id); }
     tampilLayar(tujuan);
     if (id === 'lb45') { isiAturan45(); }
+    if (SIAP_LB[id]) { SIAP_LB[id](); }
   }
   // Layar 45: aturan sandi mengikuti peran akun yang login (KARYAWAN = PIN tepat 5 angka; ADMIN = kata sandi minimal 8 karakter, maksimal 100, besar/kecil sama).
   function isiAturan45() {
     const admin = profilPribadi && profilPribadi.role === 'ADMIN';
     const teks = admin ? ['Kata sandi minimal 8 karakter', 'Maksimal 100 karakter', 'Huruf besar dan kecil dianggap sama'] : ['PIN tepat 5 angka', 'Hanya angka', 'Angka apa pun boleh'];
+    // Label kolom: KARYAWAN hanya punya PIN ("PIN lama / PIN baru / Ulangi PIN baru"); ADMIN tetap "Password" (keputusan pemilik 2026-10-07)
+    document.querySelectorAll('#lb45 label').forEach(function (l) {
+      const x = admin ? 'Password' : 'PIN', k = l.getAttribute('for');
+      if (k === 'lb45_pl') { l.textContent = x + ' lama'; } else if (k === 'lb45_pb') { l.textContent = x + ' baru'; } else if (k === 'lb45_pu') { l.textContent = 'Ulangi ' + x + ' baru'; }
+    });
     document.querySelectorAll('#lb45 [data-aturan]').forEach(function (e) { e.textContent = teks[Number(e.getAttribute('data-aturan')) - 1] || '\u2013'; });
   }
   function kembaliLb(jenis) {

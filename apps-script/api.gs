@@ -129,8 +129,19 @@ function doPost(e) {
   if (data.aksi === 'konfirmasi_putuskan') { return prosesKonfirmasiPutuskan(data); }
   if (data.aksi === 'konfirmasi_edit') { return prosesKonfirmasiEdit(data); }
   if (data.aksi === 'ambil_foto') { return prosesAmbilFoto(data); }
+  // Izin dan cuti (Fitur A), kalender libur
+  if (data.aksi === 'izin_info') { return prosesIzinInfo(data); }
+  if (data.aksi === 'izin_pratinjau') { return prosesIzinPratinjau(data); }
+  if (data.aksi === 'izin_ajukan') { return prosesIzinAjukan(data); }
+  if (data.aksi === 'izin_batal') { return prosesIzinBatal(data); }
+  if (data.aksi === 'izin_unggah_surat') { return prosesIzinUnggahSurat(data); }
+  if (data.aksi === 'izin_input') { return prosesIzinInput(data); }
+  if (data.aksi === 'izin_input_pratinjau') { return prosesIzinInputPratinjau(data); }
+  if (data.aksi === 'izin_input_info') { return prosesIzinInputInfo(data); }
+  if (data.aksi === 'kalender_baca') { return prosesKalenderBaca(data); }
+  if (data.aksi === 'kalender_simpan') { return prosesKalenderSimpan(data); }
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
-  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto'];
+  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto', 'tidak_masuk_hari_ini'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
     const hp = validasiTokenHp(data.token);
     if (!hp) {
@@ -139,6 +150,7 @@ function doPost(e) {
     if (data.aksi === 'daftar_karyawan') { return prosesDaftarKaryawan(hp); }
     if (data.aksi === 'tiket_waktu') { return prosesTiketWaktu(data.jenis, hp); }
     if (data.aksi === 'login_admin_toko') { return prosesLoginAdminToko(data, hp); }
+    if (data.aksi === 'tidak_masuk_hari_ini') { return prosesTidakMasukHariIni(hp); }
     if (data.aksi === 'unggah_foto') { return prosesUnggahFoto(data, hp); }
     if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp, data.tiket, data.tanpa_foto === true); }
     if (data.aksi === 'absen_pulang') { return prosesAbsenPulang(data.id, data.pin, data.jenis, hp, data.tiket, data.tanpa_foto === true); }
@@ -1536,6 +1548,71 @@ function tesServer() {
   ujiBebas('daftar karyawan (yang bisa diubah) TETAP tidak memuat ADMIN: saringDaftarKaryawan aktif = hanya Budi, nonaktif = hanya Tono', saringDaftarKaryawan(akunAdm, 'Ngawi', 'AKTIF').map(function (x) { return x.id; }).join() === 'K001' && saringDaftarKaryawan(akunAdm, 'Ngawi', 'NONAKTIF').map(function (x) { return x.id; }).join() === 'K003');
   ujiBebas('ID berikutnya = nomor K terbesar di SEMUA akun (nonaktif ikut) + 1, ID admin/owner/HP toko tidak mengganggu; belum ada karyawan = K001', buatIdKaryawan(akunAdm.map(function (x) { return x.id; })) === 'K004' && buatIdKaryawan([]) === 'K001');
 
+  // ---- FITUR A: izin dan cuti, kalender libur, kartu "Hari ini tidak masuk" ----
+  const hariIniA = '2026-10-07'; // Rabu; 5 Okt = Senin, 11 Okt = Minggu
+  const akunA = { id: 'K001', nama: 'Budi Santoso', panggilan: 'Budi', cabang: 'Ngawi', role: 'KARYAWAN', aktif: true, shift: 1, pola_shift: 'TETAP', urutan_shift: '', ganti_setiap: '', mulai_pola: '' };
+  ujiBebas('izin: tanggal harus benar-benar ada di kalender (30 Feb, teks, kosong ditolak)', tanggalIzinSah('2026-10-07') && !tanggalIzinSah('2026-02-30') && !tanggalIzinSah('besok') && !tanggalIzinSah('') && !tanggalIzinSah(undefined));
+  ujiBebas('izin: tanggal lewat maksimal H+2 (5 Okt dari 7 Okt diterima dan ditandai telat_aju; 4 Okt ditolak); tanggal depan tidak telat', validasiTanggalIzin('2026-10-05', '2026-10-05', hariIniA, 2).ok === true && validasiTanggalIzin('2026-10-05', '2026-10-05', hariIniA, 2).telat_aju === true && validasiTanggalIzin('2026-10-04', '2026-10-05', hariIniA, 2).ok === false && validasiTanggalIzin('2026-10-09', '2026-10-10', hariIniA, 2).telat_aju === false && validasiTanggalIzin('2026-10-06', '2026-10-06', hariIniA, 0).ok === false);
+  ujiBebas('izin: selesai sebelum mulai ditolak; satu pengajuan maksimal 31 hari; lebih dari 1 tahun ke depan ditolak', validasiTanggalIzin('2026-10-09', '2026-10-08', hariIniA, 2).ok === false && validasiTanggalIzin('2026-10-08', '2026-11-07', hariIniA, 2).ok === true && validasiTanggalIzin('2026-10-08', '2026-11-08', hariIniA, 2).ok === false && validasiTanggalIzin('2028-01-01', '2028-01-02', hariIniA, 2).ok === false);
+  const hMingguLibur = hariTerjadwalRentang(akunA, '2026-10-05', '2026-10-11', [], true), hMingguBuka = hariTerjadwalRentang(akunA, '2026-10-05', '2026-10-11', [], false);
+  ujiBebas('hari = hari TERJADWAL kerja: Senin-Minggu dengan libur Minggu = 6 hari; tanpa libur Minggu = 7', hMingguLibur.length === 6 && hMingguLibur.indexOf('2026-10-11') < 0 && hMingguBuka.length === 7);
+  const merah = [{ tanggal: '2026-10-07', cabang: '', karyawan: '', isi: 'LIBUR TANGGAL MERAH' }, { tanggal: '2026-10-08', cabang: 'Ngawi', karyawan: 'K001', isi: 'LIBUR KHUSUS: urusan' }, { tanggal: '2026-10-09', cabang: 'Pusat', karyawan: '', isi: 'LIBUR KHUSUS' }];
+  const hKal = hariTerjadwalRentang(akunA, '2026-10-05', '2026-10-11', merah, true);
+  ujiBebas('hari terjadwal: tanggal merah umum dan libur khusus milik karyawan tidak dihitung; libur cabang lain tidak berlaku', hKal.length === 4 && hKal.indexOf('2026-10-07') < 0 && hKal.indexOf('2026-10-08') < 0 && hKal.indexOf('2026-10-09') >= 0);
+  ujiBebas('kalender "MASUK: ..." (Minggu masuk, mis. stok opname) mengalahkan libur Minggu walau keterangan memuat angka', hariTerjadwalRentang(akunA, '2026-10-11', '2026-10-11', [{ tanggal: '2026-10-11', cabang: 'Ngawi', karyawan: '', isi: 'MASUK: stok opname 2' }], true).length === 1 && jadwalKaryawanHari(akunA, '2026-10-11', [{ tanggal: '2026-10-11', cabang: 'Ngawi', karyawan: '', isi: 'MASUK: stok opname 2' }], true).shift === 1);
+  const izinA = [
+    { karyawan: 'K001', jenis: 'Cuti', kelompok: 'cuti', mulai: '2026-03-02', selesai: '2026-03-03', hari: 2, status: 'DITERIMA', grup: 'IZN-2026-0001', id: 'IZN-2026-0001-A' },
+    { karyawan: 'K001', jenis: 'Cuti', kelompok: 'cuti', mulai: '2026-05-04', selesai: '2026-05-04', hari: 1, status: 'MENUNGGU', grup: 'IZN-2026-0002', id: 'IZN-2026-0002-A' },
+    { karyawan: 'K001', jenis: 'Cuti', kelompok: 'cuti', mulai: '2026-06-01', selesai: '2026-06-03', hari: 3, status: 'DITOLAK', grup: 'IZN-2026-0003', id: 'IZN-2026-0003-A' },
+    { karyawan: 'K001', jenis: 'Cuti', kelompok: 'cuti', mulai: '2025-12-01', selesai: '2025-12-02', hari: 2, status: 'DITERIMA', grup: 'IZN-2025-0009', id: 'IZN-2025-0009-A' },
+    { karyawan: 'K002', jenis: 'Cuti', kelompok: 'cuti', mulai: '2026-04-01', selesai: '2026-04-02', hari: 2, status: 'DITERIMA', grup: 'IZN-2026-0004', id: 'IZN-2026-0004-A' },
+    { karyawan: 'K001', jenis: 'Sakit', kelompok: 'biasa', mulai: '2026-10-12', selesai: '2026-10-13', hari: 2, status: 'MENUNGGU', grup: 'IZN-2026-0005', id: 'IZN-2026-0005-A', lampiran: '' }
+  ];
+  ujiBebas('sisa cuti = jatah 6 dikurangi cuti DITERIMA/MENUNGGU tahun itu saja (ditolak, tahun lain, orang lain tidak dihitung) = 3; jatah tidak bisa negatif', hitungSisaCuti(6, izinA, 'K001', '2026') === 3 && hitungSisaCuti(2, izinA, 'K001', '2026') === 0 && hitungSisaCuti(6, izinA, 'K002', '2026') === 4);
+  ujiBebas('izin bertumpuk: pengajuan yang tumpang tindih dengan izin MENUNGGU/DITERIMA ditolak; yang ditolak/dibatalkan/tukar shift tidak menghalangi; orang lain tidak', tumpangTindihIzin(izinA, 'K001', '2026-10-13', '2026-10-14') !== null && tumpangTindihIzin(izinA, 'K001', '2026-10-14', '2026-10-15') === null && tumpangTindihIzin(izinA, 'K001', '2026-06-02', '2026-06-02') === null && tumpangTindihIzin(izinA, 'K002', '2026-10-12', '2026-10-13') === null && tumpangTindihIzin(izinA.concat([{ karyawan: 'K001', jenis: 'TUKAR_SHIFT', mulai: '2026-10-20', selesai: '2026-10-20', status: 'MENUNGGU' }]), 'K001', '2026-10-20', '2026-10-20') === null);
+  ujiBebas('id grup: IZN-{tahun}-{4 angka} berikutnya per tahun, tidak pernah dipakai ulang; huruf baris A, B', buatGrupIzin(['IZN-2026-0003-A', 'IZN-2025-0009', 'IZN-2026-0002'], '2026') === 'IZN-2026-0004' && buatGrupIzin([], '2026') === 'IZN-2026-0001' && buatGrupIzin(['IZN-2025-0009'], '2026') === 'IZN-2026-0001' && hurufIzin(0) === 'A' && hurufIzin(1) === 'B');
+  const harian5 = ['2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15', '2026-10-16'];
+  const jMenikah = { nama: 'Menikah', kelompok: 'khusus', maks: 3 }, jCuti = { nama: 'Cuti', kelompok: 'cuti', maks: 0 }, jSakit = { nama: 'Sakit', kelompok: 'biasa', maks: 0 }, jMeninggal = { nama: 'Keluarga meninggal', kelompok: 'khusus', maks: 2 };
+  const dasarR = { namaBiasa: 'Keperluan pribadi', namaCuti: 'Cuti' };
+  const rMenikahCuti = rencanaIzin(Object.assign({ jenis: jMenikah, hari: harian5, sisaCuti: 4, lebih: 'CUTI' }, dasarR));
+  ujiBebas('Menikah 5 hari kerja (batas 3), kelebihan dari Cuti: 3 hari izin khusus + 2 hari cuti, sisa cuti jadi 2 (mockup 41)', rMenikahCuti.ok && rMenikahCuti.segmen.length === 2 && rMenikahCuti.segmen[0].kelompok === 'khusus' && rMenikahCuti.segmen[0].hari.length === 3 && rMenikahCuti.segmen[0].selesai === '2026-10-14' && rMenikahCuti.segmen[1].kelompok === 'cuti' && rMenikahCuti.segmen[1].hari.length === 2 && rMenikahCuti.segmen[1].mulai === '2026-10-15' && rMenikahCuti.sisa_setelah === 2);
+  const rMenikahBiasa = rencanaIzin(Object.assign({ jenis: jMenikah, hari: harian5, sisaCuti: 4, lebih: 'BIASA' }, dasarR));
+  ujiBebas('Menikah 5 hari, kelebihan diambil dari Izin biasa: segmen kedua kelompok biasa (Keperluan pribadi), sisa cuti tidak berubah', rMenikahBiasa.ok && rMenikahBiasa.segmen[1].kelompok === 'biasa' && rMenikahBiasa.segmen[1].jenis === 'Keperluan pribadi' && rMenikahBiasa.sisa_setelah === 4);
+  ujiBebas('kelebihan hari tanpa pilihan: saat mengajukan (ketat) diminta memilih; di pratinjau otomatis Cuti kalau cukup, Izin biasa kalau tidak', rencanaIzin(Object.assign({ jenis: jMenikah, hari: harian5, sisaCuti: 4, ketatLebih: true }, dasarR)).butuh_pilihan === true && rencanaIzin(Object.assign({ jenis: jMenikah, hari: harian5, sisaCuti: 4 }, dasarR)).lebih === 'CUTI' && rencanaIzin(Object.assign({ jenis: jMenikah, hari: harian5, sisaCuti: 1 }, dasarR)).lebih === 'BIASA');
+  ujiBebas('kelebihan dari Cuti ditolak bila sisa cuti kurang, dengan pesan Indonesia yang jelas', (function () { const r = rencanaIzin(Object.assign({ jenis: jMenikah, hari: harian5, sisaCuti: 1, lebih: 'CUTI' }, dasarR)); return r.ok === false && /Sisa cuti Anda 1 hari/.test(r.pesan); })());
+  ujiBebas('Cuti: melebihi sisa ditolak; pas dengan sisa diterima dan sisa jadi 0', rencanaIzin(Object.assign({ jenis: jCuti, hari: harian5, sisaCuti: 4 }, dasarR)).ok === false && rencanaIzin(Object.assign({ jenis: jCuti, hari: harian5, sisaCuti: 5 }, dasarR)).ok === true && rencanaIzin(Object.assign({ jenis: jCuti, hari: harian5, sisaCuti: 5 }, dasarR)).sisa_setelah === 0);
+  ujiBebas('izin khusus dalam batas (Keluarga meninggal 2 hari dari maks 2) = satu segmen khusus tanpa pilihan; Sakit = satu segmen biasa; tanpa hari terjadwal ditolak', rencanaIzin(Object.assign({ jenis: jMeninggal, hari: harian5.slice(0, 2), sisaCuti: 0 }, dasarR)).segmen.length === 1 && rencanaIzin(Object.assign({ jenis: jMeninggal, hari: harian5.slice(0, 2), sisaCuti: 0 }, dasarR)).segmen[0].kelompok === 'khusus' && rencanaIzin(Object.assign({ jenis: jSakit, hari: harian5.slice(0, 2), sisaCuti: 0 }, dasarR)).segmen[0].kelompok === 'biasa' && rencanaIzin(Object.assign({ jenis: jSakit, hari: [], sisaCuti: 0 }, dasarR)).ok === false);
+  const barisA = susunBarisIzin(rMenikahCuti.segmen, { grup: 'IZN-2026-0007', karyawan: 'K001', ket: 'Pernikahan', waktu: '2026-10-07 08:00', telat: false });
+  ujiBebas('baris sheet izin: id IZN-2026-0007-A/-B, grup sama, hari = jumlah hari terjadwal, status MENUNGGU, oleh/diputus kosong, kolom tukar shift kosong', barisA.length === 2 && barisA[0].id === 'IZN-2026-0007-A' && barisA[1].id === 'IZN-2026-0007-B' && barisA[0].grup === 'IZN-2026-0007' && barisA[0].hari === 3 && barisA[1].hari === 2 && barisA[0].status === 'MENUNGGU' && barisA[0].oleh === '' && barisA[0].rekan === '' && barisA[1].jenis === 'Cuti' && barisA[0].telat_aju === false);
+  ujiBebas('keterangan izin dibersihkan: spasi dirapikan, karakter kontrol dan tanda | dibuang, maksimal 200 karakter', bersihkanKetIzin('  Demam \n tinggi | rawat ') === 'Demam tinggi rawat' && bersihkanKetIzin('x'.repeat(250)).length === 200 && bersihkanKetIzin(null) === '');
+  const petaA = { K001: { nama: 'Budi Santoso', cabang: 'Ngawi', role: 'KARYAWAN' }, K009: { nama: 'Dewi Lestari', cabang: 'Ngawi', role: 'ADMIN' }, K010: { nama: 'Sari Utami', cabang: 'Pusat', role: 'ADMIN' }, K002: { nama: 'Rina Wati', cabang: 'Ngawi', role: 'KARYAWAN' }, K003: { nama: 'Andi', cabang: 'Pusat', role: 'KARYAWAN' } };
+  const izinKonf = barisA.map(function (b) { return Object.assign({}, b, { mulai: String(b.mulai), selesai: String(b.selesai) }); }).concat([
+    { id: 'IZN-2026-0008-A', grup: 'IZN-2026-0008', karyawan: 'K002', jenis: 'Sakit', kelompok: 'khusus', mulai: '2026-09-29', selesai: '2026-09-30', hari: 2, ket: 'Demam', lampiran: 'https://drive.google.com/file/d/abcdefghij1234/view', status: 'MENUNGGU', telat_aju: false },
+    { id: 'IZN-2026-0009-A', grup: 'IZN-2026-0009', karyawan: 'K009', jenis: 'Keperluan pribadi', kelompok: 'biasa', mulai: '2026-10-02', selesai: '2026-10-02', hari: 1, ket: '', lampiran: '', status: 'MENUNGGU', telat_aju: true },
+    { id: 'IZN-2026-0010-A', grup: 'IZN-2026-0010', karyawan: 'K003', jenis: 'Keperluan pribadi', kelompok: 'biasa', mulai: '2026-10-02', selesai: '2026-10-02', hari: 1, ket: '', lampiran: '', status: 'DITERIMA' },
+    { id: 'IZN-2026-0011-A', grup: 'IZN-2026-0011', karyawan: 'K002', jenis: 'TUKAR_SHIFT', kelompok: '', mulai: '2026-10-08', selesai: '2026-10-08', hari: 1, status: 'MENUNGGU' }
+  ]);
+  const itemIzin = rakitItemIzin(izinKonf, petaA);
+  ujiBebas('item Konfirmasi izin: satu item per GRUP yang masih menunggu (yang sudah diputuskan dan tukar shift tidak ikut); id "IZIN|grup"', itemIzin.length === 3 && itemIzin.map(function (x) { return x.id; }).join() === 'IZIN|IZN-2026-0007,IZIN|IZN-2026-0008,IZIN|IZN-2026-0009' && itemIzin.every(function (x) { return x.kelompok === 'IZIN'; }));
+  const iMenikah = itemIzin[0], iSakit = itemIzin[1], iAdmin = itemIzin[2];
+  ujiBebas('kartu izin: judul "Izin sakit dengan surat" dan rincian "29–30 Sep, 2 hari kerja, lampiran ada"; Menikah+Cuti satu kartu berisi dua bagian; izin admin berperan ADMIN', iSakit.judul === 'Izin sakit dengan surat' && iSakit.rincian === '29–30 Sep, 2 hari kerja, lampiran ada' && iSakit.surat === true && iSakit.sakit === true && /3 hari izin khusus menikah \(12–14 Okt\), 2 hari cuti \(15–16 Okt\)/.test(iMenikah.rincian) && iAdmin.role === 'ADMIN' && iAdmin.judul === 'Izin · keperluan pribadi');
+  const adminNgawiA = { role: 'ADMIN', id: 'K009', cabang: 'Ngawi' }, ownerA = { role: 'OWNER', id: 'OWN01', cabang: '' };
+  ujiBebas('hak izin di server: admin Ngawi hanya melihat izin KARYAWAN Ngawi (bukan miliknya sendiri = K009); owner hanya izin ADMIN (semua cabang)', saringItemKonfirmasi(itemIzin, adminNgawiA, '').map(function (x) { return x.karyawan; }).sort().join() === 'K001,K002' && saringItemKonfirmasi(itemIzin, ownerA, '').map(function (x) { return x.karyawan; }).join() === 'K009' && saringItemKonfirmasi(itemIzin, { role: 'ADMIN', id: 'K011', cabang: 'Pusat' }, '').length === 0);
+  ujiBebas('izin: id item izin dikenali hanya bentuk IZIN|IZN-tahun-4 angka; id absen biasa dan teks aneh ditolak', parseIdItemIzin('IZIN|IZN-2026-0007') === 'IZN-2026-0007' && parseIdItemIzin('IZIN|IZN-2026-0007-A') === 'IZN-2026-0007-A' && parseIdItemIzin('K001|2026-10-05|MASUK') === null && parseIdItemIzin('IZIN|../x') === null && parseIdItemIzin(undefined) === null);
+  ujiBebas('kartu beranda pribadi: jumlah pengajuan menunggu dihitung per grup milik sendiri', jumlahPengajuanMenunggu(izinKonf, 'K001') === 1 && jumlahPengajuanMenunggu(izinKonf, 'K002') === 2 && jumlahPengajuanMenunggu(izinKonf, 'K003') === 0);
+  const barisSakit = { id: 'IZN-2026-0008-A', jenis: 'Sakit', karyawan: 'K002', status: 'MENUNGGU', oleh: '' };
+  ujiBebas('surat dokter: pemilik boleh selama MENUNGGU; setelah diputuskan tidak; jenis selain Sakit tidak; admin hanya untuk izin yang ia input sendiri di cabangnya', bolehLampirSurat({ role: 'KARYAWAN', id: 'K002', cabang: 'Ngawi' }, barisSakit, { role: 'KARYAWAN', cabang: 'Ngawi' }).boleh === true && bolehLampirSurat({ role: 'KARYAWAN', id: 'K002', cabang: 'Ngawi' }, Object.assign({}, barisSakit, { status: 'DITERIMA' }), { role: 'KARYAWAN', cabang: 'Ngawi' }).boleh === false && bolehLampirSurat({ role: 'KARYAWAN', id: 'K002', cabang: 'Ngawi' }, Object.assign({}, barisSakit, { jenis: 'Cuti' }), { role: 'KARYAWAN', cabang: 'Ngawi' }).boleh === false && bolehLampirSurat({ role: 'ADMIN', id: 'K009', cabang: 'Ngawi' }, Object.assign({}, barisSakit, { status: 'DITERIMA', oleh: 'K009' }), { role: 'KARYAWAN', cabang: 'Ngawi' }).boleh === true && bolehLampirSurat({ role: 'ADMIN', id: 'K009', cabang: 'Ngawi' }, Object.assign({}, barisSakit, { status: 'DITERIMA', oleh: 'K088' }), { role: 'KARYAWAN', cabang: 'Ngawi' }).boleh === false && bolehLampirSurat({ role: 'KARYAWAN', id: 'K003', cabang: 'Ngawi' }, barisSakit, { role: 'KARYAWAN', cabang: 'Ngawi' }).boleh === false);
+  const jSurat = jalurSuratIzin({ id: 'IZN-2026-0008-A', mulai: '2026-09-29' }, { id: 'K002', nama: 'Rina Wati', cabang: 'Ngawi' }, '2026-09-30');
+  ujiBebas('surat dokter: folder SURAT IZIN/Cabang/Tahun/Bulan/ID_Nama dan berkas DDMMYY_IZIN_<id izin>.jpg', JSON.stringify(jSurat.segmen) === JSON.stringify(['SURAT IZIN', 'Ngawi', '2026', '09', 'K002_Rina Wati']) && jSurat.namaBerkas === '300926_IZIN_IZN-2026-0008-A.jpg' && jalurSuratIzin({ id: 'x', mulai: 'rusak' }, { id: 'K1', nama: 'A', cabang: 'B' }, '2026-09-30') === null);
+  ujiBebas('kalender: isi sel dibaca dan disusun bolak-balik (LIBUR TANGGAL MERAH, LIBUR KHUSUS: ket, MASUK: ket, kosong)', uraiIsiKalender('LIBUR KHUSUS: renovasi toko').tipe === 'KHUSUS' && uraiIsiKalender('LIBUR KHUSUS: renovasi toko').ket === 'renovasi toko' && uraiIsiKalender('LIBUR TANGGAL MERAH').tipe === 'MERAH' && uraiIsiKalender('MASUK: stok opname').ket === 'stok opname' && uraiIsiKalender('1').tipe === '' && susunIsiKalender('KHUSUS', 'renovasi toko') === 'LIBUR KHUSUS: renovasi toko' && susunIsiKalender('MERAH', '') === 'LIBUR TANGGAL MERAH' && susunIsiKalender('HAPUS', 'x') === '' && uraiIsiKalender(susunIsiKalender('MASUK', 'stok opname')).tipe === 'MASUK');
+  ujiBebas('kalender: perubahan hanya hari ini dan seterusnya; "masuk" hanya untuk hari Minggu; jenis ngawur ditolak', validasiPerubahanKalender('2026-10-06', 'MERAH', hariIniA).ok === false && validasiPerubahanKalender('2026-10-07', 'MERAH', hariIniA).ok === true && validasiPerubahanKalender('2026-10-12', 'MASUK', hariIniA).ok === false && validasiPerubahanKalender('2026-10-11', 'MASUK', hariIniA).ok === true && validasiPerubahanKalender('2026-10-11', 'APA', hariIniA).ok === false && validasiPerubahanKalender('2026-02-31', 'MERAH', hariIniA).ok === false);
+  const akunB = Object.assign({}, akunA, { id: 'K002', nama: 'Rina Wati', panggilan: 'Rina' }), akunC = Object.assign({}, akunA, { id: 'K003', nama: 'Ari Pratama', panggilan: 'Ari' });
+  const tidakMasuk = daftarTidakMasuk({ tanggal: hariIniA, cabang: 'Ngawi', akun: [akunA, akunB, akunC, Object.assign({}, akunA, { id: 'K004', panggilan: 'Zed', aktif: false }), Object.assign({}, akunA, { id: 'K005', panggilan: 'Pusat', cabang: 'Pusat' })], liburMinggu: true,
+    kalender: [{ tanggal: hariIniA, cabang: 'Ngawi', karyawan: 'K003', isi: 'LIBUR KHUSUS' }], izin: [{ karyawan: 'K002', jenis: 'Sakit', mulai: '2026-10-06', selesai: '2026-10-08', status: 'DITERIMA' }, { karyawan: 'K001', jenis: 'Cuti', mulai: '2026-10-07', selesai: '2026-10-07', status: 'DITOLAK' }, { karyawan: 'K001', jenis: 'TUKAR_SHIFT', mulai: '2026-10-07', selesai: '2026-10-07', status: 'MENUNGGU' }] });
+  ujiBebas('kartu "Hari ini tidak masuk": nama panggilan karyawan yang izin/cuti (MENUNGGU/DITERIMA) atau libur sendiri, urut abjad; ditolak, tukar shift, nonaktif, cabang lain tidak', tidakMasuk.join() === 'Ari,Rina');
+  ujiBebas('kartu "Hari ini tidak masuk": libur seluruh toko (Minggu / tanggal merah umum) tidak membuat semua karyawan terdaftar', daftarTidakMasuk({ tanggal: '2026-10-11', cabang: 'Ngawi', akun: [akunA, akunB], liburMinggu: true, kalender: [], izin: [] }).length === 0 && daftarTidakMasuk({ tanggal: hariIniA, cabang: 'Ngawi', akun: [akunA], liburMinggu: false, kalender: [{ tanggal: hariIniA, cabang: '', karyawan: '', isi: 'LIBUR TANGGAL MERAH' }], izin: [] }).length === 0);
+  ujiBebas('judul dan rentang tanggal: "29 Sep", "29–30 Sep", "30 Sep–2 Okt"', rentangPendek('2026-09-29', '2026-09-29') === '29 Sep' && rentangPendek('2026-09-29', '2026-09-30') === '29–30 Sep' && rentangPendek('2026-09-30', '2026-10-02') === '30 Sep–2 Okt' && judulIzinKonfirmasi({ jenis: 'Cuti', kelompok: 'cuti' }) === 'Cuti' && judulIzinKonfirmasi({ jenis: 'Sakit', kelompok: 'biasa', lampiran: '' }) === 'Izin sakit');
+  // ---- akhir FITUR A ----
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -2315,6 +2392,7 @@ function jadwalKaryawanHari(akun, tanggal, kalender, liburMinggu) {
   if (e) {
     const isi = String(e.isi).toUpperCase().trim();
     if (isi.indexOf('LIBUR') === 0) { return { libur: true, shift: null }; }
+    if (isi.indexOf('MASUK') === 0) { return { libur: false, shift: shiftMenurutPola(akun, tanggal) }; } // mis. Minggu masuk (stok opname)
     const n = nomorShift(isi);
     if (n !== null) { return { libur: false, shift: n }; }
   }
@@ -2917,7 +2995,9 @@ function cariBarisAbsen(rows, jenis, idAbsen) {
  * Fungsi murni: periksa gambar base64. Harus JPEG (cek 3 byte awal FF D8 FF), maksimal 300 KB.
  * Boleh berawalan "data:image/jpeg;base64,". Kembalian { ok, bytes } atau { ok:false, pesan }.
  */
-function periksaGambarJpeg(gambar) {
+function periksaGambarJpeg(gambar, maksByte) {
+  const batas = maksByte || MAKS_FOTO_BYTE;
+  const teksBatas = 'maksimal ' + Math.round(batas / 1024) + ' KB';
   if (typeof gambar !== 'string' || !gambar) { return { ok: false, pesan: 'Gambar kosong' }; }
   let b64 = gambar.trim();
   const awalan = /^data:([^;,]*);base64,/i.exec(b64);
@@ -2928,11 +3008,11 @@ function periksaGambarJpeg(gambar) {
   b64 = b64.replace(/\s+/g, '');
   if (b64.length < 100) { return { ok: false, pesan: 'Gambar terlalu kecil atau rusak' }; }
   const taksiran = Math.floor(b64.length * 3 / 4) - (b64.slice(-2) === '==' ? 2 : (b64.slice(-1) === '=' ? 1 : 0));
-  if (taksiran > MAKS_FOTO_BYTE) { return { ok: false, pesan: 'Foto terlalu besar (maksimal 300 KB)' }; }
+  if (taksiran > batas) { return { ok: false, pesan: 'Foto terlalu besar (' + teksBatas + ')' }; }
   if (!/^[A-Za-z0-9+\/]+={0,2}$/.test(b64) || b64.length % 4 !== 0) { return { ok: false, pesan: 'Gambar tidak valid' }; }
   let bytes;
   try { bytes = Utilities.base64Decode(b64); } catch (e) { return { ok: false, pesan: 'Gambar tidak valid' }; }
-  if (bytes.length > MAKS_FOTO_BYTE) { return { ok: false, pesan: 'Foto terlalu besar (maksimal 300 KB)' }; }
+  if (bytes.length > batas) { return { ok: false, pesan: 'Foto terlalu besar (' + teksBatas + ')' }; }
   if (bytes.length < 3 || bytes[0] !== -1 || bytes[1] !== -40 || bytes[2] !== -1) { return { ok: false, pesan: 'Tipe berkas harus JPEG' }; }
   return { ok: true, bytes: bytes };
 }
@@ -3591,7 +3671,8 @@ function prosesPribadiHariIni(d) {
     sudah_masuk: !!baris && baris.masuk !== '', sudah_pulang: !!baris && baris.pulang !== '',
     jam_masuk: baris ? baris.masuk : '', jam_pulang: baris ? baris.pulang : '',
     cara_masuk: baris ? String(baris.cara_masuk) : '', st_pulang: baris ? String(baris.st_pulang) : '',
-    lembur_boleh: lemburBolehPribadi(p, baris)
+    lembur_boleh: lemburBolehPribadi(p, baris),
+    izin_menunggu: jumlahIzinMenungguAman(p.id)
   });
 }
 
@@ -3641,7 +3722,7 @@ function prosesPribadiRiwayat(d) {
  */
 var MAKS_BARIS_KONFIRMASI = 2000;
 var UKURAN_HALAMAN_KONFIRMASI = 20;
-var URUTAN_KELOMPOK = { LUAR: 0, LEMBUR: 1, PULANG_CEPAT: 2 };
+var URUTAN_KELOMPOK = { LUAR: 0, LEMBUR: 1, PULANG_CEPAT: 2, IZIN: 3 };
 
 /** Fungsi murni: id item dipecah {karyawan, tanggal, jenis}; null kalau bentuknya tidak sah. */
 function parseIdItem(id) {
@@ -3803,7 +3884,8 @@ function aktorKonfirmasi(d) {
 function itemUntukAktor(aktor, filterCabang) {
   const petaRole = {};
   bacaSheet('akun').data.forEach(function (r) { petaRole[String(r.id)] = r.role === 'ADMIN' ? 'ADMIN' : (r.role === 'OWNER' ? 'OWNER' : 'KARYAWAN'); });
-  return saringItemKonfirmasi(rakitItemKonfirmasi(bacaAbsensiMenunggu(), petaRole), aktor, filterCabang);
+  const izinItems = rakitItemIzin(bacaIzinTernormalisasi().data, petaAkunUntukIzin());
+  return saringItemKonfirmasi(rakitItemKonfirmasi(bacaAbsensiMenunggu(), petaRole).concat(izinItems), aktor, filterCabang);
 }
 
 /** Aksi konfirmasi_jumlah: jumlah item yang menunggu (untuk badge menu; maksimal 99+). */
@@ -3828,9 +3910,10 @@ function prosesKonfirmasiDaftar(d) {
 function prosesKonfirmasiPutuskan(d) {
   const k = aktorKonfirmasi(d);
   if (k.gagal) { return k.gagal; }
+  if (d.keputusan !== 'ACC' && d.keputusan !== 'TOLAK') { return respon({ status: 'gagal', pesan: 'Keputusan tidak dikenal' }); }
+  if (String(d.id || '').indexOf('IZIN|') === 0) { return putuskanItemIzin(k.aktor, d); }
   const it = parseIdItem(d.id);
   if (!it) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
-  if (d.keputusan !== 'ACC' && d.keputusan !== 'TOLAK') { return respon({ status: 'gagal', pesan: 'Keputusan tidak dikenal' }); }
   const kunciLock = LockService.getScriptLock();
   kunciLock.waitLock(10000);
   try {
@@ -4014,6 +4097,7 @@ function prosesKonfirmasiEdit(d) {
 function prosesAmbilFoto(d) {
   const k = aktorKonfirmasi(d);
   if (k.gagal) { return k.gagal; }
+  if (String(d.id || '').indexOf('IZIN|') === 0) { return ambilSuratItemIzin(k.aktor, d); }
   const it = parseIdItem(d.id);
   if (!it) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
   const cari = cariBarisAbsensi(it.karyawan, it.tanggal);
@@ -4162,4 +4246,668 @@ function sebagaiTanggalTeks(nilai, zona) {
 
 function respon(objek) {
   return ContentService.createTextOutput(JSON.stringify(objek)).setMimeType(ContentService.MimeType.JSON);
+}
+
+
+/**
+ * ======================= FITUR A: IZIN DAN CUTI =======================
+ * Sheet izin: id, grup, karyawan, jenis, kelompok (biasa/khusus/cuti), mulai, selesai, hari, ket, lampiran, diajukan, telat_aju,
+ * status (MENUNGGU/DITERIMA/DITOLAK/BATAL), oleh, diputus, rekan, status_rekan, shift_asal, shift_tujuan.
+ * Satu pengajuan = satu grup (IZN-{tahun}-{4 angka}); tiap baris punya huruf akhir (-A, -B) bila pengajuan terbelah
+ * (contoh Menikah 5 hari kerja = 3 hari izin khusus + 2 hari cuti). Semua tanggal/jam dari jam SERVER.
+ * Fungsi murni di bagian ini bisa dites tanpa menyentuh sheet (lihat tesServer).
+ */
+var MAKS_RENTANG_IZIN_HARI = 31;
+var MAKS_SURAT_BYTE = 500 * 1024;
+var STATUS_IZIN_AKTIF = ['MENUNGGU', 'DITERIMA'];
+
+/** Fungsi murni: teks tanggal yyyy-MM-dd yang benar-benar ada di kalender. */
+function tanggalIzinSah(t) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(t === undefined || t === null ? '' : t));
+  if (!m) { return false; }
+  const d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+  return d.getUTCFullYear() === Number(m[1]) && d.getUTCMonth() === Number(m[2]) - 1 && d.getUTCDate() === Number(m[3]);
+}
+
+/**
+ * Fungsi murni: tanggal pengajuan. Mundur maksimal batasLewat hari dari hari ini (bawaan 2); selesai tidak boleh sebelum mulai;
+ * satu pengajuan maksimal MAKS_RENTANG_IZIN_HARI hari; maksimal 366 hari ke depan. telat_aju = mulai sudah lewat dari hari ini.
+ */
+function validasiTanggalIzin(mulai, selesai, hariIni, batasLewat) {
+  if (!tanggalIzinSah(mulai) || !tanggalIzinSah(selesai)) { return { ok: false, pesan: 'Tanggal mulai dan selesai wajib diisi dengan benar' }; }
+  if (selesai < mulai) { return { ok: false, pesan: 'Tanggal selesai tidak boleh sebelum tanggal mulai' }; }
+  if (selisihHari(mulai, selesai) + 1 > MAKS_RENTANG_IZIN_HARI) { return { ok: false, pesan: 'Satu pengajuan maksimal ' + MAKS_RENTANG_IZIN_HARI + ' hari. Pecah jadi beberapa pengajuan.' }; }
+  const batas = isNaN(Number(batasLewat)) ? 2 : Number(batasLewat);
+  if (mulai < geserTanggal(hariIni, -batas)) { return { ok: false, pesan: 'Izin untuk tanggal yang sudah lewat hanya bisa maksimal ' + batas + ' hari ke belakang' }; }
+  if (selesai > geserTanggal(hariIni, 366)) { return { ok: false, pesan: 'Tanggal terlalu jauh ke depan (maksimal 1 tahun)' }; }
+  return { ok: true, telat_aju: mulai < hariIni };
+}
+
+/** Fungsi murni: daftar tanggal TERJADWAL kerja (bukan libur, ada shift) milik satu akun dalam rentang; memakai jadwalKaryawanHari. */
+function hariTerjadwalRentang(akun, mulai, selesai, kalender, liburMinggu) {
+  const hasil = [];
+  const n = selisihHari(mulai, selesai);
+  for (let i = 0; i <= n && i < 400; i++) {
+    const t = geserTanggal(mulai, i);
+    const j = jadwalKaryawanHari(akun, t, kalender, liburMinggu === true);
+    if (!j.libur && j.shift !== null) { hasil.push(t); }
+  }
+  return hasil;
+}
+
+/** Fungsi murni: izin lain (MENUNGGU/DITERIMA, bukan tukar/pindah shift) milik karyawan yang bertumpuk dengan rentang; null kalau tidak ada. */
+function tumpangTindihIzin(izinRows, karyawan, mulai, selesai) {
+  return izinRows.find(function (r) {
+    const jenis = String(r.jenis).toUpperCase();
+    return String(r.karyawan) === String(karyawan) && STATUS_IZIN_AKTIF.indexOf(String(r.status).toUpperCase()) >= 0 &&
+      jenis !== 'TUKAR_SHIFT' && jenis !== 'PINDAH_SHIFT' && String(r.mulai) <= selesai && mulai <= String(r.selesai);
+  }) || null;
+}
+
+/** Fungsi murni: sisa cuti = jatah dikurangi hari cuti MENUNGGU/DITERIMA yang mulai di tahun itu. */
+function hitungSisaCuti(jatah, izinRows, karyawan, tahun) {
+  let dipakai = 0;
+  izinRows.forEach(function (r) {
+    if (String(r.karyawan) !== String(karyawan) || String(r.kelompok).toLowerCase() !== 'cuti') { return; }
+    if (STATUS_IZIN_AKTIF.indexOf(String(r.status).toUpperCase()) < 0) { return; }
+    if (String(r.mulai).slice(0, 4) !== String(tahun)) { return; }
+    dipakai += Number(r.hari) || 0;
+  });
+  return Math.max(0, (Number(jatah) || 0) - dipakai);
+}
+
+/** Fungsi murni: grup berikutnya IZN-{tahun}-{4 angka} dari daftar grup/id yang sudah ada (tidak pernah dipakai ulang). */
+function buatGrupIzin(daftarGrup, tahun) {
+  let maks = 0;
+  daftarGrup.forEach(function (g) {
+    const m = /^IZN-(\d{4})-(\d{4})/.exec(String(g));
+    if (m && m[1] === String(tahun) && Number(m[2]) > maks) { maks = Number(m[2]); }
+  });
+  return 'IZN-' + tahun + '-' + ('000' + (maks + 1)).slice(-4);
+}
+
+function hurufIzin(i) { return 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt(i); }
+
+/**
+ * Fungsi murni: rencana pengajuan. p = { jenis:{nama,kelompok,maks}, hari:[tanggal terjadwal], sisaCuti, lebih:'CUTI'|'BIASA'|undefined,
+ * namaBiasa, namaCuti, ketatLebih }. Kembalian { ok, pesan, butuh_pilihan, kelebihan, segmen:[{jenis,kelompok,hari,mulai,selesai}], sisa_setelah }.
+ * - cuti: tidak boleh melebihi sisa cuti; - khusus dengan maks: kelebihan diambil dari Cuti atau Izin biasa (pilihan), kalau Cuti harus cukup;
+ * - biasa (termasuk Sakit tanpa surat): satu segmen.
+ */
+function rencanaIzin(p) {
+  const hari = p.hari || [];
+  const kel = String(p.jenis.kelompok).toLowerCase();
+  const maks = Number(p.jenis.maks) || 0;
+  const sisa = Number(p.sisaCuti) || 0;
+  if (!hari.length) { return { ok: false, pesan: 'Tidak ada hari kerja terjadwal pada tanggal itu (libur atau tidak ada jadwal)', segmen: [] }; }
+  const buat = function (jenis, kelompok, list) { return { jenis: jenis, kelompok: kelompok, hari: list, mulai: list[0], selesai: list[list.length - 1] }; };
+  if (kel === 'cuti') {
+    if (hari.length > sisa) { return { ok: false, pesan: 'Sisa cuti Anda ' + sisa + ' hari, pengajuan ini ' + hari.length + ' hari. Kurangi tanggalnya.', segmen: [] }; }
+    return { ok: true, segmen: [buat(p.jenis.nama, 'cuti', hari)], sisa_setelah: sisa - hari.length, kelebihan: 0 };
+  }
+  if (kel === 'khusus' && maks > 0 && hari.length > maks) {
+    const lebih = hari.length - maks;
+    let pilih = p.lebih;
+    if (pilih !== 'CUTI' && pilih !== 'BIASA') {
+      if (p.ketatLebih) { return { ok: false, butuh_pilihan: true, kelebihan: lebih, pesan: 'Kelebihan ' + lebih + ' hari dari batas ' + p.jenis.nama + ' (maksimal ' + maks + ' hari): pilih diambil dari Cuti atau Izin biasa', segmen: [] }; }
+      pilih = sisa >= lebih ? 'CUTI' : 'BIASA';
+    }
+    if (pilih === 'CUTI' && lebih > sisa) { return { ok: false, kelebihan: lebih, pesan: 'Sisa cuti Anda ' + sisa + ' hari, kelebihan ' + lebih + ' hari. Pilih Izin biasa atau kurangi tanggalnya.', segmen: [] }; }
+    const a = hari.slice(0, maks), b = hari.slice(maks);
+    return {
+      ok: true, kelebihan: lebih, lebih: pilih,
+      segmen: [buat(p.jenis.nama, 'khusus', a), pilih === 'CUTI' ? buat(p.namaCuti, 'cuti', b) : buat(p.namaBiasa, 'biasa', b)],
+      sisa_setelah: pilih === 'CUTI' ? sisa - lebih : sisa
+    };
+  }
+  return { ok: true, kelebihan: 0, segmen: [buat(p.jenis.nama, kel === 'khusus' ? 'khusus' : 'biasa', hari)], sisa_setelah: sisa };
+}
+
+/** Fungsi murni: baris sheet izin dari segmen rencana. info = { grup, karyawan, ket, waktu, telat, status, oleh, diputus }. */
+function susunBarisIzin(segmen, info) {
+  return segmen.map(function (s, i) {
+    return {
+      id: info.grup + '-' + hurufIzin(i), grup: info.grup, karyawan: info.karyawan, jenis: s.jenis, kelompok: s.kelompok,
+      mulai: s.mulai, selesai: s.selesai, hari: s.hari.length, ket: info.ket || '', lampiran: '', diajukan: info.waktu,
+      telat_aju: info.telat === true, status: info.status || 'MENUNGGU', oleh: info.oleh || '', diputus: info.diputus || '',
+      rekan: '', status_rekan: '', shift_asal: '', shift_tujuan: ''
+    };
+  });
+}
+
+/** Fungsi murni: keterangan izin: dipotong, tanpa karakter kontrol dan tanda |, maksimal 200 karakter. */
+function bersihkanKetIzin(teks) {
+  return String(teks === undefined || teks === null ? '' : teks).replace(/[\u0000-\u001f\u007f|]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+}
+
+/** Fungsi murni: judul kartu izin di Konfirmasi (mockup 52/28): "Izin sakit dengan surat", "Izin sakit", "Cuti", "Izin - keperluan pribadi". */
+function judulIzinKonfirmasi(baris) {
+  const jenis = String(baris.jenis);
+  if (String(baris.kelompok).toLowerCase() === 'cuti') { return 'Cuti'; }
+  if (jenis.toLowerCase() === 'sakit') { return String(baris.lampiran || '') !== '' ? 'Izin sakit dengan surat' : 'Izin sakit'; }
+  return 'Izin · ' + jenis.toLowerCase();
+}
+
+/** Fungsi murni: rentang tanggal pendek "29-30 Sep" / "29 Sep" / "29 Sep-2 Okt" (en dash). */
+function rentangPendek(mulai, selesai) {
+  const bln = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const a = bagianTanggal(mulai), b = bagianTanggal(selesai);
+  if (mulai === selesai) { return a.d + ' ' + bln[a.m - 1]; }
+  if (a.m === b.m && a.y === b.y) { return a.d + '–' + b.d + ' ' + bln[a.m - 1]; }
+  return a.d + ' ' + bln[a.m - 1] + '–' + b.d + ' ' + bln[b.m - 1];
+}
+
+/**
+ * Fungsi murni: item Konfirmasi izin (satu item per GRUP yang masih ada baris MENUNGGU).
+ * rows = baris izin (mulai/selesai teks); petaAkun = { id: { nama, cabang, role } }. Tukar/pindah shift tidak termasuk (fitur B).
+ */
+function rakitItemIzin(rows, petaAkun) {
+  const kelompokGrup = {};
+  const urut = [];
+  rows.forEach(function (r) {
+    const jenis = String(r.jenis).toUpperCase();
+    if (jenis === 'TUKAR_SHIFT' || jenis === 'PINDAH_SHIFT') { return; }
+    const g = String(r.grup || r.id);
+    if (!kelompokGrup[g]) { kelompokGrup[g] = []; urut.push(g); }
+    kelompokGrup[g].push(r);
+  });
+  const items = [];
+  urut.forEach(function (g) {
+    const baris = kelompokGrup[g];
+    const menunggu = baris.filter(function (r) { return String(r.status).toUpperCase() === 'MENUNGGU'; });
+    if (!menunggu.length) { return; }
+    const pertama = menunggu[0];
+    const akun = petaAkun[String(pertama.karyawan)] || {};
+    const hariTotal = menunggu.reduce(function (n, r) { return n + (Number(r.hari) || 0); }, 0);
+    const mulai = menunggu.reduce(function (m, r) { return String(r.mulai) < m ? String(r.mulai) : m; }, String(pertama.mulai));
+    const selesai = menunggu.reduce(function (m, r) { return String(r.selesai) > m ? String(r.selesai) : m; }, String(pertama.selesai));
+    const bagian = menunggu.map(function (r) {
+      return (Number(r.hari) || 0) + ' hari ' + (String(r.kelompok).toLowerCase() === 'cuti' ? 'cuti' : (String(r.kelompok).toLowerCase() === 'khusus' ? 'izin khusus ' + String(r.jenis).toLowerCase() : 'izin ' + String(r.jenis).toLowerCase())) + ' (' + rentangPendek(String(r.mulai), String(r.selesai)) + ')';
+    });
+    const adaSurat = menunggu.some(function (r) { return String(r.lampiran || '') !== ''; });
+    items.push({
+      id: 'IZIN|' + g, jenis: 'IZIN', kelompok: 'IZIN', karyawan: String(pertama.karyawan), nama: akun.nama || String(pertama.karyawan),
+      cabang: akun.cabang || '', role: akun.role || 'KARYAWAN', tanggal: mulai, jam: '', shift: '',
+      judul: judulIzinKonfirmasi(pertama), rincian: menunggu.length > 1 ? bagian.join(', ') : rentangPendek(mulai, selesai) + ', ' + hariTotal + ' hari kerja' + (adaSurat ? ', lampiran ada' : ''),
+      ket: String(pertama.ket || ''), surat: adaSurat, sakit: menunggu.some(function (r) { return String(r.jenis).toLowerCase() === 'sakit'; }),
+      hari: hariTotal, mulai: mulai, selesai: selesai, telat_aju: menunggu.some(function (r) { return r.telat_aju === true; }),
+      luar: false, gps: '', dalam_area_toko: false, tingkat: 0, durasi_menit: 0, foto: adaSurat ? 'ADA' : 'TANPA'
+    });
+  });
+  return items;
+}
+
+/** Fungsi murni: id item izin "IZIN|IZN-2026-0001" -> grup; null kalau bentuknya salah. */
+function parseIdItemIzin(id) {
+  const m = /^IZIN\|(IZN-\d{4}-\d{4}(?:-[A-Z])?)$/.exec(String(id || ''));
+  return m ? m[1] : null;
+}
+
+/** Fungsi murni: jumlah pengajuan (grup) milik karyawan yang masih MENUNGGU (kartu "N pengajuan menunggu ACC" di beranda pribadi). */
+function jumlahPengajuanMenunggu(rows, karyawan) {
+  const g = {};
+  rows.forEach(function (r) {
+    if (String(r.karyawan) === String(karyawan) && String(r.status).toUpperCase() === 'MENUNGGU') { g[String(r.grup || r.id)] = true; }
+  });
+  return Object.keys(g).length;
+}
+
+// ---------- akses sheet izin / kalender / jenis ----------
+
+function normTanggalIzin(v) { return String(sebagaiTanggalTeks(v, ZONA_ABSEN)); }
+
+function bacaIzinTernormalisasi() {
+  const b = bacaSheet('izin');
+  b.data.forEach(function (r) { r.mulai = normTanggalIzin(r.mulai); r.selesai = normTanggalIzin(r.selesai); });
+  return b;
+}
+
+function bacaKalenderTernormalisasi() {
+  const b = bacaSheet('kalender');
+  b.data.forEach(function (k) { k.tanggal = normTanggalIzin(k.tanggal); k.cabang = String(k.cabang); k.karyawan = String(k.karyawan); k.isi = String(k.isi); });
+  return b;
+}
+
+/** Daftar jenis izin dari pengaturan (kategori JENIS_IZIN): [{ nama, kelompok, maks }] urutan baris. */
+function daftarJenisIzin() {
+  return bacaSheet('pengaturan').data.filter(function (r) { return r.kategori === 'JENIS_IZIN'; }).map(function (r) {
+    return { nama: String(r.nama), kelompok: String(r.kelompok || 'biasa').toLowerCase(), maks: Number(r.maks) || 0 };
+  });
+}
+
+function liburMingguCabang(cabang) {
+  const kode = ambilKodeCabang(cabang);
+  if (!kode) { return false; }
+  const p = bacaSheet('pengaturan').data.find(function (r) { return r.kategori === 'UMUM' && String(r.nama) === 'libur_minggu_' + kode; });
+  return !!p && String(p.nilai).toUpperCase() === 'TRUE';
+}
+
+/** Akun aktif lengkap (mulai_pola dinormalkan) atau null. */
+function akunLengkapAktif(id) {
+  const a = bacaSheet('akun').data.find(function (r) { return String(r.id) === String(id) && r.aktif === true; });
+  if (!a) { return null; }
+  a.mulai_pola = a.mulai_pola === '' ? '' : normTanggalIzin(a.mulai_pola);
+  return a;
+}
+
+function jatahCutiAkun(akun) {
+  const n = Number(akun.jatah_cuti);
+  return (akun.jatah_cuti !== '' && akun.jatah_cuti !== undefined && !isNaN(n)) ? n : ambilNilaiUmum('jatah_cuti', 6);
+}
+
+function tambahBarisSheet(bacaan, obj) {
+  bacaan.sheet.appendRow(bacaan.header.map(function (h) { return obj[h] === undefined ? '' : obj[h]; }));
+}
+
+function waktuServerTeks() { return Utilities.formatDate(new Date(), ZONA_ABSEN, 'yyyy-MM-dd HH:mm'); }
+function hariIniServer() { return Utilities.formatDate(new Date(), ZONA_ABSEN, 'yyyy-MM-dd'); }
+
+/** Karyawan atau admin yang login di HP pribadi: { p, akun } atau { gagal }. */
+function aktorIzinPribadi(d) {
+  const p = validasiSesiPribadi(d.sesi);
+  if (!p) { return { gagal: responSesiPribadiHabis() }; }
+  const akun = akunLengkapAktif(p.id);
+  if (!akun) { return { gagal: responSesiPribadiHabis() }; }
+  return { p: p, akun: akun };
+}
+
+/** Hitung rencana pengajuan untuk satu akun memakai data sheet (jadwal, kalender, izin, jatah cuti). opsi = { ketatLebih }. */
+function evaluasiIzin(akun, d, opsi) {
+  const hariIni = hariIniServer();
+  const mulai = String(d.mulai || ''), selesai = String(d.selesai || '');
+  const v = validasiTanggalIzin(mulai, selesai, hariIni, ambilNilaiUmum('batas_izin_lewat_hari', 2));
+  if (!v.ok) { return { ok: false, pesan: v.pesan, segmen: [] }; }
+  const daftar = daftarJenisIzin();
+  const jenis = daftar.find(function (j) { return j.nama === String(d.jenis || ''); });
+  if (!jenis) { return { ok: false, pesan: 'Jenis izin tidak dikenal', segmen: [] }; }
+  const hari = hariTerjadwalRentang(akun, mulai, selesai, bacaKalenderTernormalisasi().data, liburMingguCabang(akun.cabang));
+  const izinRows = bacaIzinTernormalisasi().data;
+  const tabrak = tumpangTindihIzin(izinRows, akun.id, mulai, selesai);
+  if (tabrak) { return { ok: false, pesan: 'Sudah ada pengajuan izin pada tanggal itu (' + rentangPendek(String(tabrak.mulai), String(tabrak.selesai)) + ')', segmen: [] }; }
+  const sisa = hitungSisaCuti(jatahCutiAkun(akun), izinRows, akun.id, mulai.slice(0, 4));
+  const cuti = daftar.find(function (j) { return j.kelompok === 'cuti'; });
+  const biasa = daftar.find(function (j) { return j.nama === 'Keperluan pribadi'; }) || daftar.find(function (j) { return j.kelompok === 'biasa' && j.nama.toLowerCase() !== 'sakit'; });
+  const r = rencanaIzin({ jenis: jenis, hari: hari, sisaCuti: sisa, lebih: d.lebih, namaBiasa: biasa ? biasa.nama : 'Keperluan pribadi', namaCuti: cuti ? cuti.nama : 'Cuti', ketatLebih: opsi && opsi.ketatLebih === true });
+  r.telat_aju = v.telat_aju; r.hari_ini = hariIni; r.sisa_cuti = sisa; r.jumlah_hari = hari.length; r.maks = jenis.maks; r.kelompok_jenis = jenis.kelompok;
+  return r;
+}
+
+function segmenUntukKlien(segmen) {
+  return (segmen || []).map(function (s) { return { jenis: s.jenis, kelompok: s.kelompok, hari: s.hari.length, mulai: s.mulai, selesai: s.selesai }; });
+}
+
+/** Aksi izin_info { sesi }: jenis izin, sisa cuti, batas hari lewat, hari ini (server). */
+function prosesIzinInfo(d) {
+  const a = aktorIzinPribadi(d);
+  if (a.gagal) { return a.gagal; }
+  const hariIni = hariIniServer();
+  const sisa = hitungSisaCuti(jatahCutiAkun(a.akun), bacaIzinTernormalisasi().data, a.akun.id, hariIni.slice(0, 4));
+  return respon({ status: 'ok', hari_ini: hariIni, jenis: daftarJenisIzin(), jatah: jatahCutiAkun(a.akun), sisa_cuti: sisa, batas_lewat_hari: ambilNilaiUmum('batas_izin_lewat_hari', 2), role: a.akun.role });
+}
+
+/** Aksi izin_pratinjau { sesi, jenis, mulai, selesai, lebih? }: hasil pengajuan tanpa menyimpan apa pun. */
+function prosesIzinPratinjau(d) {
+  const a = aktorIzinPribadi(d);
+  if (a.gagal) { return a.gagal; }
+  const e = evaluasiIzin(a.akun, d, { ketatLebih: false });
+  return respon({
+    status: 'ok', bisa: e.ok === true, pesan: e.pesan || '', hari: e.jumlah_hari || 0, kelebihan: e.kelebihan || 0, lebih: e.lebih || '',
+    maks: e.maks || 0, sisa_cuti: e.sisa_cuti === undefined ? null : e.sisa_cuti, sisa_setelah: e.sisa_setelah === undefined ? null : e.sisa_setelah,
+    segmen: segmenUntukKlien(e.segmen), telat_aju: e.telat_aju === true
+  });
+}
+
+/** Aksi izin_ajukan { sesi, jenis, mulai, selesai, lebih?, ket? }: simpan pengajuan (MENUNGGU). */
+function prosesIzinAjukan(d) {
+  const a = aktorIzinPribadi(d);
+  if (a.gagal) { return a.gagal; }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const e = evaluasiIzin(a.akun, d, { ketatLebih: true });
+    if (!e.ok) { return respon({ status: 'gagal', pesan: e.pesan, butuh_pilihan: e.butuh_pilihan === true }); }
+    const izin = bacaIzinTernormalisasi();
+    const grup = buatGrupIzin(izin.data.map(function (r) { return r.grup || r.id; }), e.hari_ini.slice(0, 4));
+    const ket = bersihkanKetIzin(d.ket);
+    const baris = susunBarisIzin(e.segmen, { grup: grup, karyawan: a.akun.id, ket: ket, waktu: waktuServerTeks(), telat: e.telat_aju, status: 'MENUNGGU' });
+    baris.forEach(function (b) { tambahBarisSheet(izin, b); });
+    tambahLog({
+      jenis: 'IZIN', oleh: a.akun.id, cabang: a.akun.cabang, aksi: 'AJUKAN_IZIN', target: a.akun.nama + ' ' + baris.map(function (b) { return b.jenis + ' ' + b.mulai + '..' + b.selesai; }).join(' + '),
+      id: grup, sebelum: '', sesudah: 'MENUNGGU', alasan: ket
+    });
+    const sakit = baris.find(function (b) { return String(b.jenis).toLowerCase() === 'sakit'; });
+    return respon({ status: 'ok', grup: grup, ids: baris.map(function (b) { return b.id; }), segmen: segmenUntukKlien(e.segmen), id_sakit: sakit ? sakit.id : '', telat_aju: e.telat_aju });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Aksi izin_batal { sesi, grup }: karyawan membatalkan pengajuan MILIKNYA yang masih MENUNGGU (status jadi BATAL, baris tidak dihapus). */
+function prosesIzinBatal(d) {
+  const a = aktorIzinPribadi(d);
+  if (a.gagal) { return a.gagal; }
+  const grup = String(d.grup || '');
+  if (!/^IZN-\d{4}-\d{4}(?:-[A-Z])?$/.test(grup)) { return respon({ status: 'gagal', pesan: 'Pengajuan tidak dikenal' }); }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const izin = bacaIzinTernormalisasi();
+    const baris = izin.data.filter(function (r) { return (String(r.grup) === grup || String(r.id) === grup) && String(r.karyawan) === String(a.akun.id); });
+    if (!baris.length) { return respon({ status: 'gagal', pesan: 'Pengajuan tidak ditemukan' }); }
+    const menunggu = baris.filter(function (r) { return String(r.status).toUpperCase() === 'MENUNGGU'; });
+    if (!menunggu.length) { return respon({ status: 'gagal', pesan: 'Pengajuan ini sudah diputuskan, tidak bisa dibatalkan' }); }
+    menunggu.forEach(function (r) { perbaruiKolom(izin, r, { status: 'BATAL', diputus: waktuServerTeks(), oleh: a.akun.id }); });
+    tambahLog({ jenis: 'IZIN', oleh: a.akun.id, cabang: a.akun.cabang, aksi: 'BATAL_IZIN', target: a.akun.nama, id: String(baris[0].grup || baris[0].id), sebelum: 'MENUNGGU', sesudah: 'BATAL' });
+    return respon({ status: 'ok' });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Fungsi murni: jalur folder surat dokter di bawah folder akar + nama berkas. akun = { id, nama, cabang }; hariIni 'yyyy-MM-dd'. */
+function jalurSuratIzin(baris, akun, hariIni) {
+  const t = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(baris.mulai));
+  const h = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(hariIni));
+  if (!t || !h) { return null; }
+  const orang = bersihkanNamaBerkas(String(akun.id) + '_' + (bersihkanNamaBerkas(akun.nama) || 'TANPA NAMA'));
+  return {
+    segmen: ['SURAT IZIN', bersihkanNamaBerkas(akun.cabang) || 'TANPA CABANG', t[1], t[2], orang],
+    namaBerkas: h[3] + h[2] + h[1].slice(2) + '_IZIN_' + bersihkanNamaBerkas(baris.id) + '.jpg'
+  };
+}
+
+/** Fungsi murni: siapa boleh melampirkan surat ke baris izin? aktor = { role, id, cabang }; target = { role, cabang }. */
+function bolehLampirSurat(aktor, baris, target) {
+  if (String(baris.jenis).toLowerCase() !== 'sakit') { return { boleh: false, pesan: 'Surat dokter hanya untuk izin sakit' }; }
+  const status = String(baris.status).toUpperCase();
+  if (String(baris.karyawan) === String(aktor.id)) {
+    if (status !== 'MENUNGGU') { return { boleh: false, pesan: 'Surat hanya bisa ditambahkan selama pengajuan masih menunggu ACC' }; }
+    return { boleh: true };
+  }
+  if (aktor.role !== 'ADMIN') { return { boleh: false, pesan: 'Bukan pengajuan Anda' }; }
+  if (!target || target.role !== 'KARYAWAN' || target.cabang !== aktor.cabang) { return { boleh: false, pesan: 'Hanya boleh untuk karyawan di cabang sendiri' }; }
+  if (String(baris.oleh) !== String(aktor.id) || status !== 'DITERIMA') { return { boleh: false, pesan: 'Admin hanya melampirkan surat pada izin yang diinputnya sendiri' }; }
+  return { boleh: true };
+}
+
+/**
+ * Aksi izin_unggah_surat { sesi | token+sesi, id (id baris izin), gambar }: JPEG maksimal 500 KB ke Drive (SURAT IZIN/Cabang/Tahun/Bulan/ID_Nama/),
+ * tautan ke kolom lampiran, kelompok jadi khusus. Gagal unggah TIDAK membatalkan pengajuannya (bisa dicoba lagi).
+ */
+function prosesIzinUnggahSurat(d) {
+  const idIzin = String(d.id || '');
+  if (!/^IZN-\d{4}-\d{4}-[A-Z]$/.test(idIzin)) { return respon({ status: 'gagal', pesan: 'Id pengajuan tidak valid' }); }
+  let aktor;
+  if (d.token) {
+    const a = autentikasiAdminToko(d);
+    if (a.gagal) { return a.gagal; }
+    aktor = { role: 'ADMIN', id: a.s.akun.id, cabang: a.s.akun.cabang };
+  } else {
+    const p = validasiSesiPribadi(d.sesi);
+    if (!p) { return responSesiPribadiHabis(); }
+    aktor = { role: p.role, id: p.id, cabang: p.cabang };
+  }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const izin = bacaIzinTernormalisasi();
+    const baris = izin.data.find(function (r) { return String(r.id) === idIzin; });
+    if (!baris) { return respon({ status: 'gagal', pesan: 'Pengajuan tidak ditemukan' }); }
+    const akunTarget = bacaSheet('akun').data.find(function (r) { return String(r.id) === String(baris.karyawan); });
+    const izinHak = bolehLampirSurat(aktor, baris, akunTarget ? { role: akunTarget.role, cabang: akunTarget.cabang } : null);
+    if (!izinHak.boleh) { return respon({ status: 'gagal', pesan: izinHak.pesan }); }
+    const g = periksaGambarJpeg(d.gambar, MAKS_SURAT_BYTE);
+    if (!g.ok) { return respon({ status: 'gagal', pesan: g.pesan }); }
+    const akar = ambilFolderAkar();
+    if (akar.galat) { catatGalatFolder(akar.galat); return respon({ status: 'gagal', pesan: 'Folder penyimpanan surat bermasalah. Pengajuan tetap tersimpan; coba lampirkan lagi nanti.' }); }
+    const jalur = jalurSuratIzin(baris, { id: akunTarget.id, nama: akunTarget.nama, cabang: akunTarget.cabang }, hariIniServer());
+    if (!jalur) { return respon({ status: 'gagal', pesan: 'Data pengajuan tidak lengkap' }); }
+    let berkas;
+    try {
+      let folder = akar.folder;
+      jalur.segmen.forEach(function (nama) { folder = ambilAtauBuatFolder(folder, nama); });
+      berkas = folder.createFile(Utilities.newBlob(g.bytes, 'image/jpeg', jalur.namaBerkas));
+    } catch (e) {
+      catatGalatFolder('Gagal menyimpan surat izin ke Drive: ' + e.message);
+      return respon({ status: 'gagal', pesan: 'Surat belum bisa disimpan. Pengajuan tetap tersimpan; coba lampirkan lagi.' });
+    }
+    perbaruiKolom(izin, baris, { lampiran: berkas.getUrl(), kelompok: 'khusus' });
+    tambahLog({ jenis: 'IZIN', oleh: aktor.id, cabang: akunTarget.cabang, aksi: 'SURAT_IZIN', target: akunTarget.nama + ' ' + idIzin, id: idIzin, sebelum: '', sesudah: 'lampiran ada; kelompok=khusus' });
+    return respon({ status: 'ok', pesan: 'Surat tersimpan' });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Aksi izin_input { token+sesi admin | sesi admin pribadi, karyawan, jenis, mulai, selesai, ket? }: admin mengisi izin untuk karyawan cabangnya; langsung DITERIMA. */
+function prosesIzinInput(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const admin = a.s.akun;
+  const target = akunLengkapAktif(d.karyawan);
+  if (!target || target.role !== 'KARYAWAN') { return respon({ status: 'gagal', pesan: 'Pilih karyawan yang valid' }); }
+  if (String(target.id) === String(admin.id)) { return respon({ status: 'gagal', pesan: 'Admin tidak boleh mengisi izin untuk dirinya sendiri. Itu tugas owner.' }); }
+  if (target.cabang !== admin.cabang) { return respon({ status: 'gagal', pesan: 'Hanya boleh untuk karyawan di cabang sendiri' }); }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const e = evaluasiIzin(target, d, { ketatLebih: true });
+    if (!e.ok) { return respon({ status: 'gagal', pesan: e.butuh_pilihan ? 'Melebihi batas hari jenis izin ini (' + e.kelebihan + ' hari berlebih). Kurangi tanggalnya.' : e.pesan }); }
+    const izin = bacaIzinTernormalisasi();
+    const grup = buatGrupIzin(izin.data.map(function (r) { return r.grup || r.id; }), e.hari_ini.slice(0, 4));
+    const waktu = waktuServerTeks();
+    const ket = bersihkanKetIzin(d.ket);
+    const baris = susunBarisIzin(e.segmen, { grup: grup, karyawan: target.id, ket: ket, waktu: waktu, telat: e.telat_aju, status: 'DITERIMA', oleh: admin.id, diputus: waktu });
+    baris.forEach(function (b) { tambahBarisSheet(izin, b); });
+    tambahLog({ jenis: 'IZIN', oleh: admin.id, cabang: target.cabang, aksi: 'INPUT_IZIN', target: target.nama + ' ' + baris.map(function (b) { return b.jenis + ' ' + b.mulai + '..' + b.selesai; }).join(' + '), id: grup, sebelum: '', sesudah: 'DITERIMA', alasan: ket });
+    const sakit = baris.find(function (b) { return String(b.jenis).toLowerCase() === 'sakit'; });
+    return respon({ status: 'ok', grup: grup, ids: baris.map(function (b) { return b.id; }), segmen: segmenUntukKlien(e.segmen), id_sakit: sakit ? sakit.id : '' });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Aksi izin_input_pratinjau { kredensial admin, karyawan, jenis, mulai, selesai }: jumlah hari kerja untuk layar Input izin. */
+function prosesIzinInputPratinjau(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const target = akunLengkapAktif(d.karyawan);
+  if (!target || target.role !== 'KARYAWAN' || target.cabang !== a.s.akun.cabang || String(target.id) === String(a.s.akun.id)) { return respon({ status: 'ok', bisa: false, pesan: 'Pilih karyawan', hari: 0, segmen: [] }); }
+  const e = evaluasiIzin(target, d, { ketatLebih: true });
+  return respon({ status: 'ok', bisa: e.ok === true, pesan: e.butuh_pilihan ? 'Melebihi batas hari jenis izin ini. Kurangi tanggalnya.' : (e.pesan || ''), hari: e.jumlah_hari || 0, segmen: segmenUntukKlien(e.segmen) });
+}
+
+/** Aksi izin_batas_input { kredensial admin }: jenis izin (untuk dropdown) dan hari ini server. */
+function prosesIzinInputInfo(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  return respon({ status: 'ok', hari_ini: hariIniServer(), jenis: daftarJenisIzin() });
+}
+
+// ---------- Konfirmasi izin ----------
+
+function petaAkunUntukIzin() {
+  const peta = {};
+  bacaSheet('akun').data.forEach(function (r) { peta[String(r.id)] = { nama: String(r.nama), cabang: String(r.cabang), role: r.role === 'ADMIN' ? 'ADMIN' : (r.role === 'OWNER' ? 'OWNER' : 'KARYAWAN') }; });
+  return peta;
+}
+
+/** Putuskan satu item izin (grup): aktor sudah lolos autentikasi; hak diperiksa di sini. d = { id, keputusan, surat_tidak_sah? }. */
+function putuskanItemIzin(aktor, d) {
+  const grup = parseIdItemIzin(d.id);
+  if (!grup) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const izin = bacaIzinTernormalisasi();
+    const semua = izin.data.filter(function (r) { return String(r.grup || r.id) === grup || String(r.id) === grup; });
+    const menunggu = semua.filter(function (r) { return String(r.status).toUpperCase() === 'MENUNGGU'; });
+    if (!semua.length) { return respon({ status: 'gagal', pesan: 'Pengajuan tidak ditemukan' }); }
+    if (!menunggu.length) { return respon({ status: 'gagal', pesan: 'Item ini sudah diputuskan' }); }
+    const peta = petaAkunUntukIzin();
+    const pemilik = peta[String(menunggu[0].karyawan)] || { cabang: '', role: 'KARYAWAN' };
+    const hak = bolehMemutuskanKonfirmasi(aktor, { karyawan: menunggu[0].karyawan, cabang: pemilik.cabang, role: pemilik.role });
+    if (!hak.boleh) { return respon({ status: 'gagal', pesan: hak.pesan }); }
+    const baru = d.keputusan === 'ACC' ? 'DITERIMA' : 'DITOLAK';
+    const waktu = waktuServerTeks();
+    const tidakSah = d.keputusan === 'ACC' && d.surat_tidak_sah === true;
+    menunggu.forEach(function (r) {
+      const ubah = { status: baru, oleh: aktor.id, diputus: waktu };
+      if (tidakSah && String(r.jenis).toLowerCase() === 'sakit') { ubah.kelompok = 'biasa'; }
+      perbaruiKolom(izin, r, ubah);
+    });
+    tambahLog({
+      jenis: 'KONFIRMASI', oleh: aktor.id, cabang: pemilik.cabang, aksi: (d.keputusan === 'ACC' ? 'ACC_IZIN' : 'TOLAK_IZIN'), target: (pemilik.nama || '') + ' ' + grup, id: grup,
+      sebelum: 'status=MENUNGGU', sesudah: 'status=' + baru, alasan: tidakSah ? 'surat tidak sah: dijadikan sakit tanpa surat' : ''
+    });
+    return respon({ status: 'ok', keputusan: baru });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Ambil foto surat dokter satu grup izin (hak lihat = hak putuskan). Memakai pola prosesAmbilFoto. */
+function ambilSuratItemIzin(aktor, d) {
+  const grup = parseIdItemIzin(d.id);
+  if (!grup) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
+  const izin = bacaIzinTernormalisasi();
+  const semua = izin.data.filter(function (r) { return String(r.grup || r.id) === grup || String(r.id) === grup; });
+  if (!semua.length) { return respon({ status: 'gagal', pesan: 'Pengajuan tidak ditemukan' }); }
+  const peta = petaAkunUntukIzin();
+  const pemilik = peta[String(semua[0].karyawan)] || { cabang: '', role: 'KARYAWAN' };
+  const hak = bolehMemutuskanKonfirmasi(aktor, { karyawan: semua[0].karyawan, cabang: pemilik.cabang, role: pemilik.role });
+  if (!hak.boleh) { return respon({ status: 'gagal', pesan: hak.pesan }); }
+  const baris = semua.find(function (r) { return String(r.lampiran || '') !== ''; });
+  if (!baris) { return respon({ status: 'ok', foto: null, teks: 'Surat belum dilampirkan' }); }
+  const idBerkas = idBerkasDrive(String(baris.lampiran));
+  if (!idBerkas) { return respon({ status: 'ok', foto: null, teks: 'Surat tidak bisa dibuka' }); }
+  try {
+    const bytes = DriveApp.getFileById(idBerkas).getBlob().getBytes();
+    if (bytes.length > 700 * 1024) { return respon({ status: 'ok', foto: null, teks: 'Surat terlalu besar untuk ditampilkan' }); }
+    return respon({ status: 'ok', foto: 'data:image/jpeg;base64,' + Utilities.base64Encode(bytes), mulai: String(baris.mulai), selesai: String(baris.selesai), hari: Number(baris.hari) || 0, ket: String(baris.ket || '') });
+  } catch (e) {
+    return respon({ status: 'ok', foto: null, teks: 'Surat tidak bisa dibuka' });
+  }
+}
+
+// ---------- Kalender libur ----------
+
+/** Fungsi murni: isi sel kalender -> { tipe: MERAH | KHUSUS | MASUK | '', ket }. */
+function uraiIsiKalender(isi) {
+  const t = String(isi === undefined || isi === null ? '' : isi).trim();
+  const u = t.toUpperCase();
+  const ket = function () { const i = t.indexOf(':'); return i >= 0 ? t.slice(i + 1).trim() : ''; };
+  if (u.indexOf('LIBUR TANGGAL MERAH') === 0) { return { tipe: 'MERAH', ket: ket() }; }
+  if (u.indexOf('LIBUR KHUSUS') === 0) { return { tipe: 'KHUSUS', ket: ket() }; }
+  if (u.indexOf('MASUK') === 0) { return { tipe: 'MASUK', ket: ket() }; }
+  return { tipe: '', ket: '' };
+}
+
+/** Fungsi murni: isi sel kalender dari tipe + keterangan; HAPUS = kosong (baris tidak dihapus). */
+function susunIsiKalender(tipe, ket) {
+  const k = bersihkanKetIzin(ket).slice(0, 60);
+  const akhir = k ? ': ' + k : '';
+  if (tipe === 'MERAH') { return 'LIBUR TANGGAL MERAH' + akhir; }
+  if (tipe === 'KHUSUS') { return 'LIBUR KHUSUS' + akhir; }
+  if (tipe === 'MASUK') { return 'MASUK' + akhir; }
+  return '';
+}
+
+/** Fungsi murni: validasi perubahan satu tanggal kalender. Hanya hari ini dan seterusnya; MASUK hanya untuk hari Minggu. */
+function validasiPerubahanKalender(tanggal, tipe, hariIni) {
+  if (!tanggalIzinSah(tanggal)) { return { ok: false, pesan: 'Tanggal tidak valid' }; }
+  if (tanggal < hariIni) { return { ok: false, pesan: 'Perubahan kalender hanya berlaku untuk hari ini dan seterusnya' }; }
+  if (['MERAH', 'KHUSUS', 'MASUK', 'HAPUS'].indexOf(tipe) < 0) { return { ok: false, pesan: 'Jenis libur tidak dikenal' }; }
+  if (tipe === 'MASUK' && hariKeIndeks(tanggal) !== 0) { return { ok: false, pesan: 'Pilihan "masuk" hanya untuk hari Minggu' }; }
+  return { ok: true };
+}
+
+/** Aksi kalender_baca { kredensial admin, bulan 'yyyy-MM' }: libur Minggu cabang + tanggal merah/khusus/Minggu masuk di bulan itu. */
+function prosesKalenderBaca(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const cabang = a.s.akun.cabang;
+  const bulan = /^\d{4}-\d{2}$/.test(String(d.bulan || '')) ? String(d.bulan) : hariIniServer().slice(0, 7);
+  const daftar = [];
+  bacaKalenderTernormalisasi().data.forEach(function (k) {
+    if (k.karyawan !== '' || (k.cabang !== '' && k.cabang !== cabang) || k.tanggal.slice(0, 7) !== bulan) { return; }
+    const u = uraiIsiKalender(k.isi);
+    if (u.tipe) { daftar.push({ tanggal: k.tanggal, tipe: u.tipe, ket: u.ket, umum: k.cabang === '' }); }
+  });
+  daftar.sort(function (x, y) { return x.tanggal < y.tanggal ? -1 : (x.tanggal > y.tanggal ? 1 : 0); });
+  return respon({ status: 'ok', cabang: cabang, bulan: bulan, hari_ini: hariIniServer(), libur_minggu: liburMingguCabang(cabang), daftar: daftar });
+}
+
+/** Aksi kalender_simpan { kredensial admin, libur_minggu? | tanggal+tipe+ket }: ubah libur Minggu cabang atau satu tanggal. Dicatat di log. */
+function prosesKalenderSimpan(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const admin = a.s.akun;
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    if (typeof d.libur_minggu === 'boolean') {
+      const kode = ambilKodeCabang(admin.cabang);
+      if (!kode) { return respon({ status: 'gagal', pesan: 'Kode cabang belum diatur di pengaturan' }); }
+      const p = bacaSheet('pengaturan');
+      const nama = 'libur_minggu_' + kode;
+      const baris = p.data.find(function (r) { return r.kategori === 'UMUM' && String(r.nama) === nama; });
+      const sebelum = baris ? String(baris.nilai).toUpperCase() : '(belum ada)';
+      if (baris) { perbaruiKolom(p, baris, { nilai: d.libur_minggu ? 'TRUE' : 'FALSE' }); }
+      else { tambahBarisSheet(p, { kategori: 'UMUM', nama: nama, nilai: d.libur_minggu ? 'TRUE' : 'FALSE', kelompok: '', maks: '' }); }
+      tambahLog({ jenis: 'KALENDER', oleh: admin.id, cabang: admin.cabang, aksi: 'LIBUR_MINGGU', target: nama, id: nama, sebelum: sebelum, sesudah: d.libur_minggu ? 'TRUE' : 'FALSE' });
+      return respon({ status: 'ok', libur_minggu: d.libur_minggu });
+    }
+    const tanggal = String(d.tanggal || ''), tipe = String(d.tipe || '');
+    const v = validasiPerubahanKalender(tanggal, tipe, hariIniServer());
+    if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
+    const kal = bacaKalenderTernormalisasi();
+    const ada = kal.data.find(function (k) { return k.tanggal === tanggal && k.cabang === admin.cabang && k.karyawan === ''; });
+    const isiBaru = susunIsiKalender(tipe, d.ket);
+    if (ada) { perbaruiKolom(kal, ada, { isi: isiBaru }); }
+    else if (tipe !== 'HAPUS') { tambahBarisSheet(kal, { tanggal: tanggal, cabang: admin.cabang, karyawan: '', isi: isiBaru }); }
+    tambahLog({ jenis: 'KALENDER', oleh: admin.id, cabang: admin.cabang, aksi: 'UBAH_KALENDER', target: tanggal, id: tanggal, sebelum: ada ? String(ada.isi) : '', sesudah: isiBaru, alasan: '' });
+    return respon({ status: 'ok' });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+// ---------- Kartu "Hari ini tidak masuk" (layar 01 HP toko) ----------
+
+/**
+ * Fungsi murni: panggilan karyawan yang HARI INI tidak masuk karena izin/cuti (MENUNGGU atau DITERIMA) atau libur milik sendiri di kalender.
+ * Libur seluruh toko (Minggu / tanggal merah umum) tidak dihitung. m = { tanggal, cabang, akun[], kalender[], izin[], liburMinggu }.
+ */
+function daftarTidakMasuk(m) {
+  const izinId = {};
+  m.izin.forEach(function (z) {
+    const st = String(z.status).toUpperCase(), jenis = String(z.jenis).toUpperCase();
+    if (STATUS_IZIN_AKTIF.indexOf(st) < 0 || jenis === 'TUKAR_SHIFT' || jenis === 'PINDAH_SHIFT') { return; }
+    if (String(z.mulai) <= m.tanggal && m.tanggal <= String(z.selesai)) { izinId[String(z.karyawan)] = true; }
+  });
+  const umum = m.kalender.filter(function (k) { return String(k.karyawan) === ''; });
+  const hasil = [];
+  m.akun.forEach(function (a) {
+    if (a.aktif !== true || (a.role !== 'KARYAWAN' && a.role !== 'ADMIN') || a.cabang !== m.cabang) { return; }
+    const jToko = jadwalKaryawanHari(a, m.tanggal, umum, m.liburMinggu === true);
+    if (jToko.libur) { return; }
+    const j = jadwalKaryawanHari(a, m.tanggal, m.kalender, m.liburMinggu === true);
+    if (izinId[String(a.id)] || j.libur) { hasil.push(String(a.panggilan || a.nama)); }
+  });
+  hasil.sort(function (x, y) { return x.toLowerCase() < y.toLowerCase() ? -1 : (x.toLowerCase() > y.toLowerCase() ? 1 : 0); });
+  return hasil;
+}
+
+/** Aksi tidak_masuk_hari_ini { token }: daftar panggilan untuk kartu di layar 01 (cabang dari HP toko, bukan kiriman HP). */
+function prosesTidakMasukHariIni(hp) {
+  const tanggal = hariIniServer();
+  const akun = bacaSheet('akun').data.map(function (r) { r.mulai_pola = r.mulai_pola === '' ? '' : normTanggalIzin(r.mulai_pola); return r; });
+  const daftar = daftarTidakMasuk({ tanggal: tanggal, cabang: hp.cabang, akun: akun, kalender: bacaKalenderTernormalisasi().data, izin: bacaIzinTernormalisasi().data, liburMinggu: liburMingguCabang(hp.cabang) });
+  return respon({ status: 'ok', jumlah: daftar.length, daftar: daftar });
+}
+
+/** Jumlah pengajuan izin milik akun yang MENUNGGU; gagal membaca sheet tidak boleh mengganggu beranda (dianggap 0). */
+function jumlahIzinMenungguAman(id) {
+  try { return jumlahPengajuanMenunggu(bacaIzinTernormalisasi().data, id); } catch (e) { return 0; }
 }

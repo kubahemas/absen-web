@@ -12,7 +12,7 @@ var CFG = {
   '04': { home: 'toko' }, '05': { home: 'toko' }, '06': { home: 'toko' }, '07': { home: 'toko' },
   '08': { home: 'toko', judulMode: true, nav: { 'Manual: pilih nama + PIN': { aksi: 'pilihnama' } } },
   '13': { home: 'toko' }, '18': { home: 'toko' }, '19': { home: 'toko' },
-  '22': { home: 'adm' }, '23': { home: 'prib' },
+  '22': { home: 'adm', fn: FN['22'] }, '23': { home: 'prib', fn: FN['23'] },
   '24': { home: 'own', hapusSatu: ['Shift 2 · Siang'] },
   '25': { home: 'own', hapusBaris: ['Ahmad Fauzi'], pudar: [/^Semua cabang$/, /^Pekan ini$/, /^Semua$/] },
   '34': { home: 'prib', tombolAngka: true, fn: function (root) {
@@ -35,7 +35,7 @@ var CFG = {
   '48': { home: 'prib', ganti: [[/^GOOD$/, 'Segera'], [/^Halo, –$/, '–']], pudar: [/^Segera$/], tanpaSegera: /^Tukar shift$/ },
   '39': { home: 'prib', hapusBaris: ['24 Sep'] },
   '40': { home: 'prib', hapusBaris: ['28 Sep'] },
-  '41': { home: 'prib', hapusTeks: [/izin khusus menikah/, /hari cuti/, /^Sisa cuti jadi/] },
+  '41': { home: 'prib', fn: FN['41'], hapusTeks: [/izin khusus menikah/, /hari cuti/, /^Sisa cuti jadi/] },
   '42': { home: 'prib', hapusSatu: [/Anda →/] },
   '43': { home: 'prib' }, '45': { home: 'prib', ganti: [[/Password lama \(awal: –\)/, 'Password lama']], fn: function (root) {
     // Aturan sandi: teks diisi saat layar dibuka menurut peran akun (KARYAWAN = PIN 5 angka; ADMIN = kata sandi minimal 8 karakter). Di markup hanya "–".
@@ -51,8 +51,8 @@ var CFG = {
   '57': { home: 'adm', hapusBaris: ['05–10 Okt'] },
   '62': { home: 'adm' },
   '64': { home: 'adm', hapusBaris: ['Ahmad Fauzi'], pudar: [/^Pekan ini$/, /^Semua$/] },
-  '65': { home: 'adm' }, '66': { home: 'adm' },
-  '67': { home: 'adm', hapusBaris: [/^17 Sep/] },
+  '65': { home: 'adm' }, '66': { home: 'adm', fn: FN['66'] },
+  '67': { home: 'adm', fn: FN['67'], hapusBaris: [/^17 Sep/] },
   '68': { home: 'adm', ganti: TREN, hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb69', ganti: true } } },
   '69': { home: 'adm', hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb68', ganti: true } } },
   '70': { home: 'adm', hapusTeks: REPORT.hapusTeks, hapusBaris: REPORT.hapusBaris, ganti: TREN.concat([[/^GOOD$/, 'Segera']]), pudar: [/^Segera$/], nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } },

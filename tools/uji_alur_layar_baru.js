@@ -131,10 +131,11 @@ async function ke(tombol, id, asal, nama) {
       gp.click(); await tunggu(150);
       ok('Ganti password membuka 45', aktif() === 'lb45');
       var ar = Array.prototype.map.call(el('lb45').querySelectorAll('[data-aturan]'), function (e) { return e.textContent; });
+      ok('45 (KARYAWAN): label "PIN lama / PIN baru / Ulangi PIN baru"', Array.prototype.map.call(el('lb45').querySelectorAll('label'), function (l) { return l.textContent; }).join('|') === 'PIN lama|PIN baru|Ulangi PIN baru');
       ok('45 (KARYAWAN): aturan = PIN tepat 5 angka; tanpa "6 angka" dan "123456"; tombol Simpan nonaktif "Segera"', ar.length === 3 && /PIN tepat 5 angka/.test(ar[0]) && !/6 angka|123456|8 karakter/.test(el('lb45').textContent) && /Simpan/.test(el('lb45').textContent) && Array.prototype.every.call(el('lb45').querySelectorAll('button'), function (b) { return b.disabled || b.hasAttribute('data-lb-kembali'); }));
       tombolKembali().click(); await tunggu(150);
       ok('Back dari 45 kembali ke Akun saya', aktif() === 'layarAkun');
-      ok('tidak ada panggilan server baru dari layar baru', panggil.slice(n0).every(function (x) { return /^(pribadi_hari_ini|konfirmasi_jumlah)$/.test(x.aksi); }));
+      ok('tidak ada panggilan server baru dari layar baru', panggil.slice(n0).every(function (x) { return /^(pribadi_hari_ini|konfirmasi_jumlah|izin_info|izin_pratinjau)$/.test(x.aksi); }));
     }
     if (K === 'pribadiadmin') {
       el('btnJenisPribadi').click(); el('pribNama').value = 'Dewi Lestari'; el('pribRahasia').value = 'rahasia12'; el('btnMasukPribadi').click(); await tunggu(900);
@@ -142,6 +143,7 @@ async function ke(tombol, id, asal, nama) {
       document.querySelector('#menuPribadiIsi [data-menu="akun"]').click(); await tunggu(150);
       Array.prototype.filter.call(el('layarAkun').querySelectorAll('button'), function (b) { return /Ganti password/.test(b.textContent); })[0].click(); await tunggu(150);
       var ara = Array.prototype.map.call(el('lb45').querySelectorAll('[data-aturan]'), function (e) { return e.textContent; });
+      ok('45 (ADMIN): label tetap "Password lama / Password baru / Ulangi Password baru"', Array.prototype.map.call(el('lb45').querySelectorAll('label'), function (l) { return l.textContent; }).join('|') === 'Password lama|Password baru|Ulangi Password baru');
       ok('45 (ADMIN): aturan = kata sandi minimal 8 karakter, maksimal 100, besar/kecil sama; tanpa "6 angka" dan "123456" -> ' + ara.join(' | '), ara.length === 3 && /minimal 8 karakter/.test(ara[0]) && /100/.test(ara[1]) && /dianggap sama/.test(ara[2]) && !/6 angka|123456/.test(el('lb45').textContent));
       tombolKembali().click(); await tunggu(150);
       el('btnAkunHome').click(); await tunggu(150);

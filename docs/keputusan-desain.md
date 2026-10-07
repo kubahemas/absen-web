@@ -213,3 +213,5 @@ Bukti: `docs/audit/visual/paket_*_app.png` (layar), `uji_alur_*_hasil.png` (alur
 | 2026-10-07 | Layar 75 (Pengaturan) | Daftar "Keperluan absen luar" dipertahankan nonaktif; diputuskan ulang saat Pengaturan dibangun | Keputusan pemilik | berlaku |
 | 2026-10-07 | Teks tren 68, 81, 36, 36e, 37, 38, 70, 82 | "–" berwarna abu netral (bukan hijau/merah) sampai ada naik/turun nyata | Keputusan pemilik | berlaku |
 | 2026-10-07 | Layar 36 yang bisa dibuka | Report netral lencana abu: disetujui | Keputusan pemilik | berlaku |
+| 2026-10-07 | Layar 45 (Ganti password) | Label untuk KARYAWAN menjadi "PIN lama / PIN baru / Ulangi PIN baru" (karyawan hanya punya PIN); untuk ADMIN tetap "Password ...". Fungsi ganti tetap "Segera". Selisih 19, 20, 21 dipertahankan | Keputusan pemilik | belum disinkron ke mockup |
+| 2026-10-07 | Fitur A (izin dan cuti) | Proses izin/cuti, cek surat dokter, input izin admin, kalender libur, kartu "Hari ini tidak masuk" dan "N pengajuan menunggu ACC" dibangun; asumsi A1-A14 ada di `docs/daftar-selisih.md` | Permintaan pemilik (Sesi A-C) | berlaku |
