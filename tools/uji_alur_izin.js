@@ -113,7 +113,7 @@ async function dariMenuAdmin(nama, kelayar) {
       el('btnPribMenuAdmin').click(); await tunggu(700);
       ok('Konfirmasi terbuka; 4 item izin dari server', aktif() === 'layarKonfirmasi' && jumlah('konfirmasi_daftar') >= 1);
       var chips = Array.prototype.map.call(el('konfChips').querySelectorAll('button'), function (b) { return b.textContent + (b.disabled ? '[x]' : ''); });
-      ok('chip "Izin 4" AKTIF (bukan Segera); Lupa absen tetap nonaktif', chips.indexOf('Izin 4') >= 0 && chips.some(function (c) { return /^Lupa absen.*Segera\[x\]$/.test(c); }) && !chips.some(function (c) { return /^Izin.*Segera/.test(c); }));
+      ok('chip "Izin 4" AKTIF (bukan Segera); Lupa absen AKTIF (Fitur C)', chips.indexOf('Izin 4') >= 0 && chips.some(function (c) { return /^Lupa absen 0$/.test(c); }) && !chips.some(function (c) { return /^Izin.*Segera/.test(c); }));
       el('konfChips').querySelector('button[data-kel="IZIN"]').click(); await tunggu(200);
       var kartu = el('daftarKonfirmasi').querySelectorAll('.kartu-konf');
       ok('chip Izin: kartu izin tampil dengan judul, nama, rincian (maksimal 5 kartu)', kartu.length === 4 && /Izin sakit dengan surat/.test(kartu[0].textContent) && /Rina Wati/.test(kartu[0].textContent) && /29\u201330 Sep, 2 hari kerja, lampiran ada/.test(kartu[0].textContent) && /Cuti/.test(kartu[3].textContent));

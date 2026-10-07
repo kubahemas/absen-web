@@ -107,5 +107,99 @@ var FN = {
     var p = cari(root, 'Pratinjau 4 minggu'); if (p) { tandai(p.parentElement, 'pratinjau'); }
     tandai(cari(root, /^Simpan/, 'button'), 'simpan');
   }
+  ,
+  // ---- Fitur C: peringatan HP toko (05, 06, 07, 13, 18, 19) dan koreksi absen admin (53, 54, 64, 65) ----
+  '05': function (root) {
+    tandai(cari(root, /^ABSEN MASUK$/), 'header');
+    tandai(cari(root, /sudah absen masuk jam/), 'judul');
+    tandai(cari(root, /^\[Foto absen/), 'fotoLama');
+    tandai(cari(root, /^\[Foto sekarang/), 'fotoBaru');
+    tandai(cari(root, /^YA, ITU SAYA/, 'button'), 'ya');
+    tandai(cari(root, /^BUKAN SAYA/, 'button'), 'bukan');
+  },
+  '06': function (root) {
+    tandai(cari(root, /jadwal Anda Shift/), 'judul');
+    tandai(cari(root, /^Jadwal: Shift/), 'pil');
+    tandai(cari(root, /^\[Foto kamera/), 'foto');
+    tandai(cari(root, /^Sekarang /), 'tanya');
+    tandai(cari(root, /^YA, SHIFT/, 'button'), 'ya');
+    tandai(cari(root, /^Tidak, saya telat/, 'button'), 'tidak');
+    tandai(cari(root, /perlu konfirmasi admin/), 'catatan');
+  },
+  '07': function (root) {
+    tandai(cari(root, /sudah absen lembur jam/), 'judul');
+    tandai(cari(root, /^Lembur .*jam/), 'pil');
+    tandai(cari(root, /^\[Foto sekarang/), 'fotoBaru');
+    tandai(cari(root, /^\[Foto(?! sekarang)/), 'fotoLama');
+    tandai(cari(root, /^Sekarang/), 'sekarang');
+    tandai(cari(root, /^YA, ITU SAYA/, 'button'), 'ya');
+    tandai(cari(root, /^Revisi lembur ke/, 'button'), 'revisi');
+    tandai(cari(root, /^BUKAN SAYA/, 'button'), 'bukan');
+  },
+  '13': function (root) {
+    tandai(cari(root, /^Satu lagi/), 'sapa');
+    tandai(cari(root, /^Senin,/), 'pil');
+    tandai(cari(root, /^MENGERTI/, 'button'), 'ok');
+    tandai(cari(root, /^Menutup otomatis/), 'tutup');
+  },
+  '18': function (root) {
+    tandai(cari(root, /^Selamat bekerja/), 'judul');
+    tandai(cari(root, /^Masuk /), 'pil');
+    tandai(cari(root, /^Senin,/), 'detail');
+    tandai(cari(root, /^Menutup otomatis/), 'tutup');
+  },
+  '19': function (root) {
+    tandai(cari(root, /^Terima kasih/), 'judul');
+    tandai(cari(root, /^Pulang /), 'pil');
+    tandai(cari(root, /^Menutup otomatis/), 'tutup');
+  },
+  '53': function (root) {
+    var judul = cari(root, 'Konflik absen'); if (judul && judul.nextElementSibling) { tandai(judul.nextElementSibling, 'sub'); }
+    tandai(cari(root, /menekan BUKAN SAYA/), 'info');
+    var fotos = Array.prototype.filter.call(root.querySelectorAll('div'), function (d) { return /^\[Foto/.test(teksLangsung(d)); });
+    if (fotos[0]) { tandai(fotos[0], 'fotoLama'); tandai(fotos[0].parentElement.children[2], 'ketLama'); tandai(fotos[0].parentElement.children[1], 'judulLama'); }
+    if (fotos[1]) { tandai(fotos[1], 'fotoBaru'); tandai(fotos[1].parentElement.children[2], 'ketBaru'); tandai(fotos[1].parentElement.children[1], 'judulBaru'); }
+    tandai(cari(root, /milik siapa\?/), 'tanya');
+    tandai(root.querySelector('select[id$="_pk"]'), 'pindah');
+    tandai(root.querySelector('select[id$="_al"]'), 'alasan');
+    tandai(cari(root, /^Hasil:/), 'hasil');
+    tandai(cari(root, /^Pindahkan$/, 'button'), 'pindahkan');
+    tandai(cari(root, /^Bukan milik siapa pun/, 'button'), 'hapus');
+  },
+  '54': function (root) {
+    tandai(root.querySelector('select[id$="_k"]'), 'karyawan');
+    tandai(root.querySelector('input[id$="_t"]'), 'tanggal');
+    tandai(root.querySelector('input[id$="_j"]'), 'jam');
+    tandai(cari(root, 'Masuk', 'button'), 'jMasuk');
+    tandai(cari(root, 'Pulang', 'button'), 'jPulang');
+    tandai(cari(root, 'Lupa absen', 'button'), 'a0');
+    tandai(cari(root, 'HP toko bermasalah', 'button'), 'a1');
+    tandai(cari(root, /^Internet/, 'button'), 'a2');
+    tandai(cari(root, 'Lainnya', 'button'), 'a3');
+    tandai(cari(root, /^Status:/), 'status');
+    tandai(cari(root, /^Ketuk$/, 'button'), 'fotoTombol');
+    tandai(cari(root, /^Foto/), 'fotoJudul');
+    tandai(cari(root, /^Ketuk kotak kamera/), 'fotoPetunjuk');
+    tandai(cari(root, /^SIMPAN/, 'button'), 'simpan');
+  },
+  '64': function (root) {
+    var ft = root.querySelector('select[id$="_ft"]'), fk = root.querySelector('select[id$="_fk"]');
+    tandai(ft, 'ft'); tandai(fk, 'fk');
+    var grid = ft && ft.parentElement && ft.parentElement.parentElement;
+    if (grid && grid.nextElementSibling) { tandai(grid.nextElementSibling.firstElementChild, 'daftar'); }
+    tandai(cari(root, /^Ketuk pensil/), 'petunjuk');
+  },
+  '65': function (root) {
+    var j = cari(root, 'Edit absen'); if (j && j.nextElementSibling) { tandai(j.nextElementSibling, 'sub'); }
+    tandai(cari(root, 'Masuk', 'button'), 'tabMasuk');
+    tandai(cari(root, 'Pulang', 'button'), 'tabPulang');
+    var foto = cari(root, /^\[Foto absen/); tandai(foto, 'foto'); if (foto && foto.nextElementSibling) { tandai(foto.nextElementSibling, 'jamFoto'); }
+    tandai(cari(root, /^Update foto/, 'button'), 'updateFoto');
+    tandai(root.querySelector('input[id$="_em"]'), 'jam');
+    tandai(root.querySelector('label[for$="_em"]'), 'labelJam');
+    var sb = cari(root, /^Sebelum/); if (sb) { tandai(sb.nextElementSibling, 'ringkas'); }
+    tandai(root.querySelector('input[id$="_ea"]'), 'alasan');
+    tandai(cari(root, /^Simpan/, 'button'), 'simpan');
+  }
 
 };

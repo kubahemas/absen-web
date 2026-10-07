@@ -9,9 +9,9 @@ var REPORT = { home: 'prib', hapusTeks: [], hapusBaris: [/^Menunggu$/], ganti: T
 var CFG = {
   '02': { home: 'toko', hapusBaris: ['Ahmad', 'Ari'], fn: FN['02'] },
   '03': { home: 'toko', judulMode: true, ganti: [[/Memindai.*/, 'Pengenalan wajah · Segera']] },
-  '04': { home: 'toko' }, '05': { home: 'toko' }, '06': { home: 'toko' }, '07': { home: 'toko' },
+  '04': { home: 'toko' }, '05': { home: 'toko', fn: FN['05'] }, '06': { home: 'toko', fn: FN['06'] }, '07': { home: 'toko', fn: FN['07'] },
   '08': { home: 'toko', judulMode: true, nav: { 'Manual: pilih nama + PIN': { aksi: 'pilihnama' } } },
-  '13': { home: 'toko' }, '18': { home: 'toko' }, '19': { home: 'toko' },
+  '13': { home: 'toko', fn: FN['13'] }, '18': { home: 'toko', fn: FN['18'] }, '19': { home: 'toko', fn: FN['19'] },
   '22': { home: 'adm', fn: FN['22'] }, '23': { home: 'prib', fn: FN['23'] },
   '24': { home: 'own', hapusSatu: ['Shift 2 · Siang'] },
   '25': { home: 'own', hapusBaris: ['Ahmad Fauzi'], pudar: [/^Semua cabang$/, /^Pekan ini$/, /^Semua$/] },
@@ -45,13 +45,13 @@ var CFG = {
       re.forEach(function (r, i) { if (r.test(t)) { d.setAttribute('data-aturan', String(i + 1)); d.textContent = '–'; } });
     });
   } },
-  '53': { home: 'adm' }, '54': { home: 'adm' },
+  '53': { home: 'adm', fn: FN['53'] }, '54': { home: 'adm', fn: FN['54'] },
   '55': { home: 'adm', fn: FN['55'], hapusSatu: ['Andi Pratama', 'Budi Santoso', 'Dewi Lestari', 'Joko Susilo', 'Rina Wati', 'Sari Utami'] },
   '56': { home: 'adm', fn: FN['56'] },
   '57': { home: 'adm', fn: FN['57'], hapusBaris: ['05–10 Okt'] },
   '62': { home: 'adm' },
-  '64': { home: 'adm', hapusBaris: ['Ahmad Fauzi'], pudar: [/^Pekan ini$/, /^Semua$/] },
-  '65': { home: 'adm' }, '66': { home: 'adm', fn: FN['66'] },
+  '64': { home: 'adm', fn: FN['64'], hapusBaris: ['Ahmad Fauzi'], pudar: [/^Pekan ini$/, /^Semua$/] },
+  '65': { home: 'adm', fn: FN['65'] }, '66': { home: 'adm', fn: FN['66'] },
   '67': { home: 'adm', fn: FN['67'], hapusBaris: [/^17 Sep/] },
   '68': { home: 'adm', ganti: TREN, hapusBaris: ['Mg 1', 'Sen', 'Budi Santoso'], nav: { 'Per karyawan': { ke: 'lb69', ganti: true } } },
   '69': { home: 'adm', hapusBaris: ['Ahmad Fauzi'], nav: { 'Ringkasan': { ke: 'lb68', ganti: true } } },

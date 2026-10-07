@@ -454,6 +454,9 @@
   .konf-aksi .acc { border: none; background: var(--abu); color: var(--kuning); }
   .konf-aksi .tolak { border: 2px solid var(--merah-tombol); background: var(--putih); color: #B8211A; }
   .konf-aksi button:disabled { opacity: 0.5; }
+  .konf-menunggu { align-self: flex-start; padding: 5px 10px; border-radius: 999px; background: var(--kuning-muda); font-size: 12px; font-weight: 800; }
+  .konf-isi-jam { height: 46px; border: none; border-radius: 999px; background: var(--hitam); color: var(--putih); font-family: inherit; font-size: 15px; font-weight: 800; white-space: nowrap; }
+  .konf-isi-jam:disabled { opacity: 0.5; }
   .judul-kelompok { font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 20px; font-weight: 700; margin-top: 6px; }
   .konf-ket { font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
   .konf-gps { font-size: 12px; font-weight: 700; color: var(--abu-teks); }
@@ -1002,20 +1005,20 @@
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 24px 22px 30px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 20px">
 <div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center">
 <img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 44px; width: auto">
-<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700">ABSEN MASUK</div>
+<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700" data-f="header">ABSEN MASUK</div>
 </div>
 <div style="box-sizing: content-box; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center">
 <div style="box-sizing: content-box; width: 72px; height: 72px; border-radius: 50%; background: var(--hitam); display: flex; align-items: center; justify-content: center"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--kuning)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></div>
-<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 34px; font-weight: 700; line-height: 1.15">– sudah absen masuk jam –</div>
+<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 34px; font-weight: 700; line-height: 1.15" data-f="judul">– sudah absen masuk jam –</div>
 <div style="box-sizing: content-box; font-size: 16px; font-weight: 700">Apakah itu Anda?</div>
 <div style="box-sizing: content-box; display: flex; gap: 18px; justify-content: center">
-<div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="box-sizing: content-box; width: 130px; height: 130px; border-radius: 50%; background: var(--krem); border: 5px solid var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center">[Foto absen –]</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Absen tadi</div></div>
-<div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="box-sizing: content-box; width: 130px; height: 130px; border-radius: 50%; background: var(--krem); border: 5px solid var(--putih); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center">[Foto sekarang]</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Sekarang</div></div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="box-sizing: content-box; width: 130px; height: 130px; border-radius: 50%; background: var(--krem); border: 5px solid var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center" data-f="fotoLama">[Foto absen –]</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Absen tadi</div></div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="box-sizing: content-box; width: 130px; height: 130px; border-radius: 50%; background: var(--krem); border: 5px solid var(--putih); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center" data-f="fotoBaru">[Foto sekarang]</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Sekarang</div></div>
 </div>
 </div>
 <div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 12px">
-<button type="button" style="height: 80px; border: none; border-radius: 26px; background: var(--hitam); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700" disabled="" aria-disabled="true" class="belum-aktif">YA, ITU SAYA<span class="segera" style="margin-left: 6px;">Segera</span></button>
-<button type="button" style="height: 64px; border: 3px solid var(--merah); border-radius: 26px; background: var(--putih); color: var(--merah); font-family: inherit; font-size: 17px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">BUKAN SAYA, laporkan ke admin<span class="segera" style="margin-left: 6px;">Segera</span></button>
+<button type="button" style="height: 80px; border: none; border-radius: 26px; background: var(--hitam); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700" data-f="ya" disabled="" aria-disabled="true" class="belum-aktif">YA, ITU SAYA<span class="segera" style="margin-left: 6px;">Segera</span></button>
+<button type="button" style="height: 64px; border: 3px solid var(--merah); border-radius: 26px; background: var(--putih); color: var(--merah); font-family: inherit; font-size: 17px; font-weight: 800" data-f="bukan" disabled="" aria-disabled="true" class="belum-aktif">BUKAN SAYA, laporkan ke admin<span class="segera" style="margin-left: 6px;">Segera</span></button>
 </div>
 
 </div>
@@ -1024,29 +1027,29 @@
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 24px 22px 28px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 16px">
 <div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 44px; width: auto"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700">ABSEN MASUK</div></div>
 <div style="box-sizing: content-box; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center">
-<div style="box-sizing: content-box; width: 120px; height: 120px; border-radius: 50%; background: var(--krem); border: 6px solid var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks)">[Foto kamera]</div>
-<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 34px; font-weight: 700; line-height: 1.15">–, jadwal Anda Shift –</div>
-<div style="box-sizing: content-box; display: flex; gap: 8px; align-items: center; font-size: 15px; font-weight: 800"><span style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; border: 2px solid var(--hitam)">Jadwal: Shift –</span></div>
-<div style="box-sizing: content-box; font-size: 16px; font-weight: 700">Sekarang –. Masuk sebagai Shift – (–)?</div>
+<div style="box-sizing: content-box; width: 120px; height: 120px; border-radius: 50%; background: var(--krem); border: 6px solid var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks)" data-f="foto">[Foto kamera]</div>
+<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 34px; font-weight: 700; line-height: 1.15" data-f="judul">–, jadwal Anda Shift –</div>
+<div style="box-sizing: content-box; display: flex; gap: 8px; align-items: center; font-size: 15px; font-weight: 800"><span style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; border: 2px solid var(--hitam)" data-f="pil">Jadwal: Shift –</span></div>
+<div style="box-sizing: content-box; font-size: 16px; font-weight: 700" data-f="tanya">Sekarang –. Masuk sebagai Shift – (–)?</div>
 </div>
-<button type="button" style="height: 72px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700" disabled="" aria-disabled="true" class="belum-aktif">YA, SHIFT –<span class="segera" style="margin-left: 6px;">Segera</span></button>
-<button type="button" style="height: 60px; border: 3px solid var(--hitam); border-radius: 26px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" disabled="" aria-disabled="true" class="belum-aktif">Tidak, saya telat (Shift –)</button>
-<div style="box-sizing: content-box; font-size: 12px; font-weight: 600; text-align: center">Shift – perlu konfirmasi admin.</div>
+<button type="button" style="height: 72px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700" data-f="ya" disabled="" aria-disabled="true" class="belum-aktif">YA, SHIFT –<span class="segera" style="margin-left: 6px;">Segera</span></button>
+<button type="button" style="height: 60px; border: 3px solid var(--hitam); border-radius: 26px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" data-f="tidak" disabled="" aria-disabled="true" class="belum-aktif">Tidak, saya telat (Shift –)</button>
+<div style="box-sizing: content-box; font-size: 12px; font-weight: 600; text-align: center" data-f="catatan">Shift – perlu konfirmasi admin.</div>
 </div>
 </div>
 <div id="lb07" class="layar" data-lb-home="toko">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 24px 22px 28px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 16px">
 <div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 44px; width: auto"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700">LEMBUR</div></div>
 <div style="box-sizing: content-box; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center">
-<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.15">– sudah absen lembur jam –</div>
-<div style="box-sizing: content-box; padding: 6px 14px; border-radius: 999px; background: var(--hitam); color: var(--kuning); font-size: 14px; font-weight: 800">Lembur – jam – menit · –</div>
+<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.15" data-f="judul">– sudah absen lembur jam –</div>
+<div style="box-sizing: content-box; padding: 6px 14px; border-radius: 999px; background: var(--hitam); color: var(--kuning); font-size: 14px; font-weight: 800" data-f="pil">Lembur – jam – menit · –</div>
 <div style="box-sizing: content-box; font-size: 16px; font-weight: 700">Apakah itu Anda?</div>
-<div style="box-sizing: content-box; display: flex; gap: 18px"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="box-sizing: content-box; width: 120px; height: 120px; border-radius: 50%; background: var(--krem); border: 5px solid var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center">[Foto –]</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Absen tadi</div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="box-sizing: content-box; width: 120px; height: 120px; border-radius: 50%; background: var(--krem); border: 5px solid var(--putih); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center">[Foto sekarang]</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Sekarang –</div></div></div>
+<div style="box-sizing: content-box; display: flex; gap: 18px"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="box-sizing: content-box; width: 120px; height: 120px; border-radius: 50%; background: var(--krem); border: 5px solid var(--hitam); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center" data-f="fotoLama">[Foto –]</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Absen tadi</div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="box-sizing: content-box; width: 120px; height: 120px; border-radius: 50%; background: var(--krem); border: 5px solid var(--putih); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks); text-align: center" data-f="fotoBaru">[Foto sekarang]</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700" data-f="sekarang">Sekarang –</div></div></div>
 </div>
-<button type="button" style="height: 72px; border: none; border-radius: 26px; background: var(--hitam); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700" disabled="" aria-disabled="true" class="belum-aktif">YA, ITU SAYA<span class="segera" style="margin-left: 6px;">Segera</span></button>
+<button type="button" style="height: 72px; border: none; border-radius: 26px; background: var(--hitam); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700" data-f="ya" disabled="" aria-disabled="true" class="belum-aktif">YA, ITU SAYA<span class="segera" style="margin-left: 6px;">Segera</span></button>
 <div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
-<button type="button" style="min-height: 52px; border: 3px solid var(--hitam); border-radius: 20px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--hitam)" disabled="" aria-disabled="true" class="belum-aktif">Revisi lembur ke –<span class="segera" style="margin-left: 6px;">Segera</span></button>
-<button type="button" style="min-height: 52px; border: 3px solid var(--merah); border-radius: 20px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--merah)" disabled="" aria-disabled="true" class="belum-aktif">BUKAN SAYA<span class="segera" style="margin-left: 6px;">Segera</span></button>
+<button type="button" style="min-height: 52px; border: 3px solid var(--hitam); border-radius: 20px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--hitam)" data-f="revisi" disabled="" aria-disabled="true" class="belum-aktif">Revisi lembur ke –<span class="segera" style="margin-left: 6px;">Segera</span></button>
+<button type="button" style="min-height: 52px; border: 3px solid var(--merah); border-radius: 20px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--merah)" data-f="bukan" disabled="" aria-disabled="true" class="belum-aktif">BUKAN SAYA<span class="segera" style="margin-left: 6px;">Segera</span></button>
 </div>
 <div style="box-sizing: content-box; font-size: 12px; font-weight: 600; text-align: center; line-height: 1.45">Revisi: jam pulang diganti ke sekarang, perlu ACC ulang.</div>
 </div>
@@ -1077,12 +1080,12 @@
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 22px; background: var(--merah); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; justify-content: center">
 <div style="box-sizing: content-box; background: var(--putih); border-radius: 30px; padding: 28px 20px 20px; display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center">
 <div style="box-sizing: content-box; width: 104px; height: 104px; border-radius: 50%; background: var(--merah); display: flex; align-items: center; justify-content: center"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--putih)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></div>
-<div style="box-sizing: content-box; font-size: 14px; font-weight: 800; color: var(--abu-tua)">Satu lagi, –</div>
+<div style="box-sizing: content-box; font-size: 14px; font-weight: 800; color: var(--abu-tua)" data-f="sapa">Satu lagi, –</div>
 <div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 34px; font-weight: 700; line-height: 1.15; color: var(--merah)">Anda belum absen pulang kemarin</div>
-<div style="box-sizing: content-box; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--merah); background: var(--merah-muda); color: var(--merah); font-size: 14px; font-weight: 800">Senin, – (Shift –)</div>
+<div style="box-sizing: content-box; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--merah); background: var(--merah-muda); color: var(--merah); font-size: 14px; font-weight: 800" data-f="pil">Senin, – (Shift –)</div>
 <div style="box-sizing: content-box; font-size: 15px; font-weight: 600; line-height: 1.45">Segera hubungi admin untuk melengkapi jam pulang.</div>
-<button type="button" style="width: 100%; min-height: 60px; border: none; border-radius: 22px; background: var(--hitam); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">MENGERTI<span class="segera" style="margin-left: 6px;">Segera</span></button>
-<div style="box-sizing: content-box; font-size: 13px; color: var(--abu-teks)">Menutup otomatis dalam – detik</div>
+<button type="button" style="width: 100%; min-height: 60px; border: none; border-radius: 22px; background: var(--hitam); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" data-f="ok" disabled="" aria-disabled="true" class="belum-aktif">MENGERTI<span class="segera" style="margin-left: 6px;">Segera</span></button>
+<div style="box-sizing: content-box; font-size: 13px; color: var(--abu-teks)" data-f="tutup">Menutup otomatis dalam – detik</div>
 </div>
 </div>
 </div>
@@ -1091,14 +1094,14 @@
 
 <div style="box-sizing: content-box; position: relative; background: var(--putih); border-radius: 30px; padding: 30px 20px 20px; display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center">
 <div style="box-sizing: content-box; position: relative; width: 112px; height: 112px; display: flex; align-items: center; justify-content: center"><div style="box-sizing: content-box; position: relative; width: 112px; height: 112px; border-radius: 50%; background: var(--hijau); display: flex; align-items: center; justify-content: center; animation: muncul .8s ease-out both;"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--putih)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v11"></path><path d="M15 5.9L14 10h5.8a2 2 0 0 1 2 2.3l-1.4 7a2 2 0 0 1-2 1.7H7V10l4.3-7.6A1.9 1.9 0 0 1 15 5.9z"></path><path d="M3 10h4v11H3z"></path></svg></div></div>
-<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 40px; font-weight: 700; line-height: 1.1; color: var(--hijau)">Selamat bekerja, –!</div>
-<div style="box-sizing: content-box; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--hijau); background: var(--hijau-muda); color: var(--hijau-tua); font-size: 14px; font-weight: 800">Masuk – (Shift –)</div>
+<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 40px; font-weight: 700; line-height: 1.1; color: var(--hijau)" data-f="judul">Selamat bekerja, –!</div>
+<div style="box-sizing: content-box; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--hijau); background: var(--hijau-muda); color: var(--hijau-tua); font-size: 14px; font-weight: 800" data-f="pil">Masuk – (Shift –)</div>
 <div style="width: 100%; box-sizing: border-box; background: var(--merah-muda); border: 3px solid var(--merah); border-radius: 18px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; text-align: left">
 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--merah)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: content-box; flex-shrink: 0"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
-<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 17px; font-weight: 800; color: var(--merah)">Anda belum absen pulang kemarin</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 600; color: var(--hitam); line-height: 1.4">Senin, –. Hubungi admin.</div></div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 17px; font-weight: 800; color: var(--merah)">Anda belum absen pulang kemarin</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 600; color: var(--hitam); line-height: 1.4" data-f="detail">Senin, –. Hubungi admin.</div></div>
 </div>
 
-<div style="box-sizing: content-box; font-size: 13px; color: var(--abu-teks)">Menutup otomatis dalam – detik</div>
+<div style="box-sizing: content-box; font-size: 13px; color: var(--abu-teks)" data-f="tutup">Menutup otomatis dalam – detik</div>
 </div>
 </div>
 </div>
@@ -1107,14 +1110,14 @@
 
 <div style="box-sizing: content-box; position: relative; background: var(--putih); border-radius: 30px; padding: 30px 20px 20px; display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center">
 <div style="box-sizing: content-box; position: relative; width: 112px; height: 112px; display: flex; align-items: center; justify-content: center"><div style="box-sizing: content-box; position: relative; width: 112px; height: 112px; border-radius: 50%; background: var(--hitam); display: flex; align-items: center; justify-content: center;"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--kuning)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></div></div>
-<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 40px; font-weight: 700; line-height: 1.1; color: var(--hitam)">Terima kasih, –!</div>
-<div style="box-sizing: content-box; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--hitam); background: var(--abu-pucat); color: var(--hitam); font-size: 14px; font-weight: 800">Pulang – (Shift –)</div>
+<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 40px; font-weight: 700; line-height: 1.1; color: var(--hitam)" data-f="judul">Terima kasih, –!</div>
+<div style="box-sizing: content-box; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--hitam); background: var(--abu-pucat); color: var(--hitam); font-size: 14px; font-weight: 800" data-f="pil">Pulang – (Shift –)</div>
 <div style="width: 100%; box-sizing: border-box; background: var(--merah-muda); border: 3px solid var(--merah); border-radius: 18px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; text-align: left">
 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--merah)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: content-box; flex-shrink: 0"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
 <div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 17px; font-weight: 800; color: var(--merah)">Anda belum absen masuk hari ini</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 600; color: var(--hitam); line-height: 1.4">Hubungi admin untuk melengkapi jam masuk.</div></div>
 </div>
 
-<div style="box-sizing: content-box; font-size: 13px; color: var(--abu-teks)">Menutup otomatis dalam – detik</div>
+<div style="box-sizing: content-box; font-size: 13px; color: var(--abu-teks)" data-f="tutup">Menutup otomatis dalam – detik</div>
 </div>
 </div>
 </div>
@@ -1309,15 +1312,15 @@
 </div>
 <div id="lb53" class="layar" data-lb-home="adm">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div>
-<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Konflik absen</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Senin, –</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 14px"><div style="box-sizing: content-box; font-size: 14px; font-weight: 700; line-height: 1.45">– menekan BUKAN SAYA pada absen lama ini.</div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center"><div style="box-sizing: content-box; width: 92px; height: 92px; border-radius: 20px; background: var(--krem); border: 4px solid var(--merah); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks)">[Foto –]<br>Ketuk untuk perbesar</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800">Absen lama</div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks)">Masuk –, wajah</div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center"><div style="box-sizing: content-box; width: 92px; height: 92px; border-radius: 20px; background: var(--krem); border: 4px solid var(--hijau); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks)">[Foto –]<br>Ketuk untuk perbesar</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800">Absen – sekarang</div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks)">Masuk –, wajah</div></div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Absen lama – milik siapa?</div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb53_pk" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Pindahkan ke</label><select id="lb53_pk" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>– (belum ada absen masuk)</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb53_al" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Alasan</label><select id="lb53_al" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>–</option></select></div><div style="box-sizing: content-box; background: var(--krem); border-radius: 14px; padding: 8px 10px; font-size: 13px; font-weight: 700">Hasil: – HADIR · – TELAT</div></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 18px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Pindahkan<span class="segera" style="margin-left: 6px;">Segera</span></button></div><button style="height: 54px; border: 3px solid var(--merah); border-radius: 26px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 800; color: var(--merah)" type="button" disabled="" aria-disabled="true" class="belum-aktif">Bukan milik siapa pun, hapus absen ini<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
+<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Konflik absen</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600" data-f="sub">Senin, –</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 14px"><div style="box-sizing: content-box; font-size: 14px; font-weight: 700; line-height: 1.45" data-f="info">– menekan BUKAN SAYA pada absen lama ini.</div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center"><div style="box-sizing: content-box; width: 92px; height: 92px; border-radius: 20px; background: var(--krem); border: 4px solid var(--merah); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks)" data-f="fotoLama">[Foto –]<br>Ketuk untuk perbesar</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800" data-f="judulLama">Absen lama</div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks)" data-f="ketLama">Masuk –, wajah</div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center"><div style="box-sizing: content-box; width: 92px; height: 92px; border-radius: 20px; background: var(--krem); border: 4px solid var(--hijau); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--abu-teks)" data-f="fotoBaru">[Foto –]<br>Ketuk untuk perbesar</div><div style="box-sizing: content-box; font-size: 14px; font-weight: 800" data-f="judulBaru">Absen – sekarang</div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks)" data-f="ketBaru">Masuk –, wajah</div></div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800" data-f="tanya">Absen lama – milik siapa?</div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb53_pk" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Pindahkan ke</label><select id="lb53_pk" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="pindah" disabled="" class="belum-aktif"><option>– (belum ada absen masuk)</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb53_al" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Alasan</label><select id="lb53_al" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="alasan" disabled="" class="belum-aktif"><option>–</option></select></div><div style="box-sizing: content-box; background: var(--krem); border-radius: 14px; padding: 8px 10px; font-size: 13px; font-weight: 700" data-f="hasil">Hasil: – HADIR · – TELAT</div></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 18px; font-weight: 800" type="button" data-f="pindahkan" disabled="" aria-disabled="true" class="belum-aktif">Pindahkan<span class="segera" style="margin-left: 6px;">Segera</span></button></div><button style="height: 54px; border: 3px solid var(--merah); border-radius: 26px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 800; color: var(--merah)" type="button" data-f="hapus" disabled="" aria-disabled="true" class="belum-aktif">Bukan milik siapa pun, hapus absen ini<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
 </div>
 <div id="lb54" class="layar" data-lb-home="adm">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div>
-<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Absen manual</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Melengkapi absen yang terlewat</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 14px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb54_k" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb54_k" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>–</option></select></div>
-<div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb54_t" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal</label><input id="lb54_t" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb54_j" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jam</label><input id="lb54_j" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div>
-<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jenis</div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); color: var(--hitam); font-family: inherit; font-size: 15px; font-weight: 700" type="button" disabled="" aria-disabled="true" class="belum-aktif">Masuk</button><button style="min-height: 40px; border: none; border-radius: 14px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 15px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Pulang</button></div></div>
-<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Alasan</div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button style="min-height: 40px; border: none; border-radius: 14px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 13px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Lupa absen</button><button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); color: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700" type="button" disabled="" aria-disabled="true" class="belum-aktif">HP toko bermasalah</button><button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); color: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700" type="button" disabled="" aria-disabled="true" class="belum-aktif">Internet / listrik mati</button><button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); color: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700" type="button" disabled="" aria-disabled="true" class="belum-aktif">Lainnya</button></div></div>
-<div style="box-sizing: content-box; background: var(--krem); border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 700">Status: PULANG NORMAL (Shift –)</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; gap: 14px; align-items: center"><button aria-label="Buka kamera untuk foto karyawan" style="width: 60px; height: 60px; border-radius: 50%; background: var(--hitam); border: 4px dashed var(--kuning); flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--kuning); font-family: inherit; font-size: 11px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif"><svg aria-hidden="true" fill="none" height="28" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="28"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Ketuk</button><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Foto –</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700; color: var(--hijau-tua)">Ketuk kotak kamera untuk memotret</div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks)">Wajah harus cocok dengan nama</div></div></div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700" type="button" disabled="" aria-disabled="true" class="belum-aktif">SIMPAN<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
+<div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Absen manual</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Melengkapi absen yang terlewat</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 14px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb54_k" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb54_k" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="karyawan" disabled="" class="belum-aktif"><option>–</option></select></div>
+<div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb54_t" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal</label><input id="lb54_t" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="tanggal" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb54_j" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jam</label><input id="lb54_j" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="jam" disabled="" class="belum-aktif"></div></div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jenis</div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); color: var(--hitam); font-family: inherit; font-size: 15px; font-weight: 700" type="button" data-f="jMasuk" disabled="" aria-disabled="true" class="belum-aktif">Masuk</button><button style="min-height: 40px; border: none; border-radius: 14px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 15px; font-weight: 800" type="button" data-f="jPulang" disabled="" aria-disabled="true" class="belum-aktif">Pulang</button></div></div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Alasan</div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button style="min-height: 40px; border: none; border-radius: 14px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 13px; font-weight: 800" type="button" data-f="a0" disabled="" aria-disabled="true" class="belum-aktif">Lupa absen</button><button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); color: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700" type="button" data-f="a1" disabled="" aria-disabled="true" class="belum-aktif">HP toko bermasalah</button><button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); color: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700" type="button" data-f="a2" disabled="" aria-disabled="true" class="belum-aktif">Internet / listrik mati</button><button style="min-height: 40px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); color: var(--hitam); font-family: inherit; font-size: 13px; font-weight: 700" type="button" data-f="a3" disabled="" aria-disabled="true" class="belum-aktif">Lainnya</button></div></div>
+<div style="box-sizing: content-box; background: var(--krem); border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 700" data-f="status">Status: PULANG NORMAL (Shift –)</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; gap: 14px; align-items: center"><button aria-label="Buka kamera untuk foto karyawan" style="width: 60px; height: 60px; border-radius: 50%; background: var(--hitam); border: 4px dashed var(--kuning); flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--kuning); font-family: inherit; font-size: 11px; font-weight: 800" type="button" data-f="fotoTombol" disabled="" aria-disabled="true" class="belum-aktif"><svg aria-hidden="true" fill="none" height="28" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="28"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Ketuk</button><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800" data-f="fotoJudul">Foto –</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700; color: var(--hijau-tua)" data-f="fotoPetunjuk">Ketuk kotak kamera untuk memotret</div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks)">Wajah harus cocok dengan nama</div></div></div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700" type="button" data-f="simpan" disabled="" aria-disabled="true" class="belum-aktif">SIMPAN<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb55" class="layar" data-lb-home="adm">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Jadwal shift</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600" data-f="sub">Minggu ini, –</div></div></div><div style="box-sizing: content-box; display: flex; gap: 8px"><button style="min-height: 44px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 0 14px" type="button" data-f="lalu" disabled="" aria-disabled="true" class="belum-aktif">‹ Minggu lalu</button><button style="min-height: 44px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 0 14px" type="button" data-f="depan" disabled="" aria-disabled="true" class="belum-aktif">Minggu depan ›</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: grid; grid-template-columns: 96px repeat(6, minmax(0, 1fr)); gap: 5px; align-items: center" data-f="header"><div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sen</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sel</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Rab</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Kam</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Jum</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sab</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; font-weight: 700" data-f="legenda"><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--putih); border: 1px solid #CFC9BC"></div>Shift – (–)</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--hitam)"></div>Shift – (–)</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--abu-garis)"></div>Libur</div></div></div></div><button style="min-height: 48px; border: 3px solid var(--hitam); border-radius: 20px; background: transparent; font-family: inherit; font-size: 15px; font-weight: 800; color: var(--hitam)" type="button" data-f="salin" disabled="" aria-disabled="true" class="belum-aktif">Salin minggu lalu<span class="segera" style="margin-left: 6px;">Segera</span></button><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 20px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 16px; font-weight: 800" type="button" data-f="simpan" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
@@ -1351,12 +1354,12 @@
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--putih); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700">Daftar wajah · –</div></div><div style="box-sizing: content-box; display: flex; gap: 6px"><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--hitam)"></div><div style="box-sizing: content-box; flex: 1; height: 8px; border-radius: 999px; background: var(--kuning-muda)"></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 700">Langkah 3 dari 4</div><div style="box-sizing: content-box; flex-grow: 1; border-radius: 28px; background: #F5F5F3; border: 2px solid #ECECE8; display: flex; align-items: center; justify-content: center; position: relative"><svg aria-hidden="true" fill="none" height="408" viewBox="0 0 240 310" width="316"><ellipse cx="120" cy="118" rx="74" ry="96" stroke="var(--hijau)" stroke-dasharray="12 9" stroke-width="4"></ellipse><path d="M92 208 L92 232 C58 238 22 258 12 306 M148 208 L148 232 C182 238 218 258 228 306" stroke="var(--hijau)" stroke-dasharray="12 9" stroke-linecap="round" stroke-width="4"></path></svg><div style="box-sizing: content-box; position: absolute; top: 375px; left: 0; right: 0; text-align: center; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700">Sedikit ke kanan</div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600"><div style="box-sizing: content-box; width: 22px; height: 22px; border-radius: 50%; background: var(--hijau); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" fill="none" height="14" stroke="var(--putih)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="14"><path d="M5 12l5 5L20 7"></path></svg></div>Hadap depan</div><div style="box-sizing: content-box; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600"><div style="box-sizing: content-box; width: 22px; height: 22px; border-radius: 50%; background: var(--hijau); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" fill="none" height="14" stroke="var(--putih)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="14"><path d="M5 12l5 5L20 7"></path></svg></div>Sedikit ke kiri</div><div style="box-sizing: content-box; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800"><div style="box-sizing: content-box; width: 22px; height: 22px; border-radius: 50%; background: var(--hitam); display: flex; align-items: center; justify-content: center"></div>Sedikit ke kanan</div><div style="box-sizing: content-box; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600"><div style="box-sizing: content-box; width: 22px; height: 22px; border-radius: 50%; background: #ECECE8; display: flex; align-items: center; justify-content: center"></div>Dengan kacamata (jika pakai)</div></div></div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks); text-align: center">Foto diambil otomatis.</div><button style="min-height: 44px; border: none; background: transparent; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--merah); text-decoration: underline" type="button" data-lb-kembali="kembali">Batal pendaftaran (data belum disimpan)</button><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹ Back</button></div></div>
 </div>
 <div id="lb64" class="layar" data-lb-home="adm">
-<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 14px; "><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Data absensi</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Urut terbaru di atas</div></div></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb64_ft" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal</label><select id="lb64_ft" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" class="belum-aktif" disabled=""><option class="belum-aktif">Pekan ini</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb64_fk" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb64_fk" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" class="belum-aktif" disabled=""><option class="belum-aktif">Semua</option></select></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 0px"><div style="box-sizing: content-box; display: flex; flex-direction: column"></div></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Ketuk pensil untuk koreksi.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="home">Home</button></div></div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 14px; "><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Data absensi</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Urut terbaru di atas</div></div></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb64_ft" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Tanggal</label><select id="lb64_ft" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="ft" class="belum-aktif" disabled=""><option class="belum-aktif">Pekan ini</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb64_fk" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb64_fk" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="fk" class="belum-aktif" disabled=""><option class="belum-aktif">Semua</option></select></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 0px"><div style="box-sizing: content-box; display: flex; flex-direction: column" data-f="daftar"></div></div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600" data-f="petunjuk">Ketuk pensil untuk koreksi.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="flex-grow: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="home">Home</button></div></div>
 </div>
 <div id="lb65" class="layar" data-lb-home="adm">
-<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px; "><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Edit absen</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">–</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px"><div role="tablist" style="box-sizing: content-box; display: flex; gap: 4px; padding: 4px; background: var(--krem); border-radius: 14px"><button style="flex: 1; height: 40px; border: none; border-radius: 10px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 14px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Masuk</button><button style="flex: 1; height: 40px; border: none; border-radius: 10px; background: transparent; color: var(--hitam); font-family: inherit; font-size: 14px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Pulang</button></div>
-<div style="box-sizing: content-box; height: 170px; border-radius: 14px; background: var(--krem); border: 2px solid #DDD8CC; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--abu-teks)"><span>[Foto absen masuk]</span><span style="box-sizing: content-box; padding: 2px 10px; border-radius: 999px; background: var(--hitam); color: var(--kuning); font-size: 12px">–</span></div>
-<button style="min-height: 44px; border: 2px solid var(--hitam); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--hitam); display: flex; align-items: center; justify-content: center; gap: 8px" type="button" disabled="" aria-disabled="true" class="belum-aktif"><svg aria-hidden="true" fill="none" height="16" stroke="var(--hitam)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="16"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Update foto<span class="segera" style="margin-left: 6px;">Segera</span></button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: grid; grid-template-columns: 1fr; gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb65_em" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jam masuk</label><input id="lb65_em" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px; font-size: 13px"><div style="box-sizing: content-box; font-weight: 800">Sebelum → sesudah</div><div>Masuk – (TELAT – min) → <b>– (HADIR)</b></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb65_ea" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Alasan edit (wajib)</label><input id="lb65_ea" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; background: var(--krem); border-radius: 12px; padding: 10px 12px; font-size: 12px; font-weight: 700">Data lama tetap tersimpan di log.</div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px; "><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Edit absen</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600" data-f="sub">–</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px"><div role="tablist" style="box-sizing: content-box; display: flex; gap: 4px; padding: 4px; background: var(--krem); border-radius: 14px"><button style="flex: 1; height: 40px; border: none; border-radius: 10px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 14px; font-weight: 800" type="button" data-f="tabMasuk" disabled="" aria-disabled="true" class="belum-aktif">Masuk</button><button style="flex: 1; height: 40px; border: none; border-radius: 10px; background: transparent; color: var(--hitam); font-family: inherit; font-size: 14px; font-weight: 800" type="button" data-f="tabPulang" disabled="" aria-disabled="true" class="belum-aktif">Pulang</button></div>
+<div style="box-sizing: content-box; height: 170px; border-radius: 14px; background: var(--krem); border: 2px solid #DDD8CC; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--abu-teks)"><span data-f="foto">[Foto absen masuk]</span><span style="box-sizing: content-box; padding: 2px 10px; border-radius: 999px; background: var(--hitam); color: var(--kuning); font-size: 12px" data-f="jamFoto">–</span></div>
+<button style="min-height: 44px; border: 2px solid var(--hitam); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 800; color: var(--hitam); display: flex; align-items: center; justify-content: center; gap: 8px" type="button" data-f="updateFoto" disabled="" aria-disabled="true" class="belum-aktif"><svg aria-hidden="true" fill="none" height="16" stroke="var(--hitam)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24" width="16"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Update foto<span class="segera" style="margin-left: 6px;">Segera</span></button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: grid; grid-template-columns: 1fr; gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb65_em" style="box-sizing: content-box; font-size: 13px; font-weight: 700" data-f="labelJam">Jam masuk</label><input id="lb65_em" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="jam" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px; font-size: 13px"><div style="box-sizing: content-box; font-weight: 800">Sebelum → sesudah</div><div data-f="ringkas">Masuk – (TELAT – min) → <b>– (HADIR)</b></div></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb65_ea" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Alasan edit (wajib)</label><input id="lb65_ea" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" data-f="alasan" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; background: var(--krem); border-radius: 12px; padding: 10px 12px; font-size: 12px; font-weight: 700">Data lama tetap tersimpan di log.</div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" type="button" data-f="simpan" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb66" class="layar" data-lb-home="adm">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px; "><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Input izin</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Untuk karyawan yang tidak punya HP</div></div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ik" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Karyawan</label><select id="lb66_ik" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>–</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ij" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Jenis izin</label><select id="lb66_ij" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>Sakit</option></select></div><div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_im" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Mulai</label><input id="lb66_im" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_is" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Selesai</label><input id="lb66_is" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700" data-f="info">– hari kerja</div><button style="min-height: 40px; border: 2px dashed var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam)" type="button" data-f="foto" disabled="" aria-disabled="true" class="belum-aktif">Foto surat dokter (opsional)</button><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb66_ik2" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Keterangan (opsional)</label><input id="lb66_ik2" style="height: 42px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 600" data-f="catatan">Langsung disetujui.</div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" type="button" data-f="simpan" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
@@ -2301,6 +2304,8 @@
     });
   }
 
+  let terakhirBodyAbsen = null; // permintaan absen terakhir (dikirim ulang untuk pilihan shift / revisi lembur)
+  let lanjutanKemarin = null;   // peringatan lanjutan (layar 13) yang menunggu pop-up utama selesai
   function kirimAbsen() {
     perbaruiKeypadKirim(true);
     const id = idTerpilih, pin = pinSaatIni, mode = modeAbsen;
@@ -2314,6 +2319,7 @@
         const body = mode === 'MASUK'
           ? { aksi: 'absen_masuk', token: hpAktif.token, id: id, pin: pin, tiket: tiket, tanpa_foto: tanpaFoto }
           : { aksi: 'absen_pulang', token: hpAktif.token, id: id, pin: pin, jenis: mode, tiket: tiket, tanpa_foto: tanpaFoto };
+        terakhirBodyAbsen = body;
         return fetch(CONFIG.webAppUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -2331,6 +2337,11 @@
   let pengingatTukarId = ''; // id karyawan yang baru berhasil absen di HP toko: pengingat ajakan tukar muncul setelah pop-up ditutup
   function tampilkanHasil(data) {
     if (data.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return; }
+    // Peringatan dari server (Fitur C): sudah absen (05), shift tidak sesuai jadwal (06), revisi lembur (07). Belum ada yang berubah di sheet.
+    if (data.dobel === true && !modeLuar) { tampilDobel(data); return; }
+    if (data.perlu_pilih_shift === true) { tampilPilihShift(data); return; }
+    if (data.perlu_konfirmasi_revisi === true) { tampilRevisiLembur(data); return; }
+    lanjutanKemarin = null;
     if (data.status === 'ok' && !modeLuar && hpAktif) { pengingatTukarId = idTerpilih || ''; }
     if (data.status !== 'ok') {
       fotoMenunggu = null; // absen tidak tersimpan: foto dibuang
@@ -2348,17 +2359,25 @@
           tingkat: data.tingkat, durasi: data.durasi_menit, acc: data.acc === 'MENUNGGU'
         };
         tampilPopupSebelumAlasan(data, panggilan);
+      } else if (data.belum_masuk_hari_ini === true) {
+        tampilPulangBelumMasuk(data, panggilan); // layar 19
+        mulaiUnggah(data.id_absen, 'PULANG');
       } else {
         tampilPulang(data, panggilan);
         mulaiUnggah(data.id_absen, 'PULANG'); // foto menyusul di latar belakang, tidak menunda pop-up
       }
       return;
     }
-    if (data.st_masuk === 'TELAT') { tampilTelat(data, panggilan); } else { tampilHadir(data, panggilan); }
+    if (data.st_masuk === 'TELAT') {
+      if (data.belum_pulang_kemarin) { lanjutanKemarin = { panggilan: panggilan, hari: data.belum_pulang_kemarin.hari, shift: data.belum_pulang_kemarin.shift }; } // layar 13 setelah alasan
+      tampilTelat(data, panggilan);
+    } else if (data.belum_pulang_kemarin && !modeLuar) { tampilMasukBelumPulang(data, panggilan); } // layar 18
+    else { tampilHadir(data, panggilan); }
     mulaiUnggah(data.id_absen, 'MASUK');
   }
 
   function kembaliKeLayarUtama() {
+    if (lanjutanKemarin) { const l = lanjutanKemarin; lanjutanKemarin = null; tampilLanjutanKemarin(l); return; } // peringatan lanjutan (13), lalu kembali lagi ke sini
     idTerpilih = '';
     panggilanTerpilih = '';
     pinSaatIni = '';
@@ -3900,7 +3919,7 @@
     if (selisih === 1) { return 'Kemarin'; }
     return ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][d.getDay()] + ' ' + d.getDate() + ' ' + NAMA_BULAN[d.getMonth()].slice(0, 3);
   }
-  const NAMA_TIPE = { LUAR: 'Absen luar', LEMBUR: 'Lembur', PULANG_CEPAT: 'Pulang cepat' };
+  const NAMA_TIPE = { LUAR: 'Absen luar', LEMBUR: 'Lembur', PULANG_CEPAT: 'Pulang cepat', SHIFT_BEDA: 'Shift tidak sesuai jadwal' };
   function kartuKonfirmasiIzin(it) {
     const detail = [it.rincian];
     if (it.ket) { detail.push(it.ket); }
@@ -3913,6 +3932,7 @@
   }
   function kartuKonfirmasi(it) {
     if (it.kelompok === 'IZIN' || it.kelompok === 'TUKAR') { return kartuKonfirmasiIzin(it); }
+    if (it.kelompok === 'LUPA' || it.kelompok === 'KONFLIK') { return kartuKonfirmasiKoreksi(it); }
     let tipe = NAMA_TIPE[it.kelompok] || it.kelompok;
     if (it.kelompok === 'LUAR') { tipe += ', ' + (it.jenis === 'MASUK' ? 'masuk' : 'pulang'); }
     if (it.kelompok === 'LEMBUR' && it.tingkat) { tipe += ' ' + (['', '<1 jam', '1–2 jam', '>2 jam'][it.tingkat] || ''); }
@@ -3944,10 +3964,10 @@
     kotak.style.display = bisa ? '' : 'none';
     if (!bisa) { return; }
     const jml = function (k) { return ' ' + konfAntrean.filter(function (it) { return it.kelompok === k; }).length; };
-    const def = [['', 'Semua ' + (konfTotal > 99 ? '99+' : konfTotal)], ['LEMBUR', 'Lembur' + jml('LEMBUR')], ['LUAR', 'Absen luar' + jml('LUAR')], ['IZIN', 'Izin' + jml('IZIN')]];
+    const def = [['', 'Semua ' + (konfTotal > 99 ? '99+' : konfTotal)], ['LEMBUR', 'Lembur' + jml('LEMBUR')], ['LUAR', 'Absen luar' + jml('LUAR')], ['IZIN', 'Izin' + jml('IZIN')], ['LUPA', 'Lupa absen' + jml('LUPA')]];
     kotak.innerHTML = def.map(function (c) {
       return '<button type="button" data-kel="' + c[0] + '"' + (konfKelPilih === c[0] ? ' class="pilih"' : '') + '>' + c[1] + '</button>';
-    }).join('') + '<button type="button" disabled>Lupa absen · Segera</button>';
+    }).join('');
   }
   // Antrean tampilan: semua pengajuan dimuat, diurut dari yang PALING LAMA; hanya MAKSIMAL 5 kartu tampil sekaligus.
   // Kartu berikutnya naik setelah satu di-ACC/ditolak. Hanya pengaturan tampilan: hak, ACC, tolak, edit, foto tetap di server.
@@ -4076,6 +4096,8 @@
     if (!tombol) { return; }
     const kartu = tombol.closest('.kartu-konf');
     const aksi = tombol.getAttribute('data-konf');
+    if (aksi === 'isijam') { bukaAbsenManual({ karyawan: kartu.getAttribute('data-karyawan'), tanggal: kartu.getAttribute('data-tanggal'), jenis: kartu.getAttribute('data-jenis') }); return; }
+    if (aksi === 'konflik') { bukaKonflik(kartu.getAttribute('data-id')); return; }
     if (aksi === 'edit') {
       if (kartu.querySelector('.konf-form')) { return; }
       kartu.querySelector('.konf-aksi').style.display = 'none';
@@ -5437,6 +5459,502 @@
       })
       .catch(function () { /* pengingat saja */ });
   }
+
+  // ================= FITUR C: KOREKSI ABSEN =================
+  // HP toko: peringatan sudah absen (05), shift tidak sesuai jadwal (06), revisi lembur (07), peringatan lanjutan (13), masuk dan pulang dengan peringatan (18, 19).
+  // Admin: konflik absen (53), absen manual (54), data absensi (64), edit absen (65). Semua jam dan status dihitung SERVER; HP hanya menampilkan.
+  function gagalSesiLb(d) {
+    if (!d) { return false; }
+    if (modeKonf) { return konfGagalSesi(d); }
+    if (d.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return true; }
+    if (d.kode === 'SESI_TIDAK_VALID') { if (sesiAdmin) { keluarAdmin(); } else { sesiPribadiHabis(d.pesan); } return true; }
+    return false;
+  }
+  function kredKoreksi() { return modeKonf ? kredKonf() : kredAdminLb(); }
+  const HARI_KLIEN = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  function tglPendekKlien(t) { const p = String(t).split('-').map(Number); return p[2] + ' ' + BLN_PENDEK[p[1] - 1]; }
+  function hariTglKlien(t) { const p = String(t).split('-').map(Number); return HARI_KLIEN[new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay()] + ', ' + p[2] + ' ' + BLN_PENDEK[p[1] - 1]; }
+  function isiFotoBulat(el, url, teksCadangan) {
+    if (!el) { return; }
+    if (url) { el.textContent = ''; el.style.backgroundImage = 'url(' + url + ')'; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; }
+    else { el.style.backgroundImage = ''; el.textContent = teksCadangan || ''; }
+  }
+  function layarToko(id, tema) { tutupPopup(); setTema(tema); tampilLayar(document.getElementById(id)); }
+  // Layar toko yang menutup sendiri (13, 18, 19): hitung mundur di baris "Menutup otomatis dalam N detik"; kembalian = fungsi penutup.
+  function mulaiHitungLayar(id, tema, detik, sesudah) {
+    layarToko(id, tema);
+    const el = lbF(id, 'tutup');
+    const akhir = Date.now() + detik * 1000;
+    let selesai = false;
+    const tutup = function () { if (selesai) { return; } selesai = true; clearInterval(timerHitung); sesudah(); };
+    if (el) { el.textContent = 'Menutup otomatis dalam ' + detik + ' detik'; }
+    timerHitung = setInterval(function () {
+      const s = Math.ceil((akhir - Date.now()) / 1000);
+      if (s <= 0) { tutup(); return; }
+      if (el) { el.textContent = 'Menutup otomatis dalam ' + s + ' detik'; }
+    }, 250);
+    return tutup;
+  }
+  function muatFotoDobel(id, kode, elLama) {
+    if (!elLama) { return; }
+    isiFotoBulat(elLama, '', '[Memuat foto...]');
+    kirimPost({ aksi: 'foto_dobel', token: hpAktif.token, kode: kode })
+      .then(function (d) {
+        if (d && d.status === 'ok' && d.foto && /^data:image\/jpeg;base64,/.test(d.foto)) { isiFotoBulat(elLama, d.foto, ''); }
+        else { isiFotoBulat(elLama, '', '[' + ((d && d.teks) || 'Foto tidak ada') + ']'); }
+      })
+      .catch(function () { isiFotoBulat(elLama, '', '[Foto tidak termuat]'); });
+  }
+  function kirimUlangAbsen(tambahan, tombol) {
+    if (!terakhirBodyAbsen) { kembaliKeLayarUtama(); return; }
+    (tombol || []).forEach(matikanEl);
+    terakhirBodyAbsen = Object.assign({}, terakhirBodyAbsen, tambahan);
+    fetch(CONFIG.webAppUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(terakhirBodyAbsen) })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { tampilkanHasil(data); })
+      .catch(function () { (tombol || []).forEach(hidupkanEl); infoDialog('Tidak bisa terhubung', 'Belum terkirim. Coba lagi.'); });
+  }
+  function laporkanDobel(kode, tombol) {
+    tombol.forEach(matikanEl);
+    kirimPost({ aksi: 'laporkan_dobel', token: hpAktif.token, kode: kode })
+      .then(function (d) { if (d && d.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return; } tampilkanHasil(d); })
+      .catch(function () { tombol.forEach(hidupkanEl); infoDialog('Tidak bisa terhubung', 'Laporan belum terkirim. Coba lagi.'); });
+  }
+  // Layar 05: sudah absen (masuk atau pulang). Penolakan server tetap; HP menawarkan "YA, ITU SAYA" (tidak ada yang berubah) atau "BUKAN SAYA" (laporan ke admin).
+  function tampilDobel(data) {
+    const L = 'lb05', pulang = data.jenis_dobel === 'PULANG';
+    lbF(L, 'header').textContent = pulang ? 'ABSEN PULANG' : 'ABSEN MASUK';
+    lbF(L, 'judul').textContent = (data.panggilan || 'Anda') + ' sudah absen ' + (pulang ? 'pulang' : 'masuk') + ' jam ' + data.jam_lama;
+    isiFotoBulat(lbF(L, 'fotoBaru'), fotoMenunggu, '[Foto sekarang]');
+    const ya = lbF(L, 'ya'), bukan = lbF(L, 'bukan');
+    hidupkanEl(ya); hidupkanEl(bukan);
+    ya.onclick = function () { fotoMenunggu = null; kembaliKeLayarUtama(); };
+    bukan.onclick = function () { laporkanDobel(data.kode_dobel, [ya, bukan]); };
+    layarToko(L, TEMA.kuning);
+    muatFotoDobel(L, data.kode_dobel, lbF(L, 'fotoLama'));
+  }
+  // Layar 06: jadwal Shift A tetapi sekarang waktunya Shift B. Belum ada yang tersimpan; jawaban dikirim ulang dengan tiket yang sama.
+  function tampilPilihShift(data) {
+    const L = 'lb06';
+    lbF(L, 'judul').textContent = (data.panggilan || 'Anda') + ', jadwal Anda Shift ' + data.jadwal.no;
+    lbF(L, 'pil').textContent = 'Jadwal: Shift ' + data.jadwal.no;
+    lbF(L, 'tanya').textContent = 'Sekarang ' + data.jam + '. Masuk sebagai Shift ' + data.usulan.no + ' (' + data.usulan.masuk + ')?';
+    lbF(L, 'catatan').textContent = 'Shift ' + data.usulan.no + ' perlu konfirmasi admin.';
+    isiFotoBulat(lbF(L, 'foto'), fotoMenunggu, '[Foto kamera]');
+    const ya = lbF(L, 'ya'), tidak = lbF(L, 'tidak');
+    hidupkanEl(ya); hidupkanEl(tidak);
+    ya.textContent = 'YA, SHIFT ' + data.usulan.no;
+    tidak.textContent = 'Tidak, saya telat (Shift ' + data.jadwal.no + ')';
+    ya.onclick = function () { kirimUlangAbsen({ shift_pilihan: data.usulan.no }, [ya, tidak]); };
+    tidak.onclick = function () { kirimUlangAbsen({ shift_pilihan: data.jadwal.no }, [ya, tidak]); };
+    layarToko(L, TEMA.kuning);
+  }
+  // Layar 07: sudah absen lembur. YA, ITU SAYA = tidak ada yang berubah; Revisi = jam lembur diganti ke sekarang (ACC ulang); BUKAN SAYA = laporan.
+  function tampilRevisiLembur(data) {
+    const L = 'lb07';
+    lbF(L, 'judul').textContent = (data.panggilan || 'Anda') + ' sudah absen lembur jam ' + data.jam_lama;
+    lbF(L, 'pil').textContent = 'Lembur ' + teksDurasi(data.durasi_lama) + ' · ' + (['', '< 1 jam', '1–2 jam', '> 2 jam'][data.tingkat_lama] || '');
+    lbF(L, 'sekarang').textContent = 'Sekarang ' + data.jam_baru;
+    isiFotoBulat(lbF(L, 'fotoBaru'), fotoMenunggu, '[Foto sekarang]');
+    const ya = lbF(L, 'ya'), revisi = lbF(L, 'revisi'), bukan = lbF(L, 'bukan');
+    [ya, revisi, bukan].forEach(hidupkanEl);
+    revisi.textContent = 'Revisi lembur ke ' + data.jam_baru;
+    ya.onclick = function () { fotoMenunggu = null; kembaliKeLayarUtama(); };
+    revisi.onclick = function () { kirimUlangAbsen({ konfirmasi_revisi: true }, [ya, revisi, bukan]); };
+    bukan.onclick = function () { laporkanDobel(data.kode_dobel, [ya, revisi, bukan]); };
+    layarToko(L, TEMA.kuning);
+    muatFotoDobel(L, data.kode_dobel, lbF(L, 'fotoLama'));
+  }
+  // Layar 18 / 19: pop-up masuk atau pulang yang membawa peringatan. Layar 13: peringatan lanjutan setelah pop-up utama (dan alasan telat) selesai.
+  function tampilMasukBelumPulang(data, panggilan) {
+    const L = 'lb18';
+    lbF(L, 'judul').textContent = 'Selamat bekerja, ' + panggilan + '!';
+    lbF(L, 'pil').textContent = 'Masuk ' + data.jam + ' (' + data.shift + ')';
+    lbF(L, 'detail').textContent = data.belum_pulang_kemarin.hari + '. Hubungi admin.';
+    const tutup = mulaiHitungLayar(L, TEMA.hijau, 6, tutupPopupDanReset);
+    document.getElementById(L).onclick = tutup;
+  }
+  function tampilPulangBelumMasuk(data, panggilan) {
+    const L = 'lb19';
+    lbF(L, 'judul').textContent = 'Terima kasih, ' + panggilan + '!';
+    lbF(L, 'pil').textContent = 'Pulang ' + data.jam + ' (' + data.shift + ')';
+    const tutup = mulaiHitungLayar(L, TEMA.hitam, 6, tutupPopupDanReset);
+    document.getElementById(L).onclick = tutup;
+  }
+  function tampilLanjutanKemarin(l) {
+    const L = 'lb13';
+    lbF(L, 'sapa').textContent = 'Satu lagi, ' + l.panggilan;
+    lbF(L, 'pil').textContent = l.hari + ' (Shift ' + l.shift + ')';
+    const ok = lbF(L, 'ok');
+    hidupkanEl(ok);
+    const tutup = mulaiHitungLayar(L, TEMA.merah, 8, function () { kembaliKeLayarUtama(); });
+    ok.onclick = tutup;
+  }
+
+  // ---------- Konfirmasi: kartu "Lupa absen" dan "Konflik absen" ----------
+  function kartuKonfirmasiKoreksi(it) {
+    const lupa = it.kelompok === 'LUPA';
+    const detail = [it.rincian];
+    if (it.cabang && modeKonf === 'OWNER') { detail.push(it.cabang); }
+    return '<div class="kartu-konf" data-id="' + escHtml(it.id) + '" data-kel="' + escHtml(it.kelompok) + '" data-karyawan="' + escHtml(it.karyawan) + '" data-tanggal="' + escHtml(it.tanggal) + '" data-jenis="' + escHtml(it.jenis) + '">' +
+      '<div class="konf-baris"><div class="konf-isi"><div class="konf-tipe">' + escHtml(it.judul) + '</div><div class="konf-nama">' + escHtml(it.nama) + '</div>' +
+      '<div class="konf-detail">' + escHtml(detail.join(', ')) + '</div></div></div>' +
+      (lupa ? '<div class="konf-menunggu">Menunggu ' + escHtml(it.menunggu_hari) + ' hari</div>' : '') +
+      (lupa && modeKonf === 'OWNER'
+        ? '<button type="button" class="konf-isi-jam" disabled aria-disabled="true">Isi jam (absen manual)<span class="segera" style="margin-left:6px">Segera</span></button></div>'
+        : '<button type="button" class="konf-isi-jam" data-konf="' + (lupa ? 'isijam' : 'konflik') + '">' + (lupa ? 'Isi jam (absen manual)' : 'Lihat detail') + '</button></div>');
+  }
+  function sesudahKoreksiKonf() {
+    kembaliLb('kembali');
+    if (layarKonfirmasi.classList.contains('aktif')) { konfAntrean = []; daftarKonfirmasi.innerHTML = ''; muatKonfirmasi(); }
+  }
+
+  // ---------- Layar 53: konflik absen ----------
+  const ALASAN_KONFLIK = ['Salah tekan IYA saat pengenalan wajah', 'Salah pilih nama', 'Absen diwakilkan orang lain'];
+  const kf = { id: '', detail: null, pratinjauMinta: 0 };
+  function bukaKonflik(id) { kf.id = id; bukaLb('lb53'); }
+  function teksJenisAbsen(jenis) { return jenis === 'MASUK' ? 'Masuk' : 'Pulang'; }
+  function fotoBesar(url) {
+    if (!url) { return; }
+    bukaDialog('<img alt="Foto absen" src="' + url + '" style="width:100%;border-radius:14px"><div class="dialog-tombol"><button type="button" class="btn-gelap" id="dlgOk">Tutup</button></div>');
+    document.getElementById('dlgOk').addEventListener('click', tutupDialog);
+  }
+  function muatFotoKotak(el, aksi, tambahan) {
+    isiFotoBulat(el, '', '[Memuat foto...]');
+    el.removeAttribute('data-foto');
+    kirimPost(Object.assign({ aksi: aksi }, tambahan, kredKoreksi()))
+      .then(function (d) {
+        if (gagalSesiLb(d)) { return; }
+        if (d && d.status === 'ok' && d.foto && /^data:image\/jpeg;base64,/.test(d.foto)) { isiFotoBulat(el, d.foto, ''); el.setAttribute('data-foto', d.foto); }
+        else { isiFotoBulat(el, '', '[' + ((d && d.teks) || 'Foto tidak ada') + ']'); }
+      })
+      .catch(function () { isiFotoBulat(el, '', '[Foto tidak termuat]'); });
+  }
+  function gambarKonflik() {
+    const d = kf.detail, L = 'lb53';
+    const pindah = lbF(L, 'pindah'), alasan = lbF(L, 'alasan');
+    if (!d) { return; }
+    lbF(L, 'sub').textContent = hariTglKlien(d.tanggal) + ' · ' + d.nama;
+    lbF(L, 'info').textContent = d.panggilan + ' menekan BUKAN SAYA pada absen lama ini.';
+    lbF(L, 'judulLama').textContent = 'Absen lama';
+    lbF(L, 'judulBaru').textContent = 'Absen ' + d.panggilan + ' sekarang';
+    lbF(L, 'ketLama').textContent = teksJenisAbsen(d.jenis) + ' ' + d.lama.jam + ', wajah';
+    lbF(L, 'ketBaru').textContent = d.baru ? teksJenisAbsen(d.jenis) + ' ' + d.baru.jam + ', wajah' : '–';
+    lbF(L, 'tanya').textContent = 'Absen lama ' + d.lama.jam + ' milik siapa?';
+    pindah.innerHTML = '<option value="">Pilih karyawan</option>' + d.kandidat.map(function (k) { return '<option value="' + escHtml(k.id) + '">' + escHtml(k.nama + ' (' + k.keterangan + ')') + '</option>'; }).join('');
+    alasan.innerHTML = ALASAN_KONFLIK.map(function (a) { return '<option value="' + escHtml(a) + '">' + escHtml(a) + '</option>'; }).join('');
+    [pindah, alasan, lbF(L, 'hapus')].forEach(hidupkanEl);
+    matikanEl(lbF(L, 'pindahkan'));
+    lbF(L, 'hasil').textContent = 'Hasil: –';
+  }
+  function pratinjauKonflik() {
+    const L = 'lb53', ke = lbF(L, 'pindah').value, hasil = lbF(L, 'hasil'), btn = lbF(L, 'pindahkan');
+    const minta = ++kf.pratinjauMinta;
+    matikanEl(btn);
+    if (!ke) { hasil.textContent = 'Hasil: –'; return; }
+    hasil.textContent = 'Hasil: memuat...';
+    kirimPost(Object.assign({ aksi: 'konflik_pratinjau', id: kf.id, ke: ke }, kredKoreksi()))
+      .then(function (d) {
+        if (minta !== kf.pratinjauMinta || gagalSesiLb(d)) { return; }
+        if (d.status === 'ok' && d.bisa) { hasil.textContent = 'Hasil: ' + d.hasil; hidupkanEl(btn); }
+        else { hasil.textContent = d.pesan || 'Belum bisa dipindahkan'; }
+      })
+      .catch(function () { hasil.textContent = 'Tidak bisa terhubung ke server.'; });
+  }
+  function putuskanKonflik(aksi) {
+    const L = 'lb53', ke = lbF(L, 'pindah').value, alasan = lbF(L, 'alasan').value;
+    const nama = kf.detail ? kf.detail.nama : '';
+    const teksKe = ke ? (kf.detail.kandidat.filter(function (k) { return k.id === ke; })[0] || { nama: '' }).nama : '';
+    bukaDialog('<div class="dialog-judul">' + (aksi === 'PINDAH' ? 'Pindahkan absen ke ' + escHtml(teksKe) + '?' : 'Hapus absen lama?') + '</div>' +
+      '<div class="dialog-sub">' + (aksi === 'PINDAH' ? 'Absen lama milik ' + escHtml(nama) + ' dipindahkan.' : 'Absen lama tidak dihitung untuk siapa pun.') + ' Salinannya tetap tersimpan di log.</div>' +
+      '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">' + (aksi === 'PINDAH' ? 'Pindahkan' : 'Hapus') + '</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', function () {
+      tutupDialog();
+      [lbF(L, 'pindahkan'), lbF(L, 'hapus')].forEach(matikanEl);
+      kirimPost(Object.assign({ aksi: 'konflik_putuskan', id: kf.id, tindakan: aksi, ke: ke, alasan: alasan }, kredKoreksi()))
+        .then(function (d) {
+          if (gagalSesiLb(d)) { return; }
+          if (d.status !== 'ok') { infoDialog('Belum bisa diselesaikan', d.pesan || 'Coba lagi.'); hidupkanEl(lbF(L, 'hapus')); pratinjauKonflik(); return; }
+          infoDialog('Konflik diselesaikan', d.hasil || '', sesudahKoreksiKonf);
+        })
+        .catch(function () { hidupkanEl(lbF(L, 'hapus')); pratinjauKonflik(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+    });
+  }
+  SIAP_LB.lb53 = function () {
+    const L = 'lb53';
+    document.getElementById(L).setAttribute('data-lb-home', modeKonf === 'OWNER' ? 'own' : 'adm');
+    if (modeKonf === 'OWNER') { Array.prototype.forEach.call(document.getElementById(L).querySelectorAll('div'), function (e) { if (e.children.length === 0 && /^(Admin\s*(–|\S+)?|Owner)$/.test(e.textContent.trim()) && /border-radius: 999px/.test(e.getAttribute('style') || '')) { e.textContent = 'Owner'; } }); }
+    else { isiBadgeAdminLb(L); }
+    kf.detail = null;
+    kirimPost(Object.assign({ aksi: 'konflik_detail', id: kf.id }, kredKoreksi()))
+      .then(function (d) {
+        if (gagalSesiLb(d)) { return; }
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.', sesudahKoreksiKonf); return; }
+        kf.detail = d; gambarKonflik();
+        muatFotoKotak(lbF(L, 'fotoLama'), 'konflik_foto', { id: kf.id, which: 'LAMA' });
+        muatFotoKotak(lbF(L, 'fotoBaru'), 'konflik_foto', { id: kf.id, which: 'BARU' });
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.', sesudahKoreksiKonf); });
+  };
+  lbF('lb53', 'pindah').addEventListener('change', pratinjauKonflik);
+  lbF('lb53', 'pindahkan').addEventListener('click', function () { if (!this.disabled) { putuskanKonflik('PINDAH'); } });
+  lbF('lb53', 'hapus').addEventListener('click', function () { if (!this.disabled) { putuskanKonflik('HAPUS'); } });
+  ['fotoLama', 'fotoBaru'].forEach(function (n) { lbF('lb53', n).addEventListener('click', function () { fotoBesar(this.getAttribute('data-foto')); }); });
+
+  // ---------- Layar 54: absen manual ----------
+  const man = { info: null, jenis: '', alasan: '', foto: '', pra: null, minta: 0, mengirim: false, pratinjauOk: false };
+  function gayaPilih(b, aktif) {
+    b.style.border = aktif ? 'none' : '2px solid var(--abu)';
+    b.style.background = aktif ? 'var(--hitam)' : 'var(--putih)';
+    b.style.color = aktif ? 'var(--kuning)' : 'var(--hitam)';
+    b.style.fontWeight = aktif ? '800' : '700';
+  }
+  function bukaAbsenManual(pre) { man.pra = pre || null; bukaLb('lb54'); }
+  function gambarManual() {
+    const L = 'lb54';
+    gayaPilih(lbF(L, 'jMasuk'), man.jenis === 'MASUK'); gayaPilih(lbF(L, 'jPulang'), man.jenis === 'PULANG');
+    ['a0', 'a1', 'a2', 'a3'].forEach(function (k, i) { gayaPilih(lbF(L, k), man.alasan === man.info.alasan[i]); });
+    const f = lbF(L, 'fotoTombol');
+    if (man.foto) { f.style.backgroundImage = 'url(' + man.foto + ')'; f.style.backgroundSize = 'cover'; f.style.backgroundPosition = 'center'; f.style.borderStyle = 'solid'; f.style.color = 'transparent'; lbF(L, 'fotoJudul').textContent = 'Foto siap'; lbF(L, 'fotoPetunjuk').textContent = 'Ketuk lagi untuk mengganti foto'; }
+    else { f.style.backgroundImage = ''; f.style.borderStyle = ''; f.style.color = ''; lbF(L, 'fotoJudul').textContent = 'Foto belum ada'; lbF(L, 'fotoPetunjuk').textContent = 'Ketuk kotak kamera untuk memotret'; }
+    const siap = !!lbF(L, 'karyawan').value && !!lbF(L, 'tanggal').value && !!lbF(L, 'jam').value && !!man.jenis && !!man.alasan && !!man.foto && man.pratinjauOk && !man.mengirim;
+    if (siap) { hidupkanEl(lbF(L, 'simpan')); } else { matikanEl(lbF(L, 'simpan')); }
+  }
+  function pratinjauManual() {
+    const L = 'lb54', st = lbF(L, 'status');
+    const k = lbF(L, 'karyawan').value, t = lbF(L, 'tanggal').value, j = lbF(L, 'jam').value;
+    const minta = ++man.minta;
+    man.pratinjauOk = false;
+    st.style.color = '';
+    if (!k || !t || !j || !man.jenis) { st.textContent = 'Status: –'; gambarManual(); return; }
+    st.textContent = 'Status: memuat...';
+    kirimPost(Object.assign({ aksi: 'absen_manual_pratinjau', karyawan: k, tanggal: t, jam: j, jenis: man.jenis }, kredKoreksi()))
+      .then(function (d) {
+        if (minta !== man.minta || gagalSesiLb(d)) { return; }
+        if (d.status === 'ok' && d.bisa) { st.textContent = d.tampil; man.pratinjauOk = true; }
+        else { st.textContent = (d && d.pesan) || 'Belum bisa disimpan'; st.style.color = 'var(--merah)'; }
+        gambarManual();
+      })
+      .catch(function () { st.textContent = 'Tidak bisa terhubung ke server.'; st.style.color = 'var(--merah)'; });
+  }
+  function kosongkanManual() {
+    man.jenis = ''; man.alasan = ''; man.foto = ''; man.pratinjauOk = false;
+    const L = 'lb54';
+    lbF(L, 'karyawan').value = ''; lbF(L, 'jam').value = ''; lbF(L, 'tanggal').value = man.info ? man.info.hari_ini : '';
+  }
+  SIAP_LB.lb54 = function () {
+    const L = 'lb54';
+    isiBadgeAdminLb(L);
+    man.info = null;
+    kirimPost(Object.assign({ aksi: 'absen_manual_info' }, kredAdminLb()))
+      .then(function (d) {
+        if (gagalSesiLb(d)) { return; }
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.', function () { kembaliLb('kembali'); }); return; }
+        man.info = d;
+        const kar = lbF(L, 'karyawan'), tgl = lbF(L, 'tanggal'), jam = lbF(L, 'jam');
+        kar.innerHTML = '<option value="">Pilih karyawan</option>' + d.karyawan.map(function (k) { return '<option value="' + escHtml(k.id) + '">' + escHtml(k.nama) + '</option>'; }).join('');
+        ['a0', 'a1', 'a2', 'a3'].forEach(function (k, i) { lbF(L, k).textContent = d.alasan[i]; });
+        tgl.type = 'date'; tgl.max = d.hari_ini; tgl.min = geserTanggalKlien(d.hari_ini, -31);
+        jam.type = 'time';
+        [kar, tgl, jam, lbF(L, 'jMasuk'), lbF(L, 'jPulang'), lbF(L, 'a0'), lbF(L, 'a1'), lbF(L, 'a2'), lbF(L, 'a3'), lbF(L, 'fotoTombol')].forEach(hidupkanEl);
+        man.jenis = 'MASUK'; man.alasan = ''; man.foto = ''; man.pratinjauOk = false;
+        tgl.value = d.hari_ini; jam.value = '';
+        const p = man.pra; man.pra = null;
+        if (p) { kar.value = p.karyawan || ''; tgl.value = p.tanggal || d.hari_ini; man.jenis = p.jenis === 'MASUK' ? 'MASUK' : 'PULANG'; }
+        lbF(L, 'status').textContent = 'Status: –';
+        gambarManual(); pratinjauManual();
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.', function () { kembaliLb('kembali'); }); });
+  };
+  function geserTanggalKlien(t, n) { const p = String(t).split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2] + n)).toISOString().slice(0, 10); }
+  ['karyawan', 'tanggal', 'jam'].forEach(function (n) { ['change', 'input'].forEach(function (ev) { lbF('lb54', n).addEventListener(ev, function () { if (man.info) { pratinjauManual(); } }); }); });
+  ['jMasuk', 'jPulang'].forEach(function (n) { lbF('lb54', n).addEventListener('click', function () { if (this.disabled) { return; } man.jenis = n === 'jMasuk' ? 'MASUK' : 'PULANG'; gambarManual(); pratinjauManual(); }); });
+  ['a0', 'a1', 'a2', 'a3'].forEach(function (n, i) { lbF('lb54', n).addEventListener('click', function () { if (this.disabled || !man.info) { return; } man.alasan = man.info.alasan[i]; gambarManual(); }); });
+  lbF('lb54', 'fotoTombol').addEventListener('click', function () {
+    if (this.disabled) { return; }
+    pilihFotoJpeg(640, 0.6, function (url) { man.foto = url; gambarManual(); });
+  });
+  lbF('lb54', 'simpan').addEventListener('click', function () {
+    if (this.disabled || man.mengirim) { return; }
+    const L = 'lb54';
+    const isi = { karyawan: lbF(L, 'karyawan').value, tanggal: lbF(L, 'tanggal').value, jam: lbF(L, 'jam').value, jenis: man.jenis, alasan: man.alasan };
+    man.mengirim = true; gambarManual();
+    kirimPost(Object.assign({ aksi: 'absen_manual' }, isi, kredAdminLb()))
+      .then(function (d) {
+        if (gagalSesiLb(d)) { man.mengirim = false; return; }
+        if (d.status !== 'ok') { man.mengirim = false; gambarManual(); infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return; }
+        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: isi.karyawan, tanggal: isi.tanggal, jenis: isi.jenis, gambar: man.foto }, kredAdminLb()))
+          .then(function (f) { return f; }, function () { return { status: 'gagal' }; })
+          .then(function (f) {
+            man.mengirim = false;
+            const fotoOk = f && f.status === 'ok';
+            kosongkanManual(); gambarManual();
+            infoDialog('Absen manual tersimpan', (d.tampil || '') + (fotoOk ? '' : ' Foto belum terunggah; ulangi lewat Data absensi > Edit absen.'), function () { sesudahKoreksiKonf(); });
+          });
+      })
+      .catch(function () { man.mengirim = false; gambarManual(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  });
+
+  // ---------- Layar 64: data absensi ----------
+  const IKON_PENSIL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>';
+  const abs64 = { rows: [], total: 0, adaLagi: false, memuat: false, karyawanDiisi: false };
+  function barisAbsensiHtml(r) {
+    const chips = r.tanda.map(function (t) {
+      const merah = t === 'TELAT' || t === 'LUPA PULANG' || t === 'LUPA MASUK';
+      return '<span style="padding:2px 8px;border-radius:999px;background:' + (merah ? 'var(--merah-muda)' : 'var(--krem)') + ';color:' + (merah ? 'var(--merah)' : 'var(--hitam)') + ';font-size:11px;font-weight:800">' + escHtml(t) + '</span>';
+    }).join('');
+    return '<div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--krem-gelap)">' +
+      '<div style="flex-grow:1;display:flex;flex-direction:column;gap:3px"><div style="font-size:14px;font-weight:800">' + escHtml(r.nama) + (r.diedit ? ' <span style="font-size:11px;font-weight:800;color:var(--abu-teks)" title="Pernah diedit">· diedit</span>' : '') + '</div>' +
+      '<div style="font-size:12px;color:var(--abu-tua);display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + escHtml(tglPendekKlien(r.tanggal)) + ' · masuk ' + escHtml(r.masuk || '—') + ' · pulang ' + escHtml(r.pulang || '—') + ' ' + chips + '</div></div>' +
+      '<button type="button" aria-label="Edit absen ' + escHtml(r.nama) + '" data-edit="' + escHtml(r.karyawan + '|' + r.tanggal) + '" style="width:44px;height:44px;border:2px solid var(--hitam);border-radius:12px;background:var(--putih);display:flex;align-items:center;justify-content:center">' + IKON_PENSIL + '</button></div>';
+  }
+  function muatAbsensi64(dariAwal) {
+    if (abs64.memuat) { return; }
+    const L = 'lb64', daftar = lbF(L, 'daftar');
+    if (dariAwal) { abs64.rows = []; abs64.adaLagi = false; daftar.innerHTML = ''; }
+    abs64.memuat = true;
+    kirimPost(Object.assign({ aksi: 'absensi_daftar', rentang: lbF(L, 'ft').value || 'PEKAN', karyawan: lbF(L, 'fk').value, offset: abs64.rows.length }, kredAdminLb()))
+      .then(function (d) {
+        abs64.memuat = false;
+        if (gagalSesiLb(d)) { return; }
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.'); return; }
+        if (!abs64.karyawanDiisi) {
+          lbF(L, 'fk').innerHTML = '<option value="">Semua</option>' + d.karyawan.map(function (k) { return '<option value="' + escHtml(k.id) + '">' + escHtml(k.nama) + '</option>'; }).join('');
+          abs64.karyawanDiisi = true;
+        }
+        d.daftar.forEach(function (r) { abs64.rows.push(r); });
+        abs64.adaLagi = d.ada_lagi; abs64.total = d.total;
+        daftar.insertAdjacentHTML('beforeend', d.daftar.map(barisAbsensiHtml).join(''));
+        if (!abs64.rows.length) { daftar.innerHTML = '<div class="hp-ket">Belum ada absen pada rentang ini.</div>'; }
+      })
+      .catch(function () { abs64.memuat = false; infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  SIAP_LB.lb64 = function () {
+    const L = 'lb64';
+    isiBadgeAdminLb(L);
+    abs64.karyawanDiisi = false;
+    const ft = lbF(L, 'ft'), fk = lbF(L, 'fk');
+    ft.innerHTML = '<option value="PEKAN">Pekan ini</option><option value="HARI">Hari ini</option><option value="BULAN">Bulan ini</option>';
+    fk.innerHTML = '<option value="">Semua</option>';
+    hidupkanEl(ft); hidupkanEl(fk);
+    muatAbsensi64(true);
+  };
+  lbF('lb64', 'ft').addEventListener('change', function () { muatAbsensi64(true); });
+  lbF('lb64', 'fk').addEventListener('change', function () { muatAbsensi64(true); });
+  lbF('lb64', 'daftar').addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-edit]');
+    if (!b) { return; }
+    const p = b.getAttribute('data-edit').split('|');
+    bukaEditAbsen(p[0], p[1]);
+  });
+  (function () {
+    let wadah = lbF('lb64', 'daftar');
+    while (wadah && !/overflow-y/.test(wadah.getAttribute('style') || '')) { wadah = wadah.parentElement; }
+    if (wadah) { wadah.addEventListener('scroll', function () { if (abs64.adaLagi && !abs64.memuat && wadah.scrollTop + wadah.clientHeight >= wadah.scrollHeight - 120) { muatAbsensi64(false); } }); }
+  })();
+
+  // ---------- Layar 65: edit absen ----------
+  const ed = { karyawan: '', tanggal: '', info: null, jenis: 'MASUK', foto: '', minta: 0, mengirim: false, pratinjau: null };
+  function bukaEditAbsen(karyawan, tanggal) { ed.karyawan = karyawan; ed.tanggal = tanggal; bukaLb('lb65'); }
+  function gayaTab(b, aktif) { b.style.background = aktif ? 'var(--hitam)' : 'transparent'; b.style.color = aktif ? 'var(--kuning)' : 'var(--hitam)'; }
+  function gambarEdit() {
+    const L = 'lb65', i = ed.info;
+    if (!i) { return; }
+    const m = ed.jenis === 'MASUK', blok = m ? i.masuk : i.pulang;
+    lbF(L, 'sub').textContent = tglPendekKlien(i.tanggal) + ' · ' + i.nama;
+    gayaTab(lbF(L, 'tabMasuk'), m); gayaTab(lbF(L, 'tabPulang'), !m);
+    lbF(L, 'labelJam').textContent = m ? 'Jam masuk' : 'Jam pulang';
+    lbF(L, 'jamFoto').textContent = blok.jam_foto || '–';
+    const jam = lbF(L, 'jam');
+    if (jam.getAttribute('data-tab') !== ed.jenis) { jam.value = blok.jam || ''; jam.setAttribute('data-tab', ed.jenis); }
+    const rg = lbF(L, 'ringkas');
+    if (ed.pratinjau) { rg.innerHTML = escHtml(ed.pratinjau.sebelum) + ' → <b>' + escHtml(ed.pratinjau.sesudah) + '</b>'; rg.style.color = ''; }
+    else { rg.textContent = (m ? 'Masuk ' : 'Pulang ') + (blok.jam || 'kosong') + ' → –'; }
+    const alasan = String(lbF(L, 'alasan').value || '').trim();
+    if (ed.pratinjau && alasan.length >= 5 && !ed.mengirim) { hidupkanEl(lbF(L, 'simpan')); } else { matikanEl(lbF(L, 'simpan')); }
+  }
+  function pratinjauEdit() {
+    const L = 'lb65', rg = lbF(L, 'ringkas'), jam = lbF(L, 'jam').value;
+    const minta = ++ed.minta;
+    ed.pratinjau = null;
+    if (!/^\d{2}:\d{2}$/.test(jam)) { gambarEdit(); return; }
+    rg.textContent = 'Memuat...';
+    kirimPost(Object.assign({ aksi: 'absensi_edit_pratinjau', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, jam: jam }, kredAdminLb()))
+      .then(function (d) {
+        if (minta !== ed.minta || gagalSesiLb(d)) { return; }
+        if (d.status === 'ok' && d.bisa) { ed.pratinjau = d; gambarEdit(); }
+        else { rg.textContent = (d && d.pesan) || 'Belum bisa disimpan'; rg.style.color = 'var(--merah)'; matikanEl(lbF(L, 'simpan')); }
+      })
+      .catch(function () { rg.textContent = 'Tidak bisa terhubung ke server.'; });
+  }
+  function muatFotoEdit() {
+    const L = 'lb65', foto = lbF(L, 'foto'), kotak = foto.parentElement;
+    ed.foto = '';
+    kotak.style.backgroundImage = ''; foto.textContent = '[Memuat foto...]';
+    kirimPost(Object.assign({ aksi: 'absensi_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis }, kredAdminLb()))
+      .then(function (d) {
+        if (gagalSesiLb(d)) { return; }
+        if (d && d.status === 'ok' && d.foto && /^data:image\/jpeg;base64,/.test(d.foto)) { foto.textContent = ''; kotak.style.backgroundImage = 'url(' + d.foto + ')'; kotak.style.backgroundSize = 'cover'; kotak.style.backgroundPosition = 'center'; }
+        else { foto.textContent = '[' + ((d && (d.teks || d.pesan)) || 'Foto tidak ada') + ']'; }
+      })
+      .catch(function () { foto.textContent = '[Foto tidak termuat]'; });
+  }
+  SIAP_LB.lb65 = function () {
+    const L = 'lb65';
+    isiBadgeAdminLb(L);
+    ed.info = null; ed.jenis = 'MASUK'; ed.foto = ''; ed.pratinjau = null; ed.mengirim = false;
+    lbF(L, 'jam').removeAttribute('data-tab'); lbF(L, 'alasan').value = '';
+    kirimPost(Object.assign({ aksi: 'absensi_edit_info', karyawan: ed.karyawan, tanggal: ed.tanggal }, kredAdminLb()))
+      .then(function (d) {
+        if (gagalSesiLb(d)) { return; }
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.', function () { kembaliLb('kembali'); }); return; }
+        ed.info = d;
+        const jam = lbF(L, 'jam'); jam.type = 'time';
+        const alasan = lbF(L, 'alasan'); alasan.maxLength = 100;
+        [lbF(L, 'tabMasuk'), lbF(L, 'tabPulang'), jam, alasan, lbF(L, 'updateFoto')].forEach(hidupkanEl);
+        gambarEdit(); pratinjauEdit(); muatFotoEdit();
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.', function () { kembaliLb('kembali'); }); });
+  };
+  ['tabMasuk', 'tabPulang'].forEach(function (n) {
+    lbF('lb65', n).addEventListener('click', function () {
+      if (this.disabled || !ed.info) { return; }
+      ed.jenis = n === 'tabMasuk' ? 'MASUK' : 'PULANG';
+      lbF('lb65', 'ringkas').style.color = '';
+      gambarEdit(); pratinjauEdit(); muatFotoEdit();
+    });
+  });
+  lbF('lb65', 'jam').addEventListener('input', function () { if (ed.info) { lbF('lb65', 'ringkas').style.color = ''; pratinjauEdit(); } });
+  lbF('lb65', 'alasan').addEventListener('input', function () { gambarEdit(); });
+  lbF('lb65', 'updateFoto').addEventListener('click', function () {
+    if (this.disabled) { return; }
+    pilihFotoJpeg(640, 0.6, function (url) {
+      ed.foto = url;
+      const foto = lbF('lb65', 'foto'), kotak = foto.parentElement;
+      foto.textContent = ''; kotak.style.backgroundImage = 'url(' + url + ')'; kotak.style.backgroundSize = 'cover'; kotak.style.backgroundPosition = 'center';
+      lbF('lb65', 'jamFoto').textContent = 'foto baru';
+    });
+  });
+  lbF('lb65', 'simpan').addEventListener('click', function () {
+    if (this.disabled || ed.mengirim || !ed.info) { return; }
+    const L = 'lb65';
+    const isi = { karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, jam: lbF(L, 'jam').value, alasan: String(lbF(L, 'alasan').value || '').trim() };
+    ed.mengirim = true; gambarEdit();
+    kirimPost(Object.assign({ aksi: 'absensi_edit' }, isi, kredAdminLb()))
+      .then(function (d) {
+        if (gagalSesiLb(d)) { ed.mengirim = false; return; }
+        if (d.status !== 'ok') { ed.mengirim = false; gambarEdit(); infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return; }
+        const sesudah = function (fotoOk) {
+          ed.mengirim = false;
+          infoDialog('Absen diperbarui', d.sesudah + (fotoOk === false ? '. Foto belum terunggah, coba lagi.' : ''), function () { kembaliLb('kembali'); if (document.getElementById('lb64').classList.contains('aktif')) { muatAbsensi64(true); } });
+        };
+        if (!ed.foto) { sesudah(true); return; }
+        return kirimPost(Object.assign({ aksi: 'absensi_unggah_foto', karyawan: ed.karyawan, tanggal: ed.tanggal, jenis: ed.jenis, gambar: ed.foto }, kredAdminLb()))
+          .then(function (f) { sesudah(f && f.status === 'ok'); }, function () { sesudah(false); });
+      })
+      .catch(function () { ed.mengirim = false; gambarEdit(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  });
 
   // ================= LAYAR BARU (tampilan saja): navigasi =================
   // Semua layar lbNN dibuat dari mockup oleh tools/bangun_layar_baru.sh: tanpa data contoh, tombol aksi nonaktif "Segera", tanpa panggilan server.

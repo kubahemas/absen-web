@@ -22,7 +22,7 @@ my $badan = '<script type="text/plain" id="__fix">' . $fix . '</script><script>(
   'function f(){try{(function(){' . $fix . "\n" . '})()}catch(e){__g.push("isi: "+e.message)}}' .
   'p();setInterval(p,200);setTimeout(f,1500);' .
   'setInterval(function(){' .
-    'if(window.__hasil){var r=document.getElementById("__hasil");if(!r){r=document.createElement("div");r.id="__hasil";r.style.cssText="position:fixed;left:0;right:0;top:0;z-index:99999;background:#063;color:#fff;font:10px monospace;padding:4px;white-space:pre-wrap";r.textContent=window.__hasil.join("\n");document.body.appendChild(r);}r.textContent=window.__hasil.join("\n");}' .
+    'if(window.__hasil){var r=document.getElementById("__hasil");if(!r){r=document.createElement("div");r.id="__hasil";r.style.cssText="position:fixed;left:0;right:0;top:0;z-index:99999;background:#063;color:#fff;font:10px monospace;padding:4px;white-space:pre-wrap";r.textContent=(function(){var a=window.__hasil,g=a.filter(function(x){return /^(GAGAL|GALAT)/.test(x)}).length,o=a.filter(function(x){return /^OK/.test(x)}).length;return "["+o+" OK, "+g+" GAGAL]\n"})()+window.__hasil.join("\n");document.body.appendChild(r);}r.textContent=(function(){var a=window.__hasil,g=a.filter(function(x){return /^(GAGAL|GALAT)/.test(x)}).length,o=a.filter(function(x){return /^OK/.test(x)}).length;return "["+o+" OK, "+g+" GAGAL]\n"})()+window.__hasil.join("\n");}' .
     'if(window.__g.length){var d=document.createElement("div");d.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:red;color:#fff;font:11px monospace;padding:4px";d.textContent="GALAT JS: "+window.__g.join(" | ");document.body.appendChild(d);}' .
   '},300);' .
   '})();</script>';
