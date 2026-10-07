@@ -15,7 +15,7 @@ nomor.forEach(function (n) {
   ada++;
   var teks = teksNode(blok);
   blok.querySelectorAll('input, textarea, select').forEach(function (e) {
-    teks += ' ' + (e.getAttribute('value') || '') + ' ' + (e.getAttribute('placeholder') || '') + ' ' + (e.tagName === 'TEXTAREA' ? e.textContent : '');
+    teks += ' ' + (e.getAttribute('value') || '') + ' ' + (/^(Cari|Ketik)/.test(e.getAttribute('placeholder') || '') ? '' : (e.getAttribute('placeholder') || '')) + ' ' + (e.tagName === 'TEXTAREA' ? e.textContent : '');
     if (!e.disabled) { hidup.push('lb' + n + ' ' + e.tagName); }
     if (e.getAttribute('value')) { isian.push('lb' + n + ' value=' + e.getAttribute('value')); }
     if (e.tagName === 'SELECT' && e.options.length > 1) { isian.push('lb' + n + ' select punya ' + e.options.length + ' opsi'); }

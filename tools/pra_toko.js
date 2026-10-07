@@ -20,6 +20,7 @@ window.fetch = function (url, opsi) {
   if (b.aksi === 'login_admin_toko') { d = { status: 'ok', sesi: 'S'.repeat(40), nama: 'Dewi Lestari', cabang: 'Ngawi' }; }
   if (b.aksi === 'konfirmasi_jumlah') { d = { status: 'ok', jumlah: 5, jumlah_teks: '5' }; }
   if (b.aksi === 'beranda_hari_ini') { d = window.__BERANDA; }
+  if (b.aksi === 'tukar_pengingat') { d = { status: 'ok', jumlah: window.__TUKAR || 0 }; }
   return Promise.resolve({ json: function () { return Promise.resolve(d); } });
 };
 // Daftar Konfirmasi tiruan (mockup 52)

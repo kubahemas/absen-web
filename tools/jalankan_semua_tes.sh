@@ -8,6 +8,7 @@ S="$TEMP/tes_salinan"; mkdir -p "$S"
 rm -f "$V/_semua.out"
 salin() { ( echo "$2"; cat "$1" ) > "$S/$3.js"; } # salin <berkas> <baris pertama> <nama>
 for k in toko pribadi pribadiadmin admin owner; do salin tools/uji_alur_layar_baru.js "window.__KONTEKS='$k';" "lbnav_$k"; done
+for k in admin karyawan toko; do salin tools/uji_alur_jadwal.js "window.__KONTEKS='$k';" "jadwal_$k"; done
 for k in karyawan admin toko toko2; do salin tools/uji_alur_izin.js "window.__KONTEKS='$k';" "izin_$k"; done
 for k in pribadi admin owner; do salin tools/uji_alur_tarik_refresh.js "window.__KONTEKS='$k';" "tr_$k"; done
 salin tools/uji_alur_foto_lingkaran.js "window.__KONTEKS='toko';" fl_toko
@@ -43,6 +44,9 @@ PRA="$PT" j $V/t_tr_admin.png "$S/tr_admin.js"
 PRA="$PO" j $V/t_tr_owner.png "$S/tr_owner.js"
 PRA="$PT" j $V/t_fl_toko.png "$S/fl_toko.js"
 j $V/t_fl_luar.png "$S/fl_luar.js"
+BUDGET=90000 j $V/uji_alur_jadwal_admin.png "$S/jadwal_admin.js"
+BUDGET=90000 j $V/uji_alur_jadwal_karyawan.png "$S/jadwal_karyawan.js"
+BUDGET=40000 PRA="$PT" j $V/uji_alur_jadwal_toko.png "$S/jadwal_toko.js"
 bash tools/uji_server.sh $V/uji_server_hasil.png > /dev/null 2>&1
 bash tools/cek_sintaks.sh $V/cek_sintaks_hasil.png > /dev/null 2>&1
 echo selesai > $V/_semua.out

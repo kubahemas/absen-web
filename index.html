@@ -951,8 +951,8 @@
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; background: rgba(20,17,17,.45); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); position: relative">
 <div style="box-sizing: content-box; position: absolute; top: 84px; left: 18px; right: 18px; background: var(--putih); border-radius: 22px; padding: 16px; box-shadow: 0 10px 30px rgba(20,17,17,.3); display: flex; flex-direction: column; gap: 10px">
 <div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 700">Jadwal hari ini</div>
-<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 16px; background: var(--hijau-muda)"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Shift – · aktif</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; color: var(--hijau-tua)">–</div></div><div style="box-sizing: content-box; display: flex; flex-wrap: wrap; gap: 6px"></div></div>
-<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 16px; background: var(--krem)"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Shift –</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; color: var(--abu-teks)">–</div></div><div style="box-sizing: content-box; display: flex; flex-wrap: wrap; gap: 6px"></div></div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 16px; background: var(--hijau-muda)" data-f="blokAktif"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Shift – · aktif</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; color: var(--hijau-tua)">–</div></div><div style="box-sizing: content-box; display: flex; flex-wrap: wrap; gap: 6px"></div></div>
+<div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 16px; background: var(--krem)" data-f="blokBiasa"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Shift –</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; color: var(--abu-teks)">–</div></div><div style="box-sizing: content-box; display: flex; flex-wrap: wrap; gap: 6px"></div></div>
 <div style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-tua)">Status absen dihitung dari shift masing-masing karyawan.</div>
 <button type="button" style="height: 50px; border: 3px solid var(--hitam); border-radius: 16px; background: transparent; font-family: inherit; font-size: 15px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">Tutup</button>
 </div></div>
@@ -1260,26 +1260,26 @@
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 12px">
 <img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 36px; width: auto; align-self: flex-start">
 <div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1">Ajukan tukar shift</div></div>
-<div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
-<div style="box-sizing: content-box; display: flex; gap: 4px; padding: 4px; background: var(--krem); border-radius: 14px"><button type="button" style="flex: 1; height: 42px; border: none; border-radius: 10px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 14px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Tukar dengan rekan<span class="segera" style="margin-left: 6px;">Segera</span></button><button type="button" style="flex: 1; height: 42px; border: none; border-radius: 10px; background: transparent; color: var(--hitam); font-family: inherit; font-size: 14px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Pindah shift</button></div>
-<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Tanggal</div><input aria-label="Tanggal" style="height: 48px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif">
-<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Tukar dengan</div><select aria-label="Rekan" style="height: 48px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>– (Shift –)</option></select>
-<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Alasan (opsional)</div><input aria-label="Alasan" style="height: 48px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif">
+<div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px" data-f="form">
+<div style="box-sizing: content-box; display: flex; gap: 4px; padding: 4px; background: var(--krem); border-radius: 14px"><button type="button" style="flex: 1; height: 42px; border: none; border-radius: 10px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 14px; font-weight: 800" data-f="segTukar" disabled="" aria-disabled="true" class="belum-aktif">Tukar dengan rekan<span class="segera" style="margin-left: 6px;">Segera</span></button><button type="button" style="flex: 1; height: 42px; border: none; border-radius: 10px; background: transparent; color: var(--hitam); font-family: inherit; font-size: 14px; font-weight: 800" data-f="segPindah" disabled="" aria-disabled="true" class="belum-aktif">Pindah shift</button></div>
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Tanggal</div><input aria-label="Tanggal" style="height: 48px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="tanggal" disabled="" class="belum-aktif">
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 800" data-f="labelRekan">Tukar dengan</div><select aria-label="Rekan" style="height: 48px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="rekan" disabled="" class="belum-aktif"><option>– (Shift –)</option></select>
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Alasan (opsional)</div><input aria-label="Alasan" style="height: 48px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="alasan" disabled="" class="belum-aktif">
 
 </div>
-<div style="box-sizing: content-box; font-size: 12px; font-weight: 600">Sepakati dulu dengan rekan. Rekan setuju di aplikasinya, lalu ACC admin.</div>
+<div style="box-sizing: content-box; font-size: 12px; font-weight: 600" data-f="catatan">Sepakati dulu dengan rekan. Rekan setuju di aplikasinya, lalu ACC admin.</div>
 <div style="box-sizing: content-box; flex-grow: 1"></div>
-<div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Kirim<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
+<div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" data-f="kirim" disabled="" aria-disabled="true" class="belum-aktif">Kirim<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
 </div>
 </div>
 <div id="lb43" class="layar" data-lb-home="prib">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 22px; background: rgba(20,17,17,.5); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; justify-content: center">
 <div style="box-sizing: content-box; background: var(--putih); border-radius: 26px; padding: 22px 20px 20px; display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center">
 <div style="box-sizing: content-box; width: 64px; height: 64px; border-radius: 50%; background: var(--hitam); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--kuning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16"></path><path d="M3 8l4-4 4 4"></path><path d="M17 20V4"></path><path d="M21 16l-4 4-4-4"></path></svg></div>
-<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.2">– mengajak tukar shift</div>
-<div style="background: var(--krem); border-radius: 14px; padding: 12px; width: 100%; box-sizing: border-box; font-size: 15px; font-weight: 700">Selasa, –<br>Anda → <b>Shift – (–)</b></div>
-<div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-tua)">Alasan: –</div>
-<div style="box-sizing: content-box; display: flex; gap: 10px; width: 100%"><button type="button" style="flex: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" disabled="" aria-disabled="true" class="belum-aktif">Tolak<span class="segera" style="margin-left: 6px;">Segera</span></button><button type="button" style="flex: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 16px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Setuju<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
+<div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.2" data-f="judul">– mengajak tukar shift</div>
+<div style="background: var(--krem); border-radius: 14px; padding: 12px; width: 100%; box-sizing: border-box; font-size: 15px; font-weight: 700" data-f="waktu">Selasa, –<br>Anda → <b>Shift – (–)</b></div>
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 600; color: var(--abu-tua)" data-f="alasan">Alasan: –</div>
+<div style="box-sizing: content-box; display: flex; gap: 10px; width: 100%"><button type="button" style="flex: 1; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" data-f="tolak" disabled="" aria-disabled="true" class="belum-aktif">Tolak<span class="segera" style="margin-left: 6px;">Segera</span></button><button type="button" style="flex: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 16px; font-weight: 800" data-f="setuju" disabled="" aria-disabled="true" class="belum-aktif">Setuju<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
 </div></div>
 </div>
 <div id="lb45" class="layar" data-lb-home="prib">
@@ -1320,31 +1320,31 @@
 <div style="box-sizing: content-box; background: var(--krem); border-radius: 14px; padding: 12px; font-size: 13px; font-weight: 700">Status: PULANG NORMAL (Shift –)</div></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; gap: 14px; align-items: center"><button aria-label="Buka kamera untuk foto karyawan" style="width: 60px; height: 60px; border-radius: 50%; background: var(--hitam); border: 4px dashed var(--kuning); flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--kuning); font-family: inherit; font-size: 11px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif"><svg aria-hidden="true" fill="none" height="28" stroke="var(--kuning)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="28"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Ketuk</button><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 4px"><div style="box-sizing: content-box; font-size: 15px; font-weight: 800">Foto –</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 700; color: var(--hijau-tua)">Ketuk kotak kamera untuk memotret</div><div style="box-sizing: content-box; font-size: 12px; color: var(--abu-teks)">Wajah harus cocok dengan nama</div></div></div></div><div style="box-sizing: content-box; flex-grow: 1"></div><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 26px; background: var(--hijau); color: var(--putih); font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700" type="button" disabled="" aria-disabled="true" class="belum-aktif">SIMPAN<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb55" class="layar" data-lb-home="adm">
-<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Jadwal shift</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">Minggu ini, –</div></div></div><div style="box-sizing: content-box; display: flex; gap: 8px"><button style="min-height: 44px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 0 14px" type="button" disabled="" aria-disabled="true" class="belum-aktif">‹ Minggu lalu</button><button style="min-height: 44px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 0 14px" type="button" disabled="" aria-disabled="true" class="belum-aktif">Minggu depan ›</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: grid; grid-template-columns: 96px repeat(6, minmax(0, 1fr)); gap: 5px; align-items: center"><div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sen</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sel</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Rab</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Kam</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Jum</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sab</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; font-weight: 700"><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--putih); border: 1px solid #CFC9BC"></div>Shift – (–)</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--hitam)"></div>Shift – (–)</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--abu-garis)"></div>Libur</div></div></div></div><button style="min-height: 48px; border: 3px solid var(--hitam); border-radius: 20px; background: transparent; font-family: inherit; font-size: 15px; font-weight: 800; color: var(--hitam)" type="button" disabled="" aria-disabled="true" class="belum-aktif">Salin minggu lalu<span class="segera" style="margin-left: 6px;">Segera</span></button><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 20px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 16px; font-weight: 800" type="button" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
+<div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px"><div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img alt="Kubah Emas Indonesia" src="assets/logo.png" style="box-sizing: content-box; height: 30px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.1">Jadwal shift</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600" data-f="sub">Minggu ini, –</div></div></div><div style="box-sizing: content-box; display: flex; gap: 8px"><button style="min-height: 44px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 0 14px" type="button" data-f="lalu" disabled="" aria-disabled="true" class="belum-aktif">‹ Minggu lalu</button><button style="min-height: 44px; border: 2px solid var(--abu); border-radius: 999px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 0 14px" type="button" data-f="depan" disabled="" aria-disabled="true" class="belum-aktif">Minggu depan ›</button></div><div style="box-sizing: content-box; background: var(--putih); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px"><div style="box-sizing: content-box; display: grid; grid-template-columns: 96px repeat(6, minmax(0, 1fr)); gap: 5px; align-items: center" data-f="header"><div></div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sen</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sel</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Rab</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Kam</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Jum</div><div style="box-sizing: content-box; font-size: 12px; font-weight: 800; text-align: center">Sab</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; font-weight: 700" data-f="legenda"><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--putih); border: 1px solid #CFC9BC"></div>Shift – (–)</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--hitam)"></div>Shift – (–)</div><div style="box-sizing: content-box; display: flex; gap: 6px; align-items: center"><div style="box-sizing: content-box; width: 16px; height: 16px; border-radius: 4px; background: var(--abu-garis)"></div>Libur</div></div></div></div><button style="min-height: 48px; border: 3px solid var(--hitam); border-radius: 20px; background: transparent; font-family: inherit; font-size: 15px; font-weight: 800; color: var(--hitam)" type="button" data-f="salin" disabled="" aria-disabled="true" class="belum-aktif">Salin minggu lalu<span class="segera" style="margin-left: 6px;">Segera</span></button><div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" type="button" data-lb-kembali="kembali">‹</button><button style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 20px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 16px; font-weight: 800" type="button" data-f="simpan" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 </div>
 <div id="lb56" class="layar" data-lb-home="adm">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; background: rgba(20,17,17,.5); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; justify-content: flex-end">
 <div style="box-sizing: content-box; background: var(--putih); border-radius: 28px 28px 0 0; padding: 12px 18px 16px; display: flex; flex-direction: column; gap: 12px">
 <div style="box-sizing: content-box; align-self: center; width: 44px; height: 5px; border-radius: 999px; background: #D5D0C4"></div>
 <div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700">Tukar shift</div>
-<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Tanggal</div><input aria-label="Tanggal tukar" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif">
-<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Karyawan –</div><select aria-label="Karyawan 1" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>– (Shift –)</option></select>
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Tanggal</div><input aria-label="Tanggal tukar" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="tanggal" disabled="" class="belum-aktif">
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 800" data-f="lab1">Karyawan –</div><select aria-label="Karyawan 1" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="k1" disabled="" class="belum-aktif"><option>– (Shift –)</option></select>
 <div style="box-sizing: content-box; align-self: center; width: 40px; height: 40px; border-radius: 50%; background: var(--hitam); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--kuning)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16"></path><path d="M3 8l4-4 4 4"></path><path d="M17 20V4"></path><path d="M21 16l-4 4-4-4"></path></svg></div>
-<div style="box-sizing: content-box; font-size: 13px; font-weight: 800">Karyawan –</div><select aria-label="Karyawan 2" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>– (Shift –)</option></select>
-<div style="box-sizing: content-box; background: var(--hijau-muda); border-radius: 14px; padding: 12px; font-size: 14px; font-weight: 700; line-height: 1.5">–: – → <b>Shift –</b>, – → <b>Shift –</b><br><span style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-tua)">Besok kembali ke pola masing-masing.</span></div>
-<div style="box-sizing: content-box; display: flex; gap: 10px"><button type="button" style="width: 110px; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">Batal</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Tukar<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
+<div style="box-sizing: content-box; font-size: 13px; font-weight: 800" data-f="lab2">Karyawan –</div><select aria-label="Karyawan 2" style="height: 46px; border: 2px solid var(--abu); border-radius: 12px; background: var(--putih); font-family: inherit; font-size: 14px; font-weight: 700; color: var(--hitam); padding: 0 10px; box-sizing: border-box; width: 100%" data-f="k2" disabled="" class="belum-aktif"><option>– (Shift –)</option></select>
+<div style="box-sizing: content-box; background: var(--hijau-muda); border-radius: 14px; padding: 12px; font-size: 14px; font-weight: 700; line-height: 1.5" data-f="preview">–: – → <b>Shift –</b>, – → <b>Shift –</b><br><span style="box-sizing: content-box; font-size: 12px; font-weight: 600; color: var(--abu-tua)">Besok kembali ke pola masing-masing.</span></div>
+<div style="box-sizing: content-box; display: flex; gap: 10px"><button type="button" style="width: 110px; height: 54px; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 16px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">Batal</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" data-f="tukar" disabled="" aria-disabled="true" class="belum-aktif">Tukar<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
 </div></div>
 </div>
 <div id="lb57" class="layar" data-lb-home="adm">
 <div style="width: 100%; min-height: 100dvh; box-sizing: border-box; padding: 16px 18px 16px; background: var(--kuning); font-family: Poppins, 'Segoe UI', sans-serif; color: var(--hitam); display: flex; flex-direction: column; gap: 12px">
 <div style="box-sizing: content-box; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px">
-<div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.1">Pola shift</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600">–</div></div></div>
-<div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; gap: 4px; padding: 4px; background: var(--krem); border-radius: 14px"><button type="button" style="flex: 1; height: 42px; border: none; border-radius: 10px; background: transparent; color: var(--hitam); font-family: inherit; font-size: 15px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Tetap</button><button type="button" style="flex: 1; height: 42px; border: none; border-radius: 10px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 15px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Bergilir</button></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Urutan shift</div><div style="box-sizing: content-box; display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><div style="box-sizing: content-box; padding: 8px 14px; border-radius: 12px; background: var(--putih); color: var(--hitam); border: 2px solid var(--hitam); font-size: 14px; font-weight: 800">Shift –</div><span style="box-sizing: content-box; font-size: 18px; font-weight: 800">→</span><div style="box-sizing: content-box; padding: 8px 14px; border-radius: 12px; background: var(--hitam); color: var(--kuning); border: 2px solid var(--hitam); font-size: 14px; font-weight: 800">Shift –</div><button type="button" style="min-height: 38px; border: 2px dashed var(--abu); border-radius: 12px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 0 12px" disabled="" aria-disabled="true" class="belum-aktif">+ Shift<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
+<div style="box-sizing: content-box; display: flex; justify-content: space-between; align-items: center"><img src="assets/logo.png" alt="Kubah Emas Indonesia" style="box-sizing: content-box; height: 36px; width: auto"><div style="box-sizing: content-box; padding: 6px 12px; border-radius: 999px; background: var(--abu); color: var(--kuning); font-size: 12px; font-weight: 800">Admin –</div></div><div style="box-sizing: content-box; display: flex; gap: 12px; align-items: stretch"><div style="box-sizing: content-box; width: 6px; background: var(--hitam)"></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 2px"><div style="box-sizing: content-box; font-family: Oswald, 'Arial Narrow', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.1">Pola shift</div><div style="box-sizing: content-box; font-size: 13px; font-weight: 600" data-f="sub">–</div></div></div>
+<div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px"><div style="box-sizing: content-box; display: flex; gap: 4px; padding: 4px; background: var(--krem); border-radius: 14px"><button type="button" style="flex: 1; height: 42px; border: none; border-radius: 10px; background: transparent; color: var(--hitam); font-family: inherit; font-size: 15px; font-weight: 800" data-f="segTetap" disabled="" aria-disabled="true" class="belum-aktif">Tetap</button><button type="button" style="flex: 1; height: 42px; border: none; border-radius: 10px; background: var(--hitam); color: var(--kuning); font-family: inherit; font-size: 15px; font-weight: 800" data-f="segBergilir" disabled="" aria-disabled="true" class="belum-aktif">Bergilir</button></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px" data-f="blokUrutan"><div style="box-sizing: content-box; font-size: 13px; font-weight: 700">Urutan shift</div><div style="box-sizing: content-box; display: flex; align-items: center; gap: 8px; flex-wrap: wrap" data-f="urutan"><div style="box-sizing: content-box; padding: 8px 14px; border-radius: 12px; background: var(--putih); color: var(--hitam); border: 2px solid var(--hitam); font-size: 14px; font-weight: 800">Shift –</div><span style="box-sizing: content-box; font-size: 18px; font-weight: 800">→</span><div style="box-sizing: content-box; padding: 8px 14px; border-radius: 12px; background: var(--hitam); color: var(--kuning); border: 2px solid var(--hitam); font-size: 14px; font-weight: 800">Shift –</div><button type="button" style="min-height: 38px; border: 2px dashed var(--abu); border-radius: 12px; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--hitam); padding: 0 12px" data-f="tambahShift" disabled="" aria-disabled="true" class="belum-aktif">+ Shift<span class="segera" style="margin-left: 6px;">Segera</span></button></div></div>
 <div style="box-sizing: content-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb57_gs" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Ganti setiap</label><select id="lb57_gs" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"><option>1 minggu</option></select></div><div style="box-sizing: content-box; display: flex; flex-direction: column; gap: 6px"><label for="lb57_ms" style="box-sizing: content-box; font-size: 13px; font-weight: 700">Mulai</label><input id="lb57_ms" style="height: 48px; border: 2px solid var(--abu); border-radius: 14px; background: var(--putih); font-family: inherit; font-size: 15px; font-weight: 700; color: var(--hitam); padding: 0 12px; box-sizing: border-box; width: 100%" disabled="" class="belum-aktif"></div></div></div>
-<div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 12px 16px; display: flex; flex-direction: column"><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; padding-bottom: 4px">Pratinjau 4 minggu</div></div>
+<div style="box-sizing: content-box; background: var(--putih); border-radius: 20px; padding: 12px 16px; display: flex; flex-direction: column" data-f="pratinjau"><div style="box-sizing: content-box; font-size: 14px; font-weight: 800; padding-bottom: 4px">Pratinjau 4 minggu</div></div>
 </div>
 <div style="box-sizing: content-box; font-size: 12px; font-weight: 600; text-align: center">Perubahan manual di jadwal tetap menang.</div>
-<div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
+<div style="box-sizing: content-box; display: flex; gap: 10px; flex-shrink: 0"><button type="button" aria-label="Kembali" style="width: 56px; flex-shrink: 0; border: 3px solid var(--hitam); border-radius: 18px; background: transparent; font-family: inherit; font-size: 26px; font-weight: 800; color: var(--hitam)" data-lb-kembali="kembali">‹</button><button type="button" style="flex-grow: 1; height: 54px; border: 4px solid var(--hijau-garis); border-radius: 18px; background: var(--hijau); color: var(--putih); font-family: inherit; font-size: 17px; font-weight: 800" data-f="simpan" disabled="" aria-disabled="true" class="belum-aktif">Simpan<span class="segera" style="margin-left: 6px;">Segera</span></button></div>
 </div>
 </div>
 <div id="lb62" class="layar" data-lb-home="adm">
@@ -1854,8 +1854,10 @@
   }
 
   function tutupPopupDanReset() {
+    const idPengingat = pengingatTukarId; pengingatTukarId = '';
     tutupPopup();
     kembaliKeLayarUtama();
+    if (idPengingat && typeof pengingatTukarToko === 'function') { pengingatTukarToko(idPengingat); }
   }
 
   // Pop-up yang menutup sendiri: ketuk di mana saja atau otomatis setelah beberapa detik, tanpa tombol X.
@@ -2326,8 +2328,10 @@
     document.querySelectorAll('#keypad button').forEach(function (b) { b.disabled = sedangKirim; });
   }
 
+  let pengingatTukarId = ''; // id karyawan yang baru berhasil absen di HP toko: pengingat ajakan tukar muncul setelah pop-up ditutup
   function tampilkanHasil(data) {
     if (data.kode === 'HP_TIDAK_TERDAFTAR') { hpTidakTerdaftar(); return; }
+    if (data.status === 'ok' && !modeLuar && hpAktif) { pengingatTukarId = idTerpilih || ''; }
     if (data.status !== 'ok') {
       fotoMenunggu = null; // absen tidak tersimpan: foto dibuang
       tampilGagal(data.pesan);
@@ -3163,7 +3167,7 @@
         (k.aktif ? '<button type="button" class="btn-biasa-garis" data-sh="reset">Reset PIN</button><button type="button" class="btn-merah-garis" data-sh="nonaktif">Nonaktifkan</button>'
                  : '<button type="button" class="btn-aktifkan" data-sh="aktifkan">Aktifkan kembali</button>') +
         '<button type="button" class="btn-nonaktif-segera" disabled aria-disabled="true">Ubah data · Segera</button>' +
-        '<button type="button" class="btn-biasa-garis" data-lb-ke="lb57">Pola shift</button>' +
+        '<button type="button" class="btn-biasa-garis" data-lb-ke="lb57" data-pola-id="' + escHtml(k.id) + '">Pola shift</button>' +
         '<button type="button" class="btn-nonaktif-segera" disabled aria-disabled="true">Daftar wajah · Segera</button>' +
         '<button type="button" class="btn-garis" data-sh="tutup">Tutup</button></div>');
     dialog.querySelectorAll('button[data-sh]').forEach(function (b) {
@@ -3635,6 +3639,7 @@
   function gambarStatusPribadi() {
     const d = statusHariIni;
     if (!d) { return; }
+    periksaAjakanTukar(d);
     if (typeof d.izin_menunggu === 'number') {
       // "N pengajuan menunggu ACC" dari server; "Lihat" tetap nonaktif karena mockup tidak punya layar daftar pengajuan
       document.getElementById('pribStripTeks').textContent = d.izin_menunggu + ' pengajuan menunggu ACC';
@@ -3901,13 +3906,13 @@
     if (it.ket) { detail.push(it.ket); }
     if (it.telat_aju) { detail.push('diajukan lewat hari'); }
     if (it.cabang && modeKonf === 'OWNER') { detail.push(it.cabang); }
-    return '<div class="kartu-konf" data-id="' + escHtml(it.id) + '" data-kel="IZIN" data-surat="' + (it.surat ? '1' : '0') + '" data-rincian="' + escHtml(it.rincian) + '">' +
+    return '<div class="kartu-konf" data-id="' + escHtml(it.id) + '" data-kel="' + escHtml(it.kelompok) + '" data-surat="' + (it.surat ? '1' : '0') + '" data-rincian="' + escHtml(it.rincian) + '">' +
       '<div class="konf-baris"><div class="konf-isi"><div class="konf-tipe">' + escHtml(it.judul) + '</div><div class="konf-nama">' + escHtml(it.nama) + '</div>' +
       '<div class="konf-detail">' + escHtml(detail.join(', ')) + '</div></div></div>' +
       '<div class="konf-aksi"><button type="button" class="acc" data-konf="acc">ACC</button><button type="button" class="tolak" data-konf="tolak">Tolak</button></div></div>';
   }
   function kartuKonfirmasi(it) {
-    if (it.kelompok === 'IZIN') { return kartuKonfirmasiIzin(it); }
+    if (it.kelompok === 'IZIN' || it.kelompok === 'TUKAR') { return kartuKonfirmasiIzin(it); }
     let tipe = NAMA_TIPE[it.kelompok] || it.kelompok;
     if (it.kelompok === 'LUAR') { tipe += ', ' + (it.jenis === 'MASUK' ? 'masuk' : 'pulang'); }
     if (it.kelompok === 'LEMBUR' && it.tingkat) { tipe += ' ' + (['', '<1 jam', '1–2 jam', '>2 jam'][it.tingkat] || ''); }
@@ -4027,7 +4032,7 @@
     kirimPost(Object.assign({ aksi: 'konfirmasi_putuskan', id: id, keputusan: keputusan }, kredKonf()))
       .then(function (d) {
         if (konfGagalSesi(d)) { return; }
-        if (d.status === 'ok') { const izinKartu = kartu.getAttribute('data-kel') === 'IZIN'; pesanKonf(keputusan === 'ACC' ? (izinKartu ? 'Izin diterima.' : 'Absen diterima.') : (izinKartu ? 'Izin ditolak.' : 'Absen ditolak.')); hapusKartuKonfirmasi(kartu); return; }
+        if (d.status === 'ok') { const kelKartu = kartu.getAttribute('data-kel'), namaItem = kelKartu === 'IZIN' ? 'Izin' : (kelKartu === 'TUKAR' ? 'Tukar shift' : 'Absen'); pesanKonf(namaItem + (keputusan === 'ACC' ? ' diterima.' : ' ditolak.')); hapusKartuKonfirmasi(kartu); return; }
         pesanKonf(d.pesan || 'Gagal.');
         kartu.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
         if (d.pesan && /sudah diputuskan/.test(d.pesan)) { hapusKartuKonfirmasi(kartu); }
@@ -4098,7 +4103,7 @@
     if (aksi === 'tolak') {
       // konfirmasi singkat sebelum TOLAK
       bukaDialog(
-        '<div class="dialog-judul">' + (kartu.getAttribute('data-kel') === 'IZIN' ? 'Tolak izin ini?' : 'Tolak absen ini?') + '</div><div class="dialog-sub">' + escHtml(kartu.querySelector('.konf-nama').textContent) + '</div>' +
+        '<div class="dialog-judul">' + (kartu.getAttribute('data-kel') === 'IZIN' ? 'Tolak izin ini?' : (kartu.getAttribute('data-kel') === 'TUKAR' ? 'Tolak tukar shift ini?' : 'Tolak absen ini?')) + '</div><div class="dialog-sub">' + escHtml(kartu.querySelector('.konf-nama').textContent) + '</div>' +
         '<div class="dialog-catatan">Keputusan tidak bisa diubah lagi.</div>' +
         '<div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">TOLAK</button></div>');
       document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
@@ -4914,6 +4919,524 @@
       .catch(function () { /* kartu tetap seperti sebelumnya */ });
   }
   setInterval(function () { if (layarUtama.classList.contains('aktif')) { muatTidakMasuk(false); } }, 120000);
+
+  // ================= FITUR B: JADWAL DAN SHIFT, POLA SHIFT, TUKAR SHIFT =================
+  // Layar 02 (jadwal hari ini, HP toko), 55 (jadwal mingguan admin), 56 (tukar shift satu hari), 57 (pola shift), 42 (ajukan tukar), 43 (rekan menyetujui).
+  // Hitungan jadwal, validasi, dan hak ada di server; HP hanya menampilkan dan mengirim pilihan.
+  const BLN_P = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const HARI_P = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  function tglP(t) { const p = String(t).split('-').map(Number); return p[2] + ' ' + BLN_P[p[1] - 1]; }
+  function geserT(t, n) { const p = String(t).split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2] + n)).toISOString().slice(0, 10); }
+  function hariT(t) { const p = String(t).split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay(); }
+  function seninT(t) { return geserT(t, -((hariT(t) + 6) % 7)); }
+  function bersihkanAnak(e) { while (e.firstChild) { e.removeChild(e.firstChild); } }
+
+  // ---------- Jadwal hari ini (02) ----------
+  let tmpl02 = null;
+  SIAP_LB.lb02 = function () {
+    const blok = document.getElementById('lb02');
+    if (!tmpl02) {
+      const a = lbF('lb02', 'blokAktif'), b = lbF('lb02', 'blokBiasa');
+      if (!a || !b) { return; }
+      tmpl02 = { aktif: a.cloneNode(true), biasa: b.cloneNode(true), induk: a.parentElement, acuan: b.nextElementSibling };
+      a.remove(); b.remove();
+    }
+    Array.prototype.slice.call(tmpl02.induk.querySelectorAll('[data-gen="1"]')).forEach(function (e) { e.remove(); });
+    if (!hpAktif || !hpAktif.token) { return; }
+    kirimPost({ aksi: 'jadwal_hari_ini', token: hpAktif.token })
+      .then(function (d) {
+        if (!d || d.status !== 'ok') { return; }
+        Array.prototype.slice.call(tmpl02.induk.querySelectorAll('[data-gen="1"]')).forEach(function (e) { e.remove(); });
+        d.shift.forEach(function (s) {
+          const e = (s.aktif ? tmpl02.aktif : tmpl02.biasa).cloneNode(true);
+          e.setAttribute('data-gen', '1'); e.removeAttribute('data-f');
+          const kepala = e.children[0];
+          kepala.children[0].textContent = 'Shift ' + s.no + (s.aktif ? ' · aktif' : '');
+          kepala.children[1].textContent = s.masuk + ' – ' + s.pulang;
+          const daftar = e.children[1];
+          bersihkanAnak(daftar);
+          s.karyawan.forEach(function (n) {
+            const c = document.createElement('span');
+            c.style.cssText = 'padding:4px 10px;border-radius:999px;background:var(--putih);font-size:13px;font-weight:700';
+            c.textContent = n; daftar.appendChild(c);
+          });
+          tmpl02.induk.insertBefore(e, tmpl02.acuan);
+        });
+      })
+      .catch(function () { /* tampilan kosong: tidak ada data palsu */ });
+  };
+
+  // ---------- Jadwal shift mingguan admin (55) ----------
+  const jad = { data: null, senin: '', edit: {}, memuat: false, tmpl: null };
+  function gayaSelJadwal(nilai, manual, diedit, indeksShift) {
+    let g = 'height:32px;border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:800;';
+    if (nilai === 'L') { g += 'background:#D9D6CC;color:#3E3F42;'; }
+    else if (nilai === '') { g += 'background:var(--putih);color:var(--abu-teks);opacity:.55;'; }
+    else if (indeksShift === 0) { g += 'background:var(--putih);color:var(--hitam);'; }
+    else { g += 'background:var(--hitam);color:var(--kuning);'; }
+    if (manual || diedit) { g += 'box-shadow:0 0 0 3px var(--hijau);'; }
+    return g;
+  }
+  function nilaiSelJadwal(row, sel) {
+    const k = row.id + '|' + sel.t;
+    if (Object.prototype.hasOwnProperty.call(jad.edit, k)) { return { nilai: jad.edit[k], diedit: true }; }
+    return { nilai: sel.l ? 'L' : (sel.s === null ? '' : String(sel.s)), diedit: false };
+  }
+  function labelMinggu(senin, hariIni) {
+    const sekarang = seninT(hariIni);
+    const selisih = Math.round((Date.parse(senin) - Date.parse(sekarang)) / 604800000);
+    const nama = selisih === 0 ? 'Minggu ini' : (selisih === 1 ? 'Minggu depan' : (selisih === -1 ? 'Minggu lalu' : 'Minggu'));
+    return nama + ', ' + tglP(senin) + ' – ' + tglP(geserT(senin, 5));
+  }
+  function gambarJadwal() {
+    const d = jad.data;
+    if (!d) { return; }
+    lbF('lb55', 'sub').textContent = labelMinggu(d.senin, d.hari_ini);
+    const header = lbF('lb55', 'header'), card = header.parentElement, legenda = lbF('lb55', 'legenda');
+    Array.prototype.slice.call(card.querySelectorAll('[data-gen="1"]')).forEach(function (e) { e.remove(); });
+    const nomor = d.shift.map(function (s) { return s.no; });
+    d.daftar.forEach(function (row) {
+      const baris = document.createElement('div');
+      baris.setAttribute('data-gen', '1');
+      baris.style.cssText = 'display:grid;grid-template-columns:96px repeat(6,minmax(0,1fr));gap:5px;align-items:center';
+      const nama = document.createElement('div');
+      nama.style.cssText = 'font-size:13px;font-weight:700;line-height:1.2';
+      nama.textContent = row.nama; baris.appendChild(nama);
+      row.sel.forEach(function (sel) {
+        const v = nilaiSelJadwal(row, sel);
+        const b = document.createElement('button');
+        b.type = 'button'; b.setAttribute('data-sel', row.id + '|' + sel.t);
+        b.textContent = v.nilai === '' ? '–' : v.nilai;
+        b.style.cssText = gayaSelJadwal(v.nilai, sel.m, v.diedit, nomor.indexOf(Number(v.nilai)));
+        const bisa = sel.t >= d.hari_ini && String(row.id) !== String(d.aktor);
+        if (!bisa) { b.setAttribute('aria-disabled', 'true'); if (sel.t < d.hari_ini) { b.style.opacity = '.55'; } }
+        baris.appendChild(b);
+      });
+      card.insertBefore(baris, legenda);
+    });
+    // legenda: Shift N (jam masuk) per shift cabang, lalu Libur
+    const item = Array.prototype.slice.call(legenda.children);
+    if (!jad.tmpl) { jad.tmpl = { satu: item[0].cloneNode(true), dua: item[1] ? item[1].cloneNode(true) : item[0].cloneNode(true), libur: item[item.length - 1].cloneNode(true) }; }
+    bersihkanAnak(legenda);
+    d.shift.forEach(function (s, i) {
+      const e = (i === 0 ? jad.tmpl.satu : jad.tmpl.dua).cloneNode(true);
+      e.lastChild.nodeValue = 'Shift ' + s.no + ' (' + s.masuk + ')';
+      legenda.appendChild(e);
+    });
+    legenda.appendChild(jad.tmpl.libur.cloneNode(true));
+    const adaEdit = Object.keys(jad.edit).length > 0;
+    const simpan = lbF('lb55', 'simpan');
+    if (adaEdit && !jad.memuat) { hidupkanEl(simpan); } else { matikanEl(simpan); }
+    hidupkanEl(lbF('lb55', 'salin')); hidupkanEl(lbF('lb55', 'lalu')); hidupkanEl(lbF('lb55', 'depan'));
+  }
+  function muatJadwal(mulai) {
+    if (jad.memuat) { return; }
+    jad.memuat = true;
+    kirimPost(Object.assign({ aksi: 'jadwal_baca', mulai: mulai || undefined }, kredAdminLb()))
+      .then(function (d) {
+        jad.memuat = false;
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.'); return; }
+        jad.data = d; jad.senin = d.senin;
+        gambarJadwal();
+      })
+      .catch(function () { jad.memuat = false; infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  SIAP_LB.lb55 = function () {
+    isiBadgeAdminLb('lb55');
+    jad.edit = {}; jad.data = null;
+    // "Tukar shift" (layar 56) ada di keputusan desain tetapi tidak di mockup 55: tombol dibuat sebagai salinan gaya "Salin minggu lalu" (lihat daftar selisih)
+    const salin = lbF('lb55', 'salin');
+    if (!lbF('lb55', 'tukar')) {
+      const t = salin.cloneNode(true);
+      t.setAttribute('data-f', 'tukar'); t.setAttribute('data-lb-ke', 'lb56'); t.setAttribute('type', 'button');
+      const sg = t.querySelector('.segera'); if (sg) { sg.remove(); }
+      t.textContent = 'Tukar shift';
+      salin.parentNode.insertBefore(t, salin.nextSibling);
+    }
+    hidupkanEl(lbF('lb55', 'tukar'));
+    muatJadwal('');
+  };
+  lbF('lb55', 'lalu').addEventListener('click', function () { if (!this.disabled && jad.data) { muatJadwal(geserT(jad.data.senin, -7)); } });
+  lbF('lb55', 'depan').addEventListener('click', function () { if (!this.disabled && jad.data) { muatJadwal(geserT(jad.data.senin, 7)); } });
+  lbF('lb55', 'header').parentElement.addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-sel]');
+    if (!b || b.getAttribute('aria-disabled') === 'true' || !jad.data) { return; }
+    const kunci = b.getAttribute('data-sel'), parts = kunci.split('|');
+    const row = jad.data.daftar.filter(function (r) { return String(r.id) === parts[0]; })[0];
+    const sel = row.sel.filter(function (s) { return s.t === parts[1]; })[0];
+    const urutan = jad.data.shift.map(function (s) { return String(s.no); }).concat(['L']);
+    const sekarang = nilaiSelJadwal(row, sel).nilai;
+    const i = urutan.indexOf(sekarang);
+    const baru = urutan[(i + 1) % urutan.length];
+    const awal = sel.l ? 'L' : (sel.s === null ? '' : String(sel.s));
+    if (baru === awal) { delete jad.edit[kunci]; } else { jad.edit[kunci] = baru; }
+    gambarJadwal();
+  });
+  lbF('lb55', 'simpan').addEventListener('click', function () {
+    if (this.disabled) { return; }
+    const perubahan = Object.keys(jad.edit).map(function (k) { const p = k.split('|'); return { karyawan: p[0], tanggal: p[1], nilai: jad.edit[k] }; });
+    jad.memuat = true; matikanEl(this);
+    kirimPost(Object.assign({ aksi: 'jadwal_simpan', perubahan: perubahan }, kredAdminLb()))
+      .then(function (d) {
+        jad.memuat = false;
+        if (d.status !== 'ok') { gambarJadwal(); infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return; }
+        jad.edit = {};
+        muatJadwal(jad.senin);
+        infoDialog('Jadwal tersimpan', d.berubah + ' perubahan dicatat.');
+      })
+      .catch(function () { jad.memuat = false; gambarJadwal(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  });
+  lbF('lb55', 'salin').addEventListener('click', function () {
+    if (this.disabled || !jad.data) { return; }
+    const senin = jad.data.senin;
+    bukaDialog('<div class="dialog-judul">Salin minggu lalu?</div><div class="dialog-sub">Jadwal minggu lalu disalin ke minggu ini (hanya hari ini dan seterusnya; libur toko tidak ikut).</div><div class="dialog-tombol"><button type="button" class="btn-garis" id="dlgBatal">Batal</button><button type="button" class="btn-gelap" id="dlgYa">Salin</button></div>');
+    document.getElementById('dlgBatal').addEventListener('click', tutupDialog);
+    document.getElementById('dlgYa').addEventListener('click', function () {
+      tutupDialog();
+      kirimPost(Object.assign({ aksi: 'jadwal_salin', senin: senin }, kredAdminLb()))
+        .then(function (d) {
+          if (d.status !== 'ok') { infoDialog('Belum bisa disalin', d.pesan || 'Coba lagi.'); return; }
+          jad.edit = {}; muatJadwal(senin);
+          infoDialog('Jadwal disalin', d.berubah + ' sel berubah.');
+        })
+        .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+    });
+  });
+
+  // ---------- Tukar shift satu hari oleh admin (56) ----------
+  const tukarAdm = { hariIni: '', daftar: [], memuat: false };
+  function gambarTukarAdm() {
+    const k1 = lbF('lb56', 'k1'), k2 = lbF('lb56', 'k2'), pr = lbF('lb56', 'preview'), tombol = lbF('lb56', 'tukar');
+    const a = tukarAdm.daftar.filter(function (x) { return x.id === k1.value; })[0], b = tukarAdm.daftar.filter(function (x) { return x.id === k2.value; })[0];
+    const catatan = pr.querySelector('span');
+    let teks = '';
+    pr.style.color = '';
+    let siap = false;
+    if (!a || !b) { teks = 'Pilih dua karyawan'; }
+    else if (a.id === b.id) { teks = 'Pilih dua karyawan yang berbeda'; pr.style.color = 'var(--merah)'; }
+    else if (a.shift === b.shift) { teks = 'Keduanya sudah di shift yang sama'; pr.style.color = 'var(--merah)'; }
+    else { siap = true; }
+    bersihkanAnak(pr);
+    if (siap) {
+      pr.appendChild(document.createTextNode(tglP(lbF('lb56', 'tanggal').value) + ': ' + a.panggilan + ' → '));
+      const b1 = document.createElement('b'); b1.textContent = 'Shift ' + b.shift; pr.appendChild(b1);
+      pr.appendChild(document.createTextNode(', ' + b.panggilan + ' → '));
+      const b2 = document.createElement('b'); b2.textContent = 'Shift ' + a.shift; pr.appendChild(b2);
+    } else { pr.appendChild(document.createTextNode(teks)); }
+    pr.appendChild(document.createElement('br'));
+    if (catatan) { pr.appendChild(catatan); }
+    if (siap && !tukarAdm.memuat) { hidupkanEl(tombol); } else { matikanEl(tombol); }
+  }
+  function muatTukarAdm() {
+    const tgl = lbF('lb56', 'tanggal').value;
+    if (!tgl) { return; }
+    kirimPost(Object.assign({ aksi: 'jadwal_hari', tanggal: tgl }, kredAdminLb()))
+      .then(function (d) {
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.'); return; }
+        tukarAdm.hariIni = d.hari_ini; tukarAdm.daftar = d.daftar;
+        const opsi = '<option value="">Pilih karyawan</option>' + d.daftar.map(function (x) { return '<option value="' + escHtml(x.id) + '">' + escHtml(x.panggilan) + ' (Shift ' + x.shift + ')</option>'; }).join('');
+        lbF('lb56', 'k1').innerHTML = opsi; lbF('lb56', 'k2').innerHTML = opsi;
+        gambarTukarAdm();
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  SIAP_LB.lb56 = function () {
+    const tgl = lbF('lb56', 'tanggal');
+    [tgl, lbF('lb56', 'k1'), lbF('lb56', 'k2')].forEach(hidupkanEl);
+    tgl.type = 'date';
+    const l1 = lbF('lb56', 'lab1'), l2 = lbF('lb56', 'lab2');
+    if (l1) { l1.textContent = 'Karyawan 1'; } if (l2) { l2.textContent = 'Karyawan 2'; }
+    kirimPost(Object.assign({ aksi: 'izin_input_info' }, kredAdminLb())).then(function (d) {
+      if (d.status === 'ok') { tukarAdm.hariIni = d.hari_ini; if (!tgl.value) { tgl.value = d.hari_ini; } tgl.min = d.hari_ini; muatTukarAdm(); }
+    }).catch(function () { /* tanggal diisi manual */ });
+    gambarTukarAdm();
+  };
+  lbF('lb56', 'tanggal').addEventListener('change', muatTukarAdm);
+  lbF('lb56', 'k1').addEventListener('change', gambarTukarAdm);
+  lbF('lb56', 'k2').addEventListener('change', gambarTukarAdm);
+  lbF('lb56', 'tukar').addEventListener('click', function () {
+    if (this.disabled) { return; }
+    tukarAdm.memuat = true; matikanEl(this);
+    kirimPost(Object.assign({ aksi: 'jadwal_tukar', tanggal: lbF('lb56', 'tanggal').value, k1: lbF('lb56', 'k1').value, k2: lbF('lb56', 'k2').value }, kredAdminLb()))
+      .then(function (d) {
+        tukarAdm.memuat = false;
+        if (d.status !== 'ok') { gambarTukarAdm(); infoDialog('Belum bisa ditukar', d.pesan || 'Coba lagi.'); return; }
+        infoDialog('Shift ditukar', 'Hanya untuk tanggal itu. Besok kembali ke pola masing-masing.', function () { kembaliLb('kembali'); });
+      })
+      .catch(function () { tukarAdm.memuat = false; gambarTukarAdm(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  });
+
+  // ---------- Pola shift karyawan (57) ----------
+  let polaTarget = '';
+  document.addEventListener('click', function (e) { const b = e.target.closest('[data-pola-id]'); if (b) { polaTarget = b.getAttribute('data-pola-id'); } }, true);
+  const pola = { data: null, jenis: 'TETAP', urutan: [], ganti: '1M', mulai: '', minggu: null, tmr: null, memuat: false, nomor: 0 };
+  const NAMA_GANTI = { '1M': '1 minggu', '2M': '2 minggu', '1B': '1 bulan', '3B': '3 bulan' };
+  function infoShiftPola(no) { return pola.data.shift.filter(function (s) { return s.no === no; })[0]; }
+  function indeksShiftPola(no) { return pola.data.shift.map(function (s) { return s.no; }).indexOf(no); }
+  function gayaSeg(b, pilih) {
+    b.style.background = pilih ? 'var(--hitam)' : 'transparent';
+    b.style.color = pilih ? 'var(--kuning)' : 'var(--hitam)';
+  }
+  function gayaChipShift(no) {
+    const gelap = indeksShiftPola(no) > 0;
+    return 'padding:8px 14px;border-radius:12px;border:2px solid var(--hitam);font-size:14px;font-weight:800;cursor:pointer;' + (gelap ? 'background:var(--hitam);color:var(--kuning);' : 'background:var(--putih);color:var(--hitam);');
+  }
+  function gambarPola() {
+    if (!pola.data) { return; }
+    const bergilir = pola.jenis === 'BERGILIR';
+    gayaSeg(lbF('lb57', 'segTetap'), !bergilir); gayaSeg(lbF('lb57', 'segBergilir'), bergilir);
+    [lbF('lb57', 'segTetap'), lbF('lb57', 'segBergilir')].forEach(hidupkanEl);
+    const urutan = lbF('lb57', 'urutan'), tambah = lbF('lb57', 'tambahShift');
+    bersihkanAnak(urutan);
+    pola.urutan.forEach(function (no, i) {
+      if (i > 0) { const p = document.createElement('span'); p.style.cssText = 'font-size:18px;font-weight:800'; p.textContent = '→'; urutan.appendChild(p); }
+      const c = document.createElement('div');
+      const s = infoShiftPola(no);
+      c.textContent = 'Shift ' + no + (s ? ' · ' + s.masuk : '');
+      c.setAttribute('data-chip', String(i)); c.style.cssText = gayaChipShift(no);
+      urutan.appendChild(c);
+    });
+    urutan.appendChild(tambah);
+    pudarEl(lbF('lb57', 'blokUrutan'), !bergilir);
+    if (bergilir) { hidupkanEl(tambah); } else { matikanEl(tambah); }
+    const gs = document.getElementById('lb57_gs'), ms = document.getElementById('lb57_ms');
+    [gs, ms].forEach(function (e) { if (bergilir) { hidupkanEl(e); } else { matikanEl(e); } });
+    gs.value = pola.ganti; ms.type = 'date'; ms.value = pola.mulai;
+    const pr = lbF('lb57', 'pratinjau');
+    Array.prototype.slice.call(pr.querySelectorAll('[data-gen="1"]')).forEach(function (e) { e.remove(); });
+    (pola.minggu || []).forEach(function (m) {
+      const r = document.createElement('div');
+      r.setAttribute('data-gen', '1');
+      r.style.cssText = 'display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--krem-gelap);font-size:14px';
+      const kiri = document.createElement('span'); kiri.style.fontWeight = '600';
+      const a = m.mulai.split('-').map(Number), b = m.selesai.split('-').map(Number);
+      kiri.textContent = a[1] === b[1] ? a[2] + '–' + b[2] + ' ' + BLN_P[a[1] - 1] : a[2] + ' ' + BLN_P[a[1] - 1] + '–' + b[2] + ' ' + BLN_P[b[1] - 1];
+      const kanan = document.createElement('span');
+      kanan.style.cssText = 'font-weight:800;padding:2px 10px;border-radius:999px;' + (indeksShiftPola(m.shift) > 0 ? 'background:var(--hitam);color:var(--kuning)' : 'background:var(--krem);color:var(--hitam)');
+      kanan.textContent = m.shift === null ? '–' : 'Shift ' + m.shift;
+      r.appendChild(kiri); r.appendChild(kanan); pr.appendChild(r);
+    });
+    const simpan = lbF('lb57', 'simpan');
+    if (!pola.memuat && (pola.jenis === 'TETAP' || (pola.urutan.length >= 2 && pola.mulai))) { hidupkanEl(simpan); } else { matikanEl(simpan); }
+  }
+  function badanPola() { return { karyawan: pola.data.id, pola_shift: pola.jenis, urutan: pola.urutan, ganti_setiap: pola.ganti, mulai_pola: pola.mulai }; }
+  function mintaPratinjauPola() {
+    clearTimeout(pola.tmr);
+    if (!pola.data) { return; }
+    const nomor = ++pola.nomor;
+    pola.tmr = setTimeout(function () {
+      kirimPost(Object.assign({ aksi: 'pola_pratinjau' }, badanPola(), kredAdminLb()))
+        .then(function (d) {
+          if (nomor !== pola.nomor) { return; }
+          pola.minggu = d.status === 'ok' && d.bisa ? d.minggu : [];
+          gambarPola();
+        })
+        .catch(function () { /* pratinjau kosong */ });
+    }, 250);
+  }
+  SIAP_LB.lb57 = function () {
+    isiBadgeAdminLb('lb57');
+    if (!polaTarget) { infoDialog('Pilih karyawan', 'Buka Pola shift dari daftar Karyawan (ketuk nama karyawan).', function () { kembaliLb('kembali'); }); return; }
+    pola.data = null; pola.minggu = null;
+    lbF('lb57', 'sub').textContent = 'Memuat...';
+    kirimPost(Object.assign({ aksi: 'pola_baca', karyawan: polaTarget }, kredAdminLb()))
+      .then(function (d) {
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.', function () { kembaliLb('kembali'); }); return; }
+        pola.data = d; pola.jenis = d.pola_shift; pola.urutan = d.urutan.length >= 2 ? d.urutan.slice() : d.shift.slice(0, 2).map(function (s) { return s.no; });
+        pola.ganti = d.ganti_setiap; pola.mulai = d.mulai_pola;
+        lbF('lb57', 'sub').textContent = d.nama + ' · ' + d.id;
+        const gs = document.getElementById('lb57_gs');
+        gs.innerHTML = Object.keys(NAMA_GANTI).map(function (k) { return '<option value="' + k + '">' + NAMA_GANTI[k] + '</option>'; }).join('');
+        gambarPola(); mintaPratinjauPola();
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.', function () { kembaliLb('kembali'); }); });
+  };
+  lbF('lb57', 'segTetap').addEventListener('click', function () { if (pola.data) { pola.jenis = 'TETAP'; gambarPola(); mintaPratinjauPola(); } });
+  lbF('lb57', 'segBergilir').addEventListener('click', function () { if (pola.data) { pola.jenis = 'BERGILIR'; gambarPola(); mintaPratinjauPola(); } });
+  lbF('lb57', 'tambahShift').addEventListener('click', function () {
+    if (this.disabled || !pola.data || pola.urutan.length >= 8) { return; }
+    const nomor = pola.data.shift.map(function (s) { return s.no; });
+    const terakhir = pola.urutan[pola.urutan.length - 1];
+    pola.urutan.push(nomor[(nomor.indexOf(terakhir) + 1) % nomor.length]);
+    gambarPola(); mintaPratinjauPola();
+  });
+  lbF('lb57', 'urutan').addEventListener('click', function (e) {
+    const c = e.target.closest('[data-chip]');
+    if (!c || pola.jenis !== 'BERGILIR') { return; }
+    const i = Number(c.getAttribute('data-chip'));
+    const nomor = pola.data.shift.map(function (s) { return s.no; });
+    const idx = nomor.indexOf(pola.urutan[i]);
+    // ketuk = ganti ke shift berikutnya; setelah shift terakhir, ketuk lagi = hapus dari urutan (minimal 2 tersisa)
+    if (idx === nomor.length - 1 && pola.urutan.length > 2) { pola.urutan.splice(i, 1); }
+    else { pola.urutan[i] = nomor[(idx + 1) % nomor.length]; }
+    gambarPola(); mintaPratinjauPola();
+  });
+  document.getElementById('lb57_gs').addEventListener('change', function () { pola.ganti = this.value; mintaPratinjauPola(); });
+  document.getElementById('lb57_ms').addEventListener('change', function () { pola.mulai = this.value; gambarPola(); mintaPratinjauPola(); });
+  lbF('lb57', 'simpan').addEventListener('click', function () {
+    if (this.disabled || !pola.data) { return; }
+    pola.memuat = true; matikanEl(this);
+    kirimPost(Object.assign({ aksi: 'pola_simpan' }, badanPola(), kredAdminLb()))
+      .then(function (d) {
+        pola.memuat = false;
+        if (d.status !== 'ok') { gambarPola(); infoDialog('Belum tersimpan', d.pesan || 'Coba lagi.'); return; }
+        infoDialog('Pola tersimpan', 'Perubahan manual di jadwal tetap menang.', function () { kembaliLb('kembali'); });
+      })
+      .catch(function () { pola.memuat = false; gambarPola(); infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  });
+
+  // ---------- Ajukan tukar shift (42), karyawan HP pribadi ----------
+  const tk = { jenis: 'TUKAR_SHIFT', tanggal: '', rekan: '', alasan: '', daftar: [], pr: null, tmr: null, memuat: false, nomor: 0, siap: false };
+  function kotakPratinjauTukar() {
+    const form = lbF('lb42', 'form');
+    let k = form.querySelector('[data-gen="pr"]');
+    if (!k) {
+      k = document.createElement('div');
+      k.setAttribute('data-gen', 'pr');
+      k.style.cssText = 'background:var(--hijau-muda);border-radius:12px;padding:12px;font-size:14px;font-weight:700';
+      form.appendChild(k);
+    }
+    return k;
+  }
+  function gambarTukar() {
+    const k = kotakPratinjauTukar(), p = tk.pr;
+    gayaSeg(lbF('lb42', 'segTukar'), tk.jenis === 'TUKAR_SHIFT'); gayaSeg(lbF('lb42', 'segPindah'), tk.jenis === 'PINDAH_SHIFT');
+    const lab = lbF('lb42', 'labelRekan'); if (lab) { lab.textContent = tk.jenis === 'TUKAR_SHIFT' ? 'Tukar dengan' : 'Pindah ke shift'; }
+    bersihkanAnak(k);
+    k.style.background = 'var(--hijau-muda)'; k.style.color = '';
+    if (!tk.rekan) { k.appendChild(document.createTextNode('Pilih rekan')); }
+    else if (!p) { k.appendChild(document.createTextNode('Memuat...')); }
+    else if (!p.bisa) { k.style.background = 'var(--merah-muda)'; k.style.color = 'var(--merah)'; k.appendChild(document.createTextNode(p.pesan || 'Belum bisa diajukan')); }
+    else {
+      const tgl = p.hari.split(' ').slice(1).join(' ');
+      k.appendChild(document.createTextNode(tgl + ': Anda → '));
+      const b1 = document.createElement('b'); b1.textContent = 'Shift ' + p.saya_ke; k.appendChild(b1);
+      if (p.rekan_ke !== null) {
+        k.appendChild(document.createTextNode(', ' + p.rekan_nama + ' → '));
+        const b2 = document.createElement('b'); b2.textContent = 'Shift ' + p.rekan_ke; k.appendChild(b2);
+      }
+    }
+    const kirim = lbF('lb42', 'kirim');
+    if (tk.pr && tk.pr.bisa && !tk.memuat) { hidupkanEl(kirim); } else { matikanEl(kirim); }
+  }
+  function muatRekanTukar() {
+    if (!tk.tanggal) { return; }
+    kirimPost({ aksi: 'tukar_rekan', sesi: sesiPribadi, tanggal: tk.tanggal })
+      .then(function (d) {
+        if (pribadiGagalSesi(d)) { return; }
+        if (d.status !== 'ok') { infoDialog('Belum bisa dibuka', d.pesan || 'Coba lagi.'); return; }
+        tk.daftar = d.daftar;
+        const sel = lbF('lb42', 'rekan');
+        sel.innerHTML = '<option value="">' + (d.daftar.length ? 'Pilih rekan' : 'Tidak ada rekan yang bisa ditukar') + '</option>' + d.daftar.map(function (x) { return '<option value="' + escHtml(x.id) + '">' + escHtml(x.panggilan) + ' (Shift ' + x.shift + ')</option>'; }).join('');
+        tk.rekan = ''; tk.pr = null; gambarTukar();
+      })
+      .catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  }
+  function mintaPratinjauTukar() {
+    clearTimeout(tk.tmr);
+    tk.pr = null; gambarTukar();
+    if (!tk.rekan || !tk.tanggal) { return; }
+    const nomor = ++tk.nomor;
+    tk.tmr = setTimeout(function () {
+      kirimPost({ aksi: 'tukar_pratinjau', sesi: sesiPribadi, jenis: tk.jenis, tanggal: tk.tanggal, rekan: tk.rekan })
+        .then(function (d) { if (nomor !== tk.nomor || pribadiGagalSesi(d)) { return; } tk.pr = d.status === 'ok' ? d : { bisa: false, pesan: 'Belum bisa dihitung' }; gambarTukar(); })
+        .catch(function () { if (nomor === tk.nomor) { tk.pr = { bisa: false, pesan: 'Tidak bisa terhubung ke server' }; gambarTukar(); } });
+    }, 250);
+  }
+  SIAP_LB.lb42 = function () {
+    if (!sesiPribadi) { return; }
+    if (profilPribadi && profilPribadi.role !== 'KARYAWAN') { infoDialog('Tidak tersedia', 'Tukar shift diajukan oleh karyawan. Jadwal admin diatur oleh owner.', function () { kembaliLb('kembali'); }); return; }
+    const tgl = lbF('lb42', 'tanggal');
+    [tgl, lbF('lb42', 'rekan'), lbF('lb42', 'alasan'), lbF('lb42', 'segTukar'), lbF('lb42', 'segPindah')].forEach(hidupkanEl);
+    tgl.type = 'date'; lbF('lb42', 'alasan').maxLength = 200;
+    tk.jenis = 'TUKAR_SHIFT'; tk.rekan = ''; tk.alasan = ''; tk.pr = null; lbF('lb42', 'alasan').value = '';
+    gambarTukar();
+    kirimPost({ aksi: 'izin_info', sesi: sesiPribadi }).then(function (d) {
+      if (pribadiGagalSesi(d) || d.status !== 'ok') { return; }
+      tgl.min = d.hari_ini; tk.tanggal = d.hari_ini; tgl.value = d.hari_ini; muatRekanTukar();
+    }).catch(function () { infoDialog('Tidak bisa terhubung', 'Periksa sinyal lalu coba lagi.'); });
+  };
+  lbF('lb42', 'segTukar').addEventListener('click', function () { tk.jenis = 'TUKAR_SHIFT'; mintaPratinjauTukar(); });
+  lbF('lb42', 'segPindah').addEventListener('click', function () { tk.jenis = 'PINDAH_SHIFT'; mintaPratinjauTukar(); });
+  lbF('lb42', 'tanggal').addEventListener('change', function () { tk.tanggal = this.value; muatRekanTukar(); });
+  lbF('lb42', 'rekan').addEventListener('change', function () { tk.rekan = this.value; mintaPratinjauTukar(); });
+  lbF('lb42', 'alasan').addEventListener('input', function () { tk.alasan = this.value; });
+  lbF('lb42', 'kirim').addEventListener('click', function () {
+    if (this.disabled || !tk.pr || !tk.pr.bisa) { return; }
+    tk.memuat = true; matikanEl(this);
+    kirimPost({ aksi: 'tukar_ajukan', sesi: sesiPribadi, jenis: tk.jenis, tanggal: tk.tanggal, rekan: tk.rekan, alasan: tk.alasan })
+      .then(function (d) {
+        tk.memuat = false;
+        if (pribadiGagalSesi(d)) { return; }
+        if (d.status !== 'ok') { gambarTukar(); infoDialog('Belum terkirim', d.pesan || 'Coba lagi.'); return; }
+        muatStatusHariIni();
+        infoDialog('Ajakan terkirim', 'Menunggu rekan setuju, lalu ACC admin.', function () { kembaliLb('home'); });
+      })
+      .catch(function () { tk.memuat = false; gambarTukar(); infoDialog('Belum terkirim', 'Tidak bisa terhubung ke server. Coba lagi.'); });
+  });
+
+  // ---------- Rekan menyetujui tukar shift (43) ----------
+  const tukarMasuk = { daftar: [], terakhirTampil: 0, memuat: false };
+  function gambarTukarMasuk() {
+    const r = tukarMasuk.daftar[0];
+    const judul = lbF('lb43', 'judul'), waktu = lbF('lb43', 'waktu'), alasan = lbF('lb43', 'alasan'), setuju = lbF('lb43', 'setuju'), tolak = lbF('lb43', 'tolak');
+    if (!r) { judul.textContent = '– mengajak tukar shift'; matikanEl(setuju); matikanEl(tolak); return; }
+    judul.textContent = r.dari_panggilan + (r.jenis === 'TUKAR_SHIFT' ? ' mengajak tukar shift' : ' ingin pindah shift');
+    bersihkanAnak(waktu);
+    waktu.appendChild(document.createTextNode(r.hari + ', ' + tglP(r.tanggal)));
+    waktu.appendChild(document.createElement('br'));
+    waktu.appendChild(document.createTextNode(r.jenis === 'TUKAR_SHIFT' ? 'Anda → ' : 'Anda tetap di '));
+    const b = document.createElement('b'); b.textContent = 'Shift ' + r.shift_saya_jadi + (r.jam_shift ? ' (' + r.jam_shift + ')' : ''); waktu.appendChild(b);
+    alasan.textContent = 'Alasan: ' + (r.alasan || '–');
+    if (!tukarMasuk.memuat) { hidupkanEl(setuju); hidupkanEl(tolak); } else { matikanEl(setuju); matikanEl(tolak); }
+  }
+  function bukaTukarMasuk() {
+    if (!sesiPribadi || tukarMasuk.memuat) { return; }
+    kirimPost({ aksi: 'tukar_masuk', sesi: sesiPribadi })
+      .then(function (d) {
+        if (pribadiGagalSesi(d) || d.status !== 'ok' || !d.daftar.length) { return; }
+        tukarMasuk.daftar = d.daftar; tukarMasuk.terakhirTampil = Date.now();
+        if (layarPribadi.classList.contains('aktif')) { bukaLb('lb43'); }
+      })
+      .catch(function () { /* beranda tetap tampil */ });
+  }
+  SIAP_LB.lb43 = function () { gambarTukarMasuk(); };
+  function jawabTukar(jawab) {
+    const r = tukarMasuk.daftar[0];
+    if (!r || tukarMasuk.memuat) { return; }
+    tukarMasuk.memuat = true; gambarTukarMasuk();
+    kirimPost({ aksi: 'tukar_jawab', sesi: sesiPribadi, id: r.id, jawab: jawab })
+      .then(function (d) {
+        tukarMasuk.memuat = false;
+        if (pribadiGagalSesi(d)) { return; }
+        if (d.status !== 'ok') {
+          tukarMasuk.daftar.shift(); gambarTukarMasuk();
+          infoDialog('Belum bisa dijawab', d.pesan || 'Coba lagi.', function () { if (!tukarMasuk.daftar.length) { kembaliLb('home'); muatStatusHariIni(); } });
+          return;
+        }
+        tukarMasuk.daftar.shift();
+        if (tukarMasuk.daftar.length) { gambarTukarMasuk(); } else { kembaliLb('home'); }
+        muatStatusHariIni();
+      })
+      .catch(function () { tukarMasuk.memuat = false; gambarTukarMasuk(); infoDialog('Tidak bisa terhubung', 'Jawaban belum terkirim. Coba lagi.'); });
+  }
+  lbF('lb43', 'setuju').addEventListener('click', function () { if (!this.disabled) { jawabTukar('SETUJU'); } });
+  lbF('lb43', 'tolak').addEventListener('click', function () { if (!this.disabled) { jawabTukar('TOLAK'); } });
+  // Beranda pribadi: ajakan tukar yang menunggu jawaban muncul sebagai layar 43 (maksimal sekali per 5 menit selama belum dijawab)
+  function periksaAjakanTukar(d) {
+    if (!d || !(d.tukar_masuk > 0)) { return; }
+    if (!layarPribadi.classList.contains('aktif') || Date.now() - tukarMasuk.terakhirTampil < 300000) { return; }
+    bukaTukarMasuk();
+  }
+  // HP toko: pengingat setelah absen (tanpa data selain jumlah)
+  function pengingatTukarToko(id) {
+    if (!hpAktif || !hpAktif.token || !id) { return; }
+    kirimPost({ aksi: 'tukar_pengingat', token: hpAktif.token, id: id })
+      .then(function (d) {
+        if (d && d.status === 'ok' && d.jumlah > 0) { infoDialog('Ajakan tukar shift', 'Ada ' + d.jumlah + ' ajakan tukar shift yang menunggu jawaban Anda. Buka aplikasi di HP pribadi untuk menjawab.'); }
+      })
+      .catch(function () { /* pengingat saja */ });
+  }
 
   // ================= LAYAR BARU (tampilan saja): navigasi =================
   // Semua layar lbNN dibuat dari mockup oleh tools/bangun_layar_baru.sh: tanpa data contoh, tombol aksi nonaktif "Segera", tanpa panggilan server.

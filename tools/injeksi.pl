@@ -6,8 +6,12 @@
 use strict; use utf8;
 binmode(STDOUT, ':utf8');
 my $id  = $ENV{ID}  // '';
+use Encode qw(decode);
 my $fix = $ENV{FIX} // '';
-my $pra = $ENV{PRA} // ''; # skrip yang dijalankan di <head> SEBELUM aplikasi mulai (mis. isi localStorage, tiruan fetch)
+if (($ENV{FIXFILE} // '') ne '' && -f $ENV{FIXFILE}) { # skrip uji besar: dibaca dari berkas (batas variabel lingkungan Windows ±32 KB)
+  open my $hf, '<:utf8', $ENV{FIXFILE} or die "tidak bisa membuka FIXFILE"; local $/; $fix = <$hf>; close $hf;
+} else { $fix = decode('UTF-8', $fix); }
+my $pra = decode('UTF-8', $ENV{PRA} // ''); # skrip yang dijalankan di <head> SEBELUM aplikasi mulai (mis. isi localStorage, tiruan fetch)
 local $/;
 open my $h, '<:utf8', $ARGV[0] or die "tidak bisa membuka $ARGV[0]";
 my $t = <$h>; close $h;

@@ -18,8 +18,8 @@ if [ "$MODE" = "mockup" ]; then
   SRC="docs/mockup/layar/$ARG"; SRC="${SRC// /%20}"
   IW=438; IH=892; CX=24; CY=24
 else
-  FIX=""; [ -n "$ISI" ] && FIX="$(cat "$ISI")"
-  ID="$ARG" FIX="$FIX" perl "$AKAR/tools/injeksi.pl" "$AKAR/index.html" > "$AKAR/__potret.html"
+  FIX=""; [ -n "$ISI" ] && [ "$(wc -c < "$ISI")" -lt 20000 ] && FIX="$(cat "$ISI")"
+  ID="$ARG" FIX="$FIX" FIXFILE="$ISI" perl "$AKAR/tools/injeksi.pl" "$AKAR/index.html" > "$AKAR/__potret.html"
   SRC="__potret.html"
   IW=${LEBAR:-390}; IH=${TINGGI:-844}; CX=0; CY=0
 fi

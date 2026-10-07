@@ -55,5 +55,57 @@ var FN = {
       if (kartu && kartu.children[2]) { tandai(kartu.children[2], 'catatanTanggal'); }
     }
     tandai(cari(root, /^\+ Libur khusus/, 'button'), 'tambah');
+  }  ,
+  '02': function (root) {
+    var aktif = cari(root, /aktif$/);
+    if (aktif) { tandai(aktif.parentElement.parentElement, 'blokAktif'); }
+    var lain = cari(root, /^Shift \S+$/);
+    if (lain) { tandai(lain.parentElement.parentElement, 'blokBiasa'); }
+  },
+  '42': function (root) {
+    tandai(cari(root, /^Tukar dengan rekan/, 'button'), 'segTukar');
+    tandai(cari(root, 'Pindah shift', 'button'), 'segPindah');
+    tandai(root.querySelector('input[aria-label="Tanggal"]'), 'tanggal');
+    tandai(root.querySelector('select[aria-label="Rekan"]'), 'rekan');
+    tandai(root.querySelector('input[aria-label="Alasan"]'), 'alasan');
+    var lab = cari(root, 'Alasan (opsional)'); if (lab) { tandai(lab.parentElement, 'form'); }
+    tandai(cari(root, /^Tukar dengan$/), 'labelRekan');
+    tandai(cari(root, /^Sepakati dulu/), 'catatan');
+    tandai(cari(root, /^Kirim/, 'button'), 'kirim');
+  },
+  '43': function (root) {
+    tandai(cari(root, /mengajak tukar shift/), 'judul');
+    tandai(cari(root, /^Selasa,/), 'waktu');
+    tandai(cari(root, /^Alasan:/), 'alasan');
+    tandai(cari(root, /^Tolak/, 'button'), 'tolak');
+    tandai(cari(root, /^Setuju/, 'button'), 'setuju');
+  },
+  '55': function (root) {
+    var j = cari(root, 'Jadwal shift'); if (j && j.nextElementSibling) { tandai(j.nextElementSibling, 'sub'); }
+    tandai(cari(root, /Minggu lalu$/, 'button'), 'lalu');
+    tandai(cari(root, /^Minggu depan/, 'button'), 'depan');
+    var sen = cari(root, 'Sen'); if (sen) { tandai(sen.parentElement, 'header'); }
+    var leg = cari(root, /^Libur$/); if (leg) { tandai(leg.parentElement, 'legenda'); }
+    tandai(cari(root, /^Salin minggu lalu/, 'button'), 'salin');
+    tandai(cari(root, /^Simpan/, 'button'), 'simpan');
+  },
+  '56': function (root) {
+    tandai(root.querySelector('input[aria-label="Tanggal tukar"]'), 'tanggal');
+    tandai(root.querySelector('select[aria-label="Karyawan 1"]'), 'k1');
+    tandai(root.querySelector('select[aria-label="Karyawan 2"]'), 'k2');
+    var lab = Array.prototype.filter.call(root.querySelectorAll('div'), function (d) { return /^Karyawan \S+$/.test(teksLangsung(d)); });
+    if (lab[0]) { tandai(lab[0], 'lab1'); } if (lab[1]) { tandai(lab[1], 'lab2'); }
+    var b = cari(root, /Besok kembali/); if (b) { tandai(b.parentElement, 'preview'); }
+    tandai(cari(root, /^Tukar/, 'button'), 'tukar');
+  },
+  '57': function (root) {
+    var j = cari(root, 'Pola shift'); if (j && j.nextElementSibling) { tandai(j.nextElementSibling, 'sub'); }
+    tandai(cari(root, 'Tetap', 'button'), 'segTetap');
+    tandai(cari(root, 'Bergilir', 'button'), 'segBergilir');
+    var u = cari(root, 'Urutan shift'); if (u) { tandai(u.parentElement, 'blokUrutan'); if (u.nextElementSibling) { tandai(u.nextElementSibling, 'urutan'); } }
+    tandai(cari(root, /^\+ Shift/, 'button'), 'tambahShift');
+    var p = cari(root, 'Pratinjau 4 minggu'); if (p) { tandai(p.parentElement, 'pratinjau'); }
+    tandai(cari(root, /^Simpan/, 'button'), 'simpan');
   }
+
 };

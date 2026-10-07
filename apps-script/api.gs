@@ -140,8 +140,22 @@ function doPost(e) {
   if (data.aksi === 'izin_input_info') { return prosesIzinInputInfo(data); }
   if (data.aksi === 'kalender_baca') { return prosesKalenderBaca(data); }
   if (data.aksi === 'kalender_simpan') { return prosesKalenderSimpan(data); }
+  // Jadwal dan shift (Fitur B)
+  if (data.aksi === 'jadwal_baca') { return prosesJadwalBaca(data); }
+  if (data.aksi === 'jadwal_simpan') { return prosesJadwalSimpan(data); }
+  if (data.aksi === 'jadwal_salin') { return prosesJadwalSalin(data); }
+  if (data.aksi === 'jadwal_hari') { return prosesJadwalHari(data); }
+  if (data.aksi === 'jadwal_tukar') { return prosesJadwalTukar(data); }
+  if (data.aksi === 'pola_baca') { return prosesPolaBaca(data); }
+  if (data.aksi === 'pola_pratinjau') { return prosesPolaPratinjau(data); }
+  if (data.aksi === 'pola_simpan') { return prosesPolaSimpan(data); }
+  if (data.aksi === 'tukar_rekan') { return prosesTukarRekan(data); }
+  if (data.aksi === 'tukar_pratinjau') { return prosesTukarPratinjau(data); }
+  if (data.aksi === 'tukar_ajukan') { return prosesTukarAjukan(data); }
+  if (data.aksi === 'tukar_masuk') { return prosesTukarMasuk(data); }
+  if (data.aksi === 'tukar_jawab') { return prosesTukarJawab(data); }
   // Semua aksi lain wajib menyertakan token HP toko yang terdaftar.
-  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto', 'tidak_masuk_hari_ini'];
+  const aksiBertoken = ['daftar_karyawan', 'tiket_waktu', 'absen_masuk', 'simpan_alasan', 'absen_pulang', 'simpan_pulang', 'login_admin_toko', 'unggah_foto', 'tidak_masuk_hari_ini', 'jadwal_hari_ini', 'tukar_pengingat'];
   if (aksiBertoken.indexOf(data.aksi) !== -1) {
     const hp = validasiTokenHp(data.token);
     if (!hp) {
@@ -151,6 +165,8 @@ function doPost(e) {
     if (data.aksi === 'tiket_waktu') { return prosesTiketWaktu(data.jenis, hp); }
     if (data.aksi === 'login_admin_toko') { return prosesLoginAdminToko(data, hp); }
     if (data.aksi === 'tidak_masuk_hari_ini') { return prosesTidakMasukHariIni(hp); }
+    if (data.aksi === 'jadwal_hari_ini') { return prosesJadwalHariIni(hp); }
+    if (data.aksi === 'tukar_pengingat') { return prosesTukarPengingat(data, hp); }
     if (data.aksi === 'unggah_foto') { return prosesUnggahFoto(data, hp); }
     if (data.aksi === 'absen_masuk') { return prosesAbsenMasuk(data.id, data.pin, hp, data.tiket, data.tanpa_foto === true); }
     if (data.aksi === 'absen_pulang') { return prosesAbsenPulang(data.id, data.pin, data.jenis, hp, data.tiket, data.tanpa_foto === true); }
@@ -1613,6 +1629,57 @@ function tesServer() {
   ujiBebas('kartu "Hari ini tidak masuk": libur seluruh toko (Minggu / tanggal merah umum) tidak membuat semua karyawan terdaftar', daftarTidakMasuk({ tanggal: '2026-10-11', cabang: 'Ngawi', akun: [akunA, akunB], liburMinggu: true, kalender: [], izin: [] }).length === 0 && daftarTidakMasuk({ tanggal: hariIniA, cabang: 'Ngawi', akun: [akunA], liburMinggu: false, kalender: [{ tanggal: hariIniA, cabang: '', karyawan: '', isi: 'LIBUR TANGGAL MERAH' }], izin: [] }).length === 0);
   ujiBebas('judul dan rentang tanggal: "29 Sep", "29–30 Sep", "30 Sep–2 Okt"', rentangPendek('2026-09-29', '2026-09-29') === '29 Sep' && rentangPendek('2026-09-29', '2026-09-30') === '29–30 Sep' && rentangPendek('2026-09-30', '2026-10-02') === '30 Sep–2 Okt' && judulIzinKonfirmasi({ jenis: 'Cuti', kelompok: 'cuti' }) === 'Cuti' && judulIzinKonfirmasi({ jenis: 'Sakit', kelompok: 'biasa', lampiran: '' }) === 'Izin sakit');
   // ---- akhir FITUR A ----
+  // ---- FITUR B: jadwal dan shift, pola shift, tukar shift ----
+  (function () {
+  const akB = { id: 'K003', nama: 'Budi Santoso', panggilan: 'Budi', cabang: 'Ngawi', role: 'KARYAWAN', aktif: true, shift: 1, pola_shift: 'TETAP', urutan_shift: '', ganti_setiap: '', mulai_pola: '' };
+  const akD = Object.assign({}, akB, { id: 'K004', nama: 'Dina Marlina', panggilan: 'Dina', shift: 2 }), akR = Object.assign({}, akB, { id: 'K005', nama: 'Ari Pratama', panggilan: 'Ari', shift: 1 });
+  ujiBebas('minggu dimulai Senin: Rabu 7 Okt, Senin 5 Okt, dan Minggu 11 Okt semuanya menghasilkan Senin 5 Okt', seninDariTanggal('2026-10-07') === '2026-10-05' && seninDariTanggal('2026-10-05') === '2026-10-05' && seninDariTanggal('2026-10-11') === '2026-10-05' && seninDariTanggal('2026-10-12') === '2026-10-12');
+  ujiBebas('nilai sel jadwal sah: kosong, L, nomor shift yang ada; shift yang tidak ada di cabang / teks ngawur ditolak', nilaiJadwalSah('', [1, 2]) && nilaiJadwalSah('l', [1, 2]) && nilaiJadwalSah('2', [1, 2]) && !nilaiJadwalSah('3', [1, 2]) && !nilaiJadwalSah('x', [1, 2]) && !nilaiJadwalSah('1; drop', [1, 2]));
+  const kalMing = [{ tanggal: '2026-10-07', cabang: 'Ngawi', karyawan: 'K003', isi: '2' }, { tanggal: '2026-10-08', cabang: '', karyawan: '', isi: 'LIBUR TANGGAL MERAH' }, { tanggal: '2026-10-09', cabang: 'Ngawi', karyawan: 'K003', isi: 'LIBUR' }];
+  const mg = jadwalMingguan([akB, akD], '2026-10-05', kalMing, true);
+  ujiBebas('jadwal mingguan: 6 sel (Senin-Sabtu) per karyawan; perubahan manual ditandai m dan menang atas pola; tanggal merah umum = libur', mg.length === 2 && mg[0].sel.length === 6 && mg[0].sel[2].s === 2 && mg[0].sel[2].m === true && mg[0].sel[0].s === 1 && mg[0].sel[0].m === false && mg[0].sel[3].l === true && mg[0].sel[3].s === null && mg[0].sel[4].l === true && mg[0].sel[4].m === true && mg[1].sel[2].s === 2 && mg[1].sel[2].m === false);
+  ujiBebas('tulis kalender: nilai sama dengan jadwal sekarang = tidak ada tulisan; beda dari pola = TULIS nomor atau LIBUR', rencanaTulisKalender(akB, '2026-10-12', '1', [], true).aksi === 'TETAP' && rencanaTulisKalender(akB, '2026-10-12', '2', [], true).aksi === 'TULIS' && rencanaTulisKalender(akB, '2026-10-12', '2', [], true).isi === '2' && rencanaTulisKalender(akB, '2026-10-12', 'L', [], true).isi === 'LIBUR');
+  ujiBebas('tulis kalender: mengembalikan ke pola menghapus (mengosongkan) isi milik karyawan; nilai kosong tanpa perubahan manual = tidak ada tulisan', rencanaTulisKalender(akB, '2026-10-07', '1', kalMing, true).aksi === 'HAPUS' && rencanaTulisKalender(akB, '2026-10-07', '', kalMing, true).aksi === 'HAPUS' && rencanaTulisKalender(akB, '2026-10-12', '', [], true).aksi === 'TETAP');
+  ujiBebas('tulis kalender: karyawan yang dipaksa masuk pada tanggal merah umum ditulis sebagai perubahan manual; libur milik karyawan lain tidak mengganggu', rencanaTulisKalender(akB, '2026-10-08', '1', kalMing, true).aksi === 'TULIS' && rencanaTulisKalender(akB, '2026-10-12', '1', [{ tanggal: '2026-10-12', cabang: 'Ngawi', karyawan: 'K999', isi: 'LIBUR' }], true).aksi === 'TETAP');
+  const ctxJ = { hariIni: '2026-10-07', cabang: 'Ngawi', aktorId: 'K009', noValid: [1, 2], akunPeta: { K003: { role: 'KARYAWAN', cabang: 'Ngawi', aktif: true }, K009: { role: 'ADMIN', cabang: 'Ngawi', aktif: true }, K020: { role: 'KARYAWAN', cabang: 'Pusat', aktif: true }, K021: { role: 'KARYAWAN', cabang: 'Ngawi', aktif: false } } };
+  ujiBebas('hak jadwal di server: hanya karyawan cabang sendiri, aktif, bukan diri sendiri, hari ini dan seterusnya, shift yang ada', validasiPerubahanJadwal([{ karyawan: 'K003', tanggal: '2026-10-07', nilai: 'l' }], ctxJ).ok === true && validasiPerubahanJadwal([{ karyawan: 'K003', tanggal: '2026-10-07', nilai: 'l' }], ctxJ).daftar[0].nilai === 'L' && !validasiPerubahanJadwal([{ karyawan: 'K003', tanggal: '2026-10-06', nilai: '1' }], ctxJ).ok && !validasiPerubahanJadwal([{ karyawan: 'K020', tanggal: '2026-10-09', nilai: '1' }], ctxJ).ok && !validasiPerubahanJadwal([{ karyawan: 'K009', tanggal: '2026-10-09', nilai: '1' }], ctxJ).ok && !validasiPerubahanJadwal([{ karyawan: 'K021', tanggal: '2026-10-09', nilai: '1' }], ctxJ).ok && !validasiPerubahanJadwal([{ karyawan: 'K003', tanggal: '2026-10-09', nilai: '3' }], ctxJ).ok && !validasiPerubahanJadwal([], ctxJ).ok && !validasiPerubahanJadwal([{ karyawan: 'K999', tanggal: '2026-10-09', nilai: '1' }], ctxJ).ok && !validasiPerubahanJadwal([{ karyawan: 'K003', tanggal: '2026/10/09', nilai: '1' }], ctxJ).ok);
+  const besar = []; for (let i = 0; i < 301; i++) { besar.push({ karyawan: 'K003', tanggal: '2026-10-09', nilai: '1' }); }
+  ujiBebas('perubahan jadwal sekaligus dibatasi 300', !validasiPerubahanJadwal(besar, ctxJ).ok);
+  const kalSalin = [{ tanggal: '2026-09-30', cabang: 'Ngawi', karyawan: 'K003', isi: '2' }, { tanggal: '2026-10-01', cabang: '', karyawan: '', isi: 'LIBUR TANGGAL MERAH' }, { tanggal: '2026-10-02', cabang: 'Ngawi', karyawan: 'K003', isi: 'LIBUR' }];
+  const sl = rencanaSalinMinggu([akB], '2026-10-05', '2026-10-07', kalSalin, true);
+  ujiBebas('salin minggu lalu: hanya hari ini dan seterusnya; perubahan manual minggu lalu ikut; tanggal merah umum minggu lalu (Kamis) tidak disalin ke Kamis 8 Okt', sl.length === 3 && sl.map(function (x) { return x.tanggal; }).join() === '2026-10-07,2026-10-09,2026-10-10' && sl[0].nilai === '2');
+  ujiBebas('salin minggu lalu: libur individu minggu lalu ikut sebagai L; sel minggu lalu tanpa perubahan menyalin shift pola', sl[1].nilai === 'L' && sl[2].nilai === '1');
+  ujiBebas('salin minggu lalu: tanggal merah umum di minggu tujuan juga dilewati', rencanaSalinMinggu([akB], '2026-10-05', '2026-10-05', [{ tanggal: '2026-10-06', cabang: '', karyawan: '', isi: 'LIBUR TANGGAL MERAH' }], true).every(function (x) { return x.tanggal !== '2026-10-06'; }));
+  const tk = rencanaTukarHari(akD, akR, '2026-10-12', [], true, '2026-10-07');
+  ujiBebas('tukar shift satu hari (admin): Dina (Shift 2) dan Ari (Shift 1) saling bertukar: Dina jadi Shift 1, Ari jadi Shift 2', tk.ok && tk.a_ke === 1 && tk.b_ke === 2 && tk.a_dari === 2 && tk.b_dari === 1);
+  ujiBebas('tukar shift satu hari: ditolak bila tanggal lewat, orang sama, shift sama, atau salah satu libur', !rencanaTukarHari(akD, akR, '2026-10-06', [], true, '2026-10-07').ok && !rencanaTukarHari(akD, akD, '2026-10-12', [], true, '2026-10-07').ok && !rencanaTukarHari(akB, akR, '2026-10-12', [], true, '2026-10-07').ok && !rencanaTukarHari(akD, akR, '2026-10-11', [], true, '2026-10-07').ok && !rencanaTukarHari(akD, akR, '2026-10-12', [{ tanggal: '2026-10-12', cabang: 'Ngawi', karyawan: 'K005', isi: 'LIBUR' }], true, '2026-10-07').ok);
+  ujiBebas('pola shift: TETAP hanya mengubah pola_shift; BERGILIR 1,2 ganti 1M mulai 5 Okt diterima dan dinormalkan', validasiPolaShift({ pola_shift: 'tetap' }, [1, 2]).ok && JSON.stringify(validasiPolaShift({ pola_shift: 'TETAP' }, [1, 2]).nilai) === '{"pola_shift":"TETAP"}' && validasiPolaShift({ pola_shift: 'BERGILIR', urutan: [1, 2], ganti_setiap: '1m', mulai_pola: '2026-10-05' }, [1, 2]).nilai.urutan_shift === '1,2' && validasiPolaShift({ pola_shift: 'BERGILIR', urutan: '2,1,2', ganti_setiap: '2M', mulai_pola: '2026-10-05' }, [1, 2]).nilai.ganti_setiap === '2M');
+  ujiBebas('pola shift ditolak: urutan 1 shift / semua sama / shift tidak ada / ganti ngawur / tanpa tanggal mulai / pola ngawur', !validasiPolaShift({ pola_shift: 'BERGILIR', urutan: [1], ganti_setiap: '1M', mulai_pola: '2026-10-05' }, [1, 2]).ok && !validasiPolaShift({ pola_shift: 'BERGILIR', urutan: [1, 1], ganti_setiap: '1M', mulai_pola: '2026-10-05' }, [1, 2]).ok && !validasiPolaShift({ pola_shift: 'BERGILIR', urutan: [1, 3], ganti_setiap: '1M', mulai_pola: '2026-10-05' }, [1, 2]).ok && !validasiPolaShift({ pola_shift: 'BERGILIR', urutan: [1, 2], ganti_setiap: '5M', mulai_pola: '2026-10-05' }, [1, 2]).ok && !validasiPolaShift({ pola_shift: 'BERGILIR', urutan: [1, 2], ganti_setiap: '1M', mulai_pola: '' }, [1, 2]).ok && !validasiPolaShift({ pola_shift: 'X' }, [1, 2]).ok);
+  const polaB = Object.assign({}, akB, { pola_shift: 'BERGILIR', urutan_shift: '1,2', ganti_setiap: '1M', mulai_pola: '2026-10-05' });
+  ujiBebas('pratinjau 4 minggu (mockup 57): 5-10 Okt Shift 1, 12-17 Okt Shift 2, 19-24 Okt Shift 1, 26-31 Okt Shift 2; memakai shiftMenurutPola yang sama dengan jadwal', pratinjauPola(polaB, '2026-10-05', 4).map(function (x) { return x.mulai + '/' + x.selesai + '=' + x.shift; }).join() === '2026-10-05/2026-10-10=1,2026-10-12/2026-10-17=2,2026-10-19/2026-10-24=1,2026-10-26/2026-10-31=2' && pratinjauPola(akB, '2026-10-05', 2).every(function (x) { return x.shift === 1; }));
+  const dasarT = { jenis: 'TUKAR_SHIFT', tanggal: '2026-10-12', hariIni: '2026-10-07', detikSekarang: detik('09:00'), pemohon: { id: 'K004', role: 'KARYAWAN', cabang: 'Ngawi', aktif: true }, rekan: { id: 'K005', role: 'KARYAWAN', cabang: 'Ngawi', aktif: true }, jPemohon: { libur: false, shift: 2 }, jRekan: { libur: false, shift: 1 }, masukShift: { '1': '07:45', '2': '12:00' }, izinRows: [] };
+  const aju = function (o) { return validasiAjuTukar(Object.assign({}, dasarT, o)); };
+  ujiBebas('ajukan tukar: Dina (Shift 2) dengan Ari (Shift 1) pada 12 Okt diterima; shift_asal 2, shift_tujuan 1', aju({}).ok && aju({}).shift_asal === 2 && aju({}).shift_tujuan === 1);
+  ujiBebas('ajukan tukar ditolak: tanggal lewat, admin sebagai pemohon, rekan diri sendiri / cabang lain / admin / nonaktif, shift sama, salah satu libur, jenis ngawur', !aju({ tanggal: '2026-10-06' }).ok && !aju({ pemohon: { id: 'K009', role: 'ADMIN', cabang: 'Ngawi', aktif: true } }).ok && !aju({ rekan: { id: 'K004', role: 'KARYAWAN', cabang: 'Ngawi', aktif: true } }).ok && !aju({ rekan: { id: 'K005', role: 'KARYAWAN', cabang: 'Pusat', aktif: true } }).ok && !aju({ rekan: { id: 'K006', role: 'ADMIN', cabang: 'Ngawi', aktif: true } }).ok && !aju({ rekan: { id: 'K005', role: 'KARYAWAN', cabang: 'Ngawi', aktif: false } }).ok && !aju({ jRekan: { libur: false, shift: 2 } }).ok && !aju({ jRekan: { libur: true, shift: null } }).ok && !aju({ jenis: 'LAIN' }).ok);
+  ujiBebas('ajukan tukar hari ini: boleh sebelum jam masuk shift paling awal (07:45), ditolak sesudahnya', aju({ tanggal: '2026-10-07', detikSekarang: detik('07:00') }).ok && !aju({ tanggal: '2026-10-07', detikSekarang: detik('07:45') }).ok && !aju({ tanggal: '2026-10-07', detikSekarang: detik('13:00') }).ok);
+  const baris1 = { grup: 'IZN-2026-0014', id: 'IZN-2026-0014-A', karyawan: 'K004', rekan: 'K005', jenis: 'TUKAR_SHIFT', mulai: '2026-10-12', selesai: '2026-10-12', hari: 1, status: 'MENUNGGU', status_rekan: 'MENUNGGU', shift_asal: 2, shift_tujuan: 1, ket: 'Antar ibu ke dokter pagi' };
+  ujiBebas('ajukan tukar ditolak bila bentrok: tukar lain yang masih berjalan pada tanggal itu untuk salah satu orang (sebagai pemohon atau rekan) atau salah satu sedang izin/cuti; yang sudah ditolak/batal tidak menghalangi', !aju({ izinRows: [baris1] }).ok && !aju({ izinRows: [Object.assign({}, baris1, { karyawan: 'K777', rekan: 'K005' })] }).ok && aju({ izinRows: [Object.assign({}, baris1, { status_rekan: 'TOLAK', status: 'DITOLAK' })] }).ok && aju({ izinRows: [Object.assign({}, baris1, { status_rekan: 'BATAL', status: 'BATAL' })] }).ok && !aju({ izinRows: [{ karyawan: 'K005', jenis: 'Sakit', mulai: '2026-10-12', selesai: '2026-10-13', status: 'DITERIMA' }] }).ok && aju({ izinRows: [Object.assign({}, baris1, { mulai: '2026-10-13' })] }).ok);
+  const jamFn = function (r) { return r.shift_asal === 2 ? detik('07:45') : null; };
+  ujiBebas('batal otomatis: rekan belum menjawab sampai jam masuk shift yang ditukar (hari H sesudah jam masuk paling awal) atau tanggal sudah lewat; belum waktunya / sudah dijawab / sudah diputuskan tidak dibatalkan', tukarKedaluwarsa([Object.assign({}, baris1, { mulai: '2026-10-07' })], '2026-10-07', detik('07:46'), jamFn).length === 1 && tukarKedaluwarsa([Object.assign({}, baris1, { mulai: '2026-10-07' })], '2026-10-07', detik('07:00'), jamFn).length === 0 && tukarKedaluwarsa([Object.assign({}, baris1, { mulai: '2026-10-06' })], '2026-10-07', detik('00:01'), jamFn).length === 1 && tukarKedaluwarsa([baris1], '2026-10-07', detik('20:00'), jamFn).length === 0 && tukarKedaluwarsa([Object.assign({}, baris1, { mulai: '2026-10-06', status_rekan: 'SETUJU' })], '2026-10-07', detik('09:00'), jamFn).length === 0 && tukarKedaluwarsa([Object.assign({}, baris1, { mulai: '2026-10-06', jenis: 'Sakit' })], '2026-10-07', detik('09:00'), jamFn).length === 0 && tukarKedaluwarsa([Object.assign({}, baris1, { mulai: '2026-10-07', jenis: 'PINDAH_SHIFT' })], '2026-10-07', detik('09:00'), jamFn).length === 1);
+  ujiBebas('ajakan untuk rekan: dihitung hanya yang MENUNGGU jawaban rekan itu', jumlahTukarMasuk([baris1, Object.assign({}, baris1, { status_rekan: 'SETUJU' }), Object.assign({}, baris1, { rekan: 'K088' })], 'K005') === 1 && jumlahTukarMasuk([baris1], 'K004') === 0);
+  const petaT = { K004: { nama: 'Dina Marlina', panggilan: 'Dina', cabang: 'Ngawi', role: 'KARYAWAN' }, K005: { nama: 'Ari Pratama', panggilan: 'Ari', cabang: 'Ngawi', role: 'KARYAWAN' } };
+  const itemT = rakitItemTukar([Object.assign({}, baris1, { mulai: '2026-10-06', status_rekan: 'SETUJU' }), baris1, Object.assign({}, baris1, { id: 'IZN-2026-0015-A', grup: 'IZN-2026-0015', jenis: 'PINDAH_SHIFT', status_rekan: 'SETUJU' })], petaT);
+  ujiBebas('item Konfirmasi tukar: hanya yang rekan sudah setuju; judul "Tukar shift \u00b7 rekan setuju", nama "Dina \u21c4 Ari", rincian "Sel 6 Okt \u00b7 Dina \u2192 Shift 1, Ari \u2192 Shift 2"; pindah hanya satu orang', itemT.length === 2 && itemT[0].id === 'TUKAR|IZN-2026-0014' && itemT[0].judul === 'Tukar shift \u00b7 rekan setuju' && itemT[0].nama === 'Dina \u21c4 Ari' && itemT[0].rincian === 'Sel 6 Okt \u00b7 Dina \u2192 Shift 1, Ari \u2192 Shift 2' && itemT[1].judul === 'Pindah shift \u00b7 rekan setuju' && itemT[1].rincian === 'Sen 12 Okt \u00b7 Dina \u2192 Shift 1' && itemT[1].nama === 'Dina');
+  ujiBebas('hak tukar di server: admin Ngawi melihat tukar karyawan Ngawi; owner tidak melihat tukar karyawan; admin cabang lain tidak', saringItemKonfirmasi(itemT, { role: 'ADMIN', id: 'K009', cabang: 'Ngawi' }, '').length === 2 && saringItemKonfirmasi(itemT, { role: 'OWNER', id: 'OWN01', cabang: '' }, '').length === 0 && saringItemKonfirmasi(itemT, { role: 'ADMIN', id: 'K011', cabang: 'Pusat' }, '').length === 0 && parseIdItemTukar('TUKAR|IZN-2026-0014') === 'IZN-2026-0014' && parseIdItemTukar('IZIN|IZN-2026-0014') === null && parseIdItemTukar('TUKAR|../x') === null);
+  const trTukar = rencanaTerapkanTukar(baris1, { libur: false, shift: 2 }, { libur: false, shift: 1 });
+  ujiBebas('ACC tukar: kalender menukar kedua karyawan (Dina jadi 1, Ari jadi 2); jadwal yang sudah berubah ditolak dengan pesan jelas; pindah hanya menulis pemohon', trTukar.ok && trTukar.tulis.length === 2 && trTukar.tulis[0].karyawan === 'K004' && trTukar.tulis[0].nilai === '1' && trTukar.tulis[1].karyawan === 'K005' && trTukar.tulis[1].nilai === '2' && !rencanaTerapkanTukar(baris1, { libur: false, shift: 1 }, { libur: false, shift: 1 }).ok && !rencanaTerapkanTukar(baris1, { libur: false, shift: 2 }, { libur: true, shift: null }).ok && /Jadwal sudah berubah/.test(rencanaTerapkanTukar(baris1, { libur: true, shift: null }, { libur: false, shift: 1 }).pesan) && rencanaTerapkanTukar(Object.assign({}, baris1, { jenis: 'PINDAH_SHIFT' }), { libur: false, shift: 2 }, null).tulis.length === 1);
+  const shList = [{ no: '1', masuk: '07:45', pulang: '16:30' }, { no: '2', masuk: '12:00', pulang: '20:30' }];
+  ujiBebas('shift aktif: dari 60 menit sebelum masuk sampai jam pulang; 06:30 belum, 06:50 Shift 1, 11:30 kedua shift, 17:00 hanya Shift 2, 21:00 tidak ada', shiftAktifSekarang(shList, '06:30', 60).length === 0 && shiftAktifSekarang(shList, '06:50', 60).join() === '1' && shiftAktifSekarang(shList, '11:30', 60).join() === '1,2' && shiftAktifSekarang(shList, '17:00', 60).join() === '2' && shiftAktifSekarang(shList, '21:00', 60).length === 0);
+  const tp = terjadwalPerShift([akB, akD, akR, Object.assign({}, akB, { id: 'K006', panggilan: 'Cici' }), Object.assign({}, akB, { id: 'K007', panggilan: 'Ani', aktif: false }), Object.assign({}, akB, { id: 'K008', panggilan: 'Eka', role: 'ADMIN' })], '2026-10-12', [{ tanggal: '2026-10-12', cabang: 'Ngawi', karyawan: 'K006', isi: 'LIBUR' }], [{ karyawan: 'K005', jenis: 'Cuti', mulai: '2026-10-12', selesai: '2026-10-12', status: 'MENUNGGU' }, { karyawan: 'K004', jenis: 'TUKAR_SHIFT', mulai: '2026-10-12', selesai: '2026-10-12', status: 'MENUNGGU' }], true);
+  ujiBebas('jadwal hari ini (layar 02): nama panggilan per shift urut abjad; yang libur, izin/cuti, nonaktif tidak tampil; tukar shift bukan izin; admin tetap tampil', JSON.stringify(tp) === '{"1":["Budi","Eka"],"2":["Dina"]}');
+  ujiBebas('hari singkat: "Sel 6 Okt", "Min 11 Okt"', hariTanggalPendek('2026-10-06') === 'Sel 6 Okt' && hariTanggalPendek('2026-10-11') === 'Min 11 Okt');
+  })();
+  // ---- akhir FITUR B ----
   // ---- Daftar HP toko (owner) ----
   const akunHp = [
     { id: 'HPT-NGW-02', role: 'PERANGKAT', nama: 'HP Toko 2', cabang: 'Ngawi', aktif: true },
@@ -3672,7 +3739,8 @@ function prosesPribadiHariIni(d) {
     jam_masuk: baris ? baris.masuk : '', jam_pulang: baris ? baris.pulang : '',
     cara_masuk: baris ? String(baris.cara_masuk) : '', st_pulang: baris ? String(baris.st_pulang) : '',
     lembur_boleh: lemburBolehPribadi(p, baris),
-    izin_menunggu: jumlahIzinMenungguAman(p.id)
+    izin_menunggu: jumlahIzinMenungguAman(p.id),
+    tukar_masuk: jumlahTukarMasukAman(p.id)
   });
 }
 
@@ -3722,7 +3790,7 @@ function prosesPribadiRiwayat(d) {
  */
 var MAKS_BARIS_KONFIRMASI = 2000;
 var UKURAN_HALAMAN_KONFIRMASI = 20;
-var URUTAN_KELOMPOK = { LUAR: 0, LEMBUR: 1, PULANG_CEPAT: 2, IZIN: 3 };
+var URUTAN_KELOMPOK = { LUAR: 0, LEMBUR: 1, PULANG_CEPAT: 2, IZIN: 3, TUKAR: 4 };
 
 /** Fungsi murni: id item dipecah {karyawan, tanggal, jenis}; null kalau bentuknya tidak sah. */
 function parseIdItem(id) {
@@ -3884,7 +3952,8 @@ function aktorKonfirmasi(d) {
 function itemUntukAktor(aktor, filterCabang) {
   const petaRole = {};
   bacaSheet('akun').data.forEach(function (r) { petaRole[String(r.id)] = r.role === 'ADMIN' ? 'ADMIN' : (r.role === 'OWNER' ? 'OWNER' : 'KARYAWAN'); });
-  const izinItems = rakitItemIzin(bacaIzinTernormalisasi().data, petaAkunUntukIzin());
+  const izinSemua = bacaIzinTernormalisasi().data, petaIzin = petaAkunUntukIzin();
+  const izinItems = rakitItemIzin(izinSemua, petaIzin).concat(rakitItemTukar(izinSemua, petaIzin));
   return saringItemKonfirmasi(rakitItemKonfirmasi(bacaAbsensiMenunggu(), petaRole).concat(izinItems), aktor, filterCabang);
 }
 
@@ -3912,6 +3981,7 @@ function prosesKonfirmasiPutuskan(d) {
   if (k.gagal) { return k.gagal; }
   if (d.keputusan !== 'ACC' && d.keputusan !== 'TOLAK') { return respon({ status: 'gagal', pesan: 'Keputusan tidak dikenal' }); }
   if (String(d.id || '').indexOf('IZIN|') === 0) { return putuskanItemIzin(k.aktor, d); }
+  if (String(d.id || '').indexOf('TUKAR|') === 0) { return putuskanItemTukar(k.aktor, d); }
   const it = parseIdItem(d.id);
   if (!it) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
   const kunciLock = LockService.getScriptLock();
@@ -4098,6 +4168,7 @@ function prosesAmbilFoto(d) {
   const k = aktorKonfirmasi(d);
   if (k.gagal) { return k.gagal; }
   if (String(d.id || '').indexOf('IZIN|') === 0) { return ambilSuratItemIzin(k.aktor, d); }
+  if (String(d.id || '').indexOf('TUKAR|') === 0) { return respon({ status: 'ok', foto: null, teks: 'Tukar shift tidak memakai foto' }); }
   const it = parseIdItem(d.id);
   if (!it) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
   const cari = cariBarisAbsensi(it.karyawan, it.tanggal);
@@ -4596,7 +4667,11 @@ function prosesIzinBatal(d) {
     if (!baris.length) { return respon({ status: 'gagal', pesan: 'Pengajuan tidak ditemukan' }); }
     const menunggu = baris.filter(function (r) { return String(r.status).toUpperCase() === 'MENUNGGU'; });
     if (!menunggu.length) { return respon({ status: 'gagal', pesan: 'Pengajuan ini sudah diputuskan, tidak bisa dibatalkan' }); }
-    menunggu.forEach(function (r) { perbaruiKolom(izin, r, { status: 'BATAL', diputus: waktuServerTeks(), oleh: a.akun.id }); });
+    menunggu.forEach(function (r) {
+      const ubah = { status: 'BATAL', diputus: waktuServerTeks(), oleh: a.akun.id };
+      if (jenisTukar(r.jenis)) { ubah.status_rekan = 'BATAL'; }
+      perbaruiKolom(izin, r, ubah);
+    });
     tambahLog({ jenis: 'IZIN', oleh: a.akun.id, cabang: a.akun.cabang, aksi: 'BATAL_IZIN', target: a.akun.nama, id: String(baris[0].grup || baris[0].id), sebelum: 'MENUNGGU', sesudah: 'BATAL' });
     return respon({ status: 'ok' });
   } finally {
@@ -4728,7 +4803,7 @@ function prosesIzinInputInfo(d) {
 
 function petaAkunUntukIzin() {
   const peta = {};
-  bacaSheet('akun').data.forEach(function (r) { peta[String(r.id)] = { nama: String(r.nama), cabang: String(r.cabang), role: r.role === 'ADMIN' ? 'ADMIN' : (r.role === 'OWNER' ? 'OWNER' : 'KARYAWAN') }; });
+  bacaSheet('akun').data.forEach(function (r) { peta[String(r.id)] = { nama: String(r.nama), panggilan: String(r.panggilan || ''), cabang: String(r.cabang), role: r.role === 'ADMIN' ? 'ADMIN' : (r.role === 'OWNER' ? 'OWNER' : 'KARYAWAN') }; });
   return peta;
 }
 
@@ -4910,4 +4985,705 @@ function prosesTidakMasukHariIni(hp) {
 /** Jumlah pengajuan izin milik akun yang MENUNGGU; gagal membaca sheet tidak boleh mengganggu beranda (dianggap 0). */
 function jumlahIzinMenungguAman(id) {
   try { return jumlahPengajuanMenunggu(bacaIzinTernormalisasi().data, id); } catch (e) { return 0; }
+}
+
+
+/**
+ * ======================= FITUR B: JADWAL DAN SHIFT =======================
+ * Prioritas jadwal: perubahan manual/tukar shift (sheet kalender, isi = nomor shift atau LIBUR, per karyawan) -> pola akun (TETAP/BERGILIR) -> shift bawaan akun.
+ * Fungsi inti jadwalKaryawanHari/shiftMenurutPola dipakai apa adanya. Perubahan jadwal hanya berlaku hari ini dan seterusnya.
+ * Tukar shift disimpan di sheet izin (jenis TUKAR_SHIFT / PINDAH_SHIFT; rekan, status_rekan, shift_asal, shift_tujuan).
+ */
+var MAKS_PERUBAHAN_JADWAL = 300;
+var GANTI_SETIAP_SAH = ['1M', '2M', '1B', '3B'];
+
+/** Fungsi murni: tanggal Senin dari minggu yang memuat tanggal itu. */
+function seninDariTanggal(t) { return geserTanggal(t, -((hariKeIndeks(t) + 6) % 7)); }
+
+/** Fungsi murni: nilai sel jadwal sah: '' (kembali ke pola), 'L' (libur), atau nomor shift yang ada. */
+function nilaiJadwalSah(nilai, noValid) {
+  const v = String(nilai === undefined || nilai === null ? '' : nilai).trim().toUpperCase();
+  if (v === '' || v === 'L') { return true; }
+  return /^\d{1,2}$/.test(v) && noValid.indexOf(Number(v)) >= 0;
+}
+
+/**
+ * Fungsi murni: jadwal satu minggu (Senin-Sabtu) per akun. Sel = { t: tanggal, s: nomor shift atau null, l: libur?, m: ada perubahan manual milik karyawan? }.
+ */
+function jadwalMingguan(akunList, senin, kalender, liburMinggu) {
+  return akunList.map(function (a) {
+    const sel = [];
+    for (let i = 0; i < 6; i++) {
+      const t = geserTanggal(senin, i);
+      const j = jadwalKaryawanHari(a, t, kalender, liburMinggu === true);
+      const manual = kalender.some(function (k) {
+        return k.tanggal === t && String(k.karyawan) === String(a.id) && String(k.isi).trim() !== '' && (String(k.cabang) === '' || String(k.cabang) === String(a.cabang));
+      });
+      sel.push({ t: t, s: j.libur ? null : j.shift, l: j.libur === true, m: manual });
+    }
+    return { id: a.id, nama: a.nama, panggilan: a.panggilan, role: a.role, sel: sel };
+  });
+}
+
+/**
+ * Fungsi murni: apa yang harus ditulis ke sheet kalender supaya jadwal satu karyawan pada satu tanggal menjadi `nilai`?
+ * Kembalian { aksi: 'TETAP' | 'HAPUS' | 'TULIS', isi }. HAPUS = isi sel milik karyawan dikosongkan (kembali ke pola/umum); baris tidak dihapus.
+ */
+function rencanaTulisKalender(akun, tanggal, nilai, kalender, liburMinggu) {
+  const v = String(nilai === undefined || nilai === null ? '' : nilai).trim().toUpperCase();
+  const sekarang = jadwalKaryawanHari(akun, tanggal, kalender, liburMinggu === true);
+  const tanpaMilikKaryawan = kalender.filter(function (k) { return String(k.karyawan) !== String(akun.id); });
+  const dasar = jadwalKaryawanHari(akun, tanggal, tanpaMilikKaryawan, liburMinggu === true);
+  const sama = function (a, b) { return a.libur === b.libur && (a.libur || a.shift === b.shift); };
+  const target = v === '' ? dasar : (v === 'L' ? { libur: true, shift: null } : { libur: false, shift: Number(v) });
+  if (sama(target, sekarang)) { return { aksi: 'TETAP', isi: '' }; }
+  if (sama(target, dasar)) { return { aksi: 'HAPUS', isi: '' }; }
+  return { aksi: 'TULIS', isi: target.libur ? 'LIBUR' : String(target.shift) };
+}
+
+/**
+ * Fungsi murni: validasi daftar perubahan jadwal dari admin. ctx = { hariIni, cabang, aktorId, noValid:[nomor shift], akunPeta:{id:{role,cabang,aktif}} }.
+ * Admin tidak boleh mengubah jadwalnya sendiri (urusan owner). Hanya hari ini dan seterusnya. Kembalian { ok, pesan, daftar }.
+ */
+function validasiPerubahanJadwal(daftar, ctx) {
+  if (!Array.isArray(daftar) || !daftar.length) { return { ok: false, pesan: 'Tidak ada perubahan untuk disimpan' }; }
+  if (daftar.length > MAKS_PERUBAHAN_JADWAL) { return { ok: false, pesan: 'Terlalu banyak perubahan sekaligus (maksimal ' + MAKS_PERUBAHAN_JADWAL + ')' }; }
+  const hasil = [];
+  for (let i = 0; i < daftar.length; i++) {
+    const d = daftar[i] || {};
+    const akun = ctx.akunPeta[String(d.karyawan)];
+    if (!akun || akun.aktif !== true || (akun.role !== 'KARYAWAN' && akun.role !== 'ADMIN')) { return { ok: false, pesan: 'Ada karyawan yang tidak dikenal' }; }
+    if (akun.cabang !== ctx.cabang) { return { ok: false, pesan: 'Hanya boleh mengatur jadwal karyawan di cabang sendiri' }; }
+    if (String(d.karyawan) === String(ctx.aktorId)) { return { ok: false, pesan: 'Admin tidak mengatur jadwalnya sendiri. Itu tugas owner.' }; }
+    if (!tanggalIzinSah(d.tanggal)) { return { ok: false, pesan: 'Ada tanggal yang tidak valid' }; }
+    if (String(d.tanggal) < ctx.hariIni) { return { ok: false, pesan: 'Jadwal hanya bisa diubah untuk hari ini dan seterusnya' }; }
+    if (!nilaiJadwalSah(d.nilai, ctx.noValid)) { return { ok: false, pesan: 'Shift yang dipilih tidak ada di cabang ini' }; }
+    hasil.push({ karyawan: String(d.karyawan), tanggal: String(d.tanggal), nilai: String(d.nilai === undefined || d.nilai === null ? '' : d.nilai).trim().toUpperCase() });
+  }
+  return { ok: true, daftar: hasil };
+}
+
+/**
+ * Fungsi murni: perubahan untuk "Salin minggu lalu". Sel minggu lalu (efektif) disalin ke minggu yang sama minggu ini hanya untuk tanggal
+ * hari ini dan seterusnya; tanggal libur seluruh toko (Minggu / tanggal merah umum), di minggu asal maupun tujuan, dilewati.
+ */
+function rencanaSalinMinggu(akunList, seninTujuan, hariIni, kalender, liburMinggu) {
+  const seninSumber = geserTanggal(seninTujuan, -7);
+  const umum = kalender.filter(function (k) { return String(k.karyawan) === ''; });
+  const hasil = [];
+  akunList.forEach(function (a) {
+    for (let i = 0; i < 6; i++) {
+      const tS = geserTanggal(seninSumber, i), tT = geserTanggal(seninTujuan, i);
+      if (tT < hariIni) { continue; }
+      if (jadwalKaryawanHari(a, tS, umum, liburMinggu === true).libur) { continue; }
+      if (jadwalKaryawanHari(a, tT, umum, liburMinggu === true).libur) { continue; }
+      const src = jadwalKaryawanHari(a, tS, kalender, liburMinggu === true);
+      hasil.push({ karyawan: String(a.id), tanggal: tT, nilai: src.libur ? 'L' : (src.shift === null ? '' : String(src.shift)) });
+    }
+  });
+  return hasil;
+}
+
+/** Fungsi murni: tukar shift satu hari oleh admin (layar 56). Keduanya harus terjadwal masuk dengan shift berbeda; hasil saling bertukar. */
+function rencanaTukarHari(a, b, tanggal, kalender, liburMinggu, hariIni) {
+  if (!a || !b) { return { ok: false, pesan: 'Pilih dua karyawan' }; }
+  if (String(a.id) === String(b.id)) { return { ok: false, pesan: 'Pilih dua karyawan yang berbeda' }; }
+  if (!tanggalIzinSah(tanggal)) { return { ok: false, pesan: 'Tanggal tidak valid' }; }
+  if (tanggal < hariIni) { return { ok: false, pesan: 'Jadwal hanya bisa diubah untuk hari ini dan seterusnya' }; }
+  const ja = jadwalKaryawanHari(a, tanggal, kalender, liburMinggu === true), jb = jadwalKaryawanHari(b, tanggal, kalender, liburMinggu === true);
+  if (ja.libur || ja.shift === null || jb.libur || jb.shift === null) { return { ok: false, pesan: 'Kedua karyawan harus terjadwal masuk pada tanggal itu' }; }
+  if (ja.shift === jb.shift) { return { ok: false, pesan: 'Keduanya sudah berada di shift yang sama' }; }
+  return { ok: true, a_dari: ja.shift, a_ke: jb.shift, b_dari: jb.shift, b_ke: ja.shift };
+}
+
+/**
+ * Fungsi murni: validasi pola shift. p = { pola_shift:'TETAP'|'BERGILIR', urutan: [nomor] | "1,2", ganti_setiap, mulai_pola }.
+ * BERGILIR: minimal 2 entri dan 2 shift berbeda, semua shift ada di cabang, ganti 1M/2M/1B/3B, tanggal mulai wajib. TETAP: hanya pola_shift berubah.
+ */
+function validasiPolaShift(p, noValid) {
+  const pola = String(p.pola_shift || '').toUpperCase();
+  if (pola === 'TETAP') { return { ok: true, nilai: { pola_shift: 'TETAP' } }; }
+  if (pola !== 'BERGILIR') { return { ok: false, pesan: 'Pola harus Tetap atau Bergilir' }; }
+  const mentah = Array.isArray(p.urutan) ? p.urutan : String(p.urutan === undefined || p.urutan === null ? '' : p.urutan).split(',');
+  const urutan = mentah.map(function (x) { return String(x).trim(); }).filter(function (x) { return x !== ''; });
+  if (urutan.length < 2 || urutan.length > 8) { return { ok: false, pesan: 'Urutan shift minimal 2 dan maksimal 8' }; }
+  for (let i = 0; i < urutan.length; i++) {
+    if (!/^\d{1,2}$/.test(urutan[i]) || noValid.indexOf(Number(urutan[i])) < 0) { return { ok: false, pesan: 'Ada shift di urutan yang tidak ada di cabang ini' }; }
+  }
+  if (urutan.every(function (x) { return x === urutan[0]; })) { return { ok: false, pesan: 'Urutan harus memuat minimal dua shift yang berbeda' }; }
+  const ganti = String(p.ganti_setiap || '').toUpperCase();
+  if (GANTI_SETIAP_SAH.indexOf(ganti) < 0) { return { ok: false, pesan: 'Pilih ganti setiap 1 minggu, 2 minggu, 1 bulan, atau 3 bulan' }; }
+  if (!tanggalIzinSah(p.mulai_pola)) { return { ok: false, pesan: 'Tanggal mulai wajib diisi' }; }
+  return { ok: true, nilai: { pola_shift: 'BERGILIR', urutan_shift: urutan.join(','), ganti_setiap: ganti, mulai_pola: String(p.mulai_pola) } };
+}
+
+/** Fungsi murni: pratinjau n minggu: [{ mulai (Senin), selesai (Sabtu), shift }]; memakai shiftMenurutPola yang sama dengan jadwal sebenarnya (nilai hari Senin). */
+function pratinjauPola(akunPola, senin, nMinggu) {
+  const hasil = [];
+  for (let i = 0; i < nMinggu; i++) {
+    const m = geserTanggal(senin, i * 7);
+    hasil.push({ mulai: m, selesai: geserTanggal(m, 5), shift: shiftMenurutPola(akunPola, m) });
+  }
+  return hasil;
+}
+
+// ---------- Tukar shift antar karyawan ----------
+
+function jenisTukar(jenis) { const j = String(jenis).toUpperCase(); return j === 'TUKAR_SHIFT' || j === 'PINDAH_SHIFT'; }
+
+/** Fungsi murni: apakah salah satu id sudah punya tukar/pindah shift yang masih berjalan (MENUNGGU/DITERIMA, rekan belum menolak/batal) pada tanggal itu? */
+function tukarBentrok(rows, ids, tanggal) {
+  return rows.some(function (r) {
+    if (!jenisTukar(r.jenis) || String(r.mulai) !== tanggal) { return false; }
+    if (STATUS_IZIN_AKTIF.indexOf(String(r.status).toUpperCase()) < 0) { return false; }
+    const sr = String(r.status_rekan).toUpperCase();
+    if (sr === 'TOLAK' || sr === 'BATAL') { return false; }
+    return ids.indexOf(String(r.karyawan)) >= 0 || ids.indexOf(String(r.rekan)) >= 0;
+  });
+}
+
+/**
+ * Fungsi murni: validasi pengajuan tukar/pindah shift. p = { jenis, tanggal, hariIni, detikSekarang, pemohon:{id,role,cabang,aktif}, rekan:{...},
+ * jPemohon:{libur,shift}, jRekan:{libur,shift}, masukShift:{nomor:'HH:mm'}, izinRows }.
+ * Admin tidak mengajukan tukar shift (jadwalnya diatur owner). Rekan harus KARYAWAN aktif di cabang yang sama. Kembalian { ok, pesan, shift_asal, shift_tujuan }.
+ */
+function validasiAjuTukar(p) {
+  if (!jenisTukar(p.jenis)) { return { ok: false, pesan: 'Pilih tukar dengan rekan atau pindah shift' }; }
+  if (!p.pemohon || p.pemohon.role !== 'KARYAWAN') { return { ok: false, pesan: 'Tukar shift diajukan oleh karyawan. Jadwal admin diatur oleh owner.' }; }
+  if (!p.rekan || p.rekan.aktif !== true || p.rekan.role !== 'KARYAWAN') { return { ok: false, pesan: 'Pilih rekan karyawan yang aktif' }; }
+  if (String(p.rekan.id) === String(p.pemohon.id)) { return { ok: false, pesan: 'Rekan tidak boleh diri sendiri' }; }
+  if (p.rekan.cabang !== p.pemohon.cabang) { return { ok: false, pesan: 'Rekan harus di cabang yang sama' }; }
+  if (!tanggalIzinSah(p.tanggal)) { return { ok: false, pesan: 'Tanggal tidak valid' }; }
+  if (p.tanggal < p.hariIni) { return { ok: false, pesan: 'Tanggal yang sudah lewat tidak bisa diajukan' }; }
+  if (!p.jPemohon || p.jPemohon.libur || p.jPemohon.shift === null || !p.jRekan || p.jRekan.libur || p.jRekan.shift === null) { return { ok: false, pesan: 'Anda dan rekan harus sama-sama terjadwal masuk pada tanggal itu' }; }
+  if (p.jPemohon.shift === p.jRekan.shift) { return { ok: false, pesan: 'Anda dan rekan sudah di shift yang sama' }; }
+  const masukA = p.masukShift[String(p.jPemohon.shift)], masukB = p.masukShift[String(p.jRekan.shift)];
+  if (p.tanggal === p.hariIni) {
+    const batas = [masukA, masukB].filter(function (x) { return !!x; }).map(jamKeDetik);
+    if (!batas.length || p.detikSekarang >= Math.min.apply(null, batas)) { return { ok: false, pesan: 'Sudah lewat jam masuk shift pada hari itu. Ajukan untuk tanggal lain.' }; }
+  }
+  const ids = [String(p.pemohon.id), String(p.rekan.id)];
+  if (tukarBentrok(p.izinRows, ids, p.tanggal)) { return { ok: false, pesan: 'Sudah ada tukar shift lain pada tanggal itu' }; }
+  const izinBentrok = p.izinRows.some(function (r) {
+    return !jenisTukar(r.jenis) && STATUS_IZIN_AKTIF.indexOf(String(r.status).toUpperCase()) >= 0 && ids.indexOf(String(r.karyawan)) >= 0 && String(r.mulai) <= p.tanggal && p.tanggal <= String(r.selesai);
+  });
+  if (izinBentrok) { return { ok: false, pesan: 'Anda atau rekan sedang izin/cuti pada tanggal itu' }; }
+  return { ok: true, shift_asal: p.jPemohon.shift, shift_tujuan: p.jRekan.shift };
+}
+
+/**
+ * Fungsi murni: baris tukar/pindah yang harus BATAL otomatis: rekan belum menjawab sampai jam masuk shift yang ditukar (paling awal dari dua shift)
+ * atau tanggalnya sudah lewat. jamMasukFn(baris) -> detik jam masuk paling awal, atau null kalau tidak diketahui.
+ */
+function tukarKedaluwarsa(rows, hariIni, detikSekarang, jamMasukFn) {
+  return rows.filter(function (r) {
+    if (!jenisTukar(r.jenis) || String(r.status).toUpperCase() !== 'MENUNGGU' || String(r.status_rekan).toUpperCase() !== 'MENUNGGU') { return false; }
+    const t = String(r.mulai);
+    if (t < hariIni) { return true; }
+    if (t === hariIni) { const j = jamMasukFn(r); return j !== null && j !== undefined && detikSekarang >= j; }
+    return false;
+  });
+}
+
+/** Fungsi murni: jumlah ajakan tukar yang menunggu jawaban rekan ini. */
+function jumlahTukarMasuk(rows, idRekan) {
+  return rows.filter(function (r) {
+    return jenisTukar(r.jenis) && String(r.rekan) === String(idRekan) && String(r.status).toUpperCase() === 'MENUNGGU' && String(r.status_rekan).toUpperCase() === 'MENUNGGU';
+  }).length;
+}
+
+/** Fungsi murni: "Sel 6 Okt" untuk tanggal yyyy-MM-dd. */
+function hariTanggalPendek(t) {
+  const b = bagianTanggal(t);
+  return HARI_PENDEK[hariKeIndeks(t)] + ' ' + b.d + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][b.m - 1];
+}
+
+/**
+ * Fungsi murni: item Konfirmasi tukar/pindah shift: hanya yang MENUNGGU dan rekan sudah SETUJU. petaAkun = { id: { nama, panggilan, cabang, role } }.
+ * Judul "Tukar shift · rekan setuju", nama "Dina ⇄ Ari", rincian "Sel 6 Okt · Dina → Shift 1, Ari → Shift 2". Id "TUKAR|<grup>".
+ */
+function rakitItemTukar(rows, petaAkun) {
+  const items = [];
+  rows.forEach(function (r) {
+    if (!jenisTukar(r.jenis) || String(r.status).toUpperCase() !== 'MENUNGGU' || String(r.status_rekan).toUpperCase() !== 'SETUJU') { return; }
+    const a = petaAkun[String(r.karyawan)] || {}, b = petaAkun[String(r.rekan)] || {};
+    const pa = a.panggilan || a.nama || String(r.karyawan), pb = b.panggilan || b.nama || String(r.rekan);
+    const tukar = String(r.jenis).toUpperCase() === 'TUKAR_SHIFT';
+    items.push({
+      id: 'TUKAR|' + String(r.grup || r.id), jenis: 'TUKAR', kelompok: 'TUKAR', karyawan: String(r.karyawan), nama: tukar ? pa + ' ⇄ ' + pb : pa,
+      cabang: a.cabang || '', role: a.role || 'KARYAWAN', tanggal: String(r.mulai), jam: '', shift: '',
+      judul: (tukar ? 'Tukar shift' : 'Pindah shift') + ' · rekan setuju',
+      rincian: hariTanggalPendek(String(r.mulai)) + ' · ' + pa + ' → Shift ' + r.shift_tujuan + (tukar ? ', ' + pb + ' → Shift ' + r.shift_asal : ''),
+      ket: String(r.ket || ''), surat: false, sakit: false, hari: 1, mulai: String(r.mulai), selesai: String(r.mulai), telat_aju: false,
+      luar: false, gps: '', dalam_area_toko: false, tingkat: 0, durasi_menit: 0, foto: 'TANPA'
+    });
+  });
+  return items;
+}
+
+/** Fungsi murni: id item "TUKAR|IZN-2026-0014" -> grup; null kalau bentuknya salah. */
+function parseIdItemTukar(id) {
+  const m = /^TUKAR\|(IZN-\d{4}-\d{4}(?:-[A-Z])?)$/.exec(String(id || ''));
+  return m ? m[1] : null;
+}
+
+/**
+ * Fungsi murni: saat admin ACC, pastikan jadwal belum berubah lalu kembalikan tulisan kalender.
+ * row = baris tukar; jPemohon/jRekan = jadwal efektif saat ini. TUKAR: pemohon -> shift_tujuan, rekan -> shift_asal. PINDAH: hanya pemohon -> shift_tujuan.
+ */
+function rencanaTerapkanTukar(row, jPemohon, jRekan) {
+  const asal = Number(row.shift_asal), tujuan = Number(row.shift_tujuan);
+  const tukar = String(row.jenis).toUpperCase() === 'TUKAR_SHIFT';
+  const pesan = 'Jadwal sudah berubah sejak diajukan. Tolak pengajuan ini lalu minta karyawan mengajukan ulang.';
+  if (!jPemohon || jPemohon.libur || jPemohon.shift !== asal) { return { ok: false, pesan: pesan }; }
+  if (tukar && (!jRekan || jRekan.libur || jRekan.shift !== tujuan)) { return { ok: false, pesan: pesan }; }
+  const tulis = [{ karyawan: String(row.karyawan), tanggal: String(row.mulai), nilai: String(tujuan) }];
+  if (tukar) { tulis.push({ karyawan: String(row.rekan), tanggal: String(row.mulai), nilai: String(asal) }); }
+  return { ok: true, tulis: tulis };
+}
+
+/** Fungsi murni: shift mana yang sedang "aktif" (jendela buka absen sampai jam pulang): [nomor]. shiftList = [{no,masuk,pulang}], jam 'HH:mm'. */
+function shiftAktifSekarang(shiftList, jam, jendelaMenit) {
+  const s = jamKeDetik(jam);
+  return shiftList.filter(function (x) {
+    if (!x.masuk || !x.pulang) { return false; }
+    return s >= jamKeDetik(x.masuk) - (jendelaMenit || 0) * 60 && s <= jamKeDetik(x.pulang);
+  }).map(function (x) { return nomorShift(x.no); });
+}
+
+/** Fungsi murni: jadwal hari ini per shift. akunList (aktif, cabang yang sama), kalender, izin (untuk menyingkirkan yang izin/cuti). Kembalian { nomorShift: [panggilan urut abjad] }. */
+function terjadwalPerShift(akunList, tanggal, kalender, izin, liburMinggu) {
+  const izinId = {};
+  izin.forEach(function (z) {
+    if (jenisTukar(z.jenis) || STATUS_IZIN_AKTIF.indexOf(String(z.status).toUpperCase()) < 0) { return; }
+    if (String(z.mulai) <= tanggal && tanggal <= String(z.selesai)) { izinId[String(z.karyawan)] = true; }
+  });
+  const hasil = {};
+  akunList.forEach(function (a) {
+    if (a.aktif !== true || (a.role !== 'KARYAWAN' && a.role !== 'ADMIN') || izinId[String(a.id)]) { return; }
+    const j = jadwalKaryawanHari(a, tanggal, kalender, liburMinggu === true);
+    if (j.libur || j.shift === null) { return; }
+    (hasil[j.shift] = hasil[j.shift] || []).push(String(a.panggilan || a.nama));
+  });
+  Object.keys(hasil).forEach(function (k) { hasil[k].sort(function (x, y) { return x.toLowerCase() < y.toLowerCase() ? -1 : (x.toLowerCase() > y.toLowerCase() ? 1 : 0); }); });
+  return hasil;
+}
+
+// ---------- akses sheet untuk jadwal dan tukar shift ----------
+
+/** Akun aktif (KARYAWAN dan ADMIN) di satu cabang, mulai_pola dinormalkan. */
+function akunCabangAktif(cabang) {
+  return bacaSheet('akun').data.filter(function (r) { return r.aktif === true && (r.role === 'KARYAWAN' || r.role === 'ADMIN') && r.cabang === cabang; }).map(function (a) {
+    a.mulai_pola = a.mulai_pola === '' ? '' : normTanggalIzin(a.mulai_pola);
+    return a;
+  });
+}
+function nomorShiftCabang(cabang) { return bacaShiftCabang(cabang).map(function (s) { return nomorShift(s.no); }).filter(function (n) { return n !== null; }); }
+function infoShiftUntukKlien(cabang) { return bacaShiftCabang(cabang).map(function (s) { return { no: nomorShift(s.no), nama: s.nama, masuk: s.masuk, pulang: s.pulang }; }); }
+
+/** Tulis satu perubahan jadwal ke sheet kalender (milik karyawan, cabang = cabang akun) memakai rencanaTulisKalender; kal = hasil bacaKalenderTernormalisasi (diperbarui di memori). */
+function terapkanPerubahanJadwal(kal, akun, tanggal, nilai, liburMinggu) {
+  const r = rencanaTulisKalender(akun, tanggal, nilai, kal.data, liburMinggu);
+  if (r.aksi === 'TETAP') { return 'TETAP'; }
+  const ada = kal.data.find(function (k) { return k.tanggal === tanggal && k.cabang === akun.cabang && k.karyawan === String(akun.id); });
+  if (ada) { perbaruiKolom(kal, ada, { isi: r.isi }); ada.isi = r.isi; }
+  else if (r.aksi === 'TULIS') {
+    const baris = { tanggal: tanggal, cabang: akun.cabang, karyawan: String(akun.id), isi: r.isi };
+    tambahBarisSheet(kal, baris);
+    kal.data.push({ tanggal: tanggal, cabang: akun.cabang, karyawan: String(akun.id), isi: r.isi });
+  }
+  return r.aksi;
+}
+
+/** Aksi jadwal_hari_ini { token }: daftar shift cabang HP toko + nama panggilan terjadwal hari ini (layar 02). Hanya membaca. */
+function prosesJadwalHariIni(hp) {
+  const sekarang = new Date();
+  const tanggal = Utilities.formatDate(sekarang, ZONA_ABSEN, 'yyyy-MM-dd'), jam = Utilities.formatDate(sekarang, ZONA_ABSEN, 'HH:mm');
+  const shifts = bacaShiftCabang(hp.cabang);
+  const per = terjadwalPerShift(akunCabangAktif(hp.cabang), tanggal, bacaKalenderTernormalisasi().data, bacaIzinTernormalisasi().data, liburMingguCabang(hp.cabang));
+  const aktif = shiftAktifSekarang(shifts, jam, ambilNilaiUmum('jendela_absen_menit', 60));
+  return respon({
+    status: 'ok', tanggal: tanggal, jam: jam,
+    shift: shifts.map(function (s) { const n = nomorShift(s.no); return { no: n, nama: s.nama, masuk: s.masuk, pulang: s.pulang, aktif: aktif.indexOf(n) >= 0, karyawan: per[n] || [] }; })
+  });
+}
+
+/** Aksi jadwal_baca { kredensial admin, mulai? }: jadwal Senin-Sabtu (minggu yang memuat `mulai`, bawaan minggu ini) seluruh karyawan cabang admin. */
+function prosesJadwalBaca(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const cabang = a.s.akun.cabang;
+  const hariIni = hariIniServer();
+  const senin = seninDariTanggal(tanggalIzinSah(d.mulai) ? String(d.mulai) : hariIni);
+  const akun = akunCabangAktif(cabang).sort(function (x, y) { return String(x.nama).toLowerCase() < String(y.nama).toLowerCase() ? -1 : 1; });
+  return respon({
+    status: 'ok', cabang: cabang, senin: senin, hari_ini: hariIni, aktor: String(a.s.akun.id),
+    shift: infoShiftUntukKlien(cabang),
+    daftar: jadwalMingguan(akun, senin, bacaKalenderTernormalisasi().data, liburMingguCabang(cabang))
+  });
+}
+
+function petaAkunCabang(cabang) {
+  const peta = {};
+  bacaSheet('akun').data.forEach(function (r) { peta[String(r.id)] = { role: r.role, cabang: String(r.cabang), aktif: r.aktif === true }; });
+  return peta;
+}
+
+/** Aksi jadwal_simpan { kredensial admin, perubahan:[{karyawan, tanggal, nilai}] }: nilai = nomor shift, "L" (libur), atau "" (kembali ke pola). Dicatat di log. */
+function prosesJadwalSimpan(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const admin = a.s.akun;
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const v = validasiPerubahanJadwal(d.perubahan, { hariIni: hariIniServer(), cabang: admin.cabang, aktorId: admin.id, noValid: nomorShiftCabang(admin.cabang), akunPeta: petaAkunCabang(admin.cabang) });
+    if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
+    const akunMap = {};
+    akunCabangAktif(admin.cabang).forEach(function (x) { akunMap[String(x.id)] = x; });
+    const kal = bacaKalenderTernormalisasi();
+    const lm = liburMingguCabang(admin.cabang);
+    let berubah = 0;
+    const ringkas = [];
+    v.daftar.forEach(function (p) {
+      const hasil = terapkanPerubahanJadwal(kal, akunMap[p.karyawan], p.tanggal, p.nilai, lm);
+      if (hasil !== 'TETAP') { berubah++; if (ringkas.length < 8) { ringkas.push(p.karyawan + ' ' + p.tanggal + '=' + (p.nilai === '' ? 'pola' : p.nilai)); } }
+    });
+    if (berubah) { tambahLog({ jenis: 'JADWAL', oleh: admin.id, cabang: admin.cabang, aksi: 'UBAH_JADWAL', target: berubah + ' sel', id: '', sebelum: '', sesudah: ringkas.join('; ') }); }
+    return respon({ status: 'ok', berubah: berubah });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Aksi jadwal_salin { kredensial admin, senin }: salin jadwal minggu sebelumnya ke minggu itu (hanya hari ini dan seterusnya, libur toko dilewati). */
+function prosesJadwalSalin(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const admin = a.s.akun;
+  if (!tanggalIzinSah(d.senin) || seninDariTanggal(String(d.senin)) !== String(d.senin)) { return respon({ status: 'gagal', pesan: 'Minggu tidak valid' }); }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const hariIni = hariIniServer();
+    const akun = akunCabangAktif(admin.cabang).filter(function (x) { return String(x.id) !== String(admin.id); });
+    const kal = bacaKalenderTernormalisasi();
+    const lm = liburMingguCabang(admin.cabang);
+    const rencana = rencanaSalinMinggu(akun, String(d.senin), hariIni, kal.data, lm);
+    const akunMap = {}; akun.forEach(function (x) { akunMap[String(x.id)] = x; });
+    let berubah = 0;
+    rencana.forEach(function (p) { if (terapkanPerubahanJadwal(kal, akunMap[p.karyawan], p.tanggal, p.nilai, lm) !== 'TETAP') { berubah++; } });
+    tambahLog({ jenis: 'JADWAL', oleh: admin.id, cabang: admin.cabang, aksi: 'SALIN_MINGGU', target: String(d.senin), id: '', sebelum: '', sesudah: berubah + ' sel berubah' });
+    return respon({ status: 'ok', berubah: berubah });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Aksi jadwal_hari { kredensial admin, tanggal }: karyawan cabang yang terjadwal masuk pada tanggal itu (untuk layar Tukar shift 56), tanpa admin yang sedang login. */
+function prosesJadwalHari(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  if (!tanggalIzinSah(d.tanggal)) { return respon({ status: 'gagal', pesan: 'Tanggal tidak valid' }); }
+  const cabang = a.s.akun.cabang, tanggal = String(d.tanggal);
+  const kal = bacaKalenderTernormalisasi().data, lm = liburMingguCabang(cabang);
+  const daftar = [];
+  akunCabangAktif(cabang).forEach(function (x) {
+    if (String(x.id) === String(a.s.akun.id)) { return; }
+    const j = jadwalKaryawanHari(x, tanggal, kal, lm);
+    if (!j.libur && j.shift !== null) { daftar.push({ id: String(x.id), nama: String(x.nama), panggilan: String(x.panggilan || x.nama), shift: j.shift }); }
+  });
+  daftar.sort(function (x, y) { return x.nama.toLowerCase() < y.nama.toLowerCase() ? -1 : 1; });
+  return respon({ status: 'ok', hari_ini: hariIniServer(), daftar: daftar });
+}
+
+/** Aksi jadwal_tukar { kredensial admin, tanggal, k1, k2 }: admin menukar shift dua karyawan untuk SATU hari (besok kembali ke pola). */
+function prosesJadwalTukar(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const admin = a.s.akun;
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const peta = {};
+    akunCabangAktif(admin.cabang).forEach(function (x) { peta[String(x.id)] = x; });
+    const k1 = peta[String(d.k1)], k2 = peta[String(d.k2)];
+    if (!k1 || !k2) { return respon({ status: 'gagal', pesan: 'Pilih dua karyawan di cabang ini' }); }
+    if (String(k1.id) === String(admin.id) || String(k2.id) === String(admin.id)) { return respon({ status: 'gagal', pesan: 'Admin tidak menukar jadwalnya sendiri. Itu tugas owner.' }); }
+    const kal = bacaKalenderTernormalisasi();
+    const lm = liburMingguCabang(admin.cabang);
+    const r = rencanaTukarHari(k1, k2, String(d.tanggal || ''), kal.data, lm, hariIniServer());
+    if (!r.ok) { return respon({ status: 'gagal', pesan: r.pesan }); }
+    terapkanPerubahanJadwal(kal, k1, String(d.tanggal), String(r.a_ke), lm);
+    terapkanPerubahanJadwal(kal, k2, String(d.tanggal), String(r.b_ke), lm);
+    tambahLog({ jenis: 'JADWAL', oleh: admin.id, cabang: admin.cabang, aksi: 'TUKAR_SHIFT_ADMIN', target: k1.nama + ' <-> ' + k2.nama + ' ' + d.tanggal, id: String(d.tanggal), sebelum: k1.id + '=' + r.a_dari + ', ' + k2.id + '=' + r.b_dari, sesudah: k1.id + '=' + r.a_ke + ', ' + k2.id + '=' + r.b_ke });
+    return respon({ status: 'ok', a_ke: r.a_ke, b_ke: r.b_ke });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+// ---------- pola shift (layar 57) ----------
+
+/** Karyawan (role KARYAWAN, aktif, cabang admin) yang pola shiftnya diatur; { akun } atau { gagal }. */
+function targetPola(a, id) {
+  const akun = akunLengkapAktif(id);
+  if (!akun || akun.role !== 'KARYAWAN') { return { gagal: respon({ status: 'gagal', pesan: 'Pilih karyawan yang valid' }) }; }
+  if (akun.cabang !== a.s.akun.cabang) { return { gagal: respon({ status: 'gagal', pesan: 'Hanya boleh untuk karyawan di cabang sendiri' }) }; }
+  return { akun: akun };
+}
+
+/** Aksi pola_baca { kredensial admin, karyawan }: pola saat ini + shift cabang. */
+function prosesPolaBaca(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const t = targetPola(a, d.karyawan);
+  if (t.gagal) { return t.gagal; }
+  const ak = t.akun, hariIni = hariIniServer();
+  const urutan = String(ak.urutan_shift || '').split(',').map(nomorShift).filter(function (x) { return x !== null; });
+  return respon({
+    status: 'ok', id: String(ak.id), nama: String(ak.nama), hari_ini: hariIni, senin: seninDariTanggal(hariIni), shift: infoShiftUntukKlien(ak.cabang),
+    pola_shift: String(ak.pola_shift).toUpperCase() === 'BERGILIR' ? 'BERGILIR' : 'TETAP', urutan: urutan, shift_bawaan: nomorShift(ak.shift),
+    ganti_setiap: GANTI_SETIAP_SAH.indexOf(String(ak.ganti_setiap).toUpperCase()) >= 0 ? String(ak.ganti_setiap).toUpperCase() : '1M',
+    mulai_pola: tanggalIzinSah(ak.mulai_pola) ? String(ak.mulai_pola) : seninDariTanggal(hariIni)
+  });
+}
+
+/** Aksi pola_pratinjau { kredensial admin, karyawan, pola_shift, urutan, ganti_setiap, mulai_pola }: 4 minggu ke depan memakai fungsi jadwal yang sama; tidak menyimpan. */
+function prosesPolaPratinjau(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const t = targetPola(a, d.karyawan);
+  if (t.gagal) { return t.gagal; }
+  const v = validasiPolaShift(d, nomorShiftCabang(t.akun.cabang));
+  if (!v.ok) { return respon({ status: 'ok', bisa: false, pesan: v.pesan, minggu: [] }); }
+  const baru = Object.assign({}, t.akun, v.nilai);
+  return respon({ status: 'ok', bisa: true, pesan: '', minggu: pratinjauPola(baru, seninDariTanggal(hariIniServer()), 4) });
+}
+
+/** Aksi pola_simpan { kredensial admin, karyawan, pola_shift, urutan, ganti_setiap, mulai_pola }: simpan ke akun karyawan. Dicatat di log. */
+function prosesPolaSimpan(d) {
+  const a = autentikasiAdminToko(d);
+  if (a.gagal) { return a.gagal; }
+  const t = targetPola(a, d.karyawan);
+  if (t.gagal) { return t.gagal; }
+  const v = validasiPolaShift(d, nomorShiftCabang(t.akun.cabang));
+  if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const sheet = bacaSheet('akun');
+    const baris = sheet.data.find(function (r) { return String(r.id) === String(t.akun.id); });
+    const sebelum = [baris.pola_shift, baris.urutan_shift, baris.ganti_setiap, normTanggalIzin(baris.mulai_pola)].join('|');
+    perbaruiKolom(sheet, baris, v.nilai);
+    tambahLog({ jenis: 'JADWAL', oleh: a.s.akun.id, cabang: t.akun.cabang, aksi: 'UBAH_POLA', target: t.akun.nama, id: String(t.akun.id), sebelum: sebelum, sesudah: [v.nilai.pola_shift, v.nilai.urutan_shift || '', v.nilai.ganti_setiap || '', v.nilai.mulai_pola || ''].join('|') });
+    return respon({ status: 'ok' });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+// ---------- tukar shift antar karyawan ----------
+
+function detikSekarangServer() { return jamKeDetik(Utilities.formatDate(new Date(), ZONA_ABSEN, 'HH:mm')); }
+
+/** Batalkan otomatis ajakan tukar yang melewati batas (rekan belum menjawab sampai jam masuk shift yang ditukar). Dipanggil saat data tukar dibaca. */
+function bereskanTukarKedaluwarsa() {
+  const izin = bacaIzinTernormalisasi();
+  if (!izin.data.some(function (r) { return jenisTukar(r.jenis) && String(r.status).toUpperCase() === 'MENUNGGU' && String(r.status_rekan).toUpperCase() === 'MENUNGGU'; })) { return 0; }
+  const peta = petaAkunUntukIzin();
+  const cacheShift = {};
+  const masuk = function (cabang, no) {
+    if (!cacheShift[cabang]) { cacheShift[cabang] = {}; bacaShiftCabang(cabang).forEach(function (s) { cacheShift[cabang][String(nomorShift(s.no))] = s.masuk; }); }
+    return cacheShift[cabang][String(no)] || '';
+  };
+  const jamMasukFn = function (r) {
+    const cab = (peta[String(r.karyawan)] || {}).cabang || '';
+    const jam = [masuk(cab, r.shift_asal), masuk(cab, r.shift_tujuan)].filter(function (x) { return !!x; }).map(jamKeDetik);
+    return jam.length ? Math.min.apply(null, jam) : null;
+  };
+  const daftar = tukarKedaluwarsa(izin.data, hariIniServer(), detikSekarangServer(), jamMasukFn);
+  daftar.forEach(function (r) {
+    perbaruiKolom(izin, r, { status: 'BATAL', status_rekan: 'BATAL', diputus: waktuServerTeks(), oleh: 'SISTEM' });
+    tambahLog({ jenis: 'IZIN', oleh: 'SISTEM', cabang: (peta[String(r.karyawan)] || {}).cabang || '', aksi: 'TUKAR_BATAL_OTOMATIS', target: String(r.karyawan) + ' -> ' + String(r.rekan) + ' ' + r.mulai, id: String(r.grup || r.id), sebelum: 'status_rekan=MENUNGGU', sesudah: 'BATAL', alasan: 'rekan belum menjawab sampai jam masuk shift' });
+  });
+  return daftar.length;
+}
+
+function jumlahTukarMasukAman(id) {
+  try { bereskanTukarKedaluwarsa(); return jumlahTukarMasuk(bacaIzinTernormalisasi().data, id); } catch (e) { return 0; }
+}
+
+/** Karyawan HP pribadi yang boleh mengajukan/menjawab tukar: { p, akun } atau { gagal }. */
+function aktorTukar(d) {
+  const a = aktorIzinPribadi(d);
+  if (a.gagal) { return a; }
+  return a;
+}
+
+function jadwalAkunHari(akun, tanggal, kalenderData) { return jadwalKaryawanHari(akun, tanggal, kalenderData, liburMingguCabang(akun.cabang)); }
+
+/** Aksi tukar_rekan { sesi, tanggal }: shift saya pada tanggal itu dan rekan (karyawan cabang yang terjadwal masuk dengan shift BERBEDA). */
+function prosesTukarRekan(d) {
+  const a = aktorTukar(d);
+  if (a.gagal) { return a.gagal; }
+  if (!tanggalIzinSah(d.tanggal)) { return respon({ status: 'gagal', pesan: 'Tanggal tidak valid' }); }
+  const kal = bacaKalenderTernormalisasi().data;
+  const saya = jadwalAkunHari(a.akun, String(d.tanggal), kal);
+  const daftar = [];
+  akunCabangAktif(a.akun.cabang).forEach(function (x) {
+    if (x.role !== 'KARYAWAN' || String(x.id) === String(a.akun.id)) { return; }
+    const j = jadwalAkunHari(x, String(d.tanggal), kal);
+    if (!j.libur && j.shift !== null && j.shift !== saya.shift) { daftar.push({ id: String(x.id), nama: String(x.nama), panggilan: String(x.panggilan || x.nama), shift: j.shift }); }
+  });
+  daftar.sort(function (x, y) { return x.nama.toLowerCase() < y.nama.toLowerCase() ? -1 : 1; });
+  return respon({ status: 'ok', hari_ini: hariIniServer(), saya: saya.libur ? null : saya.shift, daftar: daftar, boleh: a.akun.role === 'KARYAWAN' });
+}
+
+function evaluasiTukar(akun, d) {
+  const rekan = akunLengkapAktif(d.rekan);
+  const tanggal = String(d.tanggal || '');
+  const kal = bacaKalenderTernormalisasi().data;
+  const shifts = {};
+  bacaShiftCabang(akun.cabang).forEach(function (s) { shifts[String(nomorShift(s.no))] = s.masuk; });
+  const izinRows = bacaIzinTernormalisasi().data;
+  const jP = tanggalIzinSah(tanggal) ? jadwalAkunHari(akun, tanggal, kal) : null, jR = rekan && tanggalIzinSah(tanggal) ? jadwalAkunHari(rekan, tanggal, kal) : null;
+  const v = validasiAjuTukar({
+    jenis: d.jenis, tanggal: tanggal, hariIni: hariIniServer(), detikSekarang: detikSekarangServer(),
+    pemohon: { id: akun.id, role: akun.role, cabang: akun.cabang, aktif: akun.aktif === true },
+    rekan: rekan ? { id: rekan.id, role: rekan.role, cabang: rekan.cabang, aktif: rekan.aktif === true } : null,
+    jPemohon: jP, jRekan: jR, masukShift: shifts, izinRows: izinRows
+  });
+  v.rekanAkun = rekan;
+  return v;
+}
+
+/** Aksi tukar_pratinjau { sesi, jenis, tanggal, rekan }: hasil tanpa menyimpan. */
+function prosesTukarPratinjau(d) {
+  const a = aktorTukar(d);
+  if (a.gagal) { return a.gagal; }
+  const v = evaluasiTukar(a.akun, d);
+  if (!v.ok) { return respon({ status: 'ok', bisa: false, pesan: v.pesan }); }
+  return respon({ status: 'ok', bisa: true, pesan: '', hari: hariTanggalPendek(String(d.tanggal)), saya_ke: v.shift_tujuan, rekan_ke: String(d.jenis).toUpperCase() === 'TUKAR_SHIFT' ? v.shift_asal : null, rekan_nama: String(v.rekanAkun.panggilan || v.rekanAkun.nama) });
+}
+
+/** Aksi tukar_ajukan { sesi, jenis: TUKAR_SHIFT | PINDAH_SHIFT, tanggal, rekan, alasan? }: simpan di sheet izin, menunggu jawaban rekan. */
+function prosesTukarAjukan(d) {
+  const a = aktorTukar(d);
+  if (a.gagal) { return a.gagal; }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    bereskanTukarKedaluwarsa();
+    const v = evaluasiTukar(a.akun, d);
+    if (!v.ok) { return respon({ status: 'gagal', pesan: v.pesan }); }
+    const izin = bacaIzinTernormalisasi();
+    const grup = buatGrupIzin(izin.data.map(function (r) { return r.grup || r.id; }), hariIniServer().slice(0, 4));
+    const baris = {
+      id: grup + '-A', grup: grup, karyawan: a.akun.id, jenis: String(d.jenis).toUpperCase(), kelompok: '', mulai: String(d.tanggal), selesai: String(d.tanggal), hari: 1,
+      ket: bersihkanKetIzin(d.alasan), lampiran: '', diajukan: waktuServerTeks(), telat_aju: false, status: 'MENUNGGU', oleh: '', diputus: '',
+      rekan: v.rekanAkun.id, status_rekan: 'MENUNGGU', shift_asal: v.shift_asal, shift_tujuan: v.shift_tujuan
+    };
+    tambahBarisSheet(izin, baris);
+    tambahLog({ jenis: 'IZIN', oleh: a.akun.id, cabang: a.akun.cabang, aksi: 'AJUKAN_TUKAR', target: a.akun.nama + ' -> ' + v.rekanAkun.nama + ' ' + baris.mulai, id: grup, sebelum: '', sesudah: baris.jenis + ' MENUNGGU rekan', alasan: baris.ket });
+    return respon({ status: 'ok', grup: grup });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Aksi tukar_masuk { sesi }: ajakan tukar yang menunggu jawaban saya (rekan). Ajakan yang sudah lewat batas dibatalkan dulu. */
+function prosesTukarMasuk(d) {
+  const a = aktorTukar(d);
+  if (a.gagal) { return a.gagal; }
+  bereskanTukarKedaluwarsa();
+  const peta = petaAkunUntukIzin();
+  const shifts = {};
+  bacaShiftCabang(a.akun.cabang).forEach(function (s) { shifts[String(nomorShift(s.no))] = s.masuk; });
+  const daftar = bacaIzinTernormalisasi().data.filter(function (r) {
+    return jenisTukar(r.jenis) && String(r.rekan) === String(a.akun.id) && String(r.status).toUpperCase() === 'MENUNGGU' && String(r.status_rekan).toUpperCase() === 'MENUNGGU';
+  }).map(function (r) {
+    const dari = peta[String(r.karyawan)] || {};
+    const nama = String(dari.nama || r.karyawan);
+    return {
+      id: String(r.id), dari: nama, dari_panggilan: nama.split(' ')[0], tanggal: String(r.mulai), hari: HARI_PANJANG[hariKeIndeks(String(r.mulai))], tanggal_pendek: hariTanggalPendek(String(r.mulai)),
+      jenis: String(r.jenis).toUpperCase(), shift_saya_jadi: String(r.jenis).toUpperCase() === 'TUKAR_SHIFT' ? Number(r.shift_asal) : Number(r.shift_tujuan), jam_shift: shifts[String(String(r.jenis).toUpperCase() === 'TUKAR_SHIFT' ? r.shift_asal : r.shift_tujuan)] || '', alasan: String(r.ket || '')
+    };
+  });
+  return respon({ status: 'ok', daftar: daftar });
+}
+
+/** Aksi tukar_jawab { sesi, id, jawab: SETUJU | TOLAK }: hanya rekan yang diajak, hanya selama menunggu. */
+function prosesTukarJawab(d) {
+  const a = aktorTukar(d);
+  if (a.gagal) { return a.gagal; }
+  if (d.jawab !== 'SETUJU' && d.jawab !== 'TOLAK') { return respon({ status: 'gagal', pesan: 'Jawaban tidak dikenal' }); }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    bereskanTukarKedaluwarsa();
+    const izin = bacaIzinTernormalisasi();
+    const r = izin.data.find(function (x) { return String(x.id) === String(d.id) && jenisTukar(x.jenis); });
+    if (!r) { return respon({ status: 'gagal', pesan: 'Ajakan tidak ditemukan' }); }
+    if (String(r.rekan) !== String(a.akun.id)) { return respon({ status: 'gagal', pesan: 'Ajakan ini bukan untuk Anda' }); }
+    if (String(r.status).toUpperCase() !== 'MENUNGGU' || String(r.status_rekan).toUpperCase() !== 'MENUNGGU') { return respon({ status: 'gagal', pesan: 'Ajakan ini sudah tidak berlaku (sudah dijawab, dibatalkan, atau lewat batas waktu)' }); }
+    const ubah = d.jawab === 'SETUJU' ? { status_rekan: 'SETUJU' } : { status_rekan: 'TOLAK', status: 'DITOLAK', diputus: waktuServerTeks(), oleh: a.akun.id };
+    perbaruiKolom(izin, r, ubah);
+    tambahLog({ jenis: 'IZIN', oleh: a.akun.id, cabang: a.akun.cabang, aksi: d.jawab === 'SETUJU' ? 'REKAN_SETUJU' : 'REKAN_TOLAK', target: String(r.karyawan) + ' -> ' + a.akun.nama + ' ' + r.mulai, id: String(r.grup || r.id), sebelum: 'status_rekan=MENUNGGU', sesudah: 'status_rekan=' + ubah.status_rekan });
+    return respon({ status: 'ok' });
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
+/** Aksi tukar_pengingat { token HP toko, id }: berapa ajakan tukar yang menunggu jawaban karyawan itu (pengingat setelah absen di HP toko). Tanpa data lain. */
+function prosesTukarPengingat(d, hp) {
+  const id = String(d.id || '');
+  if (!/^[A-Za-z0-9]{1,20}$/.test(id)) { return respon({ status: 'gagal', pesan: 'Id tidak valid' }); }
+  const akun = bacaSheet('akun').data.find(function (r) { return String(r.id) === id && r.aktif === true && r.cabang === hp.cabang; });
+  if (!akun) { return respon({ status: 'ok', jumlah: 0 }); }
+  return respon({ status: 'ok', jumlah: jumlahTukarMasukAman(id) });
+}
+
+// ---------- Konfirmasi tukar shift ----------
+
+/** Putuskan satu item tukar/pindah shift (ACC menulis kalender kedua karyawan). aktor sudah lolos autentikasi; hak diperiksa di sini. */
+function putuskanItemTukar(aktor, d) {
+  const grup = parseIdItemTukar(d.id);
+  if (!grup) { return respon({ status: 'gagal', pesan: 'Item tidak dikenal' }); }
+  const kunci = LockService.getScriptLock();
+  kunci.waitLock(15000);
+  try {
+    const izin = bacaIzinTernormalisasi();
+    const r = izin.data.find(function (x) { return jenisTukar(x.jenis) && (String(x.grup) === grup || String(x.id) === grup); });
+    if (!r) { return respon({ status: 'gagal', pesan: 'Pengajuan tidak ditemukan' }); }
+    if (String(r.status).toUpperCase() !== 'MENUNGGU') { return respon({ status: 'gagal', pesan: 'Item ini sudah diputuskan' }); }
+    if (String(r.status_rekan).toUpperCase() !== 'SETUJU') { return respon({ status: 'gagal', pesan: 'Rekan belum menyetujui pengajuan ini' }); }
+    const peta = petaAkunUntukIzin();
+    const pemilik = peta[String(r.karyawan)] || { cabang: '', role: 'KARYAWAN' };
+    const hak = bolehMemutuskanKonfirmasi(aktor, { karyawan: r.karyawan, cabang: pemilik.cabang, role: pemilik.role });
+    if (!hak.boleh) { return respon({ status: 'gagal', pesan: hak.pesan }); }
+    if (String(aktor.id) === String(r.rekan)) { return respon({ status: 'gagal', pesan: 'Admin tidak boleh memutuskan pengajuan yang melibatkan dirinya sendiri' }); }
+    const waktu = waktuServerTeks();
+    if (d.keputusan === 'TOLAK') {
+      perbaruiKolom(izin, r, { status: 'DITOLAK', oleh: aktor.id, diputus: waktu });
+      tambahLog({ jenis: 'KONFIRMASI', oleh: aktor.id, cabang: pemilik.cabang, aksi: 'TOLAK_TUKAR', target: String(r.karyawan) + ' -> ' + String(r.rekan) + ' ' + r.mulai, id: grup, sebelum: 'status=MENUNGGU', sesudah: 'status=DITOLAK' });
+      return respon({ status: 'ok', keputusan: 'DITOLAK' });
+    }
+    if (String(r.mulai) < hariIniServer()) { return respon({ status: 'gagal', pesan: 'Tanggal tukar shift sudah lewat. Tolak pengajuan ini.' }); }
+    const kal = bacaKalenderTernormalisasi();
+    const akunMap = {};
+    akunCabangAktif(pemilik.cabang).forEach(function (x) { akunMap[String(x.id)] = x; });
+    const aP = akunMap[String(r.karyawan)], aR = akunMap[String(r.rekan)];
+    if (!aP || !aR) { return respon({ status: 'gagal', pesan: 'Karyawan tidak aktif lagi. Tolak pengajuan ini.' }); }
+    const lm = liburMingguCabang(pemilik.cabang);
+    const rn = rencanaTerapkanTukar(r, jadwalKaryawanHari(aP, String(r.mulai), kal.data, lm), jadwalKaryawanHari(aR, String(r.mulai), kal.data, lm));
+    if (!rn.ok) { return respon({ status: 'gagal', pesan: rn.pesan }); }
+    rn.tulis.forEach(function (p) { terapkanPerubahanJadwal(kal, akunMap[p.karyawan], p.tanggal, p.nilai, lm); });
+    perbaruiKolom(izin, r, { status: 'DITERIMA', oleh: aktor.id, diputus: waktu });
+    tambahLog({ jenis: 'KONFIRMASI', oleh: aktor.id, cabang: pemilik.cabang, aksi: 'ACC_TUKAR', target: aP.nama + ' <-> ' + aR.nama + ' ' + r.mulai, id: grup, sebelum: aP.id + '=' + r.shift_asal + ', ' + aR.id + '=' + r.shift_tujuan, sesudah: rn.tulis.map(function (p) { return p.karyawan + '=' + p.nilai; }).join(', ') });
+    return respon({ status: 'ok', keputusan: 'DITERIMA' });
+  } finally {
+    kunci.releaseLock();
+  }
 }

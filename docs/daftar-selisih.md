@@ -261,3 +261,34 @@ Lihat tabel "Selisih BARU" di atas: nomor 11–17 sudah diputuskan dan diterapka
 | SA6 | 41/23 | Layar yang terbuka dari tombol Izin/Cuti mengikuti jenis pertama di pengaturan (Sakit) sehingga biasanya terbuka varian 23; mockup membuka 41 dengan jenis Menikah | `23_dampingan.png` |
 | SA7 | 22 | Foto surat memakai kotak foto mockup; tidak ada Tolak di layar 22 (sama mockup), Tolak dilakukan dari kartu Konfirmasi | `22_dampingan.png` |
 | SA8 | 52 | Kartu izin tidak punya kotak "Foto" (sama mockup); chip "Izin N" aktif, "Lupa absen" tetap nonaktif | `52_dampingan.png` |
+
+## SESI A-C, FITUR B (jadwal dan shift) — ASUMSI yang diambil (butuh setuju atau koreksi pemilik)
+
+| No | Aturan yang tidak ada di dokumen | Pilihan yang dipakai (paling aman dan sederhana) |
+|---|---|---|
+| B1 | Admin mengubah jadwalnya sendiri | DITOLAK di server (jadwal admin diatur owner). Baris admin tampil di tabel 55 tetapi selnya tidak bisa diketuk. Admin juga tidak boleh ikut dalam tukar shift satu hari (56). |
+| B2 | Salin minggu lalu | Menyalin jadwal EFEKTIF minggu lalu (pola + perubahan manual) ke minggu yang sedang dibuka, hanya tanggal hari ini dan seterusnya. Libur seluruh toko (tanggal merah umum, libur Minggu) di minggu asal maupun tujuan dilewati. Baris admin sendiri tidak ikut. |
+| B3 | Cara mengubah satu sel | Ketuk = Shift 1 > Shift 2 > ... > Libur (L) > kembali ke Shift 1. Bila hasil sama dengan pola, perubahan manual dibatalkan (isi sel kalender dikosongkan, baris tidak dihapus). Perubahan hanya tersimpan setelah Simpan; sel hari yang sudah lewat tidak bisa diketuk. |
+| B4 | Tukar shift satu hari oleh admin (56) | Kedua karyawan harus terjadwal masuk pada tanggal itu dengan shift berbeda; hasilnya saling bertukar (perubahan manual hanya untuk tanggal itu). |
+| B5 | Pola shift | Mulai pola boleh tanggal lampau. Pola tersimpan satu set di akun, jadi mengubahnya ikut mengubah hitungan jadwal tanggal lampau (tidak bisa "hanya ke depan"). Pratinjau = shift pada hari Senin tiap minggu. Hanya untuk role KARYAWAN. |
+| B6 | Arti "Pindah shift" | Pemohon pindah ke shift rekan yang dipilih pada tanggal itu, rekan tetap di shiftnya. Tetap butuh jawaban rekan lalu ACC admin. |
+| B7 | Siapa yang boleh tukar | Hanya KARYAWAN yang mengajukan; rekan harus KARYAWAN aktif cabang yang sama. Admin tidak mengajukan atau menjadi rekan. |
+| B8 | Batas waktu pengajuan | Boleh untuk hari ini selama belum lewat jam masuk shift paling awal dari kedua shift. Rekan belum menjawab sampai jam itu = BATAL otomatis (dihitung saat data tukar dibaca, tanpa pemicu waktu). Tanggal lewat = BATAL. |
+| B9 | Bentrok | Ditolak bila salah satu sudah punya tukar yang masih berjalan pada tanggal itu atau sedang izin/cuti. |
+| B10 | ACC admin | Hanya admin cabang yang sama; tidak boleh yang melibatkan dirinya sendiri; jadwal kedua karyawan diperiksa ulang (bila sudah berubah, ACC ditolak dengan pesan "Jadwal sudah berubah", admin menolak pengajuan). Sesudah ACC baris kalender per karyawan ditulis (kosong bila sama dengan pola). Tolak: status DITOLAK. |
+| B11 | Layar 43 | Muncul otomatis di beranda pribadi (tanpa tombol tutup; Back HP bisa keluar), maksimal sekali per 5 menit selama belum dijawab. Kartu khusus di beranda tidak ada karena mockup beranda tidak punya. |
+| B12 | Pengingat di HP toko | Setelah pop-up absen ditutup, dialog standar "Ada N ajakan tukar shift ... buka HP pribadi" (hanya jumlah, lewat aksi tukar_pengingat dengan token HP toko dan id karyawan). |
+| B13 | "Shift aktif" di layar 02 | Aktif = dari 60 menit sebelum jam masuk (jendela_absen_menit) sampai jam pulang shift. Karyawan yang izin/cuti tidak ditampilkan; admin yang terjadwal tampil. |
+| B14 | Pembatalan ajakan oleh pemohon | Server siap (izin_batal menandai status_rekan BATAL) tetapi belum ada tombol (mockup tidak punya daftar pengajuan). |
+
+## SESI A-C, FITUR B — selisih tampilan baru (butuh keputusan pemilik)
+
+| No | Layar | Selisih | Gambar |
+|---|---|---|---|
+| SB1 | 55 | Tombol "Tukar shift" (menuju 56) DITAMBAHKAN di bawah "Salin minggu lalu": keputusan-desain.md menyebutnya tetapi mockup 55 tidak punya, sehingga 56 tidak punya jalur | `55_dampingan.png` |
+| SB2 | 55 | Nama karyawan memakai nama lengkap dari server dan daftar mengikuti cabang; tabel hanya Senin-Sabtu seperti mockup (tidak ada kolom Minggu) | `55_dampingan.png` |
+| SB3 | 57 | Mockup tidak menggambarkan cara mengubah urutan: ketuk chip = ganti ke shift berikutnya; setelah shift terakhir ketuk lagi = hapus (minimal 2). Layar 57 menampilkan scrollbar tipis di pratinjau | `57_dampingan.png` |
+| SB4 | 42 | Pada mode "Pindah shift" label "Tukar dengan" berubah jadi "Pindah ke shift" dan pratinjau hanya "Anda -> Shift N" (mockup hanya menggambarkan tukar) | `42_dampingan.png` |
+| SB5 | 43 | Untuk ajakan "pindah shift" judul "{nama} ingin pindah shift" dan baris "Anda tetap di Shift N" (mockup hanya tukar) | `43_dampingan.png` |
+| SB6 | 55, 56, 57, 42 | Kolom tanggal memakai pemilih tanggal bawaan HP ("07/10/2026") bukan teks "Selasa, 6 Okt 2026" | `56_dampingan.png`, `42_dampingan.png` |
+| SB7 | 52 | Kartu tukar shift tampil di "Semua" tanpa chip tersendiri (mockup 52 tidak punya chip Tukar shift) | `52_dampingan.png` |

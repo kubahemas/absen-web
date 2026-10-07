@@ -50,8 +50,12 @@ async function isiPin(nama) {
     var am = terakhir('absen_masuk');
     ok('angka kelima langsung mengirim: id K002, PIN 5 angka, memakai tiket', !!am && am.id === 'K002' && am.pin === '12345' && am.tiket === 'TIKET');
     ok('pop-up tepat waktu tampil "Selamat bekerja"; kotak "Bulan ini" nonaktif tanpa angka', /Selamat bekerja/.test(el('popup').textContent) && el('popup').querySelectorAll('.bulan-kotak.belum-aktif').length === 4);
-    el('popup').click(); await tunggu(200);
+    window.__TUKAR = 2;
+    el('popup').click(); await tunggu(500);
     ok('pop-up ditutup, kembali ke layar utama', aktif() === 'layarUtama');
+    var tp = terakhir('tukar_pengingat');
+    ok('pengingat ajakan tukar shift sesudah absen berhasil: tukar_pengingat membawa token HP toko dan id karyawan; dialog menyebut 2 ajakan dan menyuruh membuka HP pribadi', !!tp && tp.id === 'K002' && tp.token === 'T'.repeat(40) && /Ajakan tukar shift/.test(el('dialog').textContent) && /2 ajakan/.test(el('dialog').textContent) && /HP pribadi/.test(el('dialog').textContent));
+    el('dlgOk').click(); await tunggu(200); window.__TUKAR = 0;
 
     // ---- absen dobel ditolak (jawaban server) ----
     window.__absen = { status: 'gagal', pesan: 'Sudah absen masuk hari ini' };

@@ -7,7 +7,7 @@ var TREN = [[/^\s*[▲▼][^]*$/, '–', 'tren'], [/^\s*sama dengan[^]*$/, '–'
 // Layar Report: tiga kondisi label. 36 = versi yang bisa dibuka (lencana netral/nonaktif); 36e (EXCELLENT), 37 (GOOD), 38 (BAD) = berwarna penuh, TIDAK bisa dibuka dari navigasi.
 var REPORT = { home: 'prib', hapusTeks: [], hapusBaris: [/^Menunggu$/], ganti: TREN, nav: { 'Detail#1': { ke: 'lb40' }, 'Detail#7': { ke: 'lb39' } } };
 var CFG = {
-  '02': { home: 'toko', hapusBaris: ['Ahmad', 'Ari'] },
+  '02': { home: 'toko', hapusBaris: ['Ahmad', 'Ari'], fn: FN['02'] },
   '03': { home: 'toko', judulMode: true, ganti: [[/Memindai.*/, 'Pengenalan wajah · Segera']] },
   '04': { home: 'toko' }, '05': { home: 'toko' }, '06': { home: 'toko' }, '07': { home: 'toko' },
   '08': { home: 'toko', judulMode: true, nav: { 'Manual: pilih nama + PIN': { aksi: 'pilihnama' } } },
@@ -36,8 +36,8 @@ var CFG = {
   '39': { home: 'prib', hapusBaris: ['24 Sep'] },
   '40': { home: 'prib', hapusBaris: ['28 Sep'] },
   '41': { home: 'prib', fn: FN['41'], hapusTeks: [/izin khusus menikah/, /hari cuti/, /^Sisa cuti jadi/] },
-  '42': { home: 'prib', hapusSatu: [/Anda →/] },
-  '43': { home: 'prib' }, '45': { home: 'prib', ganti: [[/Password lama \(awal: –\)/, 'Password lama']], fn: function (root) {
+  '42': { home: 'prib', hapusSatu: [/Anda →/], fn: FN['42'] },
+  '43': { home: 'prib', fn: FN['43'] }, '45': { home: 'prib', ganti: [[/Password lama \(awal: –\)/, 'Password lama']], fn: function (root) {
     // Aturan sandi: teks diisi saat layar dibuka menurut peran akun (KARYAWAN = PIN 5 angka; ADMIN = kata sandi minimal 8 karakter). Di markup hanya "–".
     var re = [/^– angka$/, /^Bukan angka berurutan atau kembar/, /^Bukan – dan tidak sama dengan PIN$/];
     Array.prototype.forEach.call(root.querySelectorAll('div, span'), function (d) {
@@ -46,9 +46,9 @@ var CFG = {
     });
   } },
   '53': { home: 'adm' }, '54': { home: 'adm' },
-  '55': { home: 'adm', hapusSatu: ['Andi Pratama', 'Budi Santoso', 'Dewi Lestari', 'Joko Susilo', 'Rina Wati', 'Sari Utami'] },
-  '56': { home: 'adm' },
-  '57': { home: 'adm', hapusBaris: ['05–10 Okt'] },
+  '55': { home: 'adm', fn: FN['55'], hapusSatu: ['Andi Pratama', 'Budi Santoso', 'Dewi Lestari', 'Joko Susilo', 'Rina Wati', 'Sari Utami'] },
+  '56': { home: 'adm', fn: FN['56'] },
+  '57': { home: 'adm', fn: FN['57'], hapusBaris: ['05–10 Okt'] },
   '62': { home: 'adm' },
   '64': { home: 'adm', hapusBaris: ['Ahmad Fauzi'], pudar: [/^Pekan ini$/, /^Semua$/] },
   '65': { home: 'adm' }, '66': { home: 'adm', fn: FN['66'] },
